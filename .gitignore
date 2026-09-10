@@ -5,9 +5,13 @@ reference/
 node_modules/
 
 # Build output
-dist/
+web/dist/
 /nook
-server/router/frontend/dist/
+
+# The SPA that `pnpm --filter @nook/web release` bakes into the binary. The
+# placeholder is tracked so //go:embed still compiles on a fresh clone.
+server/router/frontend/dist/*
+!server/router/frontend/dist/index.html
 
 # Local data — a Nook instance keeps its SQLite file here during development
 *.db

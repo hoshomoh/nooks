@@ -13,6 +13,7 @@ import (
 	"github.com/hoshomoh/nooks/internal/profile"
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nook/api/v1/apiv1connect"
 	v1 "github.com/hoshomoh/nooks/server/router/api/v1"
+	"github.com/hoshomoh/nooks/server/router/frontend"
 	"github.com/hoshomoh/nooks/store"
 )
 
@@ -41,6 +42,16 @@ func New(cfg profile.Config, s store.Store, log *slog.Logger) (*Server, error) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("ok"))
 	})
+
+	// In dev the Vite server serves the app and proxies here, so the binary serves
+	// only the API. In prod one binary serves both.
+	if cfg.Mode == profile.ModeProd {
+		app, err := frontend.Handler()
+		if err != nil {
+			return nil, err
+		}
+		mux.Handle("/", app)
+	}
 
 	return &Server{
 		http: &http.Server{

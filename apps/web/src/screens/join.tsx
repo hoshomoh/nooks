@@ -88,7 +88,7 @@ function AskToJoin({ onSent }: AskToJoinProps) {
         />
 
         {requestJoin.isError && (
-          <p className="text-destructive text-secondary">{messageFrom(requestJoin.error)}</p>
+          <p className="text-destructive text-meta">{messageFrom(requestJoin.error)}</p>
         )}
 
         <Button type="submit" disabled={requestJoin.isPending} className="self-start">
@@ -187,7 +187,7 @@ function CheckJoinRequest({ requestUid, onStartOver }: CheckJoinRequestProps) {
         />
 
         {completeJoin.isError && (
-          <p className="text-destructive text-secondary">{messageFrom(completeJoin.error)}</p>
+          <p className="text-destructive text-meta">{messageFrom(completeJoin.error)}</p>
         )}
 
         <Button type="submit" disabled={completeJoin.isPending} className="self-start">

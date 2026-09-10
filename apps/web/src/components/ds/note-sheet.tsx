@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next"
 import type { Item } from "@nooks/api"
 
 import { Checkbox } from "./checkbox"
+import { EditableTitle } from "./editable-title"
 import { NoteEditor } from "./note-editor"
 
 export type NoteSheetField = {
@@ -23,6 +24,8 @@ export type NoteSheetProps = {
    */
   onNoteChange: (markdown: string) => void
   onToggleDone: (done: boolean) => void
+  /** Renames the Item. Its title is the field that renders it. */
+  onRename: (label: string) => void
   onClose: () => void
   /** Opens the same Note at full width. */
   onOpenFull: () => void
@@ -44,6 +47,7 @@ export function NoteSheet({
   canEdit,
   onNoteChange,
   onToggleDone,
+  onRename,
   onClose,
   onOpenFull,
   status,
@@ -51,7 +55,7 @@ export function NoteSheet({
   const { t } = useTranslation()
 
   return (
-    <aside className="absolute top-chrome right-0 bottom-0 flex w-sheet flex-col border-l border-border bg-background">
+    <aside className="absolute inset-y-0 right-0 flex w-sheet animate-sheet-in flex-col border-l border-border bg-background">
       <div className="flex h-chrome items-center gap-2.5 border-b border-hair pr-4 pl-5.5 text-micro text-muted-foreground">
         <span className="text-secondary-foreground">{crumbs.join(" / ")}</span>
         <span className="flex-1" />
@@ -68,7 +72,14 @@ export function NoteSheet({
           <span className="mt-1">
             <Checkbox checked={item.done} onCheckedChange={onToggleDone} disabled={!canEdit} />
           </span>
-          <h2 className="text-page">{item.label}</h2>
+          <EditableTitle
+            value={item.label}
+            onCommit={onRename}
+            readOnly={!canEdit}
+            label={t("note.itemName")}
+            as="h2"
+            className="text-page"
+          />
         </div>
 
         <div className="flex flex-wrap gap-x-4.5 gap-y-2.5 pl-9">

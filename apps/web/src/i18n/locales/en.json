@@ -1,6 +1,7 @@
 {
   "app": {
-    "name": "nooks"
+    "name": "nooks",
+    "stillWaiting": "Still waiting on the server. It's probably just waking up."
   },
   "action": {
     "add": "Add",
@@ -109,7 +110,8 @@
     "sharedCrumb": "Shared",
     "addToList": "Add to {{name}}",
     "addToListDue": "Add to {{name}}, due {{date}}",
-    "addItemDue": "Add an item, due {{date}}"
+    "addItemDue": "Add an item, due {{date}}",
+    "openItem": "Open item"
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",
@@ -191,7 +193,8 @@
     },
     "addToNote": "Add to the note",
     "backToList": "Back to list",
-    "escapeReturns": "Esc returns to the list"
+    "escapeReturns": "Esc returns to the list",
+    "itemName": "Item name"
   },
   "addRow": {
     "todayWords": [

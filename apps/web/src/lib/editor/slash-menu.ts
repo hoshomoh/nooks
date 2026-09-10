@@ -57,10 +57,14 @@ function slashCompletions(
     return null
   }
 
+  const typed = (match[1] ?? "").toLowerCase()
   return {
     // Replacing from the slash means picking an entry removes it.
     from: line.from,
-    options: completions,
-    filter: true,
+    options: completions.filter((option) => option.label.toLowerCase().includes(typed)),
+    // Matching is ours: CodeMirror would score the entries against the "/" as well, and
+    // no block type is spelled with one.
+    filter: false,
+    validFor: /^\/\w*$/,
   }
 }

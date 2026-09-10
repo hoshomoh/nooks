@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useDeferredValue, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "@tanstack/react-router"
@@ -8,6 +8,7 @@ import { Button } from "./button"
 import { Field } from "./field"
 import { listClient } from "@/lib/api"
 import { searchQuery } from "@/lib/list-queries"
+import { refreshLists } from "@/lib/refresh"
 import { useCommandPalette } from "@/lib/use-command-palette"
 
 /**
@@ -25,11 +26,11 @@ export function CommandPalette() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-[var(--scrim)] pt-[12vh] px-6"
+      className="fixed inset-0 z-50 flex animate-scrim-in items-start justify-center bg-[var(--scrim)] pt-[12vh] px-6"
       onClick={palette.close}
     >
       <div
-        className="w-full max-w-[560px] overflow-hidden rounded-2xl border border-border bg-popover shadow-[0_24px_60px_rgba(0,0,0,0.22)]"
+        className="w-full max-w-[560px] animate-panel-in overflow-hidden rounded-2xl border border-border bg-popover shadow-[0_24px_60px_rgba(0,0,0,0.22)]"
         onClick={(event) => event.stopPropagation()}
       >
         {palette.mode === "search" ? <SearchPanel /> : <AddListPanel />}
@@ -43,7 +44,12 @@ function SearchPanel() {
   const navigate = useNavigate()
   const palette = useCommandPalette()
   const { t } = useTranslation()
-  const results = useQuery(searchQuery(query))
+
+  // The field stays exactly as fast as the typing; the search follows a beat behind.
+  // React's own deferral rather than a timer, so there is nothing to clean up and
+  // nothing to synchronise.
+  const searching = useDeferredValue(query)
+  const results = useQuery(searchQuery(searching))
 
   const go = async (listUid: string) => {
     palette.close()
@@ -59,18 +65,20 @@ function SearchPanel() {
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder={t("palette.searchPlaceholder")}
-        className="h-input border-b border-hair px-4 text-input outline-none placeholder:text-muted-foreground"
+        className="h-input border-b border-hair px-4 text-field outline-none placeholder:text-muted-foreground"
       />
 
       <div className="max-h-[50vh] overflow-y-auto p-1.5">
         {query.trim() === "" && (
-          <p className="px-3 py-3 text-secondary text-muted-foreground">
+          <p className="px-3 py-3 text-meta text-muted-foreground">
             {t("palette.searchHint")}
           </p>
         )}
-        {query.trim() !== "" && hits.length === 0 && !results.isFetching && (
-          <p className="px-3 py-3 text-secondary text-muted-foreground">
-            {t("palette.noResults", { query })}
+        {/* Only once the answer is in: saying "nothing" while still looking is worse
+            than saying nothing at all. */}
+        {searching.trim() !== "" && hits.length === 0 && results.isSuccess && (
+          <p className="px-3 py-3 text-meta text-muted-foreground">
+            {t("palette.noResults", { query: searching })}
           </p>
         )}
         {hits.map((hit) => (
@@ -104,7 +112,7 @@ function AddListPanel() {
     mutationFn: () => listClient.createList({ name }),
     onSuccess: async (res) => {
       palette.close()
-      await queryClient.invalidateQueries()
+      await refreshLists(queryClient)
       if (res.list) {
         await navigate({ to: "/lists/$listUid", params: { listUid: res.list.uid } })
       }

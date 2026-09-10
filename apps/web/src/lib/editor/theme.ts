@@ -22,16 +22,20 @@ export function buildNoteTheme(scale: NoteScale): Extension {
 
   return EditorView.theme({
     "&": {
-      fontFamily: "var(--font-sans)",
-      fontSize: body,
       color: "var(--foreground)",
       backgroundColor: "transparent",
+    },
+    // CodeMirror's own base theme puts `font-family: monospace` on the scroller, which
+    // outranks anything set on the editor root. The app's font has to be set here.
+    ".cm-scroller": {
+      fontFamily: "var(--font-sans)",
+      fontSize: body,
+      lineHeight: "1.6",
     },
     "&.cm-focused": { outline: "none" },
     ".cm-content": {
       padding: "0",
       caretColor: "var(--shared)",
-      lineHeight: "1.6",
     },
     ".cm-line": { padding: "5px 0" },
     ".cm-nooks-heading": {
@@ -86,7 +90,7 @@ export function buildNoteTheme(scale: NoteScale): Extension {
       borderRadius: "var(--radius-md)",
       padding: "7px 10px",
       fontFamily: "var(--font-sans)",
-      fontSize: "var(--text-secondary)",
+      fontSize: "var(--text-meta)",
     },
     ".cm-tooltip-autocomplete > ul > li[aria-selected]": {
       backgroundColor: "var(--secondary)",

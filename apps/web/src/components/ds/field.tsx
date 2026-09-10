@@ -38,7 +38,7 @@ export function Field({ label, hint, error, className, ...props }: FieldProps) {
         aria-describedby={describedBy}
         aria-invalid={error ? true : undefined}
         className={cn(
-          "h-input rounded-lg border-input px-3 text-input focus-visible:ring-0",
+          "h-input rounded-lg border-input px-3 text-field focus-visible:ring-0",
           // Focus thickens the border rather than adding a ring, so the control does
           // not grow and shift the form.
           "focus-visible:border-[length:1.5px] focus-visible:border-ring",

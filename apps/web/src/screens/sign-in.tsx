@@ -69,7 +69,7 @@ export function SignIn() {
         />
 
         {signIn.isError && (
-          <p className="text-destructive text-secondary">
+          <p className="text-destructive text-meta">
             {messageFrom(signIn.error)}
           </p>
         )}

@@ -1,0 +1,83 @@
+import { useRef, useState } from "react"
+import { cn } from "cn"
+
+/** Which element the text is drawn as when it cannot be changed. */
+export type TitleElement = "h1" | "h2" | "span"
+
+export interface EditableTitleProps {
+  /** What the title currently reads, as stored. */
+  value: string
+  /** Called with the new text once the Member has committed it. */
+  onCommit?: (value: string) => void
+  /** Read-only renders the text and nothing else. Implied when nothing can be saved. */
+  readOnly?: boolean
+  /** The element to render when read-only, so a row is not given a heading. */
+  as?: TitleElement
+  /** The type token the text is drawn at, so a row and a page can differ. */
+  className?: string
+  /** What a screen reader calls the field. */
+  label: string
+}
+
+/**
+ * A title that is also the field that changes it.
+ *
+ * An Item's name is one line of text, and the design gives it no separate edit mode:
+ * the title is where it is read and where it is rewritten, in the row, the sheet and
+ * the full-screen view alike. Enter and blur commit; Escape puts back what was there.
+ *
+ * The stored value is read into the field only when nobody is typing in it, so a save
+ * coming back never moves the caret. That is why the draft is held in state rather than
+ * synchronised to the prop with an effect.
+ */
+export function EditableTitle({
+  value,
+  onCommit,
+  readOnly,
+  as = "h1",
+  className,
+  label,
+}: EditableTitleProps) {
+  const [draft, setDraft] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+
+  if (readOnly || !onCommit) {
+    const Text = as
+    return <Text className={className}>{value}</Text>
+  }
+
+  const commit = () => {
+    const next = (draft ?? value).trim()
+    setDraft(null)
+    if (next && next !== value) {
+      onCommit(next)
+    }
+  }
+
+  return (
+    <input
+      ref={inputRef}
+      aria-label={label}
+      value={draft ?? value}
+      onChange={(event) => setDraft(event.target.value)}
+      onBlur={commit}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") {
+          event.preventDefault()
+          inputRef.current?.blur()
+        }
+        if (event.key === "Escape") {
+          setDraft(null)
+          inputRef.current?.blur()
+        }
+      }}
+      // No border until it is being worked on: a title is text first and a field
+      // second.
+      className={cn(
+        "w-full rounded-md bg-transparent px-1 -mx-1 outline-none",
+        "transition-colors focus:bg-secondary",
+        className,
+      )}
+    />
+  )
+}

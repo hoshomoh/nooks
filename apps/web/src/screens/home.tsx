@@ -1,4 +1,4 @@
-import { getRouteApi, Link } from "@tanstack/react-router"
+import { Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
 import { AppShell } from "@/components/ds/app-shell"
@@ -6,8 +6,7 @@ import { Button } from "@/components/ds/button"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
 import { useCommandPalette } from "@/lib/use-command-palette"
-
-const route = getRouteApi("/")
+import { useSignedInData } from "@/lib/use-signed-in-data"
 
 /**
  * All lists — where a Member lands, and the cold start for a fresh account.
@@ -15,15 +14,15 @@ const route = getRouteApi("/")
  * An empty instance says what a List is for rather than apologising, per DESIGN.md §11.
  */
 export function Home() {
-  const { instance, member, lists } = route.useLoaderData()
+  const { instanceName, member, lists } = useSignedInData()
   const palette = useCommandPalette()
   const { t } = useTranslation()
 
   return (
     <AppShell
-      instanceName={instance.name}
-      memberName={member.name}
-      lists={lists.lists}
+      instanceName={instanceName}
+      memberName={member?.name ?? ""}
+      lists={lists}
       onSearch={palette.open}
       onAddList={palette.openAddList}
     >
@@ -33,12 +32,12 @@ export function Home() {
         <div className="w-full max-w-content">
           <header className="mb-8.5 flex flex-col gap-3.5">
             <h1 className="text-display">{t("list.allLists")}</h1>
-            <p className="text-secondary text-secondary-foreground">
-              {t("list.signedInAs", { name: member.name })}
+            <p className="text-meta text-secondary-foreground">
+              {t("list.signedInAs", { name: member?.name ?? "" })}
             </p>
           </header>
 
-          {lists.lists.length === 0 ? (
+          {lists.length === 0 ? (
             <div className="flex flex-col gap-6">
               <EmptyState title={t("list.coldStartTitle")} body={t("list.coldStartBody")} />
               <Button onClick={palette.openAddList} className="self-start">
@@ -47,7 +46,7 @@ export function Home() {
             </div>
           ) : (
             <div className="flex flex-col">
-              {lists.lists.map((list) => (
+              {lists.map((list) => (
                 <Link
                   key={list.uid}
                   to="/lists/$listUid"

@@ -78,7 +78,7 @@ function AskForReset({ onSent }: AskForResetProps) {
         />
 
         {requestReset.isError && (
-          <p className="text-destructive text-secondary">{messageFrom(requestReset.error)}</p>
+          <p className="text-destructive text-meta">{messageFrom(requestReset.error)}</p>
         )}
 
         <Button type="submit" disabled={requestReset.isPending} className="self-start">
@@ -164,7 +164,7 @@ function CheckResetRequest({ requestUid, onStartOver }: CheckResetRequestProps) 
         />
 
         {completeReset.isError && (
-          <p className="text-destructive text-secondary">{messageFrom(completeReset.error)}</p>
+          <p className="text-destructive text-meta">{messageFrom(completeReset.error)}</p>
         )}
 
         <Button type="submit" disabled={completeReset.isPending} className="self-start">

@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router"
+import { Link, useRouterState } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { cn } from "cn"
 import type { List } from "@nooks/api"
@@ -11,6 +11,9 @@ export type SidebarViewCounts = {
   /** How many are due in the next two weeks. */
   upcoming: number
 }
+
+/** The three destinations above the Lists. */
+export type ViewTarget = "/today" | "/upcoming" | "/"
 
 export type SidebarProps = {
   instanceName: string
@@ -40,6 +43,8 @@ export function Sidebar({
   onAddList,
 }: SidebarProps) {
   const { t } = useTranslation()
+  const path = useRouterState({ select: (state) => state.location.pathname })
+  const active = viewForPath(path)
   const pinned = lists.filter((list) => list.isPinned)
   const mine = lists.filter((list) => !list.isPinned && list.isOwner)
   const shared = lists.filter((list) => !list.isPinned && !list.isOwner)
@@ -55,7 +60,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={onSearch}
-          className="flex h-7.5 items-center rounded-md px-2 text-secondary text-muted-foreground hover:bg-secondary"
+          className="flex h-7.5 items-center rounded-md px-2 text-meta text-muted-foreground hover:bg-secondary"
         >
           {t("action.search")}
           <span className="ml-auto rounded-sm border border-border px-1.5 py-px font-mono text-keycap">
@@ -65,9 +70,25 @@ export function Sidebar({
       </div>
 
       <div className="flex flex-col gap-px">
-        <ViewLink to="/today" label={t("views.today")} count={counts?.today} accent />
-        <ViewLink to="/upcoming" label={t("views.upcoming")} count={counts?.upcoming} />
-        <ViewLink to="/" label={t("list.allLists")} count={lists.length} />
+        <ViewLink
+          to="/today"
+          label={t("views.today")}
+          count={counts?.today}
+          active={active === "/today"}
+          accent
+        />
+        <ViewLink
+          to="/upcoming"
+          label={t("views.upcoming")}
+          count={counts?.upcoming}
+          active={active === "/upcoming"}
+        />
+        <ViewLink
+          to="/"
+          label={t("list.allLists")}
+          count={lists.length}
+          active={active === "/"}
+        />
       </div>
 
       <ListGroup label={t("sidebar.pinned")} lists={pinned} activeListUid={activeListUid} />
@@ -77,7 +98,7 @@ export function Sidebar({
       <button
         type="button"
         onClick={onAddList}
-        className="flex h-7.5 items-center gap-2.5 rounded-md px-2 text-secondary text-muted-foreground hover:bg-secondary"
+        className="flex h-7.5 items-center gap-2.5 rounded-md px-2 text-meta text-muted-foreground hover:bg-secondary"
       >
         <span>+</span>
         <span>{t("sidebar.addList")}</span>
@@ -93,22 +114,43 @@ export function Sidebar({
   )
 }
 
+/**
+ * viewForPath says which view a path belongs to.
+ *
+ * The calendar is a lens on the same dated Items as Upcoming rather than a place of its
+ * own, so it keeps Upcoming marked. Deciding it here rather than in each link is what
+ * keeps the rule in one readable place.
+ */
+function viewForPath(path: string): ViewTarget | null {
+  if (path === "/today") {
+    return "/today"
+  }
+  if (path === "/upcoming" || path === "/calendar") {
+    return "/upcoming"
+  }
+  return path === "/" ? "/" : null
+}
+
 type ViewLinkProps = {
-  to: "/today" | "/upcoming" | "/"
+  to: ViewTarget
   label: string
   count?: number
+  /** Whether this is the view being read. */
+  active: boolean
   /** Today's count is the one number in the sidebar that takes the shared colour. */
   accent?: boolean
 }
 
 /** One of the three views above the Lists. */
-function ViewLink({ to, label, count, accent }: ViewLinkProps) {
+function ViewLink({ to, label, count, active, accent }: ViewLinkProps) {
   return (
     <Link
       to={to}
-      className="flex h-7.5 items-center rounded-md px-2 text-secondary text-secondary-foreground hover:bg-secondary"
-      activeProps={{ className: "bg-secondary font-medium text-foreground" }}
-      activeOptions={{ exact: true }}
+      className={cn(
+        "flex h-7.5 items-center rounded-md px-2 text-meta text-secondary-foreground",
+        "transition-colors hover:bg-secondary",
+        active && "bg-secondary font-medium text-foreground",
+      )}
     >
       {label}
       {count !== undefined && count > 0 && (

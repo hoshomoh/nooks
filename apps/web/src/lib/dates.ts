@@ -2,12 +2,14 @@ import {
   addDays,
   addYears,
   differenceInCalendarDays,
+  endOfMonth,
   format,
   getDay,
   isBefore,
   isValid,
   parseISO,
   startOfDay,
+  startOfMonth,
 } from "date-fns"
 import type { Locale as DateLocale } from "date-fns"
 
@@ -130,6 +132,21 @@ export interface DueRange {
 /** rangeFrom returns the stored dates bounding a window of days starting at from. */
 export function rangeFrom(from: Date, days: number): DueRange {
   return { start: toStored(from), end: toStored(addDays(from, days)) }
+}
+
+/** monthWindow is the stored dates bounding the month a day falls in. */
+export function monthWindow(from: Date): DueRange {
+  return { start: toStored(startOfMonth(from)), end: toStored(endOfMonth(from)) }
+}
+
+/** monthHeading is a month's name in a language, e.g. "August". */
+export function monthHeading(month: Date, locale: DateLocale): string {
+  return format(month, "LLLL", { locale })
+}
+
+/** dayFullHeading is a day written out, e.g. "Tuesday, 25 August". */
+export function dayFullHeading(day: Date, locale: DateLocale): string {
+  return format(day, "EEEE, d MMMM", { locale })
 }
 
 /** shift returns the day a whole number of days away from another. */

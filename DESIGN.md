@@ -117,27 +117,32 @@ internet, and a CDN call would also tell a third party that the Instance exists:
 - **IBM Plex Mono** 400 / 500 — quantities, keycaps, tokens, addresses. `--font-mono`.
   **Never for prose.**
 
-| Role | Size / weight / tracking | Where |
-| --- | --- | --- |
-| Display | 33 / 600 / −0.025em / lh 1.1 | List titles, view headings |
-| Page title | 27 / 600 / −0.02em | Settings pages, states |
-| Dialog title | 21 / 600 / −0.015em | Dialog headers |
-| Section heading | 19 / 600 / −0.01em | Sections within a page |
-| Note heading | 18 / 600 / −0.01em / lh 1.4 | Note blocks, full screen |
-| Empty title | 17 / 500 | Empty states |
-| Body | 16 / 400 / lh 1.4 | **Item labels — the floor for member-written text** |
-| Note body | 15.5 / 400 / lh 1.6 | Note paragraphs, full screen |
-| Input | 15 / 400 | Field values |
-| Note body, sheet | 14.5 / 400 / lh 1.6 | Note paragraphs in the side sheet |
-| Chrome | 14 / 500 | Sidebar items, buttons, field labels |
-| Secondary | 13.5 / 400 | Explanations, sidebar rows, hints |
-| Small | 13 / 400 | Table cells, meta values |
-| Micro | 12.5 / 400 | Breadcrumbs, attribution, counts |
-| Section head | 11.5 / 600 / 0.08em / uppercase | Page section labels |
-| Column head | 11.5 / 600 / 0.04em / uppercase | Table columns |
-| Mono badge | 11.5 | Quantities |
-| Mono keycap | 10.5 | ⌘K, ↵ |
-| Mono secret | 13.5 / break-all | Access tokens |
+Utility names are given below. A type token must never share its name with a colour
+token: Tailwind resolves `text-<name>` to a colour when one exists, so a size called
+`input` beside a colour called `input` silently paints the text in the border colour.
+That is why the 15px step is `field` and the 13.5px step is `meta`.
+
+| Role | Utility | Size / weight / tracking | Where |
+| --- | --- | --- | --- |
+| Display | `text-display` | 33 / 600 / −0.025em / lh 1.1 | List titles, view headings |
+| Page title | `text-page` | 27 / 600 / −0.02em | Settings pages, states |
+| Dialog title | `text-dialog` | 21 / 600 / −0.015em | Dialog headers |
+| Section heading | `text-section` | 19 / 600 / −0.01em | Sections within a page |
+| Note heading | `text-note-heading` | 18 / 600 / −0.01em / lh 1.4 | Note blocks, full screen |
+| Empty title | `text-empty` | 17 / 500 | Empty states |
+| Body | `text-body` | 16 / 400 / lh 1.4 | **Item labels — the floor for member-written text** |
+| Note body | `text-note` | 15.5 / 400 / lh 1.6 | Note paragraphs, full screen |
+| Field | `text-field` | 15 / 400 | Field values |
+| Note body, sheet | `text-note-sheet` | 14.5 / 400 / lh 1.6 | Note paragraphs in the side sheet |
+| Chrome | `text-chrome` | 14 / 500 | Sidebar items, buttons, field labels |
+| Meta | `text-meta` | 13.5 / 400 | Explanations, sidebar rows, hints |
+| Small | `text-small` | 13 / 400 | Table cells, meta values |
+| Micro | `text-micro` | 12.5 / 400 | Breadcrumbs, attribution, counts |
+| Section head | `text-label` | 11.5 / 600 / 0.08em / uppercase | Page section labels |
+| Column head | `text-label` | 11.5 / 600 / 0.04em / uppercase | Table columns |
+| Mono badge | `font-mono text-label` | 11.5 | Quantities |
+| Mono keycap | `font-mono text-keycap` | 10.5 | ⌘K, ↵ |
+| Mono secret | `font-mono text-meta` | 13.5 / break-all | Access tokens |
 
 Uppercase is reserved for the 11.5 section and column heads. Nothing else is uppercased.
 
@@ -352,6 +357,21 @@ of the Member's text, then real options. Their text is never discarded.
 **Conflict** — only competing *text* asks a question, and only on the row it affects. **Ticks never
 conflict** — a tick is a tick whoever made it. The two versions are shown as stacked options, the
 Member's outlined in accent, with `Keep mine` and `Keep both`.
+
+**Motion** — movement explains where something came from, and is used nowhere else. There
+are four:
+
+| Token | Where | Duration |
+| --- | --- | --- |
+| `animate-sheet-in` | The side sheet, from the edge it is anchored to | 180ms |
+| `animate-panel-in` | ⌘K and dialogs, a short drop with the scrim | 160ms |
+| `animate-scrim-in` | The ground behind an overlay | 120ms |
+| `animate-settle` | Somebody else's tick, holding then settling | 1s |
+
+Hover and focus changes are `transition-colors` at 150ms. Nothing bounces, nothing
+springs, and nothing waits for an animation before it responds — every one of these is
+decoration on a state that has already changed. A Member whose machine asks for reduced
+motion gets none of it.
 
 ---
 

@@ -13,7 +13,7 @@ export function NotePanel({ label, children }: NotePanelProps) {
   return (
     <div className="border-border bg-sidebar flex flex-col gap-1 rounded-xl border px-4 py-3.5">
       <span className="text-muted-foreground text-micro">{label}</span>
-      <span className="text-input">{children}</span>
+      <span className="text-field">{children}</span>
     </div>
   )
 }

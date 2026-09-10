@@ -1,16 +1,16 @@
-import { getRouteApi, Link } from "@tanstack/react-router"
+import { useSuspenseQuery } from "@tanstack/react-query"
+import { Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
-import { format } from "date-fns"
 
 import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { Button } from "@/components/ds/button"
 import { buildMonth, byDay, type CalendarDay } from "@/lib/calendar"
-import { today } from "@/lib/dates"
+import { datedRangeQuery } from "@/lib/dated-queries"
+import { monthHeading, monthWindow, today, toStored } from "@/lib/dates"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useLocale } from "@/lib/use-locale"
-
-const route = getRouteApi("/calendar")
+import { useSignedInData } from "@/lib/use-signed-in-data"
 
 /** The days of a week, in the order the grid draws them. */
 const WEEKDAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const
@@ -22,21 +22,23 @@ const WEEKDAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const
  * Lists.
  */
 export function CalendarScreen() {
-  const { instance, member, lists, dated } = route.useLoaderData()
+  const { instanceName, member, lists } = useSignedInData()
   const { t } = useTranslation()
   const { dateLocale } = useLocale()
   const palette = useCommandPalette()
 
   const from = today()
+  const window = monthWindow(from)
+  const dated = useSuspenseQuery(datedRangeQuery(window.start, window.end)).data
   const month = buildMonth(from)
   const itemsByDay = byDay(dated.items, (entry) => entry.item?.dueOn ?? "")
-  const currentDay = format(from, "yyyy-MM-dd")
+  const currentDay = toStored(from)
 
   return (
     <AppShell
-      instanceName={instance.name}
-      memberName={member.name}
-      lists={lists.lists}
+      instanceName={instanceName}
+      memberName={member?.name ?? ""}
+      lists={lists}
       onSearch={palette.open}
       onAddList={palette.openAddList}
     >
@@ -54,8 +56,8 @@ export function CalendarScreen() {
       <div className="flex justify-center px-5.5 pt-14 pb-22">
         <div className="w-full max-w-calendar">
           <header className="mb-8.5 flex flex-col gap-3.5">
-            <h1 className="text-display">{format(month.month, "LLLL", { locale: dateLocale })}</h1>
-            <div className="flex items-center gap-3 text-secondary text-secondary-foreground">
+            <h1 className="text-display">{monthHeading(month.month, dateLocale)}</h1>
+            <div className="flex items-center gap-3 text-meta text-secondary-foreground">
               <span>{t("views.calendarSubtitle")}</span>
               <span className="h-3 w-px bg-border" />
               <span>{t("views.datedCount", { count: dated.items.length })}</span>

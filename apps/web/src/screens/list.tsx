@@ -1,40 +1,34 @@
 import { useCallback, useMemo, useState } from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
 import { getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
-import { AddRow } from "@/components/ds/add-row"
+import { AddRow, type AddRowSubmission } from "@/components/ds/add-row"
 import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
-import { ListRow } from "@/components/ds/list-row"
+import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
 import { NoteSheet, type NoteSheetField } from "@/components/ds/note-sheet"
 import { listClient } from "@/lib/api"
+import { listQuery } from "@/lib/list-queries"
+import { refreshLists } from "@/lib/refresh"
 import { debounce } from "@/lib/debounce"
+import type { RenameItemVariables, SaveNoteVariables, SetDoneVariables } from "@/lib/item-mutations"
 import { isOverdue, today } from "@/lib/dates"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useCommandPalette } from "@/lib/use-command-palette"
+import { useSignedInData } from "@/lib/use-signed-in-data"
+import type { Item } from "@nooks/api"
 
 const route = getRouteApi("/lists/$listUid")
-
-/** What the tick mutation is told. */
-type SetDoneVariables = {
-  itemUid: string
-  done: boolean
-}
 
 /** How long the typing has to settle before a Note is saved. */
 const AUTOSAVE_DELAY_MS = 800
 
-/** What the note mutation is told. */
-type SaveNoteVariables = {
-  itemUid: string
-  note: string
-}
-
 export function ListScreen() {
-  const { instance, member, lists, list } = route.useLoaderData()
   const { listUid } = route.useParams()
+  const { instanceName, member, lists } = useSignedInData()
+  const list = useSuspenseQuery(listQuery(listUid)).data
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const palette = useCommandPalette()
@@ -49,10 +43,11 @@ export function ListScreen() {
   // screen's own state rather than a route.
   const [openItemUid, setOpenItemUid] = useState<string | null>(null)
 
-  const refresh = () => queryClient.invalidateQueries()
+  const refresh = () => refreshLists(queryClient)
 
   const addItem = useMutation({
-    mutationFn: (label: string) => listClient.createItem({ listUid, label }),
+    mutationFn: ({ label, quantity, dueOn }: AddRowSubmission) =>
+      listClient.createItem({ listUid, label, quantity, dueOn }),
     onSuccess: refresh,
   })
 
@@ -86,6 +81,14 @@ export function ListScreen() {
     onSuccess: refresh,
   })
 
+  const rename = useMutation({
+    mutationFn: ({ itemUid, label }: RenameItemVariables) =>
+      listClient.updateItem({ itemUid, label }),
+    onSuccess: refresh,
+  })
+
+  const rowLabels: ListRowLabels = { name: t("note.itemName"), open: t("list.openItem") }
+
   const openItem = list.items.find((item) => item.uid === openItemUid)
   const open = list.items.filter((item) => !item.done)
   const done = list.items.filter((item) => item.done)
@@ -93,9 +96,9 @@ export function ListScreen() {
 
   return (
     <AppShell
-      instanceName={instance.name}
-      memberName={member.name}
-      lists={lists.lists}
+      instanceName={instanceName}
+      memberName={member?.name ?? ""}
+      lists={lists}
       activeListUid={listUid}
       onSearch={palette.open}
       onAddList={palette.openAddList}
@@ -106,7 +109,7 @@ export function ListScreen() {
         <div className="w-full max-w-content">
           <header className="mb-8.5 flex flex-col gap-3.5">
             <h1 className="text-display">{list.list?.name}</h1>
-            <div className="flex items-center gap-3 text-secondary text-secondary-foreground">
+            <div className="flex items-center gap-3 text-meta text-secondary-foreground">
               <span>{t(sharingKey(list.list?.sharing ?? 0, list.list?.canEdit ?? false))}</span>
               <span className="h-3 w-px bg-border" />
               <span>{open.length === 0 ? t("list.nothingYet") : t("list.openCount", { count: open.length })}</span>
@@ -129,6 +132,10 @@ export function ListScreen() {
                   moreLinesLabel={(count) => t("note.moreLines", { count })}
                   onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
                   onOpen={() => setOpenItemUid(item.uid)}
+                  onRename={
+                    canEdit ? (label) => rename.mutate({ itemUid: item.uid, label }) : undefined
+                  }
+                  labels={rowLabels}
                 />
               ))}
             </div>
@@ -137,14 +144,14 @@ export function ListScreen() {
           {canEdit && (
             <AddRow
               placeholder={t("list.addItem")}
-              onAdd={(label) => addItem.mutate(label)}
+              onAdd={(item) => addItem.mutate(item)}
               disabled={addItem.isPending}
             />
           )}
 
           {done.length > 0 && (
             <div className="mt-8.5 flex flex-col gap-1.5 border-t border-hair pt-4.5">
-              <span className="text-secondary text-secondary-foreground">
+              <span className="text-meta text-secondary-foreground">
                 {t("list.doneCount", { count: done.length })}
               </span>
               {done.map((item) => (
@@ -155,6 +162,11 @@ export function ListScreen() {
                   addedByName={item.doneByName || item.addedByName}
                   done
                   onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
+                  onOpen={() => setOpenItemUid(item.uid)}
+                  onRename={
+                    canEdit ? (label) => rename.mutate({ itemUid: item.uid, label }) : undefined
+                  }
+                  labels={rowLabels}
                 />
               ))}
             </div>
@@ -170,6 +182,7 @@ export function ListScreen() {
             status={saveNote.isPending ? t("note.saving") : undefined}
             onNoteChange={onNoteChange}
             onToggleDone={(done) => setDone.mutate({ itemUid: openItem.uid, done })}
+            onRename={(label) => rename.mutate({ itemUid: openItem.uid, label })}
             onClose={closeSheet}
             onOpenFull={() => {
               autosave.flush()
@@ -188,7 +201,7 @@ export function ListScreen() {
 /** The detail row in the sheet: what is known about the Item, and what is not yet. */
 function noteFields(
   t: (key: string, options?: Record<string, unknown>) => string,
-  item: { quantity: string; dueOn: string; addedByName: string },
+  item: Item,
   listName: string,
   dueLabel: string,
 ): NoteSheetField[] {

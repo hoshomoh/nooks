@@ -1,14 +1,17 @@
 import { useCallback, useMemo } from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
 import { getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ds/button"
 import { Checkbox } from "@/components/ds/checkbox"
 import { ChromeBar } from "@/components/ds/chrome-bar"
+import { EditableTitle } from "@/components/ds/editable-title"
 import { NoteEditor } from "@/components/ds/note-editor"
 import { listClient } from "@/lib/api"
 import { debounce } from "@/lib/debounce"
+import { listQuery } from "@/lib/list-queries"
+import { refreshLists } from "@/lib/refresh"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useEscape } from "@/lib/use-escape"
 
@@ -24,22 +27,31 @@ const AUTOSAVE_DELAY_MS = 800
  * is it with room to be one. Esc returns to the List.
  */
 export function NoteScreen() {
-  const { list, item } = route.useLoaderData()
-  const { listUid } = route.useParams()
+  const { listUid, itemUid } = route.useParams()
+  const listData = useSuspenseQuery(listQuery(listUid)).data
+  const list = listData.list
+  const item = listData.items.find((candidate) => candidate.uid === itemUid)
   const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const due = useDueLabel()
 
+  const refresh = useCallback(() => refreshLists(queryClient), [queryClient])
+
   const save = useMutation({
-    mutationFn: (note: string) => listClient.updateItem({ itemUid: item.uid, note }),
-    onSuccess: () => queryClient.invalidateQueries(),
+    mutationFn: (note: string) => listClient.updateItem({ itemUid, note }),
+    onSuccess: refresh,
   })
   const autosave = useMemo(() => debounce(save.mutate, AUTOSAVE_DELAY_MS), [save.mutate])
 
   const setDone = useMutation({
-    mutationFn: (done: boolean) => listClient.setItemDone({ itemUid: item.uid, done }),
-    onSuccess: () => queryClient.invalidateQueries(),
+    mutationFn: (done: boolean) => listClient.setItemDone({ itemUid, done }),
+    onSuccess: refresh,
+  })
+
+  const rename = useMutation({
+    mutationFn: (label: string) => listClient.updateItem({ itemUid, label }),
+    onSuccess: refresh,
   })
 
   const back = useCallback(() => {
@@ -48,6 +60,13 @@ export function NoteScreen() {
   }, [autosave, navigate, listUid])
 
   useEscape(back)
+
+  // The Item can go while its Note is open — somebody else deleted it, or the List was
+  // unshared. The route's loader has already ruled out the case of arriving at one that
+  // was never there.
+  if (!list || !item) {
+    return null
+  }
 
   const canEdit = Boolean(list.isOwner || list.canEdit)
 
@@ -77,7 +96,13 @@ export function NoteScreen() {
                 onCheckedChange={(done) => setDone.mutate(Boolean(done))}
               />
             </span>
-            <h1 className="text-display">{item.label}</h1>
+            <EditableTitle
+              value={item.label}
+              onCommit={(label) => rename.mutate(label)}
+              readOnly={!canEdit}
+              label={t("note.itemName")}
+              className="text-display"
+            />
           </div>
 
           <div className="flex flex-wrap gap-4.5 pl-9.5">

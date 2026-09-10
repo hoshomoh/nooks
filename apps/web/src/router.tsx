@@ -1,4 +1,6 @@
 import { createRouter } from "@tanstack/react-router"
+
+import { RoutePending } from "./components/ds/loading-rows"
 import type { QueryClient } from "@tanstack/react-query"
 
 import { forgotPasswordRoute } from "./routes/forgot-password"
@@ -34,6 +36,8 @@ export function buildRouter(queryClient: QueryClient) {
     routeTree,
     context: { queryClient },
     defaultPreload: "intent",
+    // Also the Suspense boundary every screen reads its data behind.
+    defaultPendingComponent: RoutePending,
   })
 }
 

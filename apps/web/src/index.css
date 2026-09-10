@@ -10,7 +10,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
+/* The scales, as real custom properties.
+   Plain `@theme` rather than `@theme inline` so every token is emitted to :root: the
+   Note editor is styled by CodeMirror rather than by classes, and it reads these with
+   var(). An inline token has no variable to read. */
+@theme {
   --font-sans: "Public Sans Variable", ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
@@ -53,8 +57,8 @@
   --text-note: 15.5px; /* note paragraphs, full screen */
   --text-note--line-height: 1.6;
 
-  --text-input: 15px; /* field values, blurbs */
-  --text-input--line-height: 1.65;
+  --text-field: 15px; /* field values, blurbs */
+  --text-field--line-height: 1.65;
 
   --text-note-sheet: 14.5px; /* note paragraphs in the side sheet */
   --text-note-sheet--line-height: 1.6;
@@ -62,8 +66,8 @@
   --text-chrome: 14px; /* sidebar items, buttons, field labels */
   --text-chrome--line-height: 1.45;
 
-  --text-secondary: 13.5px; /* explanations, sidebar rows, hints */
-  --text-secondary--line-height: 1.5;
+  --text-meta: 13.5px; /* explanations, sidebar rows, hints */
+  --text-meta--line-height: 1.5;
 
   --text-small: 13px; /* table cells, meta values */
   --text-small--line-height: 1.5;
@@ -95,7 +99,7 @@
   --container-calendar: 1060px;
   --container-sheet: 520px; /* the side sheet */
   --container-dialog: 560px;
-  --container-form: 420px; /* a signed-out form, narrower than content */
+  --container-form: 460px; /* a signed-out form, narrower than content */
 
   --radius-sm: 4px; /* checkbox, small badge */
   --radius-md: 6px; /* row, toolbar button, menu item */
@@ -103,6 +107,57 @@
   --radius-xl: 8px; /* inner surface: card, empty state, banner */
   --radius-2xl: 10px; /* surface: panel, dialog */
 
+  /* Motion — DESIGN.md §11. Nooks moves to explain where something came from and
+     nowhere else: a sheet arrives from the edge it is anchored to, an overlay fades
+     its ground in, and a tick by somebody else holds for a second before settling.
+     Nothing bounces and nothing waits for an animation to finish. */
+  --animate-sheet-in: sheet-in 180ms cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-panel-in: panel-in 160ms cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-scrim-in: scrim-in 120ms ease-out;
+  --animate-settle: settle 1s ease-out;
+  /* A slow server explains itself rather than leaving the skeleton to. The delay is
+     the message: it appears only once the wait is long enough to worry about. */
+  --animate-slow-note: slow-note 200ms ease-out 4s both;
+
+  @keyframes sheet-in {
+    from {
+      transform: translateX(16px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes panel-in {
+    from {
+      transform: translateY(-6px) scale(0.99);
+      opacity: 0;
+    }
+  }
+
+  @keyframes scrim-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes slow-note {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes settle {
+    from {
+      background-color: var(--done-bg);
+    }
+  }
+}
+
+/* The colour aliases, inline: each points at a :root variable that the dark palette
+   replaces, so the utility has to resolve at use rather than be frozen here. */
+@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -292,5 +347,17 @@
 
   html {
     @apply font-sans;
+  }
+
+  /* A Member who has asked their machine for less movement gets none. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

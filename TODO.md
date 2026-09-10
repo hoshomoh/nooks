@@ -17,9 +17,9 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M1 · Skeleton that runs | `[x]` |
 | M2 · Auth and first run | `[x]` |
 | M3 · Lists and Items — the core | `[~]` lists, items, search and the list view |
-| M4 · Views: Today, Upcoming, Calendar | `[x]` |
+| M4 · Views: Today, Upcoming, Calendar | `[~]` add row from context left |
 | M5 · Notes | `[x]` |
-| M6 · Sharing, presence, Activity | `[ ]` |
+| M6 · Sharing, presence, Activity | `[~]` store and permissions |
 | M7 · Members and Groups | `[ ]` |
 | M8 · Public list | `[ ]` |
 | M9 · Print | `[ ]` |
@@ -80,11 +80,11 @@ TypeScript. No features. Everything after this is filling in.
 
 **Done.**
 
-- [ ] Member and Instance schema; password hashing; sessions
-- [ ] Password rule: twelve characters or more, **no other rules**
-- [ ] First run — create the first Admin and name the Instance, in one form
-- [ ] Sign in
-- [ ] Temporary password set by an Admin, and forced replacement on first sign-in
+- [x] Member and Instance schema; password hashing; sessions
+- [x] Password rule: twelve characters or more, **no other rules**
+- [x] First run — create the first Admin and name the Instance, in one form
+- [x] Sign in
+- [x] Temporary password set by an Admin, and forced replacement on first sign-in
 - [x] Join request: request → Admin approves → Member chooses a password. One approval
       creates one account; an ignored request is indistinguishable from a pending one
 - [x] Reset request: request → Admin approves out of band → Member sets a new password.
@@ -113,8 +113,12 @@ The single most important milestone; everything else is furniture.
 - [x] **The list row** — 44px, `20px 1fr auto`, truncation in the label, metadata right-aligned
 - [x] Checkbox states, with a 44px hit area around a 17px box
 - [x] Add row: `+`, placeholder, `↵` keycap, stays focused after adding
+- [x] Add row parses a quantity and a date out of the sentence and shows them as chips;
+      backspace after a chip returns it to text
+- [x] Add row's permanent date control — empty, the view's default, or a date that was set
+- [x] Rename an Item in place, in the row, the sheet and the full-screen view alike
 - [x] Quantity as free text, shown as a mono badge
-- [~] Due dates stored and shown ("Today", "Fri", "Sat 5 Sep"); parsing them out of the
+- [x] Due dates stored and shown ("Today", "Fri", "Sat 5 Sep"); parsing them out of the
       typed text is still to come
 - [x] Tick and untick, with attribution
 - [ ] Completed Items: placement and the "3 done today" row
@@ -159,8 +163,10 @@ The single most important milestone; everything else is furniture.
 
 ## M6 · Sharing, presence, Activity
 
-- [ ] Sharing model: private / everyone on the Instance / specific Members and Groups
-- [ ] Can-edit toggle; read-only means see and print, not tick or add
+- [x] Sharing model: private / everyone on the Instance / specific Members and Groups
+- [~] Can-edit toggle; read-only means see and print, not tick or add. Store and
+      `accessTo` done; the dialog arrives with the UI below
+- [x] Groups, named shares and the Activity table, on both drivers
 - [ ] Share dialog, and the specific-people dialog (Groups first, then individuals)
 - [ ] Copy list address
 - [ ] Live updates — someone else's tick lands with a one-second highlight, then settles.
@@ -227,7 +233,9 @@ The single most important milestone; everything else is furniture.
 ## M11 · Settings, export, import
 
 - [ ] Account: name, email, change password
-- [ ] Appearance: theme segment
+- [ ] Appearance: theme segment and the language picker
+- [ ] Instance default language, for public lists, printed sheets and anyone who has not
+      chosen one
 - [ ] Instance (admins only): Instance name, public signup toggle
 - [ ] About: version, storage, instance age, counts, licence, **Telemetry: None**
 - [ ] Export everything — one JSON file plus the printed pages as PDFs

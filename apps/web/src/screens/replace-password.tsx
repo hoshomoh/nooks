@@ -59,7 +59,7 @@ export function ReplacePassword() {
         />
 
         {replacePassword.isError && (
-          <p className="text-destructive text-secondary">
+          <p className="text-destructive text-meta">
             {messageFrom(replacePassword.error)}
           </p>
         )}

@@ -34,7 +34,7 @@ const nooksButton = cva(
         /** 34px — page and section headers, dialog footers. */
         default: "h-control rounded-lg px-4 text-chrome",
         /** 32px — inside a table row or a settings row. */
-        compact: "h-control-compact rounded-lg px-3.5 text-secondary",
+        compact: "h-control-compact rounded-lg px-3.5 text-meta",
         /** 26px — the 44px chrome bar only. */
         toolbar: "h-control-toolbar rounded-md px-2.5 text-micro",
       },

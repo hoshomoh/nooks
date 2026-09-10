@@ -1,3 +1,27 @@
+# Reference clone of usememos/memos — read-only, never edited, never shipped.
 reference/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+/nook
+server/router/frontend/dist/
+
+# Local data — a Nook instance keeps its SQLite file here during development
+*.db
+*.db-shm
+*.db-wal
+/data/
+
+# Machine-specific Claude Code settings (PATH for this machine's toolchain)
 .claude/settings.local.json
+
+# Downloaded toolchain archives
 go*.linux-amd64.tar.gz
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/

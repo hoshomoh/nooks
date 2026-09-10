@@ -2,13 +2,33 @@ package store
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
 )
 
-// newSQLiteStore opens a store in a directory the test framework cleans up.
-func newSQLiteStore(t *testing.T) Store {
+// postgresDSNEnv names the environment variable that points the suite at a Postgres
+// server. When it is unset the Postgres cases skip, so `go test ./...` works on a
+// laptop with nothing installed while CI still covers both drivers.
+const postgresDSNEnv = "NOOK_TEST_POSTGRES_DSN"
+
+// driverCase is one driver the shared suite runs against.
+type driverCase struct {
+	name string
+	// open returns a store, or skips the test when the driver is unavailable here.
+	open func(t *testing.T) Store
+}
+
+// drivers lists every driver the suite covers.
+func drivers() []driverCase {
+	return []driverCase{
+		{name: "sqlite", open: openSQLiteForTest},
+		{name: "postgres", open: openPostgresForTest},
+	}
+}
+
+func openSQLiteForTest(t *testing.T) Store {
 	t.Helper()
 	s, err := OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nook.db"))
 	if err != nil {
@@ -18,70 +38,99 @@ func newSQLiteStore(t *testing.T) Store {
 	return s
 }
 
-func TestInstanceSettingsBeforeFirstRun(t *testing.T) {
-	s := newSQLiteStore(t)
+// openPostgresForTest connects to the server named by the environment, and drops the
+// schema first so each test starts from nothing.
+func openPostgresForTest(t *testing.T) Store {
+	t.Helper()
+	dsn := os.Getenv(postgresDSNEnv)
+	if dsn == "" {
+		t.Skipf("%s is not set", postgresDSNEnv)
+	}
 
-	settings, err := s.InstanceSettings(t.Context())
+	s, err := OpenPostgres(t.Context(), dsn)
 	if err != nil {
-		t.Fatalf("InstanceSettings: %v", err)
+		t.Fatalf("OpenPostgres: %v", err)
 	}
-	if !settings.NeedsSetup() {
-		t.Error("NeedsSetup() = false on a fresh Instance, want true")
+	t.Cleanup(func() { _ = s.Close() })
+
+	if err := s.SaveInstanceSettings(t.Context(), InstanceSettings{}); err != nil {
+		t.Fatalf("reset instance settings: %v", err)
 	}
-	if settings.Name != "" {
-		t.Errorf("Name = %q on a fresh Instance, want empty", settings.Name)
+	return s
+}
+
+func TestInstanceSettingsBeforeFirstRun(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			settings, err := d.open(t).InstanceSettings(t.Context())
+			if err != nil {
+				t.Fatalf("InstanceSettings: %v", err)
+			}
+			if !settings.NeedsSetup() {
+				t.Error("NeedsSetup() = false on a fresh Instance, want true")
+			}
+			if settings.Name != "" {
+				t.Errorf("Name = %q on a fresh Instance, want empty", settings.Name)
+			}
+		})
 	}
 }
 
 func TestSaveAndReadInstanceSettings(t *testing.T) {
-	s := newSQLiteStore(t)
 	completedAt := time.Date(2026, time.March, 3, 9, 30, 0, 0, time.UTC)
-
 	want := InstanceSettings{Name: "Brunnen Street", PublicSignup: true, SetupCompletedAt: completedAt}
-	if err := s.SaveInstanceSettings(t.Context(), want); err != nil {
-		t.Fatalf("SaveInstanceSettings: %v", err)
-	}
 
-	got, err := s.InstanceSettings(t.Context())
-	if err != nil {
-		t.Fatalf("InstanceSettings: %v", err)
-	}
-	if got.Name != want.Name {
-		t.Errorf("Name = %q, want %q", got.Name, want.Name)
-	}
-	if got.PublicSignup != want.PublicSignup {
-		t.Errorf("PublicSignup = %v, want %v", got.PublicSignup, want.PublicSignup)
-	}
-	if !got.SetupCompletedAt.Equal(completedAt) {
-		t.Errorf("SetupCompletedAt = %v, want %v", got.SetupCompletedAt, completedAt)
-	}
-	if got.NeedsSetup() {
-		t.Error("NeedsSetup() = true after first run, want false")
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			if err := s.SaveInstanceSettings(t.Context(), want); err != nil {
+				t.Fatalf("SaveInstanceSettings: %v", err)
+			}
+
+			got, err := s.InstanceSettings(t.Context())
+			if err != nil {
+				t.Fatalf("InstanceSettings: %v", err)
+			}
+			if got.Name != want.Name {
+				t.Errorf("Name = %q, want %q", got.Name, want.Name)
+			}
+			if got.PublicSignup != want.PublicSignup {
+				t.Errorf("PublicSignup = %v, want %v", got.PublicSignup, want.PublicSignup)
+			}
+			if !got.SetupCompletedAt.Equal(completedAt) {
+				t.Errorf("SetupCompletedAt = %v, want %v", got.SetupCompletedAt, completedAt)
+			}
+			if got.NeedsSetup() {
+				t.Error("NeedsSetup() = true after first run, want false")
+			}
+		})
 	}
 }
 
 func TestSaveInstanceSettingsReplacesEarlierValues(t *testing.T) {
-	s := newSQLiteStore(t)
-	ctx := t.Context()
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			ctx := t.Context()
 
-	first := InstanceSettings{Name: "Brunnen Street", PublicSignup: true}
-	if err := s.SaveInstanceSettings(ctx, first); err != nil {
-		t.Fatalf("SaveInstanceSettings: %v", err)
-	}
-	second := InstanceSettings{Name: "Kastanienallee", PublicSignup: false}
-	if err := s.SaveInstanceSettings(ctx, second); err != nil {
-		t.Fatalf("SaveInstanceSettings: %v", err)
-	}
+			if err := s.SaveInstanceSettings(ctx, InstanceSettings{Name: "Brunnen Street", PublicSignup: true}); err != nil {
+				t.Fatalf("first SaveInstanceSettings: %v", err)
+			}
+			if err := s.SaveInstanceSettings(ctx, InstanceSettings{Name: "Kastanienallee"}); err != nil {
+				t.Fatalf("second SaveInstanceSettings: %v", err)
+			}
 
-	got, err := s.InstanceSettings(ctx)
-	if err != nil {
-		t.Fatalf("InstanceSettings: %v", err)
-	}
-	if got.Name != second.Name {
-		t.Errorf("Name = %q, want %q", got.Name, second.Name)
-	}
-	if got.PublicSignup {
-		t.Error("PublicSignup = true, want the second save to have turned it off")
+			got, err := s.InstanceSettings(ctx)
+			if err != nil {
+				t.Fatalf("InstanceSettings: %v", err)
+			}
+			if got.Name != "Kastanienallee" {
+				t.Errorf("Name = %q, want the second save to have replaced it", got.Name)
+			}
+			if got.PublicSignup {
+				t.Error("PublicSignup = true, want the second save to have turned it off")
+			}
+		})
 	}
 }
 
@@ -117,8 +166,11 @@ func TestMigrateIsIdempotent(t *testing.T) {
 	}
 }
 
-func TestOpenSQLiteRejectsEmptyPath(t *testing.T) {
+func TestOpenRejectsMissingTarget(t *testing.T) {
 	if _, err := OpenSQLite(t.Context(), ""); err == nil {
-		t.Fatal("OpenSQLite with an empty path succeeded, want an error")
+		t.Error("OpenSQLite with an empty path succeeded, want an error")
+	}
+	if _, err := OpenPostgres(t.Context(), ""); err == nil {
+		t.Error("OpenPostgres with an empty dsn succeeded, want an error")
 	}
 }

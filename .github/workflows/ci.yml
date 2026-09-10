@@ -12,6 +12,21 @@ jobs:
   go:
     name: Go
     runs-on: ubuntu-latest
+    services:
+      # The store suite runs against both drivers. Without this the Postgres cases
+      # skip, and the driver would rot unnoticed.
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: nook
+          POSTGRES_PASSWORD: nook
+          POSTGRES_DB: nook
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U nook"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -24,6 +39,8 @@ jobs:
         run: go vet ./...
       - name: Test
         run: go test -race ./...
+        env:
+          NOOK_TEST_POSTGRES_DSN: postgres://nook:nook@localhost:5432/nook?sslmode=disable
       - name: Formatted
         run: test -z "$(gofmt -l cmd internal server store)"
 

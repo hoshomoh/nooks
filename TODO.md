@@ -18,7 +18,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M2 · Auth and first run | `[x]` |
 | M3 · Lists and Items — the core | `[~]` lists, items, search and the list view |
 | M4 · Views: Today, Upcoming, Calendar | `[x]` |
-| M5 · Notes | `[~]` stored, searchable, side sheet |
+| M5 · Notes | `[~]` all but the full-screen view |
 | M6 · Sharing, presence, Activity | `[ ]` |
 | M7 · Members and Groups | `[ ]` |
 | M8 · Public list | `[ ]` |
@@ -146,11 +146,13 @@ The single most important milestone; everything else is furniture.
       block types map onto
 - [x] Side sheet at 520px — opening an Item never replaces the List
 - [ ] Full-screen Note view, and Esc back to the List
-- [ ] Blocks rendered as blocks: paragraph, heading, checklist, quote, code
-- [ ] Markdown shorthand converts as typed, and is never displayed back
-- [ ] `/` block menu, filtered, showing each shortcut
+- [x] Blocks rendered as blocks: paragraph, heading, checklist, quote, code
+- [x] Markdown shorthand converts as typed and is then hidden — the marker reappears
+      only on the line the cursor is on, or there would be no way to take it off
+- [x] `/` block menu, filtered, each entry showing its markdown shorthand so the menu
+      teaches the shortcut rather than replacing it
 - [x] Row preview: the Note's own first line with its marker stripped, plus `+N lines`
-- [~] Autosave on blur, with the "Saving…" footer state
+- [x] Autosave once the typing settles, flushed when the sheet closes
 
 ---
 

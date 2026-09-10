@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { getRouteApi } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ds/empty-state"
 import { ListRow } from "@/components/ds/list-row"
 import { NoteSheet, type NoteSheetField } from "@/components/ds/note-sheet"
 import { listClient } from "@/lib/api"
+import { debounce } from "@/lib/debounce"
 import { isOverdue, today } from "@/lib/dates"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useCommandPalette } from "@/lib/use-command-palette"
@@ -21,6 +22,9 @@ type SetDoneVariables = {
   itemUid: string
   done: boolean
 }
+
+/** How long the typing has to settle before a Note is saved. */
+const AUTOSAVE_DELAY_MS = 800
 
 /** What the note mutation is told. */
 type SaveNoteVariables = {
@@ -55,6 +59,26 @@ export function ListScreen() {
     mutationFn: ({ itemUid, note }: SaveNoteVariables) => listClient.updateItem({ itemUid, note }),
     onSuccess: refresh,
   })
+
+  // Autosave waits for the typing to settle rather than firing per keystroke.
+  // `mutate` is referentially stable, so the debounce is built once.
+  const autosave = useMemo(() => debounce(saveNote.mutate, AUTOSAVE_DELAY_MS), [saveNote.mutate])
+
+  // Closing flushes, so the last sentence is never lost to a timer that never ran.
+  const closeSheet = useCallback(() => {
+    autosave.flush()
+    setOpenItemUid(null)
+  }, [autosave])
+
+  // Stable, so the editor is built once rather than on every render.
+  const onNoteChange = useCallback(
+    (note: string) => {
+      if (openItemUid) {
+        autosave.call({ itemUid: openItemUid, note })
+      }
+    },
+    [autosave, openItemUid],
+  )
 
   const setDone = useMutation({
     mutationFn: ({ itemUid, done }: SetDoneVariables) => listClient.setItemDone({ itemUid, done }),
@@ -143,9 +167,9 @@ export function ListScreen() {
             fields={noteFields(t, openItem, list.list?.name ?? "", due.label(openItem.dueOn))}
             canEdit={Boolean(canEdit)}
             status={saveNote.isPending ? t("note.saving") : undefined}
-            onNoteChange={(note) => saveNote.mutate({ itemUid: openItem.uid, note })}
+            onNoteChange={onNoteChange}
             onToggleDone={(done) => setDone.mutate({ itemUid: openItem.uid, done })}
-            onClose={() => setOpenItemUid(null)}
+            onClose={closeSheet}
           />
         )}
       </div>

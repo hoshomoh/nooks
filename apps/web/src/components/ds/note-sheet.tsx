@@ -1,8 +1,8 @@
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import type { Item } from "@nooks/api"
 
 import { Checkbox } from "./checkbox"
+import { NoteEditor } from "./note-editor"
 
 export type NoteSheetField = {
   label: string
@@ -17,7 +17,10 @@ export type NoteSheetProps = {
   fields: NoteSheetField[]
   /** Whether the Member may change anything here. */
   canEdit: boolean
-  /** Called when the Note text settles. */
+  /**
+   * Called on every change. Debouncing belongs to whoever owns the saving, so this
+   * component stays a renderer.
+   */
   onNoteChange: (markdown: string) => void
   onToggleDone: (done: boolean) => void
   onClose: () => void
@@ -43,7 +46,6 @@ export function NoteSheet({
   status,
 }: NoteSheetProps) {
   const { t } = useTranslation()
-  const [draft, setDraft] = useState(item.note)
 
   return (
     <aside className="absolute top-chrome right-0 bottom-0 flex w-sheet flex-col border-l border-border bg-background">
@@ -76,14 +78,15 @@ export function NoteSheet({
 
         <div className="h-px bg-hair" />
 
-        <textarea
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          onBlur={() => onNoteChange(draft)}
-          placeholder={t("note.placeholder")}
-          readOnly={!canEdit}
-          className="min-h-[240px] flex-1 resize-none bg-transparent pl-9 text-note-sheet leading-[1.6] outline-none placeholder:text-muted-foreground"
-        />
+        <div className="flex min-h-[240px] flex-1 pl-9">
+          {/* Keyed on the Item: opening a different one builds a fresh editor. */}
+          <NoteEditor
+            key={item.uid}
+            initialValue={item.note}
+            onChange={onNoteChange}
+            readOnly={!canEdit}
+          />
+        </div>
       </div>
 
       <div className="flex h-sheet-footer items-center gap-4 border-t border-hair px-5.5 text-micro text-muted-foreground">

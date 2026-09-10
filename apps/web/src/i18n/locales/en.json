@@ -175,6 +175,13 @@
     "addDate": "Add a date",
     "moreLines": "+{{count}} line",
     "moreLines_other": "+{{count}} lines",
-    "marker": "note"
+    "marker": "note",
+    "blocks": {
+      "todo": "Checklist item",
+      "heading": "Heading, small",
+      "quote": "Quote",
+      "code": "Code block"
+    },
+    "addToNote": "Add to the note"
   }
 }

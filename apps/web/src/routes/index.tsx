@@ -2,6 +2,7 @@ import { createRoute, redirect } from "@tanstack/react-router"
 
 import { Home } from "@/screens/home"
 import { currentMemberQuery, instanceQuery } from "@/lib/queries"
+import { listsQuery } from "@/lib/list-queries"
 import { rootRoute } from "./root"
 
 /**
@@ -28,7 +29,9 @@ export const indexRoute = createRoute({
     if (member.mustChangePassword) {
       throw redirect({ to: "/replace-password" })
     }
-    return { instance, member }
+
+    const lists = await context.queryClient.ensureQueryData(listsQuery)
+    return { instance, member, lists }
   },
   component: Home,
 })

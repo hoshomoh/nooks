@@ -4,6 +4,7 @@ import type { QueryClient } from "@tanstack/react-query"
 import { forgotPasswordRoute } from "./routes/forgot-password"
 import { indexRoute } from "./routes/index"
 import { joinRoute } from "./routes/join"
+import { listRoute } from "./routes/list"
 import { replacePasswordRoute } from "./routes/replace-password"
 import { rootRoute } from "./routes/root"
 import { setupRoute } from "./routes/setup"
@@ -16,6 +17,7 @@ const routeTree = rootRoute.addChildren([
   replacePasswordRoute,
   joinRoute,
   forgotPasswordRoute,
+  listRoute,
 ])
 
 /** buildRouter takes the query client so loaders can prime the cache before rendering. */

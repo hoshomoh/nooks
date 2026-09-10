@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { RouterProvider } from "@tanstack/react-router"
 
+import { CommandPalette } from "./components/ds/command-palette"
 import { buildRouter } from "./router"
 import "./index.css"
 
@@ -28,6 +29,7 @@ createRoot(container).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
+      <CommandPalette />
     </QueryClientProvider>
   </StrictMode>,
 )

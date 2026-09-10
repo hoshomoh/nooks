@@ -16,7 +16,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M0 · Groundwork | `[x]` |
 | M1 · Skeleton that runs | `[x]` |
 | M2 · Auth and first run | `[x]` |
-| M3 · Lists and Items — the core | `[~]` schema and store done |
+| M3 · Lists and Items — the core | `[~]` lists, items, search and the list view |
 | M4 · Views: Today, Upcoming, Calendar | `[ ]` |
 | M5 · Notes | `[ ]` |
 | M6 · Sharing, presence, Activity | `[ ]` |
@@ -105,23 +105,25 @@ The single most important milestone; everything else is furniture.
 
 - [x] List and Item schema, ordering, soft delete. Positions are floats so an Item drops
       between two others without renumbering; both drivers tested
-- [ ] Sidebar: Instance switcher, Search, Today / Upcoming / All lists, Pinned / My lists / Shared with
-      me, Add a list, Member footer
-- [ ] App shell: 258px sidebar, 44px chrome bar, 660px content column
-- [ ] List view: title, avatars, orientation line, count, the hairline rule
-- [ ] **The list row** — 44px, `20px 1fr auto`, truncation in the label, metadata right-aligned
-- [ ] Checkbox states: rest, hover, focus, done, just ticked by someone else
-- [ ] Add row: `+`, placeholder, `↵` keycap, stays focused after adding
-- [~] Quantity as free text — store done, UI next
-- [ ] Due dates, and date parsing from the typed text (`milk friday`)
-- [~] Tick and untick, with attribution — store done, RPCs and UI next
+- [~] Sidebar: Search, Pinned / My lists / Shared with me, Add a list, Member footer.
+      Today and Upcoming arrive with M4
+- [x] App shell: 258px sidebar, 44px chrome bar, 660px content column
+- [~] List view: title, orientation line, count, the hairline rule. Avatars arrive with
+      sharing in M6
+- [x] **The list row** — 44px, `20px 1fr auto`, truncation in the label, metadata right-aligned
+- [x] Checkbox states, with a 44px hit area around a 17px box
+- [x] Add row: `+`, placeholder, `↵` keycap, stays focused after adding
+- [x] Quantity as free text, shown as a mono badge
+- [~] Due dates stored and shown ("Today", "Fri", "Sat 5 Sep"); parsing them out of the
+      typed text is still to come
+- [x] Tick and untick, with attribution
 - [ ] Completed Items: placement and the "3 done today" row
-- [ ] Empty states: empty List, cold-start All lists
+- [x] Empty states: empty List, cold-start All lists
 - [ ] List menu (`···`): rename, pin, duplicate, print, sort, completed placement, export as plain
       text, delete
 - [x] Pinning, per Member — store done, and it never touches anyone else's sidebar
-- [~] Keyboard: `↵`, `↑` `↓`, `space`, `⌘K` — full-text search is in the store; the RPC and
-      the ⌘K palette are next
+- [~] Keyboard: `↵` and `⌘K` done, including Ctrl+K. `↑` `↓` and `space` arrive with row
+      focus
 
 ---
 

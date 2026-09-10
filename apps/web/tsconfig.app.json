@@ -26,7 +26,10 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
+    /* Off: protobuf-es generates TypeScript enums, and @nooks/api is consumed from
+       source. The generated files are not ours to change, and an enum is the right
+       shape for a proto enum. */
+    "erasableSyntaxOnly": false,
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"]

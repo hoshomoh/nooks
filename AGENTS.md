@@ -43,6 +43,9 @@ Nooks is a self-hosted household todo app. See `CONTEXT.md` for the domain gloss
 Run from the repository root unless a command starts with `cd`.
 
 ```bash
+# Everything CI runs, before you commit
+./scripts/ci.sh
+
 # Backend
 go run ./cmd/nooks --port 8081    # Start backend dev server
 go test ./...                    # Run all Go tests

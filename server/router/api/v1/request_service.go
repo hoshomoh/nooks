@@ -44,12 +44,21 @@ func (s *RequestService) ListPendingRequests(
 		return nil, internalError("read reset requests", err)
 	}
 
-	res := &apiv1.ListPendingRequestsResponse{
-		JoinRequests:  make([]*apiv1.PendingJoinRequest, 0, len(joins)),
-		ResetRequests: make([]*apiv1.PendingResetRequest, 0, len(resets)),
+	resetRequests, err := s.resetRequestsToProto(ctx, resets)
+	if err != nil {
+		return nil, err
 	}
-	for _, request := range joins {
-		res.JoinRequests = append(res.JoinRequests, &apiv1.PendingJoinRequest{
+	return connect.NewResponse(&apiv1.ListPendingRequestsResponse{
+		JoinRequests:  joinRequestsToProto(joins),
+		ResetRequests: resetRequests,
+	}), nil
+}
+
+// joinRequestsToProto converts stored Join requests for the wire.
+func joinRequestsToProto(requests []store.JoinRequest) []*apiv1.PendingJoinRequest {
+	out := make([]*apiv1.PendingJoinRequest, 0, len(requests))
+	for _, request := range requests {
+		out = append(out, &apiv1.PendingJoinRequest{
 			RequestUid: request.UID,
 			Name:       request.Name,
 			Email:      request.Email,
@@ -57,19 +66,28 @@ func (s *RequestService) ListPendingRequests(
 			CreatedAt:  formatRFC3339(request.CreatedAt),
 		})
 	}
-	for _, request := range resets {
-		// An Admin has to recognise who is asking, so the Member travels with it.
+	return out
+}
+
+// resetRequestsToProto converts stored Reset requests, carrying the Member with each:
+// an Admin has to recognise who is asking to know whether it is really them.
+func (s *RequestService) resetRequestsToProto(
+	ctx context.Context,
+	requests []store.ResetRequest,
+) ([]*apiv1.PendingResetRequest, error) {
+	out := make([]*apiv1.PendingResetRequest, 0, len(requests))
+	for _, request := range requests {
 		member, err := s.store.MemberByID(ctx, request.MemberID)
 		if err != nil {
 			return nil, internalError("read member", err)
 		}
-		res.ResetRequests = append(res.ResetRequests, &apiv1.PendingResetRequest{
+		out = append(out, &apiv1.PendingResetRequest{
 			RequestUid: request.UID,
 			Member:     memberToProto(member),
 			CreatedAt:  formatRFC3339(request.CreatedAt),
 		})
 	}
-	return connect.NewResponse(res), nil
+	return out, nil
 }
 
 // DecideJoinRequest approves or ignores a request for an account.

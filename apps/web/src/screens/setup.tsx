@@ -72,7 +72,7 @@ export function Setup() {
         />
 
         {completeSetup.isError && (
-          <p className="text-destructive text-[13.5px] leading-[1.5]">
+          <p className="text-destructive text-secondary">
             {messageFrom(completeSetup.error)}
           </p>
         )}

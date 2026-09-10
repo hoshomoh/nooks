@@ -32,11 +32,11 @@ const nooksButton = cva(
       /** Three sizes, and DESIGN.md §7 says where each one is allowed. */
       scale: {
         /** 34px — page and section headers, dialog footers. */
-        default: "h-[34px] rounded-lg px-4 text-[14px]",
+        default: "h-control rounded-lg px-4 text-chrome",
         /** 32px — inside a table row or a settings row. */
-        compact: "h-8 rounded-lg px-3.5 text-[13.5px]",
+        compact: "h-control-compact rounded-lg px-3.5 text-secondary",
         /** 26px — the 44px chrome bar only. */
-        toolbar: "h-[26px] rounded-md px-2.5 text-[12.5px]",
+        toolbar: "h-control-toolbar rounded-md px-2.5 text-micro",
       },
     },
     defaultVariants: { tone: "primary", scale: "default" },

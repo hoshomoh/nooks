@@ -84,15 +84,9 @@ func (s *AuthService) CompleteJoin(
 	ctx context.Context,
 	req *connect.Request[apiv1.CompleteJoinRequest],
 ) (*connect.Response[apiv1.CompleteJoinResponse], error) {
-	request, err := s.store.JoinRequestByUID(ctx, req.Msg.GetRequestUid())
+	request, err := s.approvedJoinRequest(ctx, req.Msg.GetRequestUid())
 	if err != nil {
-		if errors.Is(err, store.ErrNotFound) {
-			return nil, errRequestNotApproved
-		}
-		return nil, internalError("read join request", err)
-	}
-	if request.Status != store.StatusApproved {
-		return nil, errRequestNotApproved
+		return nil, err
 	}
 
 	// The Visitor may correct the name they gave; the email is the Admin's decision and
@@ -162,19 +156,15 @@ func (s *AuthService) GetResetRequest(
 	ctx context.Context,
 	req *connect.Request[apiv1.GetResetRequestRequest],
 ) (*connect.Response[apiv1.GetResetRequestResponse], error) {
-	pending := connect.NewResponse(&apiv1.GetResetRequestResponse{
-		Status: apiv1.RequestStatus_REQUEST_STATUS_PENDING,
-	})
-
-	request, err := s.store.ResetRequestByUID(ctx, req.Msg.GetRequestUid())
-	if err != nil {
-		if errors.Is(err, store.ErrNotFound) {
-			return pending, nil
+	// Anything not usable — missing, pending, ignored, expired, spent — reads as
+	// pending, so none of them can be told apart from outside.
+	if _, err := s.usableResetRequest(ctx, req.Msg.GetRequestUid()); err != nil {
+		if errors.Is(err, errRequestNotApproved) {
+			return connect.NewResponse(&apiv1.GetResetRequestResponse{
+				Status: apiv1.RequestStatus_REQUEST_STATUS_PENDING,
+			}), nil
 		}
-		return nil, internalError("read reset request", err)
-	}
-	if !request.Usable(s.now()) {
-		return pending, nil
+		return nil, err
 	}
 	return connect.NewResponse(&apiv1.GetResetRequestResponse{
 		Status: apiv1.RequestStatus_REQUEST_STATUS_APPROVED,
@@ -186,15 +176,9 @@ func (s *AuthService) CompletePasswordReset(
 	ctx context.Context,
 	req *connect.Request[apiv1.CompletePasswordResetRequest],
 ) (*connect.Response[apiv1.CompletePasswordResetResponse], error) {
-	request, err := s.store.ResetRequestByUID(ctx, req.Msg.GetRequestUid())
+	request, err := s.usableResetRequest(ctx, req.Msg.GetRequestUid())
 	if err != nil {
-		if errors.Is(err, store.ErrNotFound) {
-			return nil, errRequestNotApproved
-		}
-		return nil, internalError("read reset request", err)
-	}
-	if !request.Usable(s.now()) {
-		return nil, errRequestNotApproved
+		return nil, err
 	}
 
 	hash, err := password.Hash(req.Msg.GetNewPassword())
@@ -219,6 +203,36 @@ func (s *AuthService) CompletePasswordReset(
 		return nil, err
 	}
 	return res, nil
+}
+
+// approvedJoinRequest fetches a Join request that may still be acted on.
+func (s *AuthService) approvedJoinRequest(ctx context.Context, uid string) (store.JoinRequest, error) {
+	request, err := s.store.JoinRequestByUID(ctx, uid)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			return store.JoinRequest{}, errRequestNotApproved
+		}
+		return store.JoinRequest{}, internalError("read join request", err)
+	}
+	if request.Status != store.StatusApproved {
+		return store.JoinRequest{}, errRequestNotApproved
+	}
+	return request, nil
+}
+
+// usableResetRequest fetches a Reset request that is approved and not yet expired.
+func (s *AuthService) usableResetRequest(ctx context.Context, uid string) (store.ResetRequest, error) {
+	request, err := s.store.ResetRequestByUID(ctx, uid)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			return store.ResetRequest{}, errRequestNotApproved
+		}
+		return store.ResetRequest{}, internalError("read reset request", err)
+	}
+	if !request.Usable(s.now()) {
+		return store.ResetRequest{}, errRequestNotApproved
+	}
+	return request, nil
 }
 
 // errRequestNotApproved covers a request that is missing, pending, ignored, expired or

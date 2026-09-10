@@ -122,6 +122,9 @@ Otherwise:
 
 ## 6. Commits and review
 
+**Before every commit**, run `./scripts/ci.sh`. It is exactly what CI runs, in the same
+order. Discovering a break after pushing is the same information, slower and noisier.
+
 **Conventional Commits, and keep them short.**
 
 ```

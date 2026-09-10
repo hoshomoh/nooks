@@ -39,30 +39,9 @@ func New(cfg profile.Config, s store.Store, log *slog.Logger) (*Server, error) {
 		return nil, errors.New("server: logger is required")
 	}
 
-	// Every request passes through the resolver, which attaches the signed-in Member
-	// when there is one. It never rejects: first run, sign-in and the Public list are
-	// all legitimately anonymous.
-	interceptors := connect.WithInterceptors(auth.NewResolver(s, nil).Interceptor())
-
-	authService := v1.NewAuthService(s, v1.AuthServiceOptions{Secure: cfg.SecureCookies})
-
-	mux := http.NewServeMux()
-	mux.Handle(apiv1.NewInstanceServiceHandler(v1.NewInstanceService(s), interceptors))
-	mux.Handle(apiv1.NewAuthServiceHandler(authService, interceptors))
-	mux.Handle(apiv1.NewRequestServiceHandler(v1.NewRequestService(s, nil), interceptors))
-	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("ok"))
-	})
-
-	// In dev the Vite server serves the app and proxies here, so the binary serves
-	// only the API. In prod one binary serves both.
-	if cfg.Mode == profile.ModeProd {
-		app, err := frontend.Handler()
-		if err != nil {
-			return nil, err
-		}
-		mux.Handle("/", app)
+	mux, err := newMux(cfg, s)
+	if err != nil {
+		return nil, err
 	}
 
 	return &Server{
@@ -73,6 +52,38 @@ func New(cfg profile.Config, s store.Store, log *slog.Logger) (*Server, error) {
 		},
 		log: log,
 	}, nil
+}
+
+// newMux wires every route an Instance answers.
+func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
+	// Every request passes through the resolver, which attaches the signed-in Member
+	// when there is one. It never rejects: first run, sign-in and the Public list are
+	// all legitimately anonymous.
+	interceptors := connect.WithInterceptors(auth.NewResolver(s, nil).Interceptor())
+	authService := v1.NewAuthService(s, v1.AuthServiceOptions{Secure: cfg.SecureCookies})
+
+	mux := http.NewServeMux()
+	mux.Handle(apiv1.NewInstanceServiceHandler(v1.NewInstanceService(s), interceptors))
+	mux.Handle(apiv1.NewAuthServiceHandler(authService, interceptors))
+	mux.Handle(apiv1.NewRequestServiceHandler(v1.NewRequestService(s, nil), interceptors))
+	mux.HandleFunc("GET /healthz", handleHealthz)
+
+	// In dev the Vite server serves the app and proxies here, so the binary serves only
+	// the API. In prod one binary serves both.
+	if cfg.Mode == profile.ModeProd {
+		app, err := frontend.Handler()
+		if err != nil {
+			return nil, err
+		}
+		mux.Handle("/", app)
+	}
+	return mux, nil
+}
+
+// handleHealthz answers the liveness check a container runtime asks.
+func handleHealthz(w http.ResponseWriter, _ *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write([]byte("ok"))
 }
 
 // Serve listens until the context is cancelled, then shuts down gracefully.

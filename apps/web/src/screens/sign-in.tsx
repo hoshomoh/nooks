@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { getRouteApi, useNavigate } from "@tanstack/react-router"
+import { getRouteApi, Link, useNavigate } from "@tanstack/react-router"
 
 import { AuthShell } from "@/components/ds/auth-shell"
 import { Button } from "@/components/ds/button"
@@ -31,8 +31,16 @@ export function SignIn() {
       eyebrow="Signing in to"
       title={instance.name}
       blurb="Your lists are behind this."
-      footerLeft={<span className="text-shared">Forgot your password?</span>}
-      footerRight="New here? Ask to join from the list."
+      footerLeft={
+        <Link to="/forgot-password" className="text-shared">
+          Forgot your password?
+        </Link>
+      }
+      footerRight={
+        <Link to="/join" className="text-shared">
+          New here? Ask to join.
+        </Link>
+      }
     >
       <form
         className="flex flex-col gap-5"
@@ -59,7 +67,7 @@ export function SignIn() {
         />
 
         {signIn.isError && (
-          <p className="text-destructive text-[13.5px] leading-[1.5]">
+          <p className="text-destructive text-secondary">
             {messageFrom(signIn.error)}
           </p>
         )}

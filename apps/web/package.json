@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "release": "vite build --outDir ../../server/router/frontend/dist --emptyOutDir",
-    "lint": "tsc --noEmit && oxlint",
+    "lint": "tsc -b && oxlint",
     "lint:fix": "oxlint --fix",
     "preview": "vite preview",
     "test": "vitest run",

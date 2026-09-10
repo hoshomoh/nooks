@@ -17,6 +17,86 @@
 
   /* Radius means something — DESIGN.md §4. shadcn components reach for sm/md/lg/xl,
      so those are mapped onto Nooks' five radii rather than derived from one value. */
+  /* The type scale — DESIGN.md §3. Every role is a token so that no component has to
+     write a size literal, and changing the scale changes it everywhere. */
+  --text-display: 33px; /* list titles, view headings */
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.025em;
+  --text-display--font-weight: 600;
+
+  --text-page: 27px; /* settings pages, states */
+  --text-page--line-height: 1.2;
+  --text-page--letter-spacing: -0.02em;
+  --text-page--font-weight: 600;
+
+  --text-dialog: 21px; /* dialog headers */
+  --text-dialog--line-height: 1.3;
+  --text-dialog--letter-spacing: -0.015em;
+  --text-dialog--font-weight: 600;
+
+  --text-section: 19px; /* sections within a page */
+  --text-section--line-height: 1.35;
+  --text-section--letter-spacing: -0.01em;
+  --text-section--font-weight: 600;
+
+  --text-note-heading: 18px; /* note blocks, full screen */
+  --text-note-heading--line-height: 1.4;
+  --text-note-heading--font-weight: 600;
+
+  --text-empty: 17px; /* empty states */
+  --text-empty--line-height: 1.4;
+  --text-empty--font-weight: 500;
+
+  --text-body: 16px; /* item labels — the floor for member-written text */
+  --text-body--line-height: 1.4;
+
+  --text-note: 15.5px; /* note paragraphs, full screen */
+  --text-note--line-height: 1.6;
+
+  --text-input: 15px; /* field values, blurbs */
+  --text-input--line-height: 1.65;
+
+  --text-note-sheet: 14.5px; /* note paragraphs in the side sheet */
+  --text-note-sheet--line-height: 1.6;
+
+  --text-chrome: 14px; /* sidebar items, buttons, field labels */
+  --text-chrome--line-height: 1.45;
+
+  --text-secondary: 13.5px; /* explanations, sidebar rows, hints */
+  --text-secondary--line-height: 1.5;
+
+  --text-small: 13px; /* table cells, meta values */
+  --text-small--line-height: 1.5;
+
+  --text-micro: 12.5px; /* breadcrumbs, attribution, counts */
+  --text-micro--line-height: 1.5;
+
+  --text-label: 11.5px; /* uppercase section and column heads */
+  --text-label--line-height: 1.4;
+  --text-label--font-weight: 600;
+  --text-label--letter-spacing: 0.08em;
+
+  --text-keycap: 10.5px; /* ⌘K, ↵ */
+  --text-keycap--line-height: 1.3;
+
+  /* Control and bar heights — DESIGN.md §5 and §7. Named so a component never writes
+     a pixel height, and so the three button sizes stay the three DESIGN.md allows. */
+  --spacing-control: 34px; /* default button */
+  --spacing-control-compact: 32px; /* inside a table or settings row */
+  --spacing-control-toolbar: 26px; /* the chrome bar only */
+  --spacing-input: 38px; /* text input */
+  --spacing-row: 44px; /* the list row, and the minimum hit area */
+  --spacing-chrome: 44px; /* the chrome bar */
+  --spacing-chrome-auth: 52px; /* the signed-out chrome bar */
+  --spacing-sheet-footer: 42px;
+
+  /* Column widths — DESIGN.md §5. */
+  --container-content: 660px; /* the centred content column */
+  --container-calendar: 1060px;
+  --container-sheet: 520px; /* the side sheet */
+  --container-dialog: 560px;
+  --container-form: 420px; /* a signed-out form, narrower than content */
+
   --radius-sm: 4px; /* checkbox, small badge */
   --radius-md: 6px; /* row, toolbar button, menu item */
   --radius-lg: 7px; /* control: button, input, toggle track */

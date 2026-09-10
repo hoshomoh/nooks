@@ -41,6 +41,8 @@ Requires Go, Node and pnpm. `pnpm install` brings its own pinned `buf` — there
 globally.
 
 ```bash
+./scripts/ci.sh                     # everything CI runs — do this before committing
+
 pnpm install                        # dependencies, including buf
 
 go run ./cmd/nooks --mode dev        # API on :8081

@@ -9,14 +9,14 @@ export function Home() {
 
   return (
     <div className="bg-desk min-h-dvh">
-      <main className="mx-auto max-w-[660px] px-6 pt-14">
-        <h1 className="text-[33px] leading-[1.1] font-semibold tracking-[-0.025em]">
+      <main className="mx-auto max-w-content px-6 pt-14">
+        <h1 className="text-display">
           {instance.name}
         </h1>
-        <div className="border-hair mt-3.5 flex items-center gap-3 border-b pb-4 text-[13.5px]">
+        <div className="border-hair mt-3.5 flex items-center gap-3 border-b pb-4 text-secondary">
           <span className="text-muted-foreground">Signed in as {member.name}</span>
         </div>
-        <p className="text-secondary-foreground mt-8 max-w-[46ch] text-[15px] leading-[1.65]">
+        <p className="text-secondary-foreground mt-8 max-w-[46ch] text-input">
           Lists arrive in M3. Until then this is proof that first run, sign-in and the
           session all work end to end.
         </p>

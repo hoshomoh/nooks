@@ -68,22 +68,7 @@ func (s *AuthService) CompleteSetup(
 	req *connect.Request[apiv1.CompleteSetupRequest],
 ) (*connect.Response[apiv1.CompleteSetupResponse], error) {
 	msg := req.Msg
-
-	count, err := s.store.CountMembers(ctx)
-	if err != nil {
-		return nil, internalError("count members", err)
-	}
-	if count > 0 {
-		return nil, connect.NewError(connect.CodeFailedPrecondition,
-			errors.New("this instance has already been set up"))
-	}
-	if err := requireText(msg.GetName(), "a name"); err != nil {
-		return nil, err
-	}
-	if err := requireText(msg.GetEmail(), "an email"); err != nil {
-		return nil, err
-	}
-	if err := requireText(msg.GetInstanceName(), "a name for this instance"); err != nil {
+	if err := s.checkSetupIsOpen(ctx, msg); err != nil {
 		return nil, err
 	}
 
@@ -207,6 +192,27 @@ func (s *AuthService) ReplacePassword(
 		return nil, internalError("read member", err)
 	}
 	return connect.NewResponse(&apiv1.ReplacePasswordResponse{Member: memberToProto(updated)}), nil
+}
+
+// checkSetupIsOpen rejects first run when it has already happened, or when the form is
+// incomplete. Once an Instance has an Admin this closes permanently — otherwise whoever
+// reached it next could seize it.
+func (s *AuthService) checkSetupIsOpen(ctx context.Context, msg *apiv1.CompleteSetupRequest) error {
+	count, err := s.store.CountMembers(ctx)
+	if err != nil {
+		return internalError("count members", err)
+	}
+	if count > 0 {
+		return connect.NewError(connect.CodeFailedPrecondition,
+			errors.New("this instance has already been set up"))
+	}
+	if err := requireText(msg.GetName(), "a name"); err != nil {
+		return err
+	}
+	if err := requireText(msg.GetEmail(), "an email"); err != nil {
+		return err
+	}
+	return requireText(msg.GetInstanceName(), "a name for this instance")
 }
 
 // createMemberInput is what createMember needs, kept separate so the signature does not

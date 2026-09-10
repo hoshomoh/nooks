@@ -1,0 +1,19 @@
+{
+  "name": "nook",
+  "private": true,
+  "packageManager": "pnpm@12.3.4",
+  "scripts": {
+    "buf": "buf",
+    "generate": "cd proto && buf generate",
+    "proto:lint": "cd proto && buf lint",
+    "proto:format": "cd proto && buf format -w"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "1.72.0"
+  },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "@bufbuild/buf"
+    ]
+  }
+}

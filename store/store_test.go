@@ -11,7 +11,7 @@ import (
 // postgresDSNEnv names the environment variable that points the suite at a Postgres
 // server. When it is unset the Postgres cases skip, so `go test ./...` works on a
 // laptop with nothing installed while CI still covers both drivers.
-const postgresDSNEnv = "NOOK_TEST_POSTGRES_DSN"
+const postgresDSNEnv = "NOOKS_TEST_POSTGRES_DSN"
 
 // driverCase is one driver the shared suite runs against.
 type driverCase struct {
@@ -30,7 +30,7 @@ func drivers() []driverCase {
 
 func openSQLiteForTest(t *testing.T) Store {
 	t.Helper()
-	s, err := OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nook.db"))
+	s, err := OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
 	if err != nil {
 		t.Fatalf("OpenSQLite: %v", err)
 	}
@@ -138,7 +138,7 @@ func TestSaveInstanceSettingsReplacesEarlierValues(t *testing.T) {
 // which is what makes it safe to migrate on every start.
 func TestMigrateIsIdempotent(t *testing.T) {
 	ctx := context.Background()
-	path := filepath.Join(t.TempDir(), "nook.db")
+	path := filepath.Join(t.TempDir(), "nooks.db")
 
 	first, err := OpenSQLite(ctx, path)
 	if err != nil {

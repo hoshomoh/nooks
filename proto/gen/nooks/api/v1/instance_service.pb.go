@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        (unknown)
-// source: nook/api/v1/instance_service.proto
+// source: nooks/api/v1/instance_service.proto
 
 package apiv1
 
@@ -29,7 +29,7 @@ type GetInstanceRequest struct {
 
 func (x *GetInstanceRequest) Reset() {
 	*x = GetInstanceRequest{}
-	mi := &file_nook_api_v1_instance_service_proto_msgTypes[0]
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -41,7 +41,7 @@ func (x *GetInstanceRequest) String() string {
 func (*GetInstanceRequest) ProtoMessage() {}
 
 func (x *GetInstanceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_nook_api_v1_instance_service_proto_msgTypes[0]
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -54,7 +54,7 @@ func (x *GetInstanceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetInstanceRequest.ProtoReflect.Descriptor instead.
 func (*GetInstanceRequest) Descriptor() ([]byte, []int) {
-	return file_nook_api_v1_instance_service_proto_rawDescGZIP(), []int{0}
+	return file_nooks_api_v1_instance_service_proto_rawDescGZIP(), []int{0}
 }
 
 type GetInstanceResponse struct {
@@ -62,7 +62,7 @@ type GetInstanceResponse struct {
 	// The mutable display label chosen at first run, e.g. "Brunnen Street". Empty
 	// until first run completes.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The build of Nook that is running, e.g. "1.0.2".
+	// The build of Nooks that is running, e.g. "1.0.2".
 	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
 	// True until the first Admin exists. The app shows first run rather than sign in.
 	NeedsSetup bool `protobuf:"varint,3,opt,name=needs_setup,json=needsSetup,proto3" json:"needs_setup,omitempty"`
@@ -74,7 +74,7 @@ type GetInstanceResponse struct {
 
 func (x *GetInstanceResponse) Reset() {
 	*x = GetInstanceResponse{}
-	mi := &file_nook_api_v1_instance_service_proto_msgTypes[1]
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -86,7 +86,7 @@ func (x *GetInstanceResponse) String() string {
 func (*GetInstanceResponse) ProtoMessage() {}
 
 func (x *GetInstanceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_nook_api_v1_instance_service_proto_msgTypes[1]
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -99,7 +99,7 @@ func (x *GetInstanceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetInstanceResponse.ProtoReflect.Descriptor instead.
 func (*GetInstanceResponse) Descriptor() ([]byte, []int) {
-	return file_nook_api_v1_instance_service_proto_rawDescGZIP(), []int{1}
+	return file_nooks_api_v1_instance_service_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetInstanceResponse) GetName() string {
@@ -130,42 +130,42 @@ func (x *GetInstanceResponse) GetPublicSignup() bool {
 	return false
 }
 
-var File_nook_api_v1_instance_service_proto protoreflect.FileDescriptor
+var File_nooks_api_v1_instance_service_proto protoreflect.FileDescriptor
 
-const file_nook_api_v1_instance_service_proto_rawDesc = "" +
+const file_nooks_api_v1_instance_service_proto_rawDesc = "" +
 	"\n" +
-	"\"nook/api/v1/instance_service.proto\x12\vnook.api.v1\"\x14\n" +
+	"#nooks/api/v1/instance_service.proto\x12\fnooks.api.v1\"\x14\n" +
 	"\x12GetInstanceRequest\"\x89\x01\n" +
 	"\x13GetInstanceResponse\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
 	"\aversion\x18\x02 \x01(\tR\aversion\x12\x1f\n" +
 	"\vneeds_setup\x18\x03 \x01(\bR\n" +
 	"needsSetup\x12#\n" +
-	"\rpublic_signup\x18\x04 \x01(\bR\fpublicSignup2c\n" +
-	"\x0fInstanceService\x12P\n" +
-	"\vGetInstance\x12\x1f.nook.api.v1.GetInstanceRequest\x1a .nook.api.v1.GetInstanceResponseB\xac\x01\n" +
-	"\x0fcom.nook.api.v1B\x14InstanceServiceProtoP\x01Z5github.com/hoshomoh/nooks/proto/gen/nook/api/v1;apiv1\xa2\x02\x03NAX\xaa\x02\vNook.Api.V1\xca\x02\vNook\\Api\\V1\xe2\x02\x17Nook\\Api\\V1\\GPBMetadata\xea\x02\rNook::Api::V1b\x06proto3"
+	"\rpublic_signup\x18\x04 \x01(\bR\fpublicSignup2e\n" +
+	"\x0fInstanceService\x12R\n" +
+	"\vGetInstance\x12 .nooks.api.v1.GetInstanceRequest\x1a!.nooks.api.v1.GetInstanceResponseB\xb2\x01\n" +
+	"\x10com.nooks.api.v1B\x14InstanceServiceProtoP\x01Z6github.com/hoshomoh/nooks/proto/gen/nooks/api/v1;apiv1\xa2\x02\x03NAX\xaa\x02\fNooks.Api.V1\xca\x02\fNooks\\Api\\V1\xe2\x02\x18Nooks\\Api\\V1\\GPBMetadata\xea\x02\x0eNooks::Api::V1b\x06proto3"
 
 var (
-	file_nook_api_v1_instance_service_proto_rawDescOnce sync.Once
-	file_nook_api_v1_instance_service_proto_rawDescData []byte
+	file_nooks_api_v1_instance_service_proto_rawDescOnce sync.Once
+	file_nooks_api_v1_instance_service_proto_rawDescData []byte
 )
 
-func file_nook_api_v1_instance_service_proto_rawDescGZIP() []byte {
-	file_nook_api_v1_instance_service_proto_rawDescOnce.Do(func() {
-		file_nook_api_v1_instance_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_nook_api_v1_instance_service_proto_rawDesc), len(file_nook_api_v1_instance_service_proto_rawDesc)))
+func file_nooks_api_v1_instance_service_proto_rawDescGZIP() []byte {
+	file_nooks_api_v1_instance_service_proto_rawDescOnce.Do(func() {
+		file_nooks_api_v1_instance_service_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_nooks_api_v1_instance_service_proto_rawDesc), len(file_nooks_api_v1_instance_service_proto_rawDesc)))
 	})
-	return file_nook_api_v1_instance_service_proto_rawDescData
+	return file_nooks_api_v1_instance_service_proto_rawDescData
 }
 
-var file_nook_api_v1_instance_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_nook_api_v1_instance_service_proto_goTypes = []any{
-	(*GetInstanceRequest)(nil),  // 0: nook.api.v1.GetInstanceRequest
-	(*GetInstanceResponse)(nil), // 1: nook.api.v1.GetInstanceResponse
+var file_nooks_api_v1_instance_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_nooks_api_v1_instance_service_proto_goTypes = []any{
+	(*GetInstanceRequest)(nil),  // 0: nooks.api.v1.GetInstanceRequest
+	(*GetInstanceResponse)(nil), // 1: nooks.api.v1.GetInstanceResponse
 }
-var file_nook_api_v1_instance_service_proto_depIdxs = []int32{
-	0, // 0: nook.api.v1.InstanceService.GetInstance:input_type -> nook.api.v1.GetInstanceRequest
-	1, // 1: nook.api.v1.InstanceService.GetInstance:output_type -> nook.api.v1.GetInstanceResponse
+var file_nooks_api_v1_instance_service_proto_depIdxs = []int32{
+	0, // 0: nooks.api.v1.InstanceService.GetInstance:input_type -> nooks.api.v1.GetInstanceRequest
+	1, // 1: nooks.api.v1.InstanceService.GetInstance:output_type -> nooks.api.v1.GetInstanceResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -173,26 +173,26 @@ var file_nook_api_v1_instance_service_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_nook_api_v1_instance_service_proto_init() }
-func file_nook_api_v1_instance_service_proto_init() {
-	if File_nook_api_v1_instance_service_proto != nil {
+func init() { file_nooks_api_v1_instance_service_proto_init() }
+func file_nooks_api_v1_instance_service_proto_init() {
+	if File_nooks_api_v1_instance_service_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_nook_api_v1_instance_service_proto_rawDesc), len(file_nook_api_v1_instance_service_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_nooks_api_v1_instance_service_proto_rawDesc), len(file_nooks_api_v1_instance_service_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_nook_api_v1_instance_service_proto_goTypes,
-		DependencyIndexes: file_nook_api_v1_instance_service_proto_depIdxs,
-		MessageInfos:      file_nook_api_v1_instance_service_proto_msgTypes,
+		GoTypes:           file_nooks_api_v1_instance_service_proto_goTypes,
+		DependencyIndexes: file_nooks_api_v1_instance_service_proto_depIdxs,
+		MessageInfos:      file_nooks_api_v1_instance_service_proto_msgTypes,
 	}.Build()
-	File_nook_api_v1_instance_service_proto = out.File
-	file_nook_api_v1_instance_service_proto_goTypes = nil
-	file_nook_api_v1_instance_service_proto_depIdxs = nil
+	File_nooks_api_v1_instance_service_proto = out.File
+	file_nooks_api_v1_instance_service_proto_goTypes = nil
+	file_nooks_api_v1_instance_service_proto_depIdxs = nil
 }

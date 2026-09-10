@@ -1,4 +1,4 @@
-// Package profile holds the configuration one Nook instance runs with.
+// Package profile holds the configuration one Nooks instance runs with.
 //
 // Parsing is a pure function of its arguments and an environment lookup, so the
 // whole surface can be tested without touching the process or the filesystem.
@@ -50,26 +50,26 @@ type Config struct {
 // ErrHelp reports that the caller asked for usage rather than a running server.
 var ErrHelp = flag.ErrHelp
 
-// DefaultAddr is the port Nook listens on when nothing says otherwise.
+// DefaultAddr is the port Nooks listens on when nothing says otherwise.
 const DefaultAddr = ":8081"
 
 // Parse builds a Config from command-line arguments and an environment lookup.
 //
 // Flags win over environment variables, which win over defaults. Every variable is
-// prefixed NOOK_, e.g. NOOK_ADDR. Usage is written to out.
+// prefixed NOOKS_, e.g. NOOKS_ADDR. Usage is written to out.
 func Parse(args []string, env func(string) string, out io.Writer) (Config, error) {
 	if env == nil {
 		return Config{}, errors.New("profile: env lookup is required")
 	}
 
-	set := flag.NewFlagSet("nook", flag.ContinueOnError)
+	set := flag.NewFlagSet("nooks", flag.ContinueOnError)
 	set.SetOutput(out)
 
-	addr := set.String("addr", envOr(env, "NOOK_ADDR", DefaultAddr), "host:port to listen on")
-	data := set.String("data", envOr(env, "NOOK_DATA", "./data"), "directory for instance data")
-	driver := set.String("driver", envOr(env, "NOOK_DRIVER", string(DriverSQLite)), "database driver: sqlite or postgres")
-	dsn := set.String("dsn", envOr(env, "NOOK_DSN", ""), "postgres connection string")
-	mode := set.String("mode", envOr(env, "NOOK_MODE", string(ModeProd)), "prod or dev")
+	addr := set.String("addr", envOr(env, "NOOKS_ADDR", DefaultAddr), "host:port to listen on")
+	data := set.String("data", envOr(env, "NOOKS_DATA", "./data"), "directory for instance data")
+	driver := set.String("driver", envOr(env, "NOOKS_DRIVER", string(DriverSQLite)), "database driver: sqlite or postgres")
+	dsn := set.String("dsn", envOr(env, "NOOKS_DSN", ""), "postgres connection string")
+	mode := set.String("mode", envOr(env, "NOOKS_MODE", string(ModeProd)), "prod or dev")
 
 	if err := set.Parse(args); err != nil {
 		return Config{}, err
@@ -119,7 +119,7 @@ func (c Config) validate() error {
 
 // SQLitePath is where the Instance keeps its single file.
 func (c Config) SQLitePath() string {
-	return filepath.Join(c.Data, "nook.db")
+	return filepath.Join(c.Data, "nooks.db")
 }
 
 // envOr returns the environment value for key, or fallback when it is unset or blank.

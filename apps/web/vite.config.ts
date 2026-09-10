@@ -15,7 +15,7 @@ export default defineConfig({
   server: {
     port: 3001,
     proxy: {
-      "/nook.api.v1": { target: "http://localhost:8081", changeOrigin: true },
+      "/nooks.api.v1": { target: "http://localhost:8081", changeOrigin: true },
       "/api": { target: "http://localhost:8081", changeOrigin: true },
     },
   },

@@ -32,15 +32,15 @@ screen data, and the markup above it is the layout that consumes it.
 
 ## Rules that came out of the canvas
 
-These are decisions, not suggestions. They are enforced in `web/src/styles/tokens.css` and in review.
+These are decisions, not suggestions. They are enforced in `apps/web/src/index.css` and in review.
 
 - Four meaning colours, one job each: accent/shared, done/presence, offline, overdue/error. Nothing is
   coloured for decoration.
 - A list row is 44px minimum, always: 6px inner padding, 14px between checkbox and label, metadata
   right-aligned, truncation in the label. A row with five pieces of metadata is the height of a bare one.
 - Radii mean things: 4 checkbox, 6 row, 7 control, 10 surface.
-- Three rule weights mean different things: 2px separates sections of a page, 1px `--nook-line`
-  separates blocks inside a section, 1px `--nook-hair` separates rows.
+- Three rule weights mean different things: 2px separates sections of a page, 1px `--nooks-line`
+  separates blocks inside a section, 1px `--nooks-hair` separates rows.
 - 16px is the floor for anything a Member wrote. Print steps up, never down.
 - Empty states are dashed, left-aligned, never centred, and carry no illustration.
 - Dialogs are 560px with a bordered footer: consequence text left, cancel then confirm right.

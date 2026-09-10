@@ -1,4 +1,4 @@
-// Command nook runs a Nook instance: one binary serving both the API and the app.
+// Command nooks runs a Nooks instance: one binary serving both the API and the app.
 package main
 
 import (
@@ -25,7 +25,7 @@ func main() {
 		if errors.Is(err, profile.ErrHelp) {
 			return
 		}
-		fmt.Fprintln(os.Stderr, "nook:", err)
+		fmt.Fprintln(os.Stderr, "nooks:", err)
 		os.Exit(1)
 	}
 }

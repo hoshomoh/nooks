@@ -27,13 +27,13 @@ func TestParseDefaults(t *testing.T) {
 	if cfg.Mode != ModeProd {
 		t.Errorf("Mode = %q, want %q", cfg.Mode, ModeProd)
 	}
-	if got, want := cfg.SQLitePath(), "data/nook.db"; got != want {
+	if got, want := cfg.SQLitePath(), "data/nooks.db"; got != want {
 		t.Errorf("SQLitePath() = %q, want %q", got, want)
 	}
 }
 
 func TestParseFlagsBeatEnvironment(t *testing.T) {
-	env := envFrom(map[string]string{"NOOK_ADDR": ":9000", "NOOK_DATA": "/from/env"})
+	env := envFrom(map[string]string{"NOOKS_ADDR": ":9000", "NOOKS_DATA": "/from/env"})
 
 	cfg, err := Parse([]string{"--addr", ":7000"}, env, io.Discard)
 	if err != nil {
@@ -54,7 +54,7 @@ func TestParseRejectsBadConfig(t *testing.T) {
 	}{
 		{"unknown driver", []string{"--driver", "mysql"}},
 		{"postgres without dsn", []string{"--driver", "postgres"}},
-		{"sqlite with dsn", []string{"--dsn", "postgres://localhost/nook"}},
+		{"sqlite with dsn", []string{"--dsn", "postgres://localhost/nooks"}},
 		{"unknown mode", []string{"--mode", "staging"}},
 	}
 	for _, tc := range cases {
@@ -67,7 +67,7 @@ func TestParseRejectsBadConfig(t *testing.T) {
 }
 
 func TestParseAcceptsPostgres(t *testing.T) {
-	cfg, err := Parse([]string{"--driver", "postgres", "--dsn", "postgres://localhost/nook"}, noEnv, io.Discard)
+	cfg, err := Parse([]string{"--driver", "postgres", "--dsn", "postgres://localhost/nooks"}, noEnv, io.Discard)
 	if err != nil {
 		t.Fatalf("Parse: %v", err)
 	}

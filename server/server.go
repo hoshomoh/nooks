@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/hoshomoh/nooks/internal/profile"
-	apiv1 "github.com/hoshomoh/nooks/proto/gen/nook/api/v1/apiv1connect"
+	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1/apiv1connect"
 	v1 "github.com/hoshomoh/nooks/server/router/api/v1"
 	"github.com/hoshomoh/nooks/server/router/frontend"
 	"github.com/hoshomoh/nooks/store"
@@ -67,7 +67,7 @@ func New(cfg profile.Config, s store.Store, log *slog.Logger) (*Server, error) {
 func (s *Server) Serve(ctx context.Context) error {
 	errs := make(chan error, 1)
 	go func() {
-		s.log.Info("nook listening", "addr", s.http.Addr)
+		s.log.Info("nooks listening", "addr", s.http.Addr)
 		if err := s.http.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			errs <- fmt.Errorf("listen on %s: %w", s.http.Addr, err)
 			return
@@ -88,7 +88,7 @@ func (s *Server) shutdown() error {
 	ctx, cancel := context.WithTimeout(context.Background(), shutdownGrace)
 	defer cancel()
 
-	s.log.Info("nook stopping")
+	s.log.Info("nooks stopping")
 	if err := s.http.Shutdown(ctx); err != nil {
 		return fmt.Errorf("shut down: %w", err)
 	}

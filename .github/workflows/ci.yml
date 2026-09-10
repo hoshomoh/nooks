@@ -18,12 +18,12 @@ jobs:
       postgres:
         image: postgres:17-alpine
         env:
-          POSTGRES_USER: nook
-          POSTGRES_PASSWORD: nook
-          POSTGRES_DB: nook
+          POSTGRES_USER: nooks
+          POSTGRES_PASSWORD: nooks
+          POSTGRES_DB: nooks
         ports: ['5432:5432']
         options: >-
-          --health-cmd "pg_isready -U nook"
+          --health-cmd "pg_isready -U nooks"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
@@ -40,7 +40,7 @@ jobs:
       - name: Test
         run: go test -race ./...
         env:
-          NOOK_TEST_POSTGRES_DSN: postgres://nook:nook@localhost:5432/nook?sslmode=disable
+          NOOKS_TEST_POSTGRES_DSN: postgres://nooks:nooks@localhost:5432/nooks?sslmode=disable
       - name: Formatted
         run: test -z "$(gofmt -l cmd internal server store)"
 
@@ -73,6 +73,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Lint and typecheck
-        run: pnpm --filter @nook/web lint
+        run: pnpm --filter @nooks/web lint
       - name: Build
-        run: pnpm --filter @nook/web build
+        run: pnpm --filter @nooks/web build

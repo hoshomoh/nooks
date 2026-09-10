@@ -1,4 +1,4 @@
-# Nook — plan and status
+# Nooks — plan and status
 
 Everything in the design canvas, broken into shippable milestones. This file is both the plan and the
 status board: update the checkbox in the same commit as the work.
@@ -44,7 +44,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 - [x] Decide the Go module path — `github.com/hoshomoh/nooks`
 - [x] Decide v1 database drivers — SQLite and Postgres
 - [x] Decide the live-update transport — SSE
-- [x] `go.mod` (`github.com/hoshomoh/nooks`), `cmd/nook/`, `internal/version/`, `.editorconfig`
+- [x] `go.mod` (`github.com/hoshomoh/nooks`), `cmd/nooks/`, `internal/version/`, `.editorconfig`
 - [x] Licence — AGPL-3.0
 - [x] Commit convention — Conventional Commits, no attribution trailers
 
@@ -66,7 +66,7 @@ TypeScript. No features. Everything after this is filling in.
       `minimumReleaseAge` supply-chain policy on a transitive package, retrying
 - [ ] Tailwind v4 + `shadcn init`; **verify what the CLI emits against `DESIGN.md` §16 and amend the
       spec if they disagree**
-- [ ] Tokens: full light and dark palettes, Nook's own tokens, radii
+- [ ] Tokens: full light and dark palettes, Nooks's own tokens, radii
 - [ ] Self-host Public Sans and IBM Plex Mono *(see open questions — a home server may have no
       internet, so Google Fonts CDN is not acceptable — open question 1)*
 - [ ] Theme: light / dark / system, `.dark` class, persisted
@@ -80,7 +80,7 @@ TypeScript. No features. Everything after this is filling in.
 
 ## M2 · Auth and first run
 
-From `Nook-Auth-Onboarding.dc.html`.
+From `Nooks-Auth-Onboarding.dc.html`.
 
 - [ ] Member and Instance schema; password hashing; sessions
 - [ ] Password rule: twelve characters or more, **no other rules**
@@ -97,7 +97,7 @@ From `Nook-Auth-Onboarding.dc.html`.
 
 ## M3 · Lists and Items — the core
 
-From `Nook-List-View.dc.html`. The single most important milestone; everything else is furniture.
+From `Nooks-List-View.dc.html`. The single most important milestone; everything else is furniture.
 
 - [ ] List and Item schema, ordering, soft delete
 - [ ] Sidebar: Instance switcher, Search, Today / Upcoming / All lists, Pinned / My lists / Shared with
@@ -144,7 +144,7 @@ From `Nook-List-View.dc.html`. The single most important milestone; everything e
 
 ## M6 · Sharing, presence, Activity
 
-From `Nook-Sharing-Team.dc.html`.
+From `Nooks-Sharing-Team.dc.html`.
 
 - [ ] Sharing model: private / everyone on the Instance / specific Members and Groups
 - [ ] Can-edit toggle; read-only means see and print, not tick or add
@@ -172,7 +172,7 @@ From `Nook-Sharing-Team.dc.html`.
 
 ## M8 · Public list
 
-From `Nook-Public-Access.dc.html`.
+From `Nooks-Public-Access.dc.html`.
 
 - [ ] At most one Public list per Instance, at a stable address, no password, no account
 - [ ] Public page: no sidebar, no attribution, no other List reachable
@@ -187,7 +187,7 @@ From `Nook-Public-Access.dc.html`.
 
 ## M9 · Print
 
-From `Nook-Print.dc.html`.
+From `Nooks-Print.dc.html`.
 
 - [ ] `@page` A4, `18mm 18mm 14mm`, print stylesheet
 - [ ] Header: eyebrow, title, date, counts, and the 0.7pt ink rule
@@ -231,8 +231,8 @@ From `Nook-Print.dc.html`.
 `apps/website`, Next.js + Fumadocs. Part of v1 — a self-hosted app nobody can read about does not
 ship. It reuses `DESIGN.md`, so the site looks like the product rather than like a template.
 
-- [ ] Next.js app in `apps/website` with Tailwind and the Nook tokens
-- [ ] Landing page: what Nook is, the printed page, one screenshot, how to run it
+- [ ] Next.js app in `apps/website` with Tailwind and the Nooks tokens
+- [ ] Landing page: what Nooks is, the printed page, one screenshot, how to run it
 - [ ] Docs with Fumadocs MDX: install, configure, back up, upgrade, reverse proxy
 - [ ] API docs generated from the OpenAPI spec via `fumadocs-openapi` — **needs buf's
       gnostic-openapi plugin, pulled forward from M10**
@@ -275,11 +275,11 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
 | Database drivers, v1 | **SQLite and Postgres** | Every schema change ships migrations and `LATEST.sql` for both, plus driver tests. SQLite stays the default — the About screen promises "one file you can copy" |
 | Live updates | **SSE** | One-directional, plain HTTP, self-reconnecting, fine behind a reverse proxy. Enough for ticks, presence and Activity |
 | buf | Workspace devDependency | `pnpm exec buf`; no global install for contributors |
-| Token naming | shadcn's names; Nook's accent is `shared` | Avoids colliding with shadcn's `--accent` hover surface |
+| Token naming | shadcn's names; Nooks's accent is `shared` | Avoids colliding with shadcn's `--accent` hover surface |
 | Repository shape | **Monorepo**: `apps/*` and `packages/*`, Go at the root | Room for the website now and Expo later; shared code lives in a package rather than inside one app |
-| Generated TS client | `packages/api` (`@nook/api`) | Two known consumers — the web app now, Expo later — so it is a package from the start rather than a later extraction |
+| Generated TS client | `packages/api` (`@nooks/api`) | Two known consumers — the web app now, Expo later — so it is a package from the start rather than a later extraction |
 | Website stack | **Next.js + Fumadocs**, in v1 | Same React/Tailwind/shadcn stack as the app, so `DESIGN.md` carries over. `fumadocs-openapi` turns the spec into API docs |
-| Mobile app | **Expo**, after v1 | Shares `@nook/api` and tokens, not DOM components |
+| Mobile app | **Expo**, after v1 | Shares `@nooks/api` and tokens, not DOM components |
 
 ## Open questions
 
@@ -303,5 +303,5 @@ Named so nobody wonders whether they were forgotten. None of these appear in the
   Note checklists · Full-text search across Notes (⌘K jumps to Lists only) · Multiple Instances behind
   one deployment · Email, of any kind
 
-The **mobile app is planned but not v1**: Expo, in `apps/mobile`, sharing `@nook/api` and the design
+The **mobile app is planned but not v1**: Expo, in `apps/mobile`, sharing `@nooks/api` and the design
 tokens. The layout already has room for it.

@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package nook.api.v1;
+package nooks.api.v1;
 
-// InstanceService reports what this copy of Nook is and how it is configured.
+// InstanceService reports what this copy of Nooks is and how it is configured.
 service InstanceService {
   // GetInstance returns the public profile of this Instance. It is reachable without
   // authentication because the sign-in page and the Public list both need it before
@@ -17,7 +17,7 @@ message GetInstanceResponse {
   // until first run completes.
   string name = 1;
 
-  // The build of Nook that is running, e.g. "1.0.2".
+  // The build of Nooks that is running, e.g. "1.0.2".
   string version = 2;
 
   // True until the first Admin exists. The app shows first run rather than sign in.

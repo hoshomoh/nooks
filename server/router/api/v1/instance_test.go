@@ -8,7 +8,7 @@ import (
 
 	"connectrpc.com/connect"
 
-	apiv1 "github.com/hoshomoh/nooks/proto/gen/nook/api/v1"
+	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/store"
 )
 

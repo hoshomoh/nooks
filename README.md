@@ -1,21 +1,21 @@
-# Nook
+# Nooks
 
 A household todo app you run on your own machine.
 
 One list primitive, one action to add something, and a printed page that is a real deliverable rather
 than a fallback. No email server to configure, no telemetry, no account anywhere but yours.
 
-> Nook is in early development. Nothing here is releasable yet — see [`TODO.md`](TODO.md) for where it
+> Nooks is in early development. Nothing here is releasable yet — see [`TODO.md`](TODO.md) for where it
 > is up to.
 
 ## Running it
 
-Nook is one binary. It serves the API and the app from the same process and keeps everything in one
+Nooks is one binary. It serves the API and the app from the same process and keeps everything in one
 SQLite file you can copy.
 
 ```bash
-go build -o nook ./cmd/nook
-./nook --data ./data
+go build -o nooks ./cmd/nooks
+./nooks --data ./data
 ```
 
 Then open <http://localhost:8081>. The first person to arrive creates their account and names the
@@ -25,15 +25,15 @@ Instance; everyone else joins by asking, and an Admin approves.
 
 | Flag | Environment | Default | Meaning |
 | --- | --- | --- | --- |
-| `--addr` | `NOOK_ADDR` | `:8081` | Host and port to listen on |
-| `--data` | `NOOK_DATA` | `./data` | Directory holding the SQLite file |
-| `--driver` | `NOOK_DRIVER` | `sqlite` | `sqlite` or `postgres` |
-| `--dsn` | `NOOK_DSN` | — | Postgres connection string; unused for SQLite |
-| `--mode` | `NOOK_MODE` | `prod` | `dev` expects the Vite server to serve the app |
+| `--addr` | `NOOKS_ADDR` | `:8081` | Host and port to listen on |
+| `--data` | `NOOKS_DATA` | `./data` | Directory holding the SQLite file |
+| `--driver` | `NOOKS_DRIVER` | `sqlite` | `sqlite` or `postgres` |
+| `--dsn` | `NOOKS_DSN` | — | Postgres connection string; unused for SQLite |
+| `--mode` | `NOOKS_MODE` | `prod` | `dev` expects the Vite server to serve the app |
 
 ### Backing it up
 
-Stop Nook and copy `data/nook.db`. That is the whole Instance.
+Stop Nooks and copy `data/nooks.db`. That is the whole Instance.
 
 ## Developing
 
@@ -43,27 +43,27 @@ globally.
 ```bash
 pnpm install                        # dependencies, including buf
 
-go run ./cmd/nook --mode dev        # API on :8081
-pnpm --filter @nook/web dev         # app on :3001, proxying to the API
+go run ./cmd/nooks --mode dev        # API on :8081
+pnpm --filter @nooks/web dev         # app on :3001, proxying to the API
 
 go test ./...                       # Go tests
-pnpm --filter @nook/web lint        # typecheck and lint
+pnpm --filter @nooks/web lint        # typecheck and lint
 pnpm generate                       # regenerate Go and TypeScript from proto/
 ```
 
 The store suite covers both drivers. Postgres cases skip unless you point them at a server:
 
 ```bash
-docker run -d --name nook-pg -e POSTGRES_USER=nook -e POSTGRES_PASSWORD=nook \
-  -e POSTGRES_DB=nook -p 55432:5432 postgres:17-alpine
-NOOK_TEST_POSTGRES_DSN='postgres://nook:nook@localhost:55432/nook?sslmode=disable' go test ./store/
+docker run -d --name nooks-pg -e POSTGRES_USER=nooks -e POSTGRES_PASSWORD=nooks \
+  -e POSTGRES_DB=nooks -p 55432:5432 postgres:17-alpine
+NOOKS_TEST_POSTGRES_DSN='postgres://nooks:nooks@localhost:55432/nooks?sslmode=disable' go test ./store/
 ```
 
 To bake the app into the binary:
 
 ```bash
-pnpm --filter @nook/web release     # builds into server/router/frontend/dist
-go build -o nook ./cmd/nook         # go:embed picks it up
+pnpm --filter @nooks/web release     # builds into server/router/frontend/dist
+go build -o nooks ./cmd/nooks         # go:embed picks it up
 ```
 
 ## Before you contribute

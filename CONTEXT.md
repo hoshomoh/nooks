@@ -1,6 +1,6 @@
-# Nook
+# Nooks
 
-Nook is a household todo app you run on your own machine. It is built around one primitive — a list of
+Nooks is a household todo app you run on your own machine. It is built around one primitive — a list of
 items — and it treats the printed page as a real output rather than a fallback.
 
 This file fixes the language. Every term below has one name; the `_Avoid_` line lists the names that
@@ -9,7 +9,7 @@ mean the same thing and must not be used in code, API, UI copy, or commit messag
 ## Language
 
 **Instance**:
-One running copy of Nook and everything in it. It has a name, chosen at first run, that shows in the
+One running copy of Nooks and everything in it. It has a name, chosen at first run, that shows in the
 sidebar and on printed pages.
 _Avoid_: Workspace, tenant, organisation, server
 
@@ -33,7 +33,7 @@ its own.
 _Avoid_: Team, role, circle
 
 **List**:
-A named, ordered collection of Items. The only container in Nook — there are no folders, projects, or
+A named, ordered collection of Items. The only container in Nooks — there are no folders, projects, or
 boards.
 _Avoid_: Project, board, folder, collection
 
@@ -114,9 +114,9 @@ first sign-in.
 _Avoid_: Invite code, initial password, default password
 
 **Access token**:
-A secret that lets something other than a browser reach Nook — a script, a shortcut, an assistant over
+A secret that lets something other than a browser reach Nooks — a script, a shortcut, an assistant over
 MCP. It is scoped to named Lists and to a set of permissions, belongs to the Member who made it, and
-is shown exactly once. Nook stores a hash.
+is shown exactly once. Nooks stores a hash.
 _Avoid_: API key, PAT, credential, secret (as a noun for this)
 
 **Token scope**:
@@ -126,7 +126,7 @@ _Avoid_: Permissions (that is the separate list of allowed operations)
 
 **Activity**:
 The in-app record of things that need a Member's attention or explain a change — join requests, reset
-requests, shares, token use. Nook has no mail server, so Activity is the only place these surface.
+requests, shares, token use. Nooks has no mail server, so Activity is the only place these surface.
 _Avoid_: Notifications, feed, audit log, alerts
 
 **Print sheet**:
@@ -137,7 +137,7 @@ _Avoid_: PDF export, print preview, printout
 ## Principles
 
 - One list primitive. Anything that feels like a second container is a view over Lists.
-- Nook sends no email. Anything that would need one waits in Activity instead.
+- Nooks sends no email. Anything that would need one waits in Activity instead.
 - Nothing is generated on a Member's behalf: a long Note previews as its own first line and a count of
   what is left, never a summary.
 - A row is 44px whether it carries one piece of metadata or five.

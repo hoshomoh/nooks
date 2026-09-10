@@ -6,14 +6,14 @@ node_modules/
 
 # Build output
 apps/web/dist/
-/nook
+/nooks
 
-# The SPA that `pnpm --filter @nook/web release` bakes into the binary. The
+# The SPA that `pnpm --filter @nooks/web release` bakes into the binary. The
 # placeholder is tracked so //go:embed still compiles on a fresh clone.
 server/router/frontend/dist/*
 !server/router/frontend/dist/index.html
 
-# Local data — a Nook instance keeps its SQLite file here during development
+# Local data — a Nooks instance keeps its SQLite file here during development
 *.db
 *.db-shm
 *.db-wal

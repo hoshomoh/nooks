@@ -1,4 +1,4 @@
-// Package version reports which build of Nook is running.
+// Package version reports which build of Nooks is running.
 package version
 
 // Version is the semantic version of this build. Release builds override it via

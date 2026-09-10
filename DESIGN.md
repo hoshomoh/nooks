@@ -1,4 +1,4 @@
-# Nook — design system
+# Nooks — design system
 
 The specification the UI is built to. Values here are extracted from the design canvas
 (`docs/design/README.md`) and are exact, not approximate. If a component in the app disagrees with
@@ -22,7 +22,7 @@ things being displayed.
 - **16px is the floor** for anything a Member wrote.
 - **Never summarise the Member.** A long Note previews as its own first line plus a count of what is
   left. Nothing is generated on their behalf.
-- **Nook sends no email.** Anything that would need one waits in Activity.
+- **Nooks sends no email.** Anything that would need one waits in Activity.
 
 ---
 
@@ -32,71 +32,71 @@ things being displayed.
 
 | Token | Value | Job |
 | --- | --- | --- |
-| `--nook-desk` | `#F2F2F0` | The surface behind the app frame |
-| `--nook-paper` | `#FFFFFF` | Panels, main content, dialogs |
-| `--nook-sidebar` | `#FBFBFA` | Sidebar, inset panels |
-| `--nook-selected` | `#EFEFED` | Selected row, active toolbar button |
-| `--nook-line` | `#E6E6E3` | Block rule — separates blocks inside a section |
-| `--nook-hair` | `#F0F0EE` | Row rule — separates rows |
-| `--nook-control` | `#8F8F8A` | Checkbox and radio borders at rest |
-| `--nook-muted` | `#5F5F5B` | Muted text — counts, timestamps, attribution |
-| `--nook-sub` | `#3F3F3C` | Secondary text — body copy, explanations |
-| `--nook-ink` | `#1F1F1E` | Primary text, primary button fill, monogram |
-| `--nook-chip` | `#EDEDEA` | Avatar and chip fill |
-| `--nook-input-line` | `#D6D6D1` | Input border at rest (darker than `--nook-line`) |
+| `--nooks-desk` | `#F2F2F0` | The surface behind the app frame |
+| `--nooks-paper` | `#FFFFFF` | Panels, main content, dialogs |
+| `--nooks-sidebar` | `#FBFBFA` | Sidebar, inset panels |
+| `--nooks-selected` | `#EFEFED` | Selected row, active toolbar button |
+| `--nooks-line` | `#E6E6E3` | Block rule — separates blocks inside a section |
+| `--nooks-hair` | `#F0F0EE` | Row rule — separates rows |
+| `--nooks-control` | `#8F8F8A` | Checkbox and radio borders at rest |
+| `--nooks-muted` | `#5F5F5B` | Muted text — counts, timestamps, attribution |
+| `--nooks-sub` | `#3F3F3C` | Secondary text — body copy, explanations |
+| `--nooks-ink` | `#1F1F1E` | Primary text, primary button fill, monogram |
+| `--nooks-chip` | `#EDEDEA` | Avatar and chip fill |
+| `--nooks-input-line` | `#D6D6D1` | Input border at rest (darker than `--nooks-line`) |
 
 ### Light — meaning colours
 
 | Token | Value | Job |
 | --- | --- | --- |
-| `--nook-accent` | `#37618F` | Shared, links, focus ring, quiet buttons, due dates |
-| `--nook-accent-bg` | `#EEF2F7` | Accent badge fill |
-| `--nook-accent-panel` | `#F1F6FB` | Accent panel fill — secret, selected share option |
-| `--nook-accent-line` | `#C9DAEC` | Accent panel border |
-| `--nook-done` | `#2E7D5B` | Done, and presence of another Member |
-| `--nook-done-bg` | `#F4F8F4` | Row just ticked by someone else |
-| `--nook-offline` | `#9A6B14` | Offline dot |
-| `--nook-offline-bg` | `#FBF6E9` | Offline banner fill |
-| `--nook-offline-line` | `#EDE1C4` | Offline banner border |
-| `--nook-offline-text` | `#6B4A0E` | Offline banner text |
-| `--nook-error` | `#A03A2E` | Overdue dates |
-| `--nook-error-text` | `#8E3B31` | Error text, destructive button label |
-| `--nook-error-line` | `#E4C2BC` | Error and destructive borders |
-| `--nook-error-bg` | `#FCF5F4` | Rejected input, errored row |
-| `--nook-scrim` | `rgba(31,31,30,0.34)` | Behind dialogs — ink at 34% |
-| `--nook-knob` | `#FFFFFF` | Toggle knob |
-| `--nook-toggle-off` | `#E0E0DC` | Toggle track, off |
+| `--nooks-accent` | `#37618F` | Shared, links, focus ring, quiet buttons, due dates |
+| `--nooks-accent-bg` | `#EEF2F7` | Accent badge fill |
+| `--nooks-accent-panel` | `#F1F6FB` | Accent panel fill — secret, selected share option |
+| `--nooks-accent-line` | `#C9DAEC` | Accent panel border |
+| `--nooks-done` | `#2E7D5B` | Done, and presence of another Member |
+| `--nooks-done-bg` | `#F4F8F4` | Row just ticked by someone else |
+| `--nooks-offline` | `#9A6B14` | Offline dot |
+| `--nooks-offline-bg` | `#FBF6E9` | Offline banner fill |
+| `--nooks-offline-line` | `#EDE1C4` | Offline banner border |
+| `--nooks-offline-text` | `#6B4A0E` | Offline banner text |
+| `--nooks-error` | `#A03A2E` | Overdue dates |
+| `--nooks-error-text` | `#8E3B31` | Error text, destructive button label |
+| `--nooks-error-line` | `#E4C2BC` | Error and destructive borders |
+| `--nooks-error-bg` | `#FCF5F4` | Rejected input, errored row |
+| `--nooks-scrim` | `rgba(31,31,30,0.34)` | Behind dialogs — ink at 34% |
+| `--nooks-knob` | `#FFFFFF` | Toggle knob |
+| `--nooks-toggle-off` | `#E0E0DC` | Toggle track, off |
 
 ### Dark
 
 | Token | Value |
 | --- | --- |
-| `--nook-desk` | `#111110` |
-| `--nook-paper` | `#191918` |
-| `--nook-sidebar` | `#151514` |
-| `--nook-selected` | `#232321` |
-| `--nook-line` | `#2E2E2B` |
-| `--nook-hair` | `#242422` |
-| `--nook-control` | `#7A7A73` |
-| `--nook-muted` | `#9A9A95` |
-| `--nook-sub` | `#C8C8C3` |
-| `--nook-ink` | `#ECECEA` |
-| `--nook-chip` | `#2A2A27` |
-| `--nook-accent` | `#7FA8D4` |
-| `--nook-accent-bg` / `--nook-accent-panel` | `#1B2129` |
-| `--nook-accent-line` | `#33465C` |
-| `--nook-done` | `#5FA98A` |
-| `--nook-done-bg` | `#18241F` |
-| `--nook-offline` | `#D9A93C` |
-| `--nook-offline-bg` | `#2A2413` |
-| `--nook-offline-line` | `#3D3520` |
-| `--nook-offline-text` | `#E4C67E` |
-| `--nook-error` | `#E08B7C` |
-| `--nook-error-text` | `#D98A7E` |
-| `--nook-error-line` | `#5C3A34` |
-| `--nook-scrim` | `rgba(0,0,0,0.55)` — ink at 55% |
-| `--nook-knob` | `#0F0F0E` |
-| `--nook-toggle-off` | `#33332F` |
+| `--nooks-desk` | `#111110` |
+| `--nooks-paper` | `#191918` |
+| `--nooks-sidebar` | `#151514` |
+| `--nooks-selected` | `#232321` |
+| `--nooks-line` | `#2E2E2B` |
+| `--nooks-hair` | `#242422` |
+| `--nooks-control` | `#7A7A73` |
+| `--nooks-muted` | `#9A9A95` |
+| `--nooks-sub` | `#C8C8C3` |
+| `--nooks-ink` | `#ECECEA` |
+| `--nooks-chip` | `#2A2A27` |
+| `--nooks-accent` | `#7FA8D4` |
+| `--nooks-accent-bg` / `--nooks-accent-panel` | `#1B2129` |
+| `--nooks-accent-line` | `#33465C` |
+| `--nooks-done` | `#5FA98A` |
+| `--nooks-done-bg` | `#18241F` |
+| `--nooks-offline` | `#D9A93C` |
+| `--nooks-offline-bg` | `#2A2413` |
+| `--nooks-offline-line` | `#3D3520` |
+| `--nooks-offline-text` | `#E4C67E` |
+| `--nooks-error` | `#E08B7C` |
+| `--nooks-error-text` | `#D98A7E` |
+| `--nooks-error-line` | `#5C3A34` |
+| `--nooks-scrim` | `rgba(0,0,0,0.55)` — ink at 55% |
+| `--nooks-knob` | `#0F0F0E` |
+| `--nooks-toggle-off` | `#33332F` |
 
 **Visitor variant.** On the Public list the checkbox is not interactive, so its border uses a lighter
 control: `#B4B4AE` light, `#5A5A55` dark.
@@ -159,9 +159,9 @@ Uppercase is reserved for the 11.5 section and column heads. Nothing else is upp
 
 | Weight | Colour | Separates |
 | --- | --- | --- |
-| 2px | `--nook-line` | Sections of a page |
-| 1px | `--nook-line` | Blocks inside a section |
-| 1px | `--nook-hair` | Rows |
+| 2px | `--nooks-line` | Sections of a page |
+| 1px | `--nooks-line` | Blocks inside a section |
+| 1px | `--nooks-hair` | Rows |
 
 ---
 
@@ -198,23 +198,23 @@ margin: 0 -8px;
 border-radius: 6px;
 ```
 
-- Checkbox **17 × 17**, 1.5px `--nook-control` border, radius 4. Hit area is **44px** regardless.
+- Checkbox **17 × 17**, 1.5px `--nooks-control` border, radius 4. Hit area is **44px** regardless.
 - Label 16px, truncates with ellipsis. **Truncation happens in the label**, never in the metadata, so
   the label always starts at the same x and the row never grows.
 - Metadata is right-aligned in the third column, `gap: 12px`, `white-space: nowrap`: quantity badge,
   list name, date, `note` marker, attribution.
-- Quantity is a mono 11.5 badge: 1px `--nook-line`, radius 4, padding `1px 5px`.
-- A due date takes `--nook-accent`; an overdue date takes `--nook-error`.
-- Hover fills `--nook-selected` and darkens the checkbox border to `--nook-muted`.
-- Done: checkbox filled `--nook-muted` with a white tick; label `--nook-muted` with
+- Quantity is a mono 11.5 badge: 1px `--nooks-line`, radius 4, padding `1px 5px`.
+- A due date takes `--nooks-accent`; an overdue date takes `--nooks-error`.
+- Hover fills `--nooks-selected` and darkens the checkbox border to `--nooks-muted`.
+- Done: checkbox filled `--nooks-muted` with a white tick; label `--nooks-muted` with
   `line-through` in `#C4C4BE`.
-- Just ticked by someone else: fill `--nook-done-bg`, checkbox filled `--nook-done`, attribution
-  `--nook-done`. Holds for one second, then settles. **No toast, no sound.**
-- A Note previews as one line below the row: 13.5px `--nook-sub`, on a 2px `--nook-line` left rule
+- Just ticked by someone else: fill `--nooks-done-bg`, checkbox filled `--nooks-done`, attribution
+  `--nooks-done`. Holds for one second, then settles. **No toast, no sound.**
+- A Note previews as one line below the row: 13.5px `--nooks-sub`, on a 2px `--nooks-line` left rule
   indented 10px, in the label column, with `+N lines` after it.
 
-**Add row.** Same grid, `border-top: 1px solid --nook-hair`, a `+` in the checkbox column, placeholder
-in `--nook-muted`, and a mono `↵` keycap at the right. Enter adds and keeps focus for the next one.
+**Add row.** Same grid, `border-top: 1px solid --nooks-hair`, a `+` in the checkbox column, placeholder
+in `--nooks-muted`, and a mono `↵` keycap at the right. Enter adds and keeps focus for the next one.
 
 ---
 
@@ -224,10 +224,10 @@ in `--nook-muted`, and a mono `↵` keycap at the right. Enter adds and keeps fo
 
 | Variant | Spec |
 | --- | --- |
-| Primary | `--nook-ink` fill, `--nook-paper` text, 500 |
-| Secondary | 1px `--nook-line` border, `--nook-sub` text |
-| Quiet | no border, `--nook-accent` text |
-| Destructive | 1px `--nook-error-line` border, `--nook-error-text` text |
+| Primary | `--nooks-ink` fill, `--nooks-paper` text, 500 |
+| Secondary | 1px `--nooks-line` border, `--nooks-sub` text |
+| Quiet | no border, `--nooks-accent` text |
+| Destructive | 1px `--nooks-error-line` border, `--nooks-error-text` text |
 
 | Size | Height / padding / radius / text | Allowed in |
 | --- | --- | --- |
@@ -235,55 +235,55 @@ in `--nook-muted`, and a mono `↵` keycap at the right. Enter adds and keeps fo
 | Compact | 32 / `0 14` / 7 / 13.5 | Inside a table row or settings row |
 | Toolbar | 26 / `0 10` / 6 / 12.5 | The 44px chrome bar only |
 
-**Focus is 2px `--nook-accent` outline at 2px offset**, everywhere, on every focusable thing.
+**Focus is 2px `--nooks-accent` outline at 2px offset**, everywhere, on every focusable thing.
 
 ### Inputs
 
-38px high, radius 7, 15px text. Rest 1px `--nook-input-line`; focus **1.5px** `--nook-accent`;
-rejected 1px `--nook-error-line` on `--nook-error-bg` with `--nook-error-text`. Settings-row inputs are
-36px and 280px wide. Labels are 13 / 500 `--nook-sub`; hints sit under the field in 12.5
-`--nook-muted`.
+38px high, radius 7, 15px text. Rest 1px `--nooks-input-line`; focus **1.5px** `--nooks-accent`;
+rejected 1px `--nooks-error-line` on `--nooks-error-bg` with `--nooks-error-text`. Settings-row inputs are
+36px and 280px wide. Labels are 13 / 500 `--nooks-sub`; hints sit under the field in 12.5
+`--nooks-muted`.
 
 ### Toggle
 
-34 × 20 track, radius 10, 16px knob, 2px padding. On: `--nook-accent` track, knob right. Off:
-`--nook-toggle-off` track, knob left. The word `On` / `Off` sits to its left in 13 `--nook-muted`.
+34 × 20 track, radius 10, 16px knob, 2px padding. On: `--nooks-accent` track, knob right. Off:
+`--nooks-toggle-off` track, knob left. The word `On` / `Off` sits to its left in 13 `--nooks-muted`.
 
 ### Chips and permission lists
 
 Chips pick many of one kind of thing: 30px high, radius 15, 13px, a 13px square swatch at 3px radius
-inside. Selected fills `--nook-selected`; unselected takes a 1px `--nook-line` border.
+inside. Selected fills `--nooks-selected`; unselected takes a 1px `--nooks-line` border.
 
 Use the bordered list instead when each choice needs a sentence explaining what it costs: 1px
-`--nook-line`, radius 8, rows padded `12px 14px` split by 1px `--nook-hair`, a 15px checkbox, label 14
-and explanation 12.5 `--nook-muted`.
+`--nooks-line`, radius 8, rows padded `12px 14px` split by 1px `--nooks-hair`, a 15px checkbox, label 14
+and explanation 12.5 `--nooks-muted`.
 
 ---
 
 ## 8. Page furniture
 
-**Chrome bar** — 44px, 1px `--nook-hair` bottom, padding `0 16px 0 22px`. Breadcrumb left in 12.5
-(`--nook-muted`, current segment `--nook-sub`), toolbar buttons right, then the `···` menu at 26 × 26.
+**Chrome bar** — 44px, 1px `--nooks-hair` bottom, padding `0 16px 0 22px`. Breadcrumb left in 12.5
+(`--nooks-muted`, current segment `--nooks-sub`), toolbar buttons right, then the `···` menu at 26 × 26.
 It carries location and view-level actions only — **never the page's primary action**.
 
 **Page header** — 27px title, one 14px line of orientation capped at 540px, primary action pinned
 right and top-aligned with the title. The action never sits at the bottom of the page.
 
-**Section header** — 2px `--nook-line` above, 18px padding, 19px heading, 13px explanation, secondary
+**Section header** — 2px `--nooks-line` above, 18px padding, 19px heading, 13px explanation, secondary
 action pinned right.
 
-**Table** — 11.5 uppercase column heads over a 1px `--nook-line` rule; rows min 56px split by 1px
-`--nook-hair`; compact buttons inside; the last column is always the `···` menu at 24px. A row that has
+**Table** — 11.5 uppercase column heads over a 1px `--nooks-line` rule; rows min 56px split by 1px
+`--nooks-hair`; compact buttons inside; the last column is always the `···` menu at 24px. A row that has
 never been used greys its name and its last column, **not the whole row**.
 
-**Card** — 1px `--nook-line`, radius 8, padding `15px 16px`. Name row, body, then one
-`--nook-hair`-separated footer fact. Cards go two-up in a 12px grid; they never stretch to a
+**Card** — 1px `--nooks-line`, radius 8, padding `15px 16px`. Name row, body, then one
+`--nooks-hair`-separated footer fact. Cards go two-up in a 12px grid; they never stretch to a
 single full-width column.
 
-**Settings row** — `190px 1fr` grid, 24px gap, min-height 48px, split by 1px `--nook-hair`. Label 14
-with a 12.5 `--nook-muted` explanation under it; control right-aligned.
+**Settings row** — `190px 1fr` grid, 24px gap, min-height 48px, split by 1px `--nooks-hair`. Label 14
+with a 12.5 `--nooks-muted` explanation under it; control right-aligned.
 
-**Empty state** — 1px **dashed** `--nook-line`, radius 8, padding `30px 26px`, **left-aligned, never
+**Empty state** — 1px **dashed** `--nooks-line`, radius 8, padding `30px 26px`, **left-aligned, never
 centred**. 17 / 500 statement of fact, then one 14 / 1.6 sentence capped at 440px saying what the thing
 is for. No illustration, no centred hero, and **no button if the page header already has one**.
 
@@ -291,23 +291,23 @@ is for. No illustration, no centred hero, and **no button if the page header alr
 
 ## 9. Overlays
 
-**Dialog** — 560px, radius 10, 1px `--nook-line`, shadow `0 24px 60px rgba(0,0,0,0.22)`, over the
+**Dialog** — 560px, radius 10, 1px `--nooks-line`, shadow `0 24px 60px rgba(0,0,0,0.22)`, over the
 scrim. Header `24px 26px 0`: 21px title then one 14 / 1.6 explaining line. Body. Then a
-`--nook-hair`-topped footer at `14px 26px`: **consequence text left, Cancel then confirm right.**
+`--nooks-hair`-topped footer at `14px 26px`: **consequence text left, Cancel then confirm right.**
 
 Say what happens: *"Ignore removes the request silently and never notifies the sender."* Not *"Are you
 sure?"*
 
-**Menu** — 248px, radius 9, 1px `--nook-line`, 6px padding; items 32px at radius 6 with the shortcut
-right in 12 `--nook-muted`; groups split by a 1px `--nook-hair` rule inset 8px. Destructive items take
-`--nook-error`.
+**Menu** — 248px, radius 9, 1px `--nooks-line`, 6px padding; items 32px at radius 6 with the shortcut
+right in 12 `--nooks-muted`; groups split by a 1px `--nooks-hair` rule inset 8px. Destructive items take
+`--nooks-error`.
 
-**Side sheet** — 520px, pinned below the chrome bar, 1px `--nook-line` left border. Same order as full
+**Side sheet** — 520px, pinned below the chrome bar, 1px `--nooks-line` left border. Same order as full
 screen: chrome bar, checkbox and title, detail row, hairline, Note, footer bar. Title 24 / 600, fields
 in a wrapping row of 12.5 label + 13 value pairs. **Opening an Item never replaces the List with a
 page.**
 
-**Secret shown once** — accent panel (`--nook-accent-panel` on 1px `--nook-accent-line`, radius 8),
+**Secret shown once** — accent panel (`--nooks-accent-panel` on 1px `--nooks-accent-line`, radius 8),
 mono 13.5 with `word-break: break-all`, a primary Copy button, and a sentence saying plainly that it
 cannot be shown again. **Never a warning triangle.**
 
@@ -323,8 +323,8 @@ converts a block as it is typed but is **never displayed back to the Member**.
 | Heading | 18 / 600 / lh 1.4 | 13.5 | padding `18px 0 3px` |
 | Paragraph | 15.5 / lh 1.6 | 14.5 | padding `5px 0` |
 | Checklist | 15.5 | 14.5 | 15px box in a 26px gutter, padding `3px 0` |
-| Quote | 15.5 `--nook-sub` | 14.5 | 2px `--nook-line` left rule, 13px indent, padding `10px 0` |
-| Code | mono 13 `--nook-sub` | 12.5 | padding `10px 0` |
+| Quote | 15.5 `--nooks-sub` | 14.5 | 2px `--nooks-line` left rule, 13px indent, padding `10px 0` |
+| Code | mono 13 `--nooks-sub` | 12.5 | padding `10px 0` |
 
 Typing `/` on an empty line opens a 300px block menu, filtered as typing continues. Every entry shows
 its markdown shorthand, so **the menu teaches the shortcut rather than replacing it**.
@@ -334,15 +334,15 @@ its markdown shorthand, so **the menu teaches the shortcut rather than replacing
 ## 11. States
 
 **Loading** — skeleton rows hold the **exact height of real rows**, so nothing jumps when they arrive.
-Blocks are `--nook-selected` fading to `--nook-hair` down the list. After 4s: *"Still waiting on the
+Blocks are `--nooks-selected` fading to `--nooks-hair` down the list. After 4s: *"Still waiting on the
 server — 4s. It's probably just waking up."*
 
-**Offline** — a banner above the content: `--nook-offline-bg` on 1px `--nook-offline-line`, a 7px
-`--nook-offline` dot, 13.5 `--nook-offline-text`, and a Retry on the right. Ticks made offline carry a
+**Offline** — a banner above the content: `--nooks-offline-bg` on 1px `--nooks-offline-line`, a 7px
+`--nooks-offline` dot, 13.5 `--nooks-offline-text`, and a Retry on the right. Ticks made offline carry a
 `not synced` badge. Reading, ticking and adding all still work.
 
-**Error on save** — the errored row gets 1px `--nook-error-line` on `--nook-error-bg` with a `Try
-again` in `--nook-error-text`. Below it, a plain sentence saying what the server said and what became
+**Error on save** — the errored row gets 1px `--nooks-error-line` on `--nooks-error-bg` with a `Try
+again` in `--nooks-error-text`. Below it, a plain sentence saying what the server said and what became
 of the Member's text, then real options. Their text is never discarded.
 
 **Conflict** — only competing *text* asks a question, and only on the row it affects. **Ticks never
@@ -376,15 +376,15 @@ Member's outlined in accent, with `Keep mine` and `Keep both`.
 
 ## 14. Identity
 
-The monogram is one letter at one weight — `N`, 600, `--nook-paper` on `--nook-ink`.
+The monogram is one letter at one weight — `N`, 600, `--nooks-paper` on `--nooks-ink`.
 
 | Context | Box / radius / letter |
 | --- | --- |
 | App icon | 64 / 14 / 34 · 32 / 7 / 17 · 16 / 4 / 9 |
-| Wordmark | 30 / 7 / 16, beside "Nook" at 30 / 600 / −0.035em |
+| Wordmark | 30 / 7 / 16, beside "Nooks" at 30 / 600 / −0.035em |
 | Sidebar | 20 / 5 / 11.5 |
 
-Tab title is `<List> · Nook`.
+Tab title is `<List> · Nooks`.
 
 ---
 
@@ -400,7 +400,7 @@ The Print sheet is a deliverable, not a screenshot. A4, 210 × 297mm, margins `1
 - **Three blank dashed rows** at the end, for whatever gets remembered in the shop.
 - Long lists go two-up: `column-count: 2`, 12mm gap, a 0.4pt column rule, type down one step to 13pt
   and 5.5mm boxes. **Never below 13pt.**
-- Footer: a sentence left, and `Nook · A4 210 × 297 mm · n/N` right in mono 8.5pt.
+- Footer: a sentence left, and `Nooks · A4 210 × 297 mm · n/N` right in mono 8.5pt.
 
 > **Open conflict to resolve.** The Foundations artboard states *"Print steps up, not down: 40pt title,
 > 20pt items, 15pt when a list goes two-up."* The Print artboard actually renders **27pt / 16pt /
@@ -415,7 +415,7 @@ The UI is built on shadcn/ui, so tokens follow **shadcn's paradigm, not a parall
 come from that and are not ours to vary:
 
 1. **Names are shadcn's, unprefixed.** `--background`, `--foreground`, `--border`, `--input`, `--ring`,
-   `--primary`, the `--sidebar-*` family. There is no `--nook-*` layer underneath — the tables in §2
+   `--primary`, the `--sidebar-*` family. There is no `--nooks-*` layer underneath — the tables in §2
    are the *source values*, and they are written directly into shadcn's variables.
 2. **Values are OKLCH.** Hex appears nowhere in the CSS. §2 keeps hex because that is what the canvas
    specifies and what a designer reads; the conversions are in the table below.
@@ -434,31 +434,31 @@ come from that and are not ours to vary:
 :root  { /* light values */ }
 .dark  { /* dark values  */ }
 
-@theme inline { /* --color-* mappings, incl. Nook's own */ }
+@theme inline { /* --color-* mappings, incl. Nooks's own */ }
 
 @layer base { /* base styles */ }
 ```
 
 ### The collision, and how it is resolved
 
-**shadcn's `--accent` is a subtle hover surface, not a brand colour.** Nook's accent is a meaning
+**shadcn's `--accent` is a subtle hover surface, not a brand colour.** Nooks's accent is a meaning
 colour. Reusing the name would silently restyle every shadcn hover state.
 
-The Foundations artboard labels that swatch **"Shared / accent"**, so Nook's takes the name **`shared`**
+The Foundations artboard labels that swatch **"Shared / accent"**, so Nooks's takes the name **`shared`**
 and shadcn keeps `--accent` for its own job. Everywhere §2 says *accent*, the token is `shared`.
 
 ### Mapping onto shadcn's semantics
 
-| shadcn variable | Nook source | Note |
+| shadcn variable | Nooks source | Note |
 | --- | --- | --- |
 | `--background` / `--foreground` | paper / ink | |
 | `--card`, `--popover` (+ `-foreground`) | paper / ink | |
 | `--primary` / `--primary-foreground` | ink / paper | The primary button is ink on paper |
 | `--secondary` / `--secondary-foreground` | selected / sub | |
 | `--muted` | selected | shadcn `--muted` is a **surface** |
-| `--muted-foreground` | muted `#5F5F5B` | Nook's "muted" is a **text** colour |
-| `--accent` / `--accent-foreground` | selected / ink | shadcn's hover surface — **not** Nook's accent |
-| `--destructive` | error-text | Nook's destructive button is outlined, not filled |
+| `--muted-foreground` | muted `#5F5F5B` | Nooks's "muted" is a **text** colour |
+| `--accent` / `--accent-foreground` | selected / ink | shadcn's hover surface — **not** Nooks's accent |
+| `--destructive` | error-text | Nooks's destructive button is outlined, not filled |
 | `--border` | line | |
 | `--input` | input-line `#D6D6D1` | Deliberately darker than `--border` |
 | `--ring` | shared | The 2px focus ring |
@@ -467,7 +467,7 @@ and shadcn keeps `--accent` for its own job. Everywhere §2 says *accent*, the t
 | `--sidebar-border` / `--sidebar-ring` | line / shared | |
 | `--chart-1` … `--chart-5` | shared, done, offline, overdue, control | Unused; set so shadcn defaults never leak |
 
-### Nook's own tokens
+### Nooks's own tokens
 
 Added the documented way — declared in `:root` and `.dark`, exposed through `@theme inline` as
 `--color-<name>`, which is what generates the `bg-*` / `text-*` / `border-*` utilities:
@@ -477,8 +477,8 @@ Added the documented way — declared in `:root` and `.dark`, exposed through `@
 
 ### Radius
 
-shadcn derives `--radius-sm/md/lg/xl` from one `--radius` by ±4px, which cannot express Nook's
-4 / 6 / 7 / 8 / 10. So `--radius: 7px` is set for shadcn's own components, and Nook's five radii are
+shadcn derives `--radius-sm/md/lg/xl` from one `--radius` by ±4px, which cannot express Nooks's
+4 / 6 / 7 / 8 / 10. So `--radius: 7px` is set for shadcn's own components, and Nooks's five radii are
 explicit tokens: `--radius-checkbox` 4, `--radius-row` 6, `--radius-control` 7, `--radius-inner` 8,
 `--radius-surface` 10.
 

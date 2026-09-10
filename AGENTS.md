@@ -6,7 +6,7 @@ file and update this guide.
 
 ## Project Snapshot
 
-Nook is a self-hosted household todo app. See `CONTEXT.md` for the domain glossary — use those terms.
+Nooks is a self-hosted household todo app. See `CONTEXT.md` for the domain glossary — use those terms.
 
 - Backend: Go, Connect RPC, Protocol Buffers. gRPC-Gateway and OpenAPI arrive with the REST API in M10.
 - Frontend: React, TypeScript, Vite, Tailwind CSS v4, shadcn/ui, TanStack Query, TanStack Router.
@@ -39,7 +39,7 @@ Run from the repository root unless a command starts with `cd`.
 
 ```bash
 # Backend
-go run ./cmd/nook --port 8081    # Start backend dev server
+go run ./cmd/nooks --port 8081    # Start backend dev server
 go test ./...                    # Run all Go tests
 go test -v -race ./server/...    # Server tests with race detector
 golangci-lint run                # Go lint
@@ -65,7 +65,7 @@ cd proto && buf format -w        # Format proto files
 | `DESIGN.md` | The design system spec the UI is built to. Exact values, not approximate |
 | `STANDARDS.md` | Code standards. Binding on contributors and agents alike |
 | `TODO.md` | Plan and status. Update the checkbox in the same commit as the work |
-| `cmd/nook/` | CLI setup and server startup |
+| `cmd/nooks/` | CLI setup and server startup |
 | `server/` | HTTP server, router wiring, graceful shutdown |
 | `server/auth/` | Sessions, passwords, access tokens |
 | `server/router/api/` | Connect RPC service implementations |

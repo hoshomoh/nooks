@@ -4,7 +4,7 @@ Binding on every contributor and every agent working in this repo. `AGENTS.md` p
 enforce it. Where a rule below and a rule in `AGENTS.md` disagree, `AGENTS.md` wins — it is closer to
 the commands.
 
-Nook is a small app that people run on their own machines and that other developers will extend after
+Nooks is a small app that people run on their own machines and that other developers will extend after
 v1. Both facts push the same way: **plain code that a newcomer can read, test, and change without
 first learning our abstractions.**
 

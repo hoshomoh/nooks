@@ -1,6 +1,6 @@
 // Package frontend serves the built app from inside the binary.
 //
-// `pnpm --filter @nook/web release` writes the build into dist/, which go:embed bakes
+// `pnpm --filter @nooks/web release` writes the build into dist/, which go:embed bakes
 // in. A placeholder index.html is committed so that a fresh clone compiles before the
 // app has ever been built.
 package frontend

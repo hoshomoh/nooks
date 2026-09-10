@@ -73,8 +73,9 @@ func TestArrivingOnAListTellsTheOthers(t *testing.T) {
 	if event.Kind != KindPresence {
 		t.Fatalf("kind = %q, want presence", event.Kind)
 	}
-	if len(event.Watchers) != 2 {
-		t.Errorf("watchers = %v, want both of them", event.Watchers)
+	// Anna is not told that Anna is here.
+	if len(event.Watchers) != 1 || event.Watchers[0] != "Jonas" {
+		t.Errorf("watchers = %v, want only Jonas", event.Watchers)
 	}
 }
 
@@ -88,8 +89,8 @@ func TestLeavingAListTellsTheOthers(t *testing.T) {
 	jonas.Close()
 
 	event := waitFor(t, anna)
-	if len(event.Watchers) != 1 || event.Watchers[0] != "Anna" {
-		t.Errorf("watchers = %v, want only Anna", event.Watchers)
+	if len(event.Watchers) != 0 {
+		t.Errorf("watchers = %v, want nobody left", event.Watchers)
 	}
 }
 

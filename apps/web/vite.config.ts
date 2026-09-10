@@ -30,6 +30,8 @@ export default defineConfig({
     port: 3001,
     proxy: {
       "/nooks.api.v1": { target: "http://localhost:8081", changeOrigin: true },
+      // The event stream must not be buffered by the dev proxy either.
+      "/api/v1/events": { target: "http://localhost:8081", changeOrigin: true },
       "/api": { target: "http://localhost:8081", changeOrigin: true },
     },
   },

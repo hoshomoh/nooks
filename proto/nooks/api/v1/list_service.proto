@@ -109,6 +109,14 @@ message Item {
   // Who ticked it, when anyone has.
   string done_by_name = 7;
 
+  // When it was ticked, RFC 3339, or empty. A tick that has just landed is held for a
+  // second before it settles, and this is how a reader knows it just landed.
+  string done_at = 11;
+
+  // Who ticked it, as an identifier. A reader compares it with their own, because a
+  // tick of your own is not news.
+  string done_by_uid = 12;
+
   // The Note attached to the Item, as markdown. Empty when there is none.
   string note = 8;
 

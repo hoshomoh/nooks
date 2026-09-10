@@ -151,15 +151,18 @@ func (b *Broker) Publish(event Event, audience []int64) {
 func (b *Broker) WatchersOf(listUID string) []string {
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	return b.watchersOf(listUID)
+	return b.watchersOf(listUID, 0)
 }
 
-// watchersOf is WatchersOf with the lock already held.
-func (b *Broker) watchersOf(listUID string) []string {
+// watchersOf is WatchersOf with the lock already held, leaving out one Member.
+//
+// Presence answers "who else is here", so the person asking is never in the answer:
+// a Member does not need telling that they are reading the List they are reading.
+func (b *Broker) watchersOf(listUID string, except int64) []string {
 	seen := make(map[int64]bool)
 	names := make([]string, 0, len(b.watches))
 	for _, w := range b.watches {
-		if w.listUID != listUID || seen[w.memberID] {
+		if w.listUID != listUID || w.memberID == except || seen[w.memberID] {
 			continue
 		}
 		seen[w.memberID] = true
@@ -168,7 +171,7 @@ func (b *Broker) watchersOf(listUID string) []string {
 	return names
 }
 
-// announcePresence tells everyone on a List who is now standing there.
+// announcePresence tells everyone on a List who else is now standing there.
 func (b *Broker) announcePresence(listUID string) {
 	if listUID == "" {
 		return
@@ -177,15 +180,17 @@ func (b *Broker) announcePresence(listUID string) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	event := Event{
-		Kind:     KindPresence,
-		ListUID:  listUID,
-		Watchers: b.watchersOf(listUID),
-	}
+	// Each watcher is told a different answer, because each of them is the one person
+	// the answer leaves out.
 	for _, w := range b.watches {
-		if w.listUID == listUID {
-			send(w, event)
+		if w.listUID != listUID {
+			continue
 		}
+		send(w, Event{
+			Kind:     KindPresence,
+			ListUID:  listUID,
+			Watchers: b.watchersOf(listUID, w.memberID),
+		})
 	}
 }
 

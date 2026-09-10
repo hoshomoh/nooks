@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"errors"
+	"time"
 
 	"connectrpc.com/connect"
 
@@ -46,7 +47,7 @@ func (s *ListService) CreateItem(
 	s.announceListChanged(ctx, list)
 
 	return connect.NewResponse(&apiv1.CreateItemResponse{
-		Item: itemToProto(item, map[int64]string{member.ID: member.Name}),
+		Item: itemToProto(item, map[int64]memberLabel{member.ID: {Name: member.Name, UID: member.UID}}),
 	}), nil
 }
 
@@ -184,11 +185,11 @@ func (s *ListService) readItem(ctx context.Context, uid string) (*apiv1.Item, er
 	if err != nil {
 		return nil, internalError("read item", err)
 	}
-	names, err := s.memberNames(ctx, []store.Item{item})
+	labels, err := s.memberLabels(ctx, []store.Item{item})
 	if err != nil {
 		return nil, err
 	}
-	return itemToProto(item, names), nil
+	return itemToProto(item, labels), nil
 }
 
 // positionAfter works out where an Item should sit, given the List's current order and
@@ -225,13 +226,28 @@ func positionAfter(items []store.Item, moving, after string) (float64, error) {
 // positionGapDefault mirrors the store's appending gap.
 const positionGapDefault = 1024.0
 
-// memberNames looks up the display names an Item's rows need, once per Member rather
-// than once per Item.
-func (s *ListService) memberNames(ctx context.Context, items []store.Item) (map[int64]string, error) {
-	names := map[int64]string{}
+// memberLabel is what a row needs to know about the Member it names.
+//
+// The identifier as well as the name, because a reader compares it with their own: a
+// tick of your own is not somebody else's tick.
+type memberLabel struct {
+	Name string
+	UID  string
+}
+
+// memberLabels looks up what an Item's rows need, once per Member rather than once per
+// Item.
+func (s *ListService) memberLabels(
+	ctx context.Context,
+	items []store.Item,
+) (map[int64]memberLabel, error) {
+	labels := map[int64]memberLabel{}
 	for _, item := range items {
 		for _, id := range []int64{item.AddedByID, item.DoneByID} {
-			if id == 0 || names[id] != "" {
+			if id == 0 {
+				continue
+			}
+			if _, known := labels[id]; known {
 				continue
 			}
 			member, err := s.store.MemberByID(ctx, id)
@@ -241,25 +257,30 @@ func (s *ListService) memberNames(ctx context.Context, items []store.Item) (map[
 				}
 				return nil, internalError("read member", err)
 			}
-			names[id] = member.Name
+			labels[id] = memberLabel{Name: member.Name, UID: member.UID}
 		}
 	}
-	return names, nil
+	return labels, nil
 }
 
 // itemToProto converts an Item for the wire.
-func itemToProto(item store.Item, names map[int64]string) *apiv1.Item {
+func itemToProto(item store.Item, labels map[int64]memberLabel) *apiv1.Item {
 	preview := note.PreviewOf(item.Note)
-	return &apiv1.Item{
+	out := &apiv1.Item{
 		Uid:                item.UID,
 		Label:              item.Label,
 		Quantity:           item.Quantity,
 		DueOn:              item.DueOn,
 		Done:               item.Done(),
-		AddedByName:        names[item.AddedByID],
-		DoneByName:         names[item.DoneByID],
+		AddedByName:        labels[item.AddedByID].Name,
+		DoneByName:         labels[item.DoneByID].Name,
+		DoneByUid:          labels[item.DoneByID].UID,
 		Note:               item.Note,
 		NoteFirstLine:      preview.FirstLine,
 		NoteRemainingLines: int32(preview.RemainingLines),
 	}
+	if !item.DoneAt.IsZero() {
+		out.DoneAt = item.DoneAt.Format(time.RFC3339)
+	}
+	return out
 }

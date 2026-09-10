@@ -4,6 +4,7 @@ import { getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
 import { ActivityControl } from "@/components/ds/activity-control"
+import { Presence } from "@/components/ds/presence"
 import { AddRow, type AddRowSubmission } from "@/components/ds/add-row"
 import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
@@ -17,9 +18,10 @@ import { listQuery } from "@/lib/list-queries"
 import { refreshLists } from "@/lib/refresh"
 import { debounce } from "@/lib/debounce"
 import type { RenameItemVariables, SaveNoteVariables, SetDoneVariables } from "@/lib/item-mutations"
-import { isOverdue, today } from "@/lib/dates"
+import { isOverdue, justHappened, today } from "@/lib/dates"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useCommandPalette } from "@/lib/use-command-palette"
+import { useLive } from "@/lib/use-live"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 import { Sharing, type Item } from "@nooks/api"
 
@@ -32,6 +34,7 @@ export function ListScreen() {
   const { listUid } = route.useParams()
   const { instanceName, member, lists } = useSignedInData()
   const list = useSuspenseQuery(listQuery(listUid)).data
+  const live = useLive()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const palette = useCommandPalette()
@@ -41,6 +44,13 @@ export function ListScreen() {
   // measured against the same moment.
   const from = today()
   const due = useDueLabel()
+
+  // A tick somebody else just made lands with a highlight and then settles. Read from
+  // the Item itself rather than remembered between renders: the Item already says when
+  // it was ticked and by whom, so there is nothing to keep in sync.
+  const settled = new Date()
+  const justTickedByAnother = (item: Item) =>
+    item.done && item.doneByUid !== member?.uid && justHappened(item.doneAt, settled)
 
   // Which Item's sheet is open. The List keeps its place behind it, so this is the
   // screen's own state rather than a route.
@@ -145,9 +155,15 @@ export function ListScreen() {
           <header className="mb-8.5 flex flex-col gap-3.5">
             <h1 className="text-display">{list.list?.name}</h1>
             <div className="flex items-center gap-3 text-meta text-secondary-foreground">
-              <span>
-                {t(sharingKey(list.list?.sharing ?? Sharing.UNSPECIFIED, list.list?.canEdit ?? false))}
-              </span>
+              {/* While somebody else is reading it, that is the more useful of the
+                  two facts, so it takes the line. */}
+              {live.watchers.length > 0 ? (
+                <Presence watchers={live.watchers} />
+              ) : (
+                <span>
+                  {t(sharingKey(list.list?.sharing ?? Sharing.UNSPECIFIED, list.list?.canEdit ?? false))}
+                </span>
+              )}
               <span className="h-3 w-px bg-border" />
               <span>{open.length === 0 ? t("list.nothingYet") : t("list.openCount", { count: open.length })}</span>
             </div>
@@ -165,6 +181,7 @@ export function ListScreen() {
                   addedByName={item.addedByName}
                   dueLabel={due.label(item.dueOn)}
                   overdue={isOverdue(item.dueOn, from)}
+                  justTicked={justTickedByAnother(item)}
                   note={{ firstLine: item.noteFirstLine, remainingLines: item.noteRemainingLines }}
                   moreLinesLabel={(count) => t("note.moreLines", { count })}
                   onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
@@ -198,6 +215,7 @@ export function ListScreen() {
                   quantity={item.quantity}
                   addedByName={item.doneByName || item.addedByName}
                   done
+                  justTicked={justTickedByAnother(item)}
                   onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
                   onOpen={() => setOpenItemUid(item.uid)}
                   onRename={

@@ -241,6 +241,12 @@ type Item struct {
 	AddedByName string `protobuf:"bytes,6,opt,name=added_by_name,json=addedByName,proto3" json:"added_by_name,omitempty"`
 	// Who ticked it, when anyone has.
 	DoneByName string `protobuf:"bytes,7,opt,name=done_by_name,json=doneByName,proto3" json:"done_by_name,omitempty"`
+	// When it was ticked, RFC 3339, or empty. A tick that has just landed is held for a
+	// second before it settles, and this is how a reader knows it just landed.
+	DoneAt string `protobuf:"bytes,11,opt,name=done_at,json=doneAt,proto3" json:"done_at,omitempty"`
+	// Who ticked it, as an identifier. A reader compares it with their own, because a
+	// tick of your own is not news.
+	DoneByUid string `protobuf:"bytes,12,opt,name=done_by_uid,json=doneByUid,proto3" json:"done_by_uid,omitempty"`
 	// The Note attached to the Item, as markdown. Empty when there is none.
 	Note string `protobuf:"bytes,8,opt,name=note,proto3" json:"note,omitempty"`
 	// The Note's own first line, for the row. Nooks never summarises a Member, so this
@@ -327,6 +333,20 @@ func (x *Item) GetAddedByName() string {
 func (x *Item) GetDoneByName() string {
 	if x != nil {
 		return x.DoneByName
+	}
+	return ""
+}
+
+func (x *Item) GetDoneAt() string {
+	if x != nil {
+		return x.DoneAt
+	}
+	return ""
+}
+
+func (x *Item) GetDoneByUid() string {
+	if x != nil {
+		return x.DoneByUid
 	}
 	return ""
 }
@@ -1942,7 +1962,7 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\bis_owner\x18\x05 \x01(\bR\aisOwner\x12\x1b\n" +
 	"\tis_pinned\x18\x06 \x01(\bR\bisPinned\x12\x1d\n" +
 	"\n" +
-	"open_count\x18\a \x01(\x05R\topenCount\"\xa9\x02\n" +
+	"open_count\x18\a \x01(\x05R\topenCount\"\xe2\x02\n" +
 	"\x04Item\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x14\n" +
 	"\x05label\x18\x02 \x01(\tR\x05label\x12\x1a\n" +
@@ -1951,7 +1971,9 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\x04done\x18\x05 \x01(\bR\x04done\x12\"\n" +
 	"\radded_by_name\x18\x06 \x01(\tR\vaddedByName\x12 \n" +
 	"\fdone_by_name\x18\a \x01(\tR\n" +
-	"doneByName\x12\x12\n" +
+	"doneByName\x12\x17\n" +
+	"\adone_at\x18\v \x01(\tR\x06doneAt\x12\x1e\n" +
+	"\vdone_by_uid\x18\f \x01(\tR\tdoneByUid\x12\x12\n" +
 	"\x04note\x18\b \x01(\tR\x04note\x12&\n" +
 	"\x0fnote_first_line\x18\t \x01(\tR\rnoteFirstLine\x120\n" +
 	"\x14note_remaining_lines\x18\n" +

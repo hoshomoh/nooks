@@ -159,6 +159,20 @@ export function momentLabel(at: Date, options: MomentLabelOptions): string {
   return format(at, "d MMM", { locale: options.locale })
 }
 
+/**
+ * SETTLE_MS is how long a tick somebody else made is held before it settles.
+ *
+ * DESIGN.md §6 says a second. A little longer here, so a tick that took a moment to
+ * arrive is still shown as having just landed.
+ */
+export const SETTLE_MS = 3000
+
+/** justHappened reports whether a moment is recent enough to still be news. */
+export function justHappened(at: string, now: Date): boolean {
+  const parsed = parseMoment(at)
+  return parsed !== null && now.getTime() - parsed.getTime() < SETTLE_MS
+}
+
 /** parseMoment reads an RFC 3339 timestamp, or null when it is not one. */
 export function parseMoment(value: string): Date | null {
   if (!value) {

@@ -113,7 +113,9 @@
     "addItemDue": "Add an item, due {{date}}",
     "openItem": "Open item",
     "namedCanEdit": "Shared with specific people · they can edit",
-    "namedReadOnly": "Shared with specific people · read-only"
+    "namedReadOnly": "Shared with specific people · read-only",
+    "isHere": "{{name}} is here",
+    "areHere": "{{names}} are here"
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",

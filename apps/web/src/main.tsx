@@ -7,6 +7,7 @@ import "./i18n"
 
 import { CommandPalette } from "./components/ds/command-palette"
 import { buildRouter } from "./router"
+import { wireLiveUpdates } from "./lib/live-wiring"
 import "./index.css"
 
 const queryClient = new QueryClient({
@@ -21,6 +22,12 @@ const queryClient = new QueryClient({
 })
 
 const router = buildRouter(queryClient)
+
+// Live updates are wired outside React: the stream outlives any screen, and navigation
+// is what tells it which List is being read.
+const live = wireLiveUpdates(queryClient)
+live.navigated(window.location.pathname)
+router.subscribe("onResolved", ({ toLocation }) => live.navigated(toLocation.pathname))
 
 const container = document.getElementById("root")
 if (!container) {

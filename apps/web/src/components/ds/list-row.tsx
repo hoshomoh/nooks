@@ -72,7 +72,9 @@ export function ListRow({
         className={cn(
           "group relative grid min-h-row grid-cols-[20px_1fr_auto] items-center gap-3.5 rounded-md px-2 py-1.5 -mx-2",
           "transition-colors duration-150 hover:bg-secondary",
-          justTicked && "animate-settle bg-done-bg",
+          // The animation paints the highlight and takes it away again; the class
+          // must not also paint it, or it would never settle.
+          justTicked && "animate-settle",
         )}
       >
         {/* The whole row opens the Item — a 44px row is a target, and asking a Member

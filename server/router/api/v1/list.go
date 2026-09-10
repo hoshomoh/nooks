@@ -110,7 +110,7 @@ func (s *ListService) GetList(
 	if err != nil {
 		return nil, internalError("read items", err)
 	}
-	names, err := s.memberNames(ctx, items)
+	labels, err := s.memberLabels(ctx, items)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (s *ListService) GetList(
 		if !item.Done() {
 			open++
 		}
-		out = append(out, itemToProto(item, names))
+		out = append(out, itemToProto(item, labels))
 	}
 	return connect.NewResponse(&apiv1.GetListResponse{
 		List:  listToProto(list, member, pinned[list.ID], open),

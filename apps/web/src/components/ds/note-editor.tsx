@@ -7,7 +7,7 @@ import { markdown } from "@codemirror/lang-markdown"
 
 import { liveMarkers } from "@/lib/editor/live-markers"
 import { slashMenu, type SlashOption } from "@/lib/editor/slash-menu"
-import { noteTheme } from "@/lib/editor/theme"
+import { buildNoteTheme, type NoteScale } from "@/lib/editor/theme"
 
 export type NoteEditorProps = {
   /**
@@ -21,6 +21,8 @@ export type NoteEditorProps = {
   /** Called on every change. Whoever owns the saving decides when to act on it. */
   onChange: (markdown: string) => void
   readOnly?: boolean
+  /** Which of the design's two sizes to render the blocks at. */
+  scale?: NoteScale
 }
 
 /**
@@ -34,7 +36,7 @@ export type NoteEditorProps = {
  * The view is created once and driven imperatively. CodeMirror owns its own DOM and
  * state; re-creating it on every render would lose the cursor mid-sentence.
  */
-export function NoteEditor({ initialValue, onChange, readOnly }: NoteEditorProps) {
+export function NoteEditor({ initialValue, onChange, readOnly, scale = "sheet" }: NoteEditorProps) {
   const { t } = useTranslation()
   const viewRef = useRef<EditorView | null>(null)
 
@@ -80,7 +82,7 @@ export function NoteEditor({ initialValue, onChange, readOnly }: NoteEditorProps
             markdown(),
             liveMarkers,
             slashMenu({ options }),
-            noteTheme,
+            buildNoteTheme(scale),
             EditorView.lineWrapping,
             EditorState.readOnly.of(Boolean(readOnly)),
             EditorView.updateListener.of((update) => {
@@ -93,7 +95,7 @@ export function NoteEditor({ initialValue, onChange, readOnly }: NoteEditorProps
       })
       viewRef.current = view
     },
-    [initialDoc, onChange, options, readOnly],
+    [initialDoc, onChange, options, readOnly, scale],
   )
 
   return <div ref={mount} className="flex-1" />

@@ -182,6 +182,8 @@
       "quote": "Quote",
       "code": "Code block"
     },
-    "addToNote": "Add to the note"
+    "addToNote": "Add to the note",
+    "backToList": "Back to list",
+    "escapeReturns": "Esc returns to the list"
   }
 }

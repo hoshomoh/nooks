@@ -24,6 +24,8 @@ export type NoteSheetProps = {
   onNoteChange: (markdown: string) => void
   onToggleDone: (done: boolean) => void
   onClose: () => void
+  /** Opens the same Note at full width. */
+  onOpenFull: () => void
   /** Shown at the right of the footer, e.g. "Saving…". */
   status?: string
 }
@@ -43,6 +45,7 @@ export function NoteSheet({
   onNoteChange,
   onToggleDone,
   onClose,
+  onOpenFull,
   status,
 }: NoteSheetProps) {
   const { t } = useTranslation()
@@ -52,6 +55,9 @@ export function NoteSheet({
       <div className="flex h-chrome items-center gap-2.5 border-b border-hair pr-4 pl-5.5 text-micro text-muted-foreground">
         <span className="text-secondary-foreground">{crumbs.join(" / ")}</span>
         <span className="flex-1" />
+        <button type="button" onClick={onOpenFull} className="text-small hover:text-foreground">
+          {t("note.openFull")}
+        </button>
         <button type="button" onClick={onClose} className="text-small hover:text-foreground">
           {t("note.close")}
         </button>

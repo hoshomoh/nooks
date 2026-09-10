@@ -18,7 +18,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M2 · Auth and first run | `[x]` |
 | M3 · Lists and Items — the core | `[~]` lists, items, search and the list view |
 | M4 · Views: Today, Upcoming, Calendar | `[x]` |
-| M5 · Notes | `[~]` all but the full-screen view |
+| M5 · Notes | `[x]` |
 | M6 · Sharing, presence, Activity | `[ ]` |
 | M7 · Members and Groups | `[ ]` |
 | M8 · Public list | `[ ]` |
@@ -145,7 +145,8 @@ The single most important milestone; everything else is furniture.
       "export as plain text" produces, what the conflict rule compares, and what the five
       block types map onto
 - [x] Side sheet at 520px — opening an Item never replaces the List
-- [ ] Full-screen Note view, and Esc back to the List
+- [x] Full-screen Note view, and Esc back to the List. The same blocks one scale up —
+      the editor is built once and told which size it is
 - [x] Blocks rendered as blocks: paragraph, heading, checklist, quote, code
 - [x] Markdown shorthand converts as typed and is then hidden — the marker reappears
       only on the line the cursor is on, or there would be no way to take it off

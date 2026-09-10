@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { getRouteApi } from "@tanstack/react-router"
+import { getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
 import { AddRow } from "@/components/ds/add-row"
@@ -36,6 +36,7 @@ export function ListScreen() {
   const { instance, member, lists, list } = route.useLoaderData()
   const { listUid } = route.useParams()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const palette = useCommandPalette()
   const { t } = useTranslation()
 
@@ -170,6 +171,13 @@ export function ListScreen() {
             onNoteChange={onNoteChange}
             onToggleDone={(done) => setDone.mutate({ itemUid: openItem.uid, done })}
             onClose={closeSheet}
+            onOpenFull={() => {
+              autosave.flush()
+              void navigate({
+                to: "/lists/$listUid/items/$itemUid",
+                params: { listUid, itemUid: openItem.uid },
+              })
+            }}
           />
         )}
       </div>

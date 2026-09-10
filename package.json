@@ -4,7 +4,7 @@
   "packageManager": "pnpm@12.3.4",
   "scripts": {
     "buf": "buf",
-    "generate": "cd proto && buf generate",
+    "generate": "cd proto && buf generate && node ../packages/api/scripts/write-barrel.mjs",
     "proto:lint": "cd proto && buf lint",
     "proto:format": "cd proto && buf format -w"
   },

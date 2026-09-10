@@ -5,8 +5,28 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>nooks</title>
-    <script type="module" crossorigin src="/assets/index-Cs60c0Sc.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BBorPVlW.css">
+    <!--
+      Applies the theme before the first paint. The app's module script is deferred, so
+      without this the page paints light and then flips. The logic is duplicated from
+      src/lib/theme.ts on purpose: it is four lines, and the alternative is a visible
+      flash on every load.
+    -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("nooks.theme")
+          var choice = stored === "light" || stored === "dark" ? stored : "system"
+          var dark =
+            choice === "dark" ||
+            (choice === "system" && matchMedia("(prefers-color-scheme: dark)").matches)
+          document.documentElement.classList.toggle("dark", dark)
+        } catch (_) {
+          // A browser that refuses storage still gets the light theme.
+        }
+      })()
+    </script>
+    <script type="module" crossorigin src="/assets/index-BnySvHMb.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CXhsv_s8.css">
   </head>
   <body>
     <div id="root"></div>

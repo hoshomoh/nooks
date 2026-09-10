@@ -1,0 +1,82 @@
+# AGENTS.md
+
+Repository instructions for AI coding agents. Keep this file short, concrete, and tied to commands that
+actually work in this repo. If a fact here conflicts with a source file or CI config, trust the source
+file and update this guide.
+
+## Project Snapshot
+
+Nook is a self-hosted household todo app. See `CONTEXT.md` for the domain glossary — use those terms.
+
+- Backend: Go, Echo, Connect RPC, gRPC-Gateway, Protocol Buffers.
+- Frontend: React, TypeScript, Vite, Tailwind CSS v4, shadcn/ui, TanStack Query, TanStack Router.
+- Storage: SQLite (default — one file the user can copy) and Postgres, behind one store interface.
+- Generated API outputs: `proto/gen/` for Go and OpenAPI, `web/src/types/proto/` for TypeScript.
+- Ships as one binary: the SPA is built into `server/router/frontend/dist` and embedded.
+
+## Working Rules
+
+- Follow `STANDARDS.md`: single responsibility, KISS, DRY applied to knowledge, injected dependencies,
+  pure functions, small functions, intention-revealing names, explicit types, guard clauses, and errors
+  that are wrapped rather than swallowed.
+- Read relevant code before editing; prefer local patterns over new abstractions.
+- Keep diffs scoped. No repo-wide cleanup, dependency churn, or generated-file rewrites unless the task
+  needs it.
+- Do not hand-edit generated proto outputs. Change `.proto` files, then run `buf generate`.
+- Add migrations for every database driver when the schema changes, and update each driver's
+  `LATEST.sql`.
+- UI work follows `DESIGN.md`, not improvisation. Tokens live in `web/src/styles/tokens.css`; do not
+  introduce a colour, radius or size that is not in there. `docs/design/` points at the canvas the
+  spec was extracted from.
+- One verb for creating things, everywhere: **Add**. Never New, Create, Issue, or Generate.
+- Ask before adding heavy dependencies, changing auth or token behaviour, or altering the Docker and
+  release workflows.
+
+## Commands
+
+Run from the repository root unless a command starts with `cd`.
+
+```bash
+# Backend
+go run ./cmd/nook --port 8081    # Start backend dev server
+go test ./...                    # Run all Go tests
+go test -v -race ./server/...    # Server tests with race detector
+golangci-lint run                # Go lint
+
+# Frontend
+cd web && pnpm install           # Install dependencies
+cd web && pnpm dev               # Dev server, proxying API to :8081
+cd web && pnpm lint              # Type check + lint
+cd web && pnpm test              # Unit tests
+cd web && pnpm release           # Build SPA into server/router/frontend/dist
+
+# Protocol Buffers
+cd proto && buf generate         # Regenerate Go + TypeScript + OpenAPI
+cd proto && buf lint             # Lint proto files
+cd proto && buf format -w        # Format proto files
+```
+
+## Code Map
+
+| Path | Purpose |
+| --- | --- |
+| `CONTEXT.md` | Domain glossary. Every term has one name and a list of what not to call it |
+| `DESIGN.md` | The design system spec the UI is built to. Exact values, not approximate |
+| `STANDARDS.md` | Code standards. Binding on contributors and agents alike |
+| `TODO.md` | Plan and status. Update the checkbox in the same commit as the work |
+| `cmd/nook/` | CLI setup and server startup |
+| `server/` | HTTP server, router wiring, graceful shutdown |
+| `server/auth/` | Sessions, passwords, access tokens |
+| `server/router/api/` | Connect RPC service implementations |
+| `store/` | Store interface, drivers, migrations, seed data |
+| `internal/` | Leaf packages with no store or server dependency |
+| `proto/` | `.proto` definitions, `buf` config, generated output |
+| `web/src/` | React app |
+| `docs/design/` | The design canvas source and notes |
+| `reference/memos/` | Read-only clone of usememos/memos, for reference. Gitignored. Never edit. |
+
+## Reference
+
+`reference/memos/` is a shallow clone of [usememos/memos](https://github.com/usememos/memos), kept as a
+worked example of this exact stack. Consult it for structure, naming, and how a problem was solved
+there. It is not a dependency and nothing imports from it.

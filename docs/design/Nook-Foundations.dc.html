@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #F2F2F0; }
+  * { box-sizing: border-box; }
+  a { color: #37618F; text-decoration: none; }
+</style>
+</helmet>
+<div style="font-family: 'Public Sans', system-ui, sans-serif; background: #F2F2F0; padding: 48px 40px 80px; display: flex; flex-direction: column; gap: 44px; color: #1F1F1E;">
+
+<div style="max-width: 720px; display: flex; flex-direction: column; gap: 18px;">
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <span style="width: 28px; height: 28px; border-radius: 7px; background: #1F1F1E; display: grid; place-items: center; color: #FFFFFF; font-size: 15px; font-weight: 600;">N</span>
+    <span style="font-size: 26px; font-weight: 600; letter-spacing: -0.03em;">Nook</span>
+  </div>
+  <p style="margin: 0; font-size: 16.5px; line-height: 1.65; color: #3F3F3C;">A household todo app that looks like a document, not a dashboard. One list primitive, one action to add something, and a printed page that is a real deliverable rather than a fallback. The signature element is the hairline rule under the list title: everything on screen hangs off it, and it is the one mark that survives onto paper.</p>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Palette</div>
+  <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 28px 32px; display: flex; flex-direction: column; gap: 24px;">
+    <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+      <div style="width: 150px;"><div style="height: 56px; border-radius: 6px; background: #FFFFFF; border: 1px solid #E6E6E3;"></div><div style="margin-top: 8px; font-size: 13px; font-weight: 500;">Paper</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B;">#FFFFFF</div></div>
+      <div style="width: 150px;"><div style="height: 56px; border-radius: 6px; background: #FBFBFA; border: 1px solid #E6E6E3;"></div><div style="margin-top: 8px; font-size: 13px; font-weight: 500;">Sidebar</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B;">#FBFBFA</div></div>
+      <div style="width: 150px;"><div style="height: 56px; border-radius: 6px; background: #EFEFED;"></div><div style="margin-top: 8px; font-size: 13px; font-weight: 500;">Selected</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B;">#EFEFED</div></div>
+      <div style="width: 150px;"><div style="height: 56px; border-radius: 6px; background: #E6E6E3;"></div><div style="margin-top: 8px; font-size: 13px; font-weight: 500;">Hairline</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B;">#E6E6E3</div></div>
+      <div style="width: 150px;"><div style="height: 56px; border-radius: 6px; background: #8F8F8A;"></div><div style="margin-top: 8px; font-size: 13px; font-weight: 500;">Control</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B;">#8F8F8A</div></div>
+      <div style="width: 150px;"><div style="height: 56px; border-radius: 6px; background: #5F5F5B;"></div><div style="margin-top: 8px; font-size: 13px; font-weight: 500;">Muted text</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B;">#5F5F5B</div></div>
+      <div style="width: 150px;"><div style="height: 56px; border-radius: 6px; background: #1F1F1E;"></div><div style="margin-top: 8px; font-size: 13px; font-weight: 500;">Ink</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B;">#1F1F1E</div></div>
+    </div>
+    <div style="height: 1px; background: #F0F0EE;"></div>
+    <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+      <div style="width: 150px;"><div style="height: 56px; border-radius: 6px; background: #37618F;"></div><div style="margin-top: 8px; font-size: 13px; font-weight: 500;">Shared / accent</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B;">#37618F</div></div>
+      <div style="width: 150px;"><div style="height: 56px; border-radius: 6px; background: #2E7D5B;"></div><div style="margin-top: 8px; font-size: 13px; font-weight: 500;">Done / presence</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B;">#2E7D5B</div></div>
+      <div style="width: 150px;"><div style="height: 56px; border-radius: 6px; background: #9A6B14;"></div><div style="margin-top: 8px; font-size: 13px; font-weight: 500;">Offline</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B;">#9A6B14</div></div>
+      <div style="width: 150px;"><div style="height: 56px; border-radius: 6px; background: #A03A2E;"></div><div style="margin-top: 8px; font-size: 13px; font-weight: 500;">Overdue / error</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B;">#A03A2E</div></div>
+      <div style="width: 150px;"><div style="height: 56px; border-radius: 6px; background: #191918;"></div><div style="margin-top: 8px; font-size: 13px; font-weight: 500;">Dark paper</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B;">#191918</div></div>
+      <div style="width: 150px;"><div style="height: 56px; border-radius: 6px; background: #ECECEA;"></div><div style="margin-top: 8px; font-size: 13px; font-weight: 500;">Dark ink</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B;">#ECECEA</div></div>
+      <div style="width: 150px;"><div style="height: 56px; border-radius: 6px; background: #7FA8D4;"></div><div style="margin-top: 8px; font-size: 13px; font-weight: 500;">Dark accent</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B;">#7FA8D4</div></div>
+    </div>
+    <div style="font-size: 13.5px; color: #5F5F5B; line-height: 1.6; max-width: 68ch;">Four meaning colours, each with exactly one job. Nothing is coloured for decoration; a screen at rest shows only ink, paper, and one blue dot per shared list.</div>
+  </div>
+</div>
+
+<div style="display: flex; gap: 32px; flex-wrap: wrap;">
+  <div style="width: 520px; display: flex; flex-direction: column; gap: 16px;">
+    <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Type</div>
+    <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 28px 32px; display: flex; flex-direction: column; gap: 22px;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-size: 33px; font-weight: 600; letter-spacing: -0.025em;">Public Sans 600 · 33/36</span>
+        <span style="font-size: 13px; color: #5F5F5B;">Display — list titles, screen headings</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-size: 16px;">Public Sans 400 · 16/22 — item labels, body copy</span>
+        <span style="font-size: 13px; color: #5F5F5B;">Body. 16px is the floor for anything a user wrote.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-size: 14px; font-weight: 500;">Public Sans 500 · 14/20 — sidebar, buttons, labels</span>
+        <span style="font-size: 12.5px; color: #5F5F5B;">Chrome. 11.5px uppercase 600 for group headings.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">IBM Plex Mono 400 · quantities, keycaps, links</span>
+        <span style="font-size: 12.5px; color: #5F5F5B;">Utility. Never for prose.</span>
+      </div>
+      <div style="font-size: 13.5px; color: #5F5F5B; line-height: 1.6; padding-top: 6px; border-top: 1px solid #F0F0EE;">Print steps up, not down: 40pt title, 20pt items, 15pt when a list goes two-up.</div>
+    </div>
+  </div>
+
+  <div style="width: 520px; display: flex; flex-direction: column; gap: 16px;">
+    <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Spacing & radius</div>
+    <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 28px 32px; display: flex; flex-direction: column; gap: 20px;">
+      <div style="display: flex; align-items: flex-end; gap: 10px;">
+        <span style="width: 2px; height: 20px; background: #E0E0DC;"></span>
+        <span style="width: 4px; height: 28px; background: #D8D8D4;"></span>
+        <span style="width: 6px; height: 36px; background: #D0D0CB;"></span>
+        <span style="width: 8px; height: 44px; background: #C8C8C3;"></span>
+        <span style="width: 12px; height: 52px; background: #BEBEB9;"></span>
+        <span style="width: 16px; height: 60px; background: #B4B4AF;"></span>
+        <span style="width: 22px; height: 68px; background: #A9A9A4;"></span>
+        <span style="width: 34px; height: 76px; background: #9E9E99;"></span>
+        <span style="width: 56px; height: 84px; background: #93938E;"></span>
+      </div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #3F3F3C;">2 · 4 · 6 · 8 · 12 · 16 · 22 · 34 · 56</div>
+      <div style="font-size: 13.5px; color: #5F5F5B; line-height: 1.6;">A 2px base with a loose ratio. Row rhythm is fixed: 44px minimum row, 6px inner padding, 14px gap between checkbox and label — a row with five pieces of metadata is the same height as a bare one.</div>
+      <div style="display: flex; align-items: center; gap: 14px; padding-top: 14px; border-top: 1px solid #F0F0EE;">
+        <span style="width: 44px; height: 32px; border: 1px solid #D6D6D1; border-radius: 4px;"></span>
+        <span style="width: 44px; height: 32px; border: 1px solid #D6D6D1; border-radius: 6px;"></span>
+        <span style="width: 44px; height: 32px; border: 1px solid #D6D6D1; border-radius: 7px;"></span>
+        <span style="width: 44px; height: 32px; border: 1px solid #D6D6D1; border-radius: 10px;"></span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #5F5F5B;">4 checkbox · 6 row · 7 control · 10 surface</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Components</div>
+  <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 32px; display: flex; flex-wrap: wrap; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 14px; width: 300px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Buttons</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <span style="height: 34px; padding: 0 16px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; background: #1F1F1E; color: #FFFFFF; font-size: 14px; font-weight: 500;">Primary</span>
+        <span style="height: 34px; padding: 0 14px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; border: 1px solid #E6E6E3; font-size: 14px; color: #3F3F3C;">Secondary</span>
+        <span style="height: 34px; padding: 0 12px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; font-size: 14px; color: #37618F;">Quiet</span>
+        <span style="height: 34px; padding: 0 14px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; border: 1px solid #E4C2BC; color: #8E3B31; font-size: 14px;">Destructive</span>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <span style="height: 34px; padding: 0 16px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; background: #1F1F1E; color: #FFFFFF; font-size: 14px; font-weight: 500; outline: 2px solid #37618F; outline-offset: 2px;">Focused</span>
+        <span style="font-size: 12.5px; color: #5F5F5B;">2px accent ring, 2px offset</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 12px; border-top: 1px solid #F0F0EE;">
+        <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Three sizes, and where each one is allowed</div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="height: 34px; padding: 0 16px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; background: #1F1F1E; color: #FFFFFF; font-size: 14px; font-weight: 500;">Default 34</span>
+          <span style="font-size: 12.5px; color: #5F5F5B;">page and section headers, dialog footers</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="height: 32px; padding: 0 14px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; border: 1px solid #E6E6E3; font-size: 13.5px; color: #3F3F3C;">Compact 32</span>
+          <span style="font-size: 12.5px; color: #5F5F5B;">inside a table row or a settings row</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="height: 26px; padding: 0 10px; display: grid; place-items: center; border-radius: 6px; background: #EFEFED; font-size: 12.5px; color: #3F3F3C;">Toolbar 26</span>
+          <span style="font-size: 12.5px; color: #5F5F5B;">the 44px chrome bar only</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px; width: 300px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Inputs</div>
+      <span style="height: 38px; border: 1px solid #D6D6D1; border-radius: 7px; padding: 0 12px; display: flex; align-items: center; font-size: 15px; color: #63635E;">Rest</span>
+      <span style="height: 38px; border: 1.5px solid #37618F; border-radius: 7px; padding: 0 12px; display: flex; align-items: center; font-size: 15px;">Focused</span>
+      <span style="height: 38px; border: 1px solid #E4C2BC; background: #FCF5F4; border-radius: 7px; padding: 0 12px; display: flex; align-items: center; font-size: 15px; color: #8E3B31;">Rejected</span>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="width: 34px; height: 20px; border-radius: 10px; background: #37618F; display: flex; align-items: center; padding: 2px; justify-content: flex-end;"><span style="width: 16px; height: 16px; border-radius: 50%; background: #FFFFFF;"></span></span>
+        <span style="width: 34px; height: 20px; border-radius: 10px; background: #E0E0DC; display: flex; align-items: center; padding: 2px;"><span style="width: 16px; height: 16px; border-radius: 50%; background: #FFFFFF; border: 1px solid #D0D0CB;"></span></span>
+        <span style="font-size: 12.5px; color: #5F5F5B;">Toggle</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px; width: 300px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Checkboxes</div>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <span style="width: 17px; height: 17px; border: 1.5px solid #8F8F8A; border-radius: 4px;"></span>
+        <span style="width: 17px; height: 17px; border: 1.5px solid #5F5F5B; border-radius: 4px;"></span>
+        <span style="width: 17px; height: 17px; border: 1.5px solid #8F8F8A; border-radius: 4px; outline: 2px solid #37618F; outline-offset: 2px;"></span>
+        <span style="width: 17px; height: 17px; border-radius: 4px; background: #5F5F5B; display: grid; place-items: center; color: #FFFFFF; font-size: 11px;">✓</span>
+        <span style="width: 17px; height: 17px; border-radius: 4px; background: #2E7D5B; display: grid; place-items: center; color: #FFFFFF; font-size: 11px;">✓</span>
+      </div>
+      <div style="font-size: 12.5px; color: #5F5F5B; line-height: 1.6;">Rest · hover · focus · done · just ticked by someone else. Hit area is 44px even though the box is 17px.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px; width: 300px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Avatars, badges</div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="width: 20px; height: 20px; border-radius: 50%; background: #EDEDEA; display: grid; place-items: center; font-size: 9px; color: #5F5F5B;">AN</span>
+        <span style="width: 28px; height: 28px; border-radius: 50%; background: #EDEDEA; display: grid; place-items: center; font-size: 11px; color: #5F5F5B;">JO</span>
+        <span style="display: flex;"><span style="width: 24px; height: 24px; border-radius: 50%; background: #EDEDEA; border: 1.5px solid #FFFFFF; display: grid; place-items: center; font-size: 10px; color: #5F5F5B;">AN</span><span style="width: 24px; height: 24px; border-radius: 50%; background: #EDEDEA; border: 1.5px solid #2E7D5B; margin-left: -6px; display: grid; place-items: center; font-size: 10px; color: #5F5F5B;">JO</span></span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <span style="font-size: 11.5px; color: #37618F; background: #EEF2F7; border-radius: 4px; padding: 2px 7px;">flat</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B; border: 1px solid #E6E6E3; border-radius: 4px; padding: 1px 5px;">2</span>
+        <span style="font-size: 12px; color: #37618F; border: 1px solid #C9DAEC; background: #F1F6FB; border-radius: 4px; padding: 1px 7px;">admins only</span>
+        <span style="font-size: 12.5px; color: #A03A2E;">Fri, 22 Aug</span>
+        <span style="width: 5px; height: 5px; border-radius: 50%; background: #37618F;"></span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 640px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">List row — bare, hovered, done, and fully loaded (all four are 44px)</div>
+      <div style="display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 14px; min-height: 44px; padding: 6px 8px; border-radius: 6px;">
+        <span style="width: 17px; height: 17px; border: 1.5px solid #8F8F8A; border-radius: 4px;"></span>
+        <span style="font-size: 16px;">Baking paper</span>
+        <span style="font-size: 12.5px; color: #6B6B68;">Jonas</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 14px; min-height: 44px; padding: 6px 8px; border-radius: 6px; background: #F7F7F5;">
+        <span style="width: 17px; height: 17px; border: 1.5px solid #5F5F5B; border-radius: 4px;"></span>
+        <span style="font-size: 16px; display: flex; align-items: baseline; gap: 8px;">Milk <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B; border: 1px solid #E6E6E3; border-radius: 4px; padding: 1px 5px; background: #FFFFFF;">2</span></span>
+        <span style="font-size: 12.5px; color: #6B6B68;">Anna</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 14px; min-height: 44px; padding: 6px 8px; border-radius: 6px;">
+        <span style="width: 17px; height: 17px; border-radius: 4px; background: #5F5F5B; display: grid; place-items: center; color: #FFFFFF; font-size: 11px;">✓</span>
+        <span style="font-size: 16px; color: #5F5F5B; text-decoration: line-through; text-decoration-color: #C4C4BE;">Eggs</span>
+        <span style="font-size: 12.5px; color: #6B6B68;">Anna</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 14px; min-height: 44px; padding: 6px 8px; border-radius: 6px; border: 1px dashed #E6E6E3;">
+        <span style="width: 17px; height: 17px; border: 1.5px solid #8F8F8A; border-radius: 4px;"></span>
+        <span style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+          <span style="font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Call the plumber about the bathroom tap</span>
+          <span style="font-size: 11.5px; color: #37618F; background: #EEF2F7; border-radius: 4px; padding: 2px 6px; white-space: nowrap;">flat</span>
+        </span>
+        <span style="display: flex; align-items: center; gap: 12px; font-size: 12.5px; color: #6B6B68; white-space: nowrap;">
+          <span>2 subtasks</span><span>1 comment</span><span style="color: #3F3F3C;">Fri</span><span>Jonas</span>
+        </span>
+      </div>
+      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">Metadata is right-aligned and truncation happens in the label, so the label always starts at the same x and the row never grows. Item detail, when it exists, opens as a right panel over this pane — never a new page.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 300px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Sidebar item</div>
+      <div style="width: 240px; background: #FBFBFA; border: 1px solid #EDEDEB; border-radius: 8px; padding: 8px;">
+        <div style="display: flex; align-items: center; height: 31px; padding: 0 8px; border-radius: 6px; background: #EFEFED;"><span style="font-size: 14px; font-weight: 500;">Groceries</span><span style="margin-left: auto; font-size: 11.5px; color: #5F5F5B;">7</span></div>
+        <div style="display: flex; align-items: center; gap: 9px; height: 31px; padding: 0 8px; border-radius: 6px;"><span style="width: 5px; height: 5px; border-radius: 50%; background: #37618F;"></span><span style="font-size: 14px; color: #3F3F3C;">Flat jobs</span><span style="margin-left: auto; font-size: 11.5px; color: #6B6B68;">4</span></div>
+        <div style="display: flex; align-items: center; height: 31px; padding: 0 8px; border-radius: 6px; outline: 2px solid #37618F; outline-offset: -2px;"><span style="font-size: 14px; color: #3F3F3C;">Bike</span><span style="margin-left: auto; font-size: 11.5px; color: #6B6B68;">3</span></div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 300px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Keyboard</div>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; color: #3F3F3C;">
+        <span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; border: 1px solid #E6E6E3; border-radius: 4px; padding: 1px 6px;">⌘K</span> jump to any list</span>
+        <span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; border: 1px solid #E6E6E3; border-radius: 4px; padding: 1px 6px;">↵</span> add · stays focused for the next one</span>
+        <span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; border: 1px solid #E6E6E3; border-radius: 4px; padding: 1px 6px;">↑ ↓</span> move between items · <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; border: 1px solid #E6E6E3; border-radius: 4px; padding: 1px 6px;">space</span> tick</span>
+        <span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; border: 1px solid #E6E6E3; border-radius: 4px; padding: 1px 6px;">⌘P</span> print the list you’re looking at</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Page furniture</div>
+  <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 32px; display: flex; flex-wrap: wrap; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 640px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Chrome bar — 44px, breadcrumb left, toolbar buttons right</div>
+      <div style="border: 1px solid #E6E6E3; border-radius: 8px; overflow: hidden;">
+        <div style="height: 44px; border-bottom: 1px solid #F0F0EE; display: flex; align-items: center; gap: 8px; padding: 0 16px 0 22px; font-size: 12.5px; color: #6B6B68;">
+          <span>Settings</span><span>/</span><span style="color: #3F3F3C;">Members</span>
+          <span style="flex: 1;"></span>
+          <span style="height: 26px; padding: 0 10px; display: grid; place-items: center; border-radius: 6px; background: #EFEFED; font-size: 12.5px; color: #3F3F3C;">Print</span>
+          <span style="height: 26px; width: 26px; display: grid; place-items: center; border-radius: 6px; font-size: 13px; color: #6B6B68;">···</span>
+        </div>
+        <div style="height: 46px;"></div>
+      </div>
+      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">Every screen starts with this bar. It carries location and view-level actions only — never the page's primary action.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 640px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Page header — title, one line of orientation, primary action</div>
+      <div style="display: flex; align-items: flex-start; gap: 24px; border: 1px dashed #E6E6E3; border-radius: 8px; padding: 16px;">
+        <div style="min-width: 0;">
+          <h2 style="margin: 0 0 6px; font-size: 27px; font-weight: 600; letter-spacing: -0.02em;">Members</h2>
+          <div style="font-size: 14px; line-height: 1.55; color: #3F3F3C; max-width: 540px;">Five people at Brunnen Street. Adding someone sets a temporary password you read out once.</div>
+        </div>
+        <span style="margin-left: auto; flex: none; height: 34px; padding: 0 16px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; background: #1F1F1E; color: #FFFFFF; font-size: 14px; font-weight: 500;">Add a member</span>
+      </div>
+      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">27px title, 14px subtitle capped at 540px, action pinned right and vertically top-aligned with the title. The action never sits at the bottom of the page.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 640px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Section header — 2px rule above, 19px heading, secondary action</div>
+      <div style="display: flex; flex-direction: column; gap: 14px; padding-top: 18px; border-top: 2px solid #E6E6E3;">
+        <div style="display: flex; align-items: flex-start; gap: 20px;">
+          <div style="min-width: 0;">
+            <div style="font-size: 19px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 4px;">Groups</div>
+            <div style="font-size: 13px; color: #3F3F3C;">A group is a shortcut for sharing.</div>
+          </div>
+          <span style="margin-left: auto; flex: none; height: 34px; padding: 0 14px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; border: 1px solid #E6E6E3; font-size: 14px; color: #3F3F3C;">Add a group</span>
+        </div>
+      </div>
+      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">Three rule weights, and they mean different things: 2px separates sections of a page, 1px #E6E6E3 separates blocks inside a section, 1px #F0F0EE separates rows.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 640px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Table — uppercase column head, 56px rows, compact buttons inside</div>
+      <div>
+        <div style="display: grid; grid-template-columns: 1fr 130px 96px 24px; gap: 16px; align-items: center; padding-bottom: 10px; border-bottom: 1px solid #E6E6E3; font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #6B6B68;">
+          <span>Person</span><span>Role</span><span>Added</span><span></span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 130px 96px 24px; gap: 16px; align-items: center; min-height: 56px; border-bottom: 1px solid #F0F0EE;">
+          <span style="display: flex; align-items: center; gap: 12px;">
+            <span style="width: 28px; height: 28px; border-radius: 50%; background: #EDEDEA; display: grid; place-items: center; font-size: 11px; color: #5F5F5B;">AN</span>
+            <span style="display: flex; flex-direction: column;">
+              <span style="font-size: 15px;">Anna</span>
+              <span style="font-size: 12.5px; color: #6B6B68;">anna@brunnen.lan</span>
+            </span>
+          </span>
+          <span style="font-size: 13px; color: #3F3F3C;">Admin</span>
+          <span style="font-size: 13px; color: #3F3F3C;">Sunday</span>
+          <span style="font-size: 14px; color: #6B6B68;">···</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 130px 96px 24px; gap: 16px; align-items: center; min-height: 56px; border-bottom: 1px solid #F0F0EE;">
+          <span style="display: flex; align-items: center; gap: 12px;">
+            <span style="width: 28px; height: 28px; border-radius: 50%; background: #EDEDEA; display: grid; place-items: center; font-size: 11px; color: #5F5F5B;">RU</span>
+            <span style="display: flex; flex-direction: column;">
+              <span style="font-size: 15px; color: #6B6B68;">Ruth</span>
+              <span style="font-size: 12.5px; color: #6B6B68;">temporary password not yet replaced</span>
+            </span>
+          </span>
+          <span style="font-size: 13px; color: #3F3F3C;">Member</span>
+          <span style="font-size: 13px; color: #6B6B68;">Never</span>
+          <span style="font-size: 14px; color: #6B6B68;">···</span>
+        </div>
+      </div>
+      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">A row that has never been used greys its name and its last column, not the whole row. The last column is always the ··· menu at 24px.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 520px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Empty state — dashed, left-aligned, never centred</div>
+      <div style="border: 1px dashed #E6E6E3; border-radius: 8px; padding: 30px 26px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start;">
+        <span style="font-size: 17px; font-weight: 500;">No tokens yet</span>
+        <span style="font-size: 14px; line-height: 1.6; color: #3F3F3C; max-width: 440px;">A token lets something other than a browser reach your lists. Each one reaches only the lists you name.</span>
+      </div>
+      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">17px statement of fact, then one sentence saying what the thing is for. No illustration, no centred hero, and no button if the page header already has one.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 520px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Card — group, token, anything with a name and a body</div>
+      <div style="border: 1px solid #E6E6E3; border-radius: 8px; padding: 15px 16px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 15px; font-weight: 500;">Flatmates</span>
+          <span style="font-size: 12px; color: #6B6B68; border: 1px solid #E6E6E3; border-radius: 4px; padding: 1px 6px;">3 people</span>
+          <span style="margin-left: auto; font-size: 14px; color: #6B6B68;">···</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="display: flex;">
+            <span style="width: 24px; height: 24px; border-radius: 50%; background: #EDEDEA; border: 1.5px solid #FFFFFF; display: grid; place-items: center; font-size: 10px; color: #5F5F5B;">AN</span>
+            <span style="width: 24px; height: 24px; border-radius: 50%; background: #EDEDEA; border: 1.5px solid #FFFFFF; margin-left: -6px; display: grid; place-items: center; font-size: 10px; color: #5F5F5B;">JO</span>
+            <span style="width: 24px; height: 24px; border-radius: 50%; background: #EDEDEA; border: 1.5px solid #FFFFFF; margin-left: -6px; display: grid; place-items: center; font-size: 10px; color: #5F5F5B;">MI</span>
+          </span>
+          <span style="font-size: 13px; color: #3F3F3C;">Anna, Jonas, Mira</span>
+        </div>
+        <div style="font-size: 12.5px; color: #6B6B68; padding-top: 10px; border-top: 1px solid #F0F0EE;">Groceries, Flat jobs, and 4 more</div>
+      </div>
+      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">Name row, body, then one hairline-separated footer fact. Cards go two-up in a 12px grid; they never stretch to a single full-width column.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 520px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Settings row — 190px label column, control right</div>
+      <div style="border-top: 1px solid #F0F0EE;">
+        <div style="display: grid; grid-template-columns: 190px 1fr; align-items: center; gap: 24px; min-height: 48px; padding: 6px 0; border-bottom: 1px solid #F0F0EE;">
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 14px;">Instance name</span>
+            <span style="font-size: 12.5px; color: #6B6B68; line-height: 1.5;">Shows in the sidebar and on print</span>
+          </div>
+          <div style="display: flex; justify-content: flex-end;">
+            <span style="width: 280px; height: 36px; border: 1px solid #E6E6E3; border-radius: 7px; padding: 0 12px; display: flex; align-items: center; font-size: 14.5px;">Brunnen Street</span>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 190px 1fr; align-items: center; gap: 24px; min-height: 48px; padding: 6px 0; border-bottom: 1px solid #F0F0EE;">
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 14px;">Public signup</span>
+            <span style="font-size: 12.5px; color: #6B6B68; line-height: 1.5;">Off means every account is a request you approve</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; justify-content: flex-end;">
+            <span style="font-size: 13px; color: #6B6B68;">Off</span>
+            <span style="width: 34px; height: 20px; border-radius: 10px; background: #E0E0DC; display: flex; align-items: center; padding: 2px;"><span style="width: 16px; height: 16px; border-radius: 50%; background: #FFFFFF;"></span></span>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 190px 1fr; align-items: center; gap: 24px; min-height: 48px; padding: 6px 0;">
+          <span style="font-size: 14px;">Theme</span>
+          <div style="display: flex; justify-content: flex-end;">
+            <div style="display: flex; border: 1px solid #E6E6E3; border-radius: 7px; overflow: hidden;">
+              <span style="height: 32px; padding: 0 14px; display: grid; place-items: center; font-size: 13.5px; background: #EFEFED; font-weight: 500;">Light</span>
+              <span style="height: 32px; padding: 0 14px; display: grid; place-items: center; font-size: 13.5px; color: #3F3F3C; border-left: 1px solid #E6E6E3;">Dark</span>
+              <span style="height: 32px; padding: 0 14px; display: grid; place-items: center; font-size: 13.5px; color: #3F3F3C; border-left: 1px solid #E6E6E3;">System</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Overlays and the note editor</div>
+  <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 32px; display: flex; flex-wrap: wrap; gap: 40px;">
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 560px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Dialog — 560px, scrim, footer bar carries the actions</div>
+      <div style="background: #EDEDEB; border-radius: 10px; padding: 26px; display: flex; justify-content: center;">
+        <div style="width: 460px; background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; box-shadow: 0 24px 60px rgba(0,0,0,0.14);">
+          <div style="padding: 20px 22px 0; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 21px; font-weight: 600; letter-spacing: -0.015em;">Add a token</div>
+            <div style="font-size: 14px; line-height: 1.6; color: #3F3F3C;">Name it after the thing that will hold it, not the person.</div>
+          </div>
+          <div style="padding: 18px 22px; display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-size: 13px; font-weight: 500; color: #3F3F3C;">Name</span>
+            <span style="height: 38px; border: 1.5px solid #37618F; border-radius: 7px; padding: 0 12px; display: flex; align-items: center; font-size: 14.5px;">Kitchen tablet</span>
+          </div>
+          <div style="border-top: 1px solid #F0F0EE; padding: 14px 22px; display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 12.5px; color: #6B6B68;">Expires in 90 days</span>
+            <span style="flex: 1;"></span>
+            <span style="height: 34px; padding: 0 14px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; border: 1px solid #E6E6E3; font-size: 14px; color: #3F3F3C;">Cancel</span>
+            <span style="height: 34px; padding: 0 16px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; background: #1F1F1E; color: #FFFFFF; font-size: 14px; font-weight: 500;">Add token</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">Title, one explaining line, body, then a bordered footer: consequence text left, cancel then confirm right. Scrim is ink at 34% in light, 55% in dark.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 560px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Chip picker and permission list</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <span style="display: flex; align-items: center; gap: 7px; height: 30px; padding: 0 11px; border-radius: 15px; background: #EFEFED; font-size: 13px;"><span style="width: 13px; height: 13px; border-radius: 3px; background: #37618F;"></span>Groceries</span>
+        <span style="display: flex; align-items: center; gap: 7px; height: 30px; padding: 0 11px; border-radius: 15px; border: 1px solid #E6E6E3; font-size: 13px; color: #3F3F3C;"><span style="width: 13px; height: 13px; border-radius: 3px; border: 1.5px solid #8F8F8A;"></span>Flat jobs</span>
+        <span style="display: flex; align-items: center; gap: 7px; height: 30px; padding: 0 11px; border-radius: 15px; border: 1px solid #E6E6E3; font-size: 13px; color: #3F3F3C;"><span style="width: 13px; height: 13px; border-radius: 3px; border: 1.5px solid #8F8F8A;"></span>Bike</span>
+      </div>
+      <div style="display: flex; flex-direction: column; border: 1px solid #E6E6E3; border-radius: 8px; overflow: hidden;">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #EFEFED;">
+          <span style="width: 15px; height: 15px; border-radius: 4px; background: #37618F; flex: none;"></span>
+          <span style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 14px;">Read items</span>
+            <span style="font-size: 12.5px; color: #6B6B68; line-height: 1.45;">Titles, quantities, dates and notes.</span>
+          </span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid #F0F0EE;">
+          <span style="width: 15px; height: 15px; border-radius: 4px; border: 1.5px solid #8F8F8A; flex: none;"></span>
+          <span style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 14px;">Delete items and lists</span>
+            <span style="font-size: 12.5px; color: #6B6B68; line-height: 1.45;">Off by default.</span>
+          </span>
+        </div>
+      </div>
+      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">Chips for picking many of one kind of thing; the bordered list when each choice needs a sentence explaining what it costs.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 560px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Note blocks — same markup in the side sheet and full screen</div>
+      <div style="border: 1px solid #E6E6E3; border-radius: 8px; padding: 20px 22px; display: flex; flex-direction: column; gap: 1px;">
+        <div style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.4; padding: 4px 0 3px;">Where</div>
+        <div style="font-size: 15.5px; line-height: 1.6; padding: 5px 0;">Saturday market, second row from the entrance.</div>
+        <div style="display: grid; grid-template-columns: 26px 1fr; gap: 6px; align-items: baseline; padding: 3px 0; margin-left: -30px;">
+          <span style="display: flex; justify-content: flex-end; padding-right: 4px;"><span style="width: 15px; height: 15px; border: 1.5px solid #8F8F8A; border-radius: 4px; position: relative; top: 2px;"></span></span>
+          <span style="font-size: 15.5px; line-height: 1.6;">Ethiopian, whole bean</span>
+        </div>
+        <div style="font-size: 15.5px; line-height: 1.6; color: #3F3F3C; border-left: 2px solid #E6E6E3; padding: 0 0 0 13px; margin: 10px 0;">They pack up around two.</div>
+      </div>
+      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">Heading 18, body 15.5, checklist box 15px in a 26px gutter, quote on a 2px rule. The side sheet renders the same blocks one step down: 13.5 / 14.5. Markdown shorthand converts as the user types but is never displayed back to them.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 560px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Side sheet — 520px, the full-screen view narrowed</div>
+      <div style="border: 1px solid #E6E6E3; border-radius: 8px; overflow: hidden; display: grid; grid-template-columns: 1fr 300px; height: 220px;">
+        <div style="background: #FBFBFA;"></div>
+        <div style="border-left: 1px solid #E6E6E3; display: flex; flex-direction: column;">
+          <div style="height: 34px; border-bottom: 1px solid #F0F0EE; display: flex; align-items: center; gap: 8px; padding: 0 12px; font-size: 11.5px; color: #6B6B68;">
+            <span>Groceries / Item</span><span style="flex: 1;"></span><span style="height: 22px; padding: 0 8px; display: grid; place-items: center; border-radius: 6px; background: #EFEFED; font-size: 11px;">Open full</span>
+          </div>
+          <div style="padding: 14px 14px 0; display: flex; flex-direction: column; gap: 10px;">
+            <span style="font-size: 15px; font-weight: 600;">Coffee — the good beans</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 11.5px; color: #6B6B68;"><span>List Groceries</span><span>Due Saturday</span></div>
+            <div style="height: 1px; background: #F0F0EE;"></div>
+            <span style="font-size: 12.5px; color: #3F3F3C;">Not the supermarket ones — the stall at the Saturday market.</span>
+          </div>
+          <div style="margin-top: auto; height: 30px; border-top: 1px solid #F0F0EE; display: flex; align-items: center; padding: 0 12px; font-size: 11px; color: #6B6B68;">Press / for blocks</div>
+        </div>
+      </div>
+      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">Same order in both: chrome bar, checkbox and title, detail row, hairline, note, footer bar. Opening an item never replaces the list with a page.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 560px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Secret shown once</div>
+      <div style="border: 1px solid #C9DAEC; background: #F1F6FB; border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; word-break: break-all; line-height: 1.5;">nk_mcp_a48d3c91b7e24f60a5d8c2317fb094ae</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="height: 34px; padding: 0 16px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; background: #1F1F1E; color: #FFFFFF; font-size: 14px; font-weight: 500;">Copy token</span>
+          <span style="font-size: 12.5px; color: #3F3F3C;">Shown once.</span>
+        </div>
+      </div>
+      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">Accent panel, mono at 13.5, and a sentence saying plainly that it cannot be shown again. Never a warning triangle.</div>
+    </div>
+
+  </div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Words</div>
+  <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 28px 32px; display: flex; flex-wrap: wrap; gap: 40px;">
+    <div style="width: 300px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Actions</div>
+      <div style="font-size: 13.5px; line-height: 1.7; color: #3F3F3C;">Add a member · Add a group · Add a token · Add a list. One verb for creating things, everywhere. Never New, Create, Issue, or Generate.</div>
+    </div>
+    <div style="width: 300px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Sentence case, full stops in prose</div>
+      <div style="font-size: 13.5px; line-height: 1.7; color: #3F3F3C;">Buttons and labels take no full stop. Explanatory lines are sentences and take one. Uppercase is reserved for 11.5px section and column heads.</div>
+    </div>
+    <div style="width: 300px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Say what happens</div>
+      <div style="font-size: 13.5px; line-height: 1.7; color: #3F3F3C;">“Ignore removes the request silently and never notifies the sender.” Not “Are you sure?”. State the consequence in the footer of the thing that causes it.</div>
+    </div>
+    <div style="width: 300px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Never summarise the user</div>
+      <div style="font-size: 13.5px; line-height: 1.7; color: #3F3F3C;">A long note previews as its own first line plus a count of what is left. Nothing is generated on their behalf.</div>
+    </div>
+  </div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Identity</div>
+  <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 32px; display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-start;">
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Wordmark</div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="width: 30px; height: 30px; border-radius: 7px; background: #1F1F1E; display: grid; place-items: center; color: #FFFFFF; font-size: 16px; font-weight: 600;">N</span>
+        <span style="font-size: 30px; font-weight: 600; letter-spacing: -0.035em;">Nook</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; background: #191918; padding: 14px 18px; border-radius: 8px;">
+        <span style="width: 26px; height: 26px; border-radius: 6px; background: #ECECEA; display: grid; place-items: center; color: #191918; font-size: 14px; font-weight: 600;">N</span>
+        <span style="font-size: 26px; font-weight: 600; letter-spacing: -0.035em; color: #ECECEA;">Nook</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">App icon at 64, 32, 16</div>
+      <div style="display: flex; align-items: flex-end; gap: 16px;">
+        <span style="width: 64px; height: 64px; border-radius: 14px; background: #1F1F1E; display: grid; place-items: center; color: #FFFFFF; font-size: 34px; font-weight: 600;">N</span>
+        <span style="width: 32px; height: 32px; border-radius: 7px; background: #1F1F1E; display: grid; place-items: center; color: #FFFFFF; font-size: 17px; font-weight: 600;">N</span>
+        <span style="width: 16px; height: 16px; border-radius: 4px; background: #1F1F1E; display: grid; place-items: center; color: #FFFFFF; font-size: 9px; font-weight: 600;">N</span>
+      </div>
+      <div style="font-size: 12.5px; color: #5F5F5B; max-width: 34ch; line-height: 1.6;">One letter at one weight. A tab strip is where an icon competes hardest, so there is nothing in it to lose.</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Favicon in a tab</div>
+      <div style="display: flex; align-items: center; gap: 0; background: #DEDEDA; padding: 8px 8px 0; border-radius: 8px 8px 0 0;">
+        <span style="display: flex; align-items: center; gap: 8px; background: #FFFFFF; border-radius: 6px 6px 0 0; padding: 8px 14px;">
+          <span style="width: 16px; height: 16px; border-radius: 4px; background: #1F1F1E; display: grid; place-items: center; color: #FFFFFF; font-size: 9px; font-weight: 600;">N</span>
+          <span style="font-size: 12.5px;">Groceries · Nook</span>
+        </span>
+        <span style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; opacity: 0.5;">
+          <span style="width: 16px; height: 16px; border-radius: 4px; background: #B4B4AF;"></span>
+          <span style="font-size: 12.5px; color: #3F3F3C;">Another tab</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div style="display: flex; flex-direction: column; gap: 16px;">
+  <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">States</div>
+  <div style="font-size: 13.5px; color: #5F5F5B; max-width: 68ch; line-height: 1.6;">Every state is built from the same rows, hairlines and one meaning colour. Full-page versions of each live in the screen files.</div>
+<div style="display: flex; gap: 32px; flex-wrap: wrap;">
+
+  <div style="width: 520px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Empty list</div>
+    <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 44px 40px; min-height: 300px; display: flex; flex-direction: column;">
+      <h2 style="margin: 0 0 10px; font-size: 27px; font-weight: 600; letter-spacing: -0.02em;">Packing — Norway</h2>
+      <div style="font-size: 13.5px; color: #5F5F5B; margin-bottom: 40px;">Private · nothing on it yet</div>
+      <div style="display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 14px; min-height: 44px; padding-bottom: 12px; border-bottom: 1.5px solid #37618F;">
+        <span style="font-size: 15px; color: #63635E; text-align: center;">+</span>
+        <span style="font-size: 16px; color: #63635E;">Wool socks</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #63635E; border: 1px solid #EDEDEA; border-radius: 4px; padding: 1px 5px;">↵</span>
+      </div>
+      <div style="margin-top: 16px; font-size: 14px; color: #5F5F5B; line-height: 1.6;">Type and press enter. Repeat until the list is done.</div>
+    </div>
+  </div>
+
+  <div style="width: 520px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Empty app — brand new account</div>
+    <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 44px 40px; min-height: 300px; display: flex; flex-direction: column; gap: 26px;">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <h2 style="margin: 0; font-size: 27px; font-weight: 600; letter-spacing: -0.02em;">Nothing here yet, Til.</h2>
+        <p style="margin: 0; font-size: 15px; line-height: 1.65; color: #3F3F3C; max-width: 46ch;">A list is a name and some things under it. Groceries, films, questions for the landlord — Nook doesn’t care which.</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="height: 34px; padding: 0 16px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; background: #1F1F1E; color: #FFFFFF; font-size: 14px; font-weight: 500;">Add a list</span>
+        <span style="font-size: 14px; color: #5F5F5B;">or open one of the four shared with you</span>
+      </div>
+      <div style="margin-top: auto; display: flex; flex-direction: column; gap: 6px; padding-top: 20px; border-top: 1px solid #F0F0EE;">
+        <span style="font-size: 13px; color: #5F5F5B;">Shared with you</span>
+        <div style="display: flex; gap: 18px; font-size: 14px; color: #37618F;">
+          <span>Groceries</span><span>Flat jobs</span><span>Landlord questions</span><span>Films to watch</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width: 520px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Loading — slow home server</div>
+    <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 44px 40px; min-height: 300px; display: flex; flex-direction: column; gap: 22px;">
+      <div style="width: 180px; height: 26px; border-radius: 5px; background: #EFEFED;"></div>
+      <div style="width: 240px; height: 13px; border-radius: 4px; background: #F4F4F2;"></div>
+      <div style="display: flex; flex-direction: column; gap: 18px; margin-top: 10px;">
+        <div style="display: grid; grid-template-columns: 20px 1fr; gap: 14px; align-items: center;">
+          <span style="width: 17px; height: 17px; border-radius: 4px; background: #F0F0EE;"></span>
+          <span style="height: 13px; width: 62%; border-radius: 4px; background: #F0F0EE;"></span>
+        </div>
+        <div style="display: grid; grid-template-columns: 20px 1fr; gap: 14px; align-items: center;">
+          <span style="width: 17px; height: 17px; border-radius: 4px; background: #F2F2F0;"></span>
+          <span style="height: 13px; width: 44%; border-radius: 4px; background: #F2F2F0;"></span>
+        </div>
+        <div style="display: grid; grid-template-columns: 20px 1fr; gap: 14px; align-items: center;">
+          <span style="width: 17px; height: 17px; border-radius: 4px; background: #F5F5F3;"></span>
+          <span style="height: 13px; width: 70%; border-radius: 4px; background: #F5F5F3;"></span>
+        </div>
+      </div>
+      <div style="margin-top: auto; font-size: 13px; color: #5F5F5B;">Still waiting on the server — 4s. It’s probably just waking up.</div>
+    </div>
+  </div>
+
+  <div style="width: 520px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Offline / server unreachable</div>
+    <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; min-height: 300px; display: flex; flex-direction: column; overflow: hidden;">
+      <div style="background: #FBF6E9; border-bottom: 1px solid #EDE1C4; padding: 12px 20px; display: flex; align-items: center; gap: 12px;">
+        <span style="width: 7px; height: 7px; border-radius: 50%; background: #9A6B14;"></span>
+        <span style="font-size: 13.5px; color: #6B4A0E;">Can’t reach Brunnen Street. Ticks are saved here and will sync when it’s back.</span>
+        <span style="margin-left: auto; font-size: 13px; color: #6B4A0E; font-weight: 500;">Retry</span>
+      </div>
+      <div style="padding: 34px 40px; display: flex; flex-direction: column; gap: 18px;">
+        <h2 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Groceries</h2>
+        <div style="display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 14px; min-height: 44px;">
+          <span style="width: 17px; height: 17px; border-radius: 4px; background: #5F5F5B; display: grid; place-items: center; color: #FFFFFF; font-size: 11px;">✓</span>
+          <span style="font-size: 16px; color: #5F5F5B; text-decoration: line-through; text-decoration-color: #C4C4BE;">Milk</span>
+          <span style="font-size: 12px; color: #6B4A0E; background: #FBF6E9; border-radius: 4px; padding: 2px 7px;">not synced</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 14px; min-height: 44px;">
+          <span style="width: 17px; height: 17px; border: 1.5px solid #8F8F8A; border-radius: 4px;"></span>
+          <span style="font-size: 16px;">Baking paper</span>
+          <span style="font-size: 12.5px; color: #6B6B68;">Jonas</span>
+        </div>
+        <div style="font-size: 13px; color: #5F5F5B;">Last seen 18:42. Reading and ticking still work; adding does too.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width: 520px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Error on save</div>
+    <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 44px 40px; min-height: 300px; display: flex; flex-direction: column; gap: 20px;">
+      <h2 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Flat jobs</h2>
+      <div style="display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 14px; min-height: 44px; border: 1px solid #E4C2BC; border-radius: 6px; background: #FCF5F4; padding: 6px 10px;">
+        <span style="width: 17px; height: 17px; border: 1.5px solid #B0554A; border-radius: 4px;"></span>
+        <span style="font-size: 16px;">Descale the kettle</span>
+        <span style="font-size: 13px; color: #8E3B31; font-weight: 500;">Try again</span>
+      </div>
+      <div style="font-size: 14px; line-height: 1.6; color: #3F3F3C; max-width: 48ch;">The server rejected this item: the list was deleted by Jonas while you were typing. Your text is still here — put it on another list, or make a new one.</div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="height: 34px; padding: 0 16px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; background: #1F1F1E; color: #FFFFFF; font-size: 14px; font-weight: 500;">Move to Groceries</span>
+        <span style="height: 34px; padding: 0 14px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; border: 1px solid #E6E6E3; font-size: 14px; color: #3F3F3C;">Copy the text</span>
+        <span style="font-size: 13.5px; color: #5F5F5B;">Discard</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="width: 520px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Conflict — two people at once</div>
+    <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 44px 40px; min-height: 300px; display: flex; flex-direction: column; gap: 20px;">
+      <h2 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Groceries</h2>
+      <div style="display: grid; grid-template-columns: 20px 1fr; align-items: start; gap: 14px; border: 1px solid #E6E6E3; border-radius: 8px; padding: 14px 14px;">
+        <span style="width: 17px; height: 17px; border: 1.5px solid #8F8F8A; border-radius: 4px; margin-top: 3px;"></span>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <span style="font-size: 16px;">Coffee — the good beans from the market</span>
+          <span style="font-size: 13.5px; color: #5F5F5B;">Mira renamed this while you were editing. Keep one:</span>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 14.5px; border: 1.5px solid #37618F; border-radius: 6px; padding: 9px 12px; background: #F7FAFD;">Coffee — the good beans from the market <span style="font-size: 12.5px; color: #5F5F5B;">· yours</span></span>
+            <span style="font-size: 14.5px; border: 1px solid #E6E6E3; border-radius: 6px; padding: 9px 12px;">Coffee beans, 1 kg <span style="font-size: 12.5px; color: #5F5F5B;">· Mira, 2 min ago</span></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">
+            <span style="height: 34px; padding: 0 16px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; background: #1F1F1E; color: #FFFFFF; font-size: 14px; font-weight: 500;">Keep mine</span>
+            <span style="height: 34px; padding: 0 14px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; border: 1px solid #E6E6E3; font-size: 14px; color: #3F3F3C;">Keep both</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">Ticks never conflict — a tick is a tick whoever made it. Only competing text asks a question, and only on the row it affects.</div>
+    </div>
+  </div>
+
+  <div style="width: 520px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Offline + loading, dark</div>
+    <div style="background: #191918; border: 1px solid #2A2A28; border-radius: 10px; min-height: 300px; overflow: hidden; color: #ECECEA;">
+      <div style="background: #2A2413; border-bottom: 1px solid #3D3520; padding: 12px 20px; display: flex; align-items: center; gap: 12px;">
+        <span style="width: 7px; height: 7px; border-radius: 50%; background: #D9A93C;"></span>
+        <span style="font-size: 13.5px; color: #E4C67E;">Can’t reach Brunnen Street. Ticks are saved here.</span>
+        <span style="margin-left: auto; font-size: 13px; color: #E4C67E; font-weight: 500;">Retry</span>
+      </div>
+      <div style="padding: 34px 40px; display: flex; flex-direction: column; gap: 22px;">
+        <div style="width: 180px; height: 26px; border-radius: 5px; background: #242422;"></div>
+        <div style="display: flex; flex-direction: column; gap: 18px;">
+          <div style="display: grid; grid-template-columns: 20px 1fr; gap: 14px; align-items: center;">
+            <span style="width: 17px; height: 17px; border-radius: 4px; background: #262624;"></span>
+            <span style="height: 13px; width: 62%; border-radius: 4px; background: #262624;"></span>
+          </div>
+          <div style="display: grid; grid-template-columns: 20px 1fr; gap: 14px; align-items: center;">
+            <span style="width: 17px; height: 17px; border-radius: 4px; background: #222220;"></span>
+            <span style="height: 13px; width: 44%; border-radius: 4px; background: #222220;"></span>
+          </div>
+          <div style="display: grid; grid-template-columns: 20px 1fr; gap: 14px; align-items: center;">
+            <span style="width: 17px; height: 17px; border-radius: 4px; background: #1E1E1C;"></span>
+            <span style="height: 13px; width: 70%; border-radius: 4px; background: #1E1E1C;"></span>
+          </div>
+        </div>
+        <div style="font-size: 13px; color: #9A9A95;">Skeleton rows hold the exact height of real rows, so nothing jumps when they arrive.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+</div>
+
+</x-dc>
+</body>
+</html>

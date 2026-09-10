@@ -71,8 +71,16 @@ export function AddRow({ placeholder, defaultDue = "", onAdd, disabled }: AddRow
   const chosenDue = draft.picked ?? typedDue
   const effectiveDue = chosenDue || (draft.cleared ? "" : defaultDue)
 
-  /** Reads the sentence and lifts out whatever it recognises. */
+  /**
+   * Reads the sentence and lifts out whatever it recognises.
+   *
+   * Only once a space follows the word. Converting mid-word would make `1` a quantity
+   * while the Member is still typing `1kg`, and take the `kg` with it.
+   */
   const absorb = (typing: string): AddRowDraft => {
+    if (!/\s$/.test(typing)) {
+      return { ...draft, typing }
+    }
     const parsed = parse(sentenceOf(draft.name, typing), kinds)
     if (parsed.chips.length === 0) {
       return { ...draft, typing }
@@ -143,9 +151,17 @@ export function AddRow({ placeholder, defaultDue = "", onAdd, disabled }: AddRow
         ))}
         <input
           ref={inputRef}
+          aria-label={placeholder}
           value={draft.typing}
           onChange={(event) => setDraft(absorb(event.target.value))}
           onKeyDown={(event) => {
+            // The row has a second input — the date control — so the browser will not
+            // submit it implicitly. Enter is the way an Item is filed, so it is handled
+            // rather than left to the form.
+            if (event.key === "Enter") {
+              event.preventDefault()
+              submit()
+            }
             if (event.key === "Backspace" && draft.typing === "") {
               event.preventDefault()
               unchip()

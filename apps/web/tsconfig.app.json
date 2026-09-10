@@ -4,14 +4,16 @@
     "target": "es2023",
     "lib": ["ES2023", "DOM"],
     "module": "esnext",
-    "types": ["vite/client"],
+    /* node is here for the tests, which read files from the repository. */
+    "types": ["vite/client", "node"],
     "allowArbitraryExtensions": true,
     "skipLibCheck": true,
 
     /* Path alias. No baseUrl: TypeScript 6 deprecates it, and relative
        path patterns work without one. */
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "cn": ["./src/lib/cn.ts"]
     },
 
     /* Bundler mode */

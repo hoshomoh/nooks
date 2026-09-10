@@ -1,16 +1,30 @@
 import path from "node:path"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
-import { defineConfig } from "vite"
+// vitest's defineConfig, which is Vite's plus the `test` block below.
+import { defineConfig } from "vitest/config"
 
 // The dev server proxies the API to the Go binary on :8081 so that the browser
 // talks to one origin and cookies behave as they do in production.
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
-    alias: {
-      "@": path.resolve(import.meta.dirname, "./src"),
-    },
+    alias: [
+      { find: "@", replacement: path.resolve(import.meta.dirname, "./src") },
+      // The generated shadcn components import "cn" directly and must not be edited,
+      // so the name resolves to Nooks' configured merger — see src/lib/cn.ts.
+      {
+        find: /^cn$/,
+        replacement: path.resolve(import.meta.dirname, "./src/lib/cn.ts"),
+      },
+    ],
+  },
+  test: {
+    // A test that renders types one character at a time through a real event loop, and
+    // CI runs the whole suite beside a Go build. Five seconds is the default and it is
+    // not enough on a loaded machine; this is about the machine, not the code.
+    testTimeout: 20_000,
+    hookTimeout: 20_000,
   },
   server: {
     port: 3001,

@@ -1,6 +1,7 @@
 import { createRouter } from "@tanstack/react-router"
 
 import { RoutePending } from "./components/ds/loading-rows"
+import { RouteError } from "./components/ds/route-error"
 import type { QueryClient } from "@tanstack/react-query"
 
 import { forgotPasswordRoute } from "./routes/forgot-password"
@@ -38,6 +39,9 @@ export function buildRouter(queryClient: QueryClient) {
     defaultPreload: "intent",
     // Also the Suspense boundary every screen reads its data behind.
     defaultPendingComponent: RoutePending,
+    // And the error boundary. A screen reads its data with useSuspenseQuery, which
+    // throws when a refetch fails, and a blank page is not an answer.
+    defaultErrorComponent: RouteError,
   })
 }
 

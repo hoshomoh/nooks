@@ -134,7 +134,10 @@
   },
   "error": {
     "unreachable": "Something went wrong reaching the server.",
-    "cannotReach": "Can't reach the server."
+    "cannotReach": "Can't reach the server.",
+    "screenTitle": "That didn't load",
+    "screenBody": "The server did not answer. Nothing you have written is lost — try again.",
+    "tryAgain": "Try again"
   },
   "views": {
     "today": "Today",

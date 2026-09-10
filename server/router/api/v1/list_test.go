@@ -677,3 +677,74 @@ func TestClearingANoteRemovesItFromSearch(t *testing.T) {
 		t.Errorf("hits = %d, want none once the Note is gone", len(res.Msg.GetHits()))
 	}
 }
+
+// A ticked Item stays on its List. It moves to the done section rather than leaving,
+// and untick puts it back — a tick is not a delete.
+func TestATickedItemStaysAndCanBeUnticked(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+	ctx := f.as(t, f.anna)
+
+	added, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: uid, Label: "Milk",
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+	itemUID := added.Msg.GetItem().GetUid()
+
+	if _, err := f.svc.SetItemDone(ctx, connect.NewRequest(&apiv1.SetItemDoneRequest{
+		ItemUid: itemUID, Done: true,
+	})); err != nil {
+		t.Fatalf("tick: %v", err)
+	}
+
+	ticked, err := f.svc.GetList(ctx, connect.NewRequest(&apiv1.GetListRequest{ListUid: uid}))
+	if err != nil {
+		t.Fatalf("GetList: %v", err)
+	}
+	if len(ticked.Msg.GetItems()) != 1 {
+		t.Fatalf("got %d items after ticking, want the ticked one still there", len(ticked.Msg.GetItems()))
+	}
+	if !ticked.Msg.GetItems()[0].GetDone() {
+		t.Error("Done = false on the Item that was just ticked")
+	}
+
+	untickedItem, err := f.svc.SetItemDone(ctx, connect.NewRequest(&apiv1.SetItemDoneRequest{
+		ItemUid: itemUID, Done: false,
+	}))
+	if err != nil {
+		t.Fatalf("untick: %v", err)
+	}
+	if untickedItem.Msg.GetItem().GetDone() {
+		t.Error("Done = true after unticking")
+	}
+	if got := untickedItem.Msg.GetItem().GetDoneByName(); got != "" {
+		t.Errorf("DoneByName = %q after unticking, want nobody", got)
+	}
+}
+
+// An Item's name is changed where it is read, so every view has to be able to send one.
+func TestRenamingAnItem(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+	ctx := f.as(t, f.anna)
+
+	added, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: uid, Label: "Milk",
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+
+	label := "Oat milk"
+	renamed, err := f.svc.UpdateItem(ctx, connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid: added.Msg.GetItem().GetUid(), Label: &label,
+	}))
+	if err != nil {
+		t.Fatalf("UpdateItem: %v", err)
+	}
+	if got := renamed.Msg.GetItem().GetLabel(); got != "Oat milk" {
+		t.Errorf("Label = %q, want the new name", got)
+	}
+}

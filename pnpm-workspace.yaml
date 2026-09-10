@@ -1,8 +1,12 @@
 packages:
-  - web
+  - apps/*
+  - packages/*
 
 # @bufbuild/buf ships its platform binary as an optional dependency, so its build
 # script has nothing to do. Denied explicitly rather than left unreviewed, which
 # pnpm treats as an error.
 allowBuilds:
   '@bufbuild/buf': false
+
+minimumReleaseAgeExclude:
+  - '@rolldown/binding-openharmony-arm64@1.2.8'

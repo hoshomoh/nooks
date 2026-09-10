@@ -11,8 +11,9 @@ Nook is a self-hosted household todo app. See `CONTEXT.md` for the domain glossa
 - Backend: Go, Connect RPC, Protocol Buffers. gRPC-Gateway and OpenAPI arrive with the REST API in M10.
 - Frontend: React, TypeScript, Vite, Tailwind CSS v4, shadcn/ui, TanStack Query, TanStack Router.
 - Storage: SQLite (default — one file the user can copy) and Postgres, behind one store interface.
-- Generated API outputs: `proto/gen/` for Go, `web/src/types/proto/` for TypeScript.
+- Generated API outputs: `proto/gen/` for Go, `packages/api/src/gen/` for TypeScript.
 - Ships as one binary: the SPA is built into `server/router/frontend/dist` and embedded.
+- Monorepo: Go at the root, JavaScript in `apps/*` and `packages/*`.
 
 ## Working Rules
 
@@ -44,11 +45,11 @@ go test -v -race ./server/...    # Server tests with race detector
 golangci-lint run                # Go lint
 
 # Frontend
-cd web && pnpm install           # Install dependencies
-cd web && pnpm dev               # Dev server, proxying API to :8081
-cd web && pnpm lint              # Type check + lint
-cd web && pnpm test              # Unit tests
-cd web && pnpm release           # Build SPA into server/router/frontend/dist
+cd apps/web && pnpm install           # Install dependencies
+cd apps/web && pnpm dev               # Dev server, proxying API to :8081
+cd apps/web && pnpm lint              # Type check + lint
+cd apps/web && pnpm test              # Unit tests
+cd apps/web && pnpm release           # Build SPA into server/router/frontend/dist
 
 # Protocol Buffers
 cd proto && buf generate         # Regenerate Go + TypeScript + OpenAPI
@@ -71,7 +72,9 @@ cd proto && buf format -w        # Format proto files
 | `store/` | Store interface, drivers, migrations, seed data |
 | `internal/` | Leaf packages with no store or server dependency |
 | `proto/` | `.proto` definitions, `buf` config, generated output |
-| `web/src/` | React app |
+| `apps/web/` | The app SPA, embedded in the binary |
+| `apps/website/` | Marketing site and docs (Next.js + Fumadocs) |
+| `packages/api/` | Generated TypeScript client, shared by the app and later Expo |
 | `docs/design/` | The design canvas source and notes |
 | `reference/memos/` | Read-only clone of usememos/memos, for reference. Gitignored. Never edit. |
 

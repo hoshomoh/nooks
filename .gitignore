@@ -5,7 +5,7 @@ reference/
 node_modules/
 
 # Build output
-web/dist/
+apps/web/dist/
 /nook
 
 # The SPA that `pnpm --filter @nook/web release` bakes into the binary. The

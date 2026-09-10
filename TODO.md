@@ -25,8 +25,9 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M9 · Print | `[ ]` |
 | M10 · Access tokens, REST, MCP | `[ ]` |
 | M11 · Settings, export, import | `[ ]` |
-| M12 · Offline and conflicts | `[ ]` |
-| M13 · Ship | `[ ]` |
+| M12 · Website: marketing, docs, API docs | `[ ]` |
+| M13 · Offline and conflicts | `[ ]` |
+| M14 · Ship | `[ ]` |
 
 ---
 
@@ -225,7 +226,23 @@ From `Nook-Print.dc.html`.
 
 ---
 
-## M12 · Offline and conflicts
+## M12 · Website: marketing, docs, API docs
+
+`apps/website`, Next.js + Fumadocs. Part of v1 — a self-hosted app nobody can read about does not
+ship. It reuses `DESIGN.md`, so the site looks like the product rather than like a template.
+
+- [ ] Next.js app in `apps/website` with Tailwind and the Nook tokens
+- [ ] Landing page: what Nook is, the printed page, one screenshot, how to run it
+- [ ] Docs with Fumadocs MDX: install, configure, back up, upgrade, reverse proxy
+- [ ] API docs generated from the OpenAPI spec via `fumadocs-openapi` — **needs buf's
+      gnostic-openapi plugin, pulled forward from M10**
+- [ ] MCP docs: what a token reaches, how to point a client at `/mcp`
+- [ ] Dark mode, sharing the app's `.dark` contract
+- [ ] Deploy target and a preview build in CI
+
+---
+
+## M13 · Offline and conflicts
 
 - [ ] Offline banner, retry, last-seen time
 - [ ] Reading, ticking and adding all work offline; queued changes carry `not synced`
@@ -238,7 +255,7 @@ From `Nook-Print.dc.html`.
 
 ---
 
-## M13 · Ship
+## M14 · Ship
 
 - [ ] Docker image, `docker-compose.yml`, and a one-line run command
 - [ ] Release workflow, versioned binaries
@@ -259,6 +276,10 @@ From `Nook-Print.dc.html`.
 | Live updates | **SSE** | One-directional, plain HTTP, self-reconnecting, fine behind a reverse proxy. Enough for ticks, presence and Activity |
 | buf | Workspace devDependency | `pnpm exec buf`; no global install for contributors |
 | Token naming | shadcn's names; Nook's accent is `shared` | Avoids colliding with shadcn's `--accent` hover surface |
+| Repository shape | **Monorepo**: `apps/*` and `packages/*`, Go at the root | Room for the website now and Expo later; shared code lives in a package rather than inside one app |
+| Generated TS client | `packages/api` (`@nook/api`) | Two known consumers — the web app now, Expo later — so it is a package from the start rather than a later extraction |
+| Website stack | **Next.js + Fumadocs**, in v1 | Same React/Tailwind/shadcn stack as the app, so `DESIGN.md` carries over. `fumadocs-openapi` turns the spec into API docs |
+| Mobile app | **Expo**, after v1 | Shares `@nook/api` and tokens, not DOM components |
 
 ## Open questions
 
@@ -279,5 +300,8 @@ Resolve, then delete from this list.
 Named so nobody wonders whether they were forgotten. None of these appear in the design.
 
 - Recurring Items · Reminders and push notifications · File attachments · Sub-lists or nesting beyond
-  Note checklists · Full-text search across Notes (⌘K jumps to Lists only) · Mobile apps · Multiple
-  Instances behind one deployment · Email, of any kind
+  Note checklists · Full-text search across Notes (⌘K jumps to Lists only) · Multiple Instances behind
+  one deployment · Email, of any kind
+
+The **mobile app is planned but not v1**: Expo, in `apps/mobile`, sharing `@nook/api` and the design
+tokens. The layout already has room for it.

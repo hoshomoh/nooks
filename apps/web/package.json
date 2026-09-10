@@ -11,9 +11,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^2.10.1",
     "@connectrpc/connect": "^2.1.1",
     "@connectrpc/connect-web": "^2.1.1",
+    "@nook/api": "workspace:*",
     "@tanstack/react-query": "^5.100.9",
     "@tanstack/react-router": "^1.135.2",
     "react": "^19.2.8",

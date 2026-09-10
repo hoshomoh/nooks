@@ -1,7 +1,10 @@
 import {
   addDays,
+  addYears,
   differenceInCalendarDays,
   format,
+  getDay,
+  isBefore,
   isValid,
   parseISO,
   startOfDay,
@@ -118,7 +121,104 @@ export function dayHeading(due: DueDate, options: DateLabelOptions): string {
   return format(parsed, "EEEE", { locale: options.locale })
 }
 
+/** A window of days, as the two stored dates that bound it. */
+export interface DueRange {
+  start: DueDate
+  end: DueDate
+}
+
 /** rangeFrom returns the stored dates bounding a window of days starting at from. */
-export function rangeFrom(from: Date, days: number): { start: DueDate; end: DueDate } {
+export function rangeFrom(from: Date, days: number): DueRange {
   return { start: toStored(from), end: toStored(addDays(from, days)) }
+}
+
+/** shift returns the day a whole number of days away from another. */
+export function shift(from: Date, days: number): Date {
+  return addDays(startOfDay(from), days)
+}
+
+/**
+ * nextWeekday returns the coming occurrence of a weekday, today excluded.
+ *
+ * Typing "sat" on a Saturday means the Saturday after this one: the day being named is
+ * the one still to come, otherwise it would have been called "today".
+ */
+export function nextWeekday(from: Date, weekday: Weekday): Date {
+  const start = startOfDay(from)
+  const ahead = (weekday - getDay(start) + 7) % 7
+  return addDays(start, ahead === 0 ? 7 : ahead)
+}
+
+/** Weekday is a day of the week as date-fns numbers them: 0 is Sunday. */
+export type Weekday = number
+
+/**
+ * nextDayOfMonth returns the coming occurrence of a day and month, rolling into next
+ * year when the date has already passed. Returns null for a day that month never has.
+ */
+export function nextDayOfMonth(from: Date, day: number, month: Month): Date | null {
+  const start = startOfDay(from)
+  const candidate = startOfDay(new Date(start.getFullYear(), month, day))
+  if (candidate.getDate() !== day || candidate.getMonth() !== month) {
+    return null
+  }
+  return isBefore(candidate, start) ? addYears(candidate, 1) : candidate
+}
+
+/** Month is a month as date-fns numbers them: 0 is January. */
+export type Month = number
+
+/**
+ * weekdayNames maps every spelling of a weekday in a language to its number.
+ *
+ * Taken from the date-fns locale rather than a table in each locale file: a language
+ * already names its own days, and asking translators to repeat them is how the two
+ * drift apart.
+ */
+export function weekdayNames(locale: DateLocale): Map<string, Weekday> {
+  const names = new Map<string, Weekday>()
+  for (let weekday = 0; weekday < 7; weekday += 1) {
+    const day = new Date(2024, 0, 7 + weekday)
+    addSpellings(names, weekday, [
+      format(day, "EEEE", { locale }),
+      format(day, "EEE", { locale }),
+    ])
+  }
+  return names
+}
+
+/** monthNames maps every spelling of a month in a language to its number. */
+export function monthNames(locale: DateLocale): Map<string, Month> {
+  const names = new Map<string, Month>()
+  for (let month = 0; month < 12; month += 1) {
+    const day = new Date(2024, month, 1)
+    addSpellings(names, month, [
+      format(day, "MMMM", { locale }),
+      format(day, "MMM", { locale }),
+    ])
+  }
+  return names
+}
+
+/**
+ * addSpellings records each way a name is written, folded for comparison.
+ *
+ * The first spelling wins a collision, so a full name is never shadowed by another
+ * month's abbreviation.
+ */
+function addSpellings(names: Map<string, number>, value: number, spellings: string[]): void {
+  for (const spelling of spellings) {
+    const folded = fold(spelling)
+    if (folded && !names.has(folded)) {
+      names.set(folded, value)
+    }
+  }
+}
+
+/**
+ * fold reduces a word to what it is compared by: lower case, without the trailing stop
+ * some languages put on an abbreviation.
+ */
+export function fold(word: string): string {
+  return word.toLocaleLowerCase().replace(/\.$/, "")
 }

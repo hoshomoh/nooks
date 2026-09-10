@@ -106,7 +106,10 @@
     "coldStartTitle": "Start with one list",
     "coldStartBody": "Groceries, flat jobs, a book you keep meaning to find. A list is a name and a first item; sharing it with the household comes later.",
     "myListsCrumb": "My lists",
-    "sharedCrumb": "Shared"
+    "sharedCrumb": "Shared",
+    "addToList": "Add to {{name}}",
+    "addToListDue": "Add to {{name}}, due {{date}}",
+    "addItemDue": "Add an item, due {{date}}"
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",
@@ -121,7 +124,11 @@
   "date": {
     "today": "Today",
     "tomorrow": "Tomorrow",
-    "dueToday": "Due today"
+    "dueToday": "Due today",
+    "addDate": "Add a date",
+    "clearDate": "Clear the date",
+    "dueChip": "due",
+    "quantityChip": "quantity"
   },
   "error": {
     "unreachable": "Something went wrong reaching the server.",
@@ -185,5 +192,21 @@
     "addToNote": "Add to the note",
     "backToList": "Back to list",
     "escapeReturns": "Esc returns to the list"
+  },
+  "addRow": {
+    "todayWords": [
+      "today",
+      "tonight"
+    ],
+    "tomorrowWords": [
+      "tomorrow"
+    ],
+    "units": [
+      "kg",
+      "g",
+      "l",
+      "ml",
+      "x"
+    ]
   }
 }

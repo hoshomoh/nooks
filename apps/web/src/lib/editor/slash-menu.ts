@@ -28,19 +28,36 @@ export type SlashMenuOptions = {
  */
 export function slashMenu({ options }: SlashMenuOptions): Extension {
   const completions: Completion[] = options.map((option) => ({
-    label: `${option.glyph}  ${option.label}`,
+    label: option.label,
     // The shorthand appears at the right of each entry.
     detail: SHORTHAND[option.kind],
     apply: INSERTION[option.kind],
-    type: "keyword",
   }))
+
+  const glyphs = new Map(options.map((option) => [option.label, option.glyph]))
 
   return autocompletion({
     override: [(context) => slashCompletions(context, completions)],
     // The menu is the only completion source here, so it may open on its own.
     activateOnTyping: true,
     icons: false,
+    // The glyph is an element of its own rather than part of the label, so it can sit
+    // in a fixed column and every label start at the same x — DESIGN.md §10.
+    addToOptions: [
+      {
+        render: (completion) => renderGlyph(glyphs.get(completion.label) ?? ""),
+        position: 10,
+      },
+    ],
   })
+}
+
+/** renderGlyph draws the block type's mark in its own column. */
+function renderGlyph(glyph: string): HTMLElement {
+  const element = document.createElement("span")
+  element.className = "cm-nooks-slash-glyph"
+  element.textContent = glyph
+  return element
 }
 
 /** slashCompletions offers the block types when a line begins with a slash. */

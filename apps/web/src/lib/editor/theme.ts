@@ -79,22 +79,73 @@ export function buildNoteTheme(scale: NoteScale): Extension {
       backgroundColor: "var(--muted-foreground)",
       borderColor: "var(--muted-foreground)",
     },
+
+    // Emphasis is drawn, never spelled: the markup that asked for it is hidden.
+    ".cm-nooks-strong": { fontWeight: "600" },
+    ".cm-nooks-emphasis": { fontStyle: "italic" },
+    ".cm-nooks-struck": {
+      textDecoration: "line-through",
+      color: "var(--muted-foreground)",
+    },
+    ".cm-nooks-inline-code": {
+      fontFamily: "var(--font-mono)",
+      fontSize: "0.92em",
+      backgroundColor: "var(--chip)",
+      borderRadius: "var(--radius-sm)",
+      padding: "1px 4px",
+    },
+    ".cm-nooks-link": {
+      color: "var(--shared)",
+      textDecoration: "underline",
+      textUnderlineOffset: "2px",
+    },
+    // The / menu, per DESIGN.md §10: 300px, its own heading, and 34px rows.
     ".cm-tooltip.cm-tooltip-autocomplete": {
+      width: "300px",
       border: "1px solid var(--border)",
-      borderRadius: "var(--radius-2xl)",
+      borderRadius: "var(--radius-menu)",
       backgroundColor: "var(--popover)",
       boxShadow: "0 12px 32px rgba(0,0,0,0.14)",
       padding: "6px",
     },
+    // The heading is set as a custom property by the editor, so it stays translated.
+    ".cm-tooltip.cm-tooltip-autocomplete::before": {
+      content: "var(--nooks-slash-title, none)",
+      display: "block",
+      padding: "7px 10px 8px",
+      fontFamily: "var(--font-sans)",
+      fontSize: "var(--text-label)",
+      fontWeight: "600",
+      letterSpacing: "0.04em",
+      textTransform: "uppercase",
+      color: "var(--muted-foreground)",
+    },
+    ".cm-tooltip-autocomplete > ul": {
+      maxHeight: "none",
+      fontFamily: "var(--font-sans)",
+    },
     ".cm-tooltip-autocomplete > ul > li": {
+      display: "flex",
+      alignItems: "center",
+      gap: "11px",
+      height: "34px",
+      padding: "0 10px",
       borderRadius: "var(--radius-md)",
-      padding: "7px 10px",
       fontFamily: "var(--font-sans)",
       fontSize: "var(--text-meta)",
+      color: "var(--foreground)",
     },
     ".cm-tooltip-autocomplete > ul > li[aria-selected]": {
       backgroundColor: "var(--secondary)",
       color: "var(--foreground)",
+    },
+    // The glyph sits in a column of its own so every label starts at the same x.
+    ".cm-nooks-slash-glyph": {
+      flex: "none",
+      width: "20px",
+      textAlign: "center",
+      fontSize: "var(--text-micro)",
+      color: "var(--secondary-foreground)",
     },
     ".cm-completionDetail": {
       marginLeft: "auto",

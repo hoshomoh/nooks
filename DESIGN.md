@@ -347,7 +347,7 @@ scrim. Header `24px 26px 0`: 21px title then one 14 / 1.6 explaining line. Body.
 Say what happens: *"Ignore removes the request silently and never notifies the sender."* Not *"Are you
 sure?"*
 
-**Menu** — 248px, radius 9, 1px `--border`, 6px padding; items 32px at radius 6 with the shortcut
+**Menu** — 248px, radius 9 (`rounded-menu`, the one step outside the sm–2xl scale), 1px `--border`, 6px padding; items 32px at radius 6 with the shortcut
 right in 12 `--muted-foreground`; groups split by a 1px `--hair` rule inset 8px. Destructive items take
 `--overdue`.
 
@@ -387,8 +387,18 @@ converts a block as it is typed but is **never displayed back to the Member**.
 | Quote | 15.5 `--secondary-foreground` | 14.5 | 2px `--border` left rule, 13px indent, padding `10px 0` |
 | Code | mono 13 `--secondary-foreground` | 12.5 | padding `10px 0` |
 
-Typing `/` on an empty line opens a 300px block menu, filtered as typing continues. Every entry shows
-its markdown shorthand, so **the menu teaches the shortcut rather than replacing it**.
+**Inline markup is markup too.** `**bold**`, `*italic*`, `~~struck~~`, `` `code` `` and
+`[text](url)` are drawn as what they mean and the punctuation is taken away — including a link's
+address. A marker reappears only while the caret is touching **that marker**, never the whole line
+around it: typing `###` shows it, and it is gone by the time the heading's first word is typed. That
+is the narrowest reveal that still leaves a way to take a marker off again.
+
+**The `/` menu** — 300px, radius 9, 1px `--border`, 6px padding, shadow `0 12px 32px rgba(0,0,0,0.14)`,
+opened by `/` on an empty line and filtered as typing continues. An 11.5 uppercase `--muted-foreground`
+heading — *Add to the note* — then 34px rows at radius 6, `0 10px`, 11px gap: the glyph in a 20px
+centred column at 12.5 `--secondary-foreground`, the label at 13.5, and the markdown shorthand at the
+right in mono `--muted-foreground`. The selected row fills `--secondary`. **The menu teaches the
+shortcut rather than replacing it.**
 
 ---
 

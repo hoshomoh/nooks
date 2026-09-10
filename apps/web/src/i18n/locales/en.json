@@ -130,7 +130,8 @@
     "addDate": "Add a date",
     "clearDate": "Clear the date",
     "dueChip": "due",
-    "quantityChip": "quantity"
+    "quantityChip": "quantity",
+    "dueLabel": "Due date"
   },
   "error": {
     "unreachable": "Something went wrong reaching the server.",

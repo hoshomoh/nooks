@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from "react"
+import type { CSSProperties } from "react"
 import { useTranslation } from "react-i18next"
 import { EditorState } from "@codemirror/state"
 import { EditorView, keymap } from "@codemirror/view"
@@ -36,6 +37,19 @@ export type NoteEditorProps = {
  * The view is created once and driven imperatively. CodeMirror owns its own DOM and
  * state; re-creating it on every render would lose the cursor mid-sentence.
  */
+/** The custom properties the editor hands down to its own stylesheet. */
+type EditorStyle = CSSProperties & Record<"--nooks-slash-title", string>
+
+/**
+ * slashTitleStyle carries the menu's heading into CSS.
+ *
+ * `content` takes a quoted string, so the words are quoted here rather than in the
+ * stylesheet, where they could not be translated.
+ */
+function slashTitleStyle(title: string): EditorStyle {
+  return { "--nooks-slash-title": JSON.stringify(title) }
+}
+
 export function NoteEditor({ initialValue, onChange, readOnly, scale = "sheet" }: NoteEditorProps) {
   const { t } = useTranslation()
   const viewRef = useRef<EditorView | null>(null)
@@ -98,5 +112,13 @@ export function NoteEditor({ initialValue, onChange, readOnly, scale = "sheet" }
     [initialDoc, onChange, options, readOnly, scale],
   )
 
-  return <div ref={mount} className="flex-1" />
+  return (
+    <div
+      ref={mount}
+      className="flex-1"
+      // The / menu's heading is drawn by CSS, which cannot read a translation. Handing
+      // it down as a custom property keeps the words in the Member's language.
+      style={slashTitleStyle(t("note.addToNote"))}
+    />
+  )
 }

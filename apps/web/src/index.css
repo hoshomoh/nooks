@@ -106,6 +106,7 @@
   --radius-lg: 7px; /* control: button, input, toggle track */
   --radius-xl: 8px; /* inner surface: card, empty state, banner */
   --radius-2xl: 10px; /* surface: panel, dialog */
+  --radius-menu: 9px; /* the one radius between the two: menus — DESIGN.md §9 */
 
   /* Motion — DESIGN.md §11. Nooks moves to explain where something came from and
      nowhere else: a sheet arrives from the edge it is anchored to, an overlay fades

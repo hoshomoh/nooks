@@ -2,6 +2,7 @@ import { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { cn } from "cn"
 
+import { DateField } from "./date-field"
 import type { AddRowChip, ChipKind } from "@/lib/add-row"
 import type { DueDate } from "@/lib/dates"
 import { useAddRowParse } from "@/lib/use-add-row-parse"
@@ -180,10 +181,10 @@ export function AddRow({ placeholder, defaultDue = "", onAdd, disabled }: AddRow
       </span>
 
       <span className="flex items-center gap-1.5">
-        <DateControl
+        <DateField
           value={effectiveDue}
           label={effectiveDue ? due.label(effectiveDue) : t("date.addDate")}
-          set={Boolean(chosenDue)}
+          chosen={Boolean(chosenDue)}
           onChange={(next) => setDraft({ ...draft, picked: next || null, cleared: !next })}
         />
         <span className="rounded-sm border border-border px-1.5 py-px font-mono text-keycap text-muted-foreground">
@@ -210,63 +211,6 @@ function Chip({ kind, label, kindLabel }: ChipProps) {
       </span>
       <span className="text-keycap text-muted-foreground">{kindLabel}</span>
     </span>
-  )
-}
-
-interface DateControlProps {
-  /** The date it currently carries, stored. */
-  value: DueDate
-  /** How that date reads, or the words for having none. */
-  label: string
-  /** Whether the Member chose this date, rather than the view supplying it. */
-  set: boolean
-  onChange: (value: DueDate) => void
-}
-
-/**
- * The date control, always in the row.
- *
- * It wraps a real date input rather than drawing a calendar: the browser's own picker
- * is already in the Member's language, already reachable from the keyboard, and already
- * knows what a month looks like where they live.
- */
-function DateControl({ value, label, set, onChange }: DateControlProps) {
-  return (
-    <label
-      className={cn(
-        "flex h-6.5 shrink-0 cursor-pointer items-center gap-1.5 rounded-md px-2.5 text-micro",
-        "transition-colors",
-        set
-          ? "bg-shared-bg text-shared"
-          : "border border-border text-secondary-foreground hover:bg-secondary",
-      )}
-    >
-      <CalendarGlyph />
-      <span className="whitespace-nowrap">{label}</span>
-      <input
-        type="date"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        // The pill is the control; the input is what opens the picker and holds the
-        // value. Hidden rather than removed, so the keyboard still reaches it.
-        className="sr-only"
-      />
-    </label>
-  )
-}
-
-/** The calendar glyph, drawn at the size the row uses. */
-function CalendarGlyph() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden className="shrink-0">
-      <rect x="1" y="2.2" width="10" height="9" rx="1.6" stroke="currentColor" strokeWidth="1.1" />
-      <path
-        d="M1 5h10M3.6 1v2.2M8.4 1v2.2"
-        stroke="currentColor"
-        strokeWidth="1.1"
-        strokeLinecap="round"
-      />
-    </svg>
   )
 }
 

@@ -67,6 +67,34 @@ describe("the add row", () => {
     expect(screen.queryByText("Add a date")).not.toBeInTheDocument()
   })
 
+  // The browser's own date picker looks different in every browser, and this control
+  // is on every row a Member adds.
+  it("opens the design system's calendar rather than the browser's", async () => {
+    const { container } = render(<AddRow placeholder="Add an item" onAdd={vi.fn()} />)
+
+    expect(container.querySelector("input[type=date]")).toBeNull()
+
+    await userEvent.click(screen.getByRole("button", { name: "Due date" }))
+
+    expect(await screen.findByRole("grid")).toBeInTheDocument()
+  })
+
+  it("files the day picked in the calendar", async () => {
+    const onAdd = vi.fn()
+    render(<AddRow placeholder="Add an item" onAdd={onAdd} />)
+
+    await typeInto("Milk")
+    await userEvent.click(screen.getByRole("button", { name: "Due date" }))
+    const days = await screen.findAllByRole("gridcell")
+    const pickable = days.find((day) => day.querySelector("button:not([disabled])"))
+    await userEvent.click(pickable?.querySelector("button") as HTMLElement)
+    await typeInto("{Enter}")
+
+    expect(onAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "Milk", dueOn: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/) }),
+    )
+  })
+
   it("clears the row after filing, so the next item can be typed", async () => {
     render(<AddRow placeholder="Add an item" onAdd={vi.fn()} />)
 

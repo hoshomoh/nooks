@@ -57,10 +57,12 @@ TypeScript. No features. Everything after this is filling in.
 - [x] `proto/` module: `buf.yaml`, `buf.gen.yaml` — Go, Connect, TS via `@bufbuild/es`.
       Gateway and OpenAPI deferred to M10, when REST is actually specified
 - [x] First service definition end to end — `InstanceService`, generating Go and TypeScript
-- [ ] Store interface + SQLite and Postgres drivers, migration runner, `LATEST.sql` for each
-- [ ] Config: flags and env (port, data directory, driver, DSN)
-- [ ] HTTP server: routing, graceful shutdown, request logging
-- [ ] `web/`: Vite + React + TypeScript
+- [x] Store interface + SQLite and Postgres drivers, migration runner, `LATEST.sql` for each.
+      The suite runs against both; CI provides a Postgres service so the driver cannot rot
+- [x] Config: flags and env (port, data directory, driver, DSN), parsed as a pure function
+- [x] HTTP server: routing, graceful shutdown, request logging
+- [~] `web/`: Vite + React + TypeScript — scaffolded; install blocked by pnpm's
+      `minimumReleaseAge` supply-chain policy on a transitive package, retrying
 - [ ] Tailwind v4 + `shadcn init`; **verify what the CLI emits against `DESIGN.md` §16 and amend the
       spec if they disagree**
 - [ ] Tokens: full light and dark palettes, Nook's own tokens, radii
@@ -69,8 +71,9 @@ TypeScript. No features. Everything after this is filling in.
 - [ ] Theme: light / dark / system, `.dark` class, persisted
 - [ ] TanStack Query + TanStack Router
 - [ ] Connect-web transport wired to the generated client
-- [ ] SPA embedded into the binary; one process serves API and app
-- [ ] CI: `go test`, `golangci-lint`, `buf lint`, `buf format -d`, web typecheck, lint, test, build
+- [x] SPA embedded into the binary; one process serves API and app, with SPA fallback
+- [x] CI: `go build`/`vet`/`test -race`/`gofmt`, `buf lint` and `buf format -d`, web typecheck,
+      lint and build
 
 ---
 

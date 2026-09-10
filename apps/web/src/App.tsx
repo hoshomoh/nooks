@@ -4,7 +4,7 @@ import { InstanceService } from "@nooks/api"
 
 import { Mark } from "./components/mark"
 import { transport } from "./lib/transport"
-import { useTheme } from "./lib/theme-context"
+import { useTheme } from "./lib/use-theme"
 import type { Theme } from "./lib/theme"
 
 const instanceClient = createClient(InstanceService, transport)

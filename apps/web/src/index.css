@@ -71,6 +71,8 @@
   --color-offline-line: var(--offline-line);
   --color-offline-text: var(--offline-text);
   --color-overdue: var(--overdue);
+  --color-destructive-line: var(--destructive-line);
+  --color-destructive-bg: var(--destructive-bg);
   --color-toggle-off: var(--toggle-off);
   --color-knob: var(--knob);
 }
@@ -129,6 +131,8 @@
   --offline-line: oklch(0.9118 0.0405 88.2); /* #EDE1C4 */
   --offline-text: oklch(0.435 0.0843 76.76); /* #6B4A0E */
   --overdue: oklch(0.4906 0.138 29.59); /* #A03A2E */
+  --destructive-line: oklch(0.8416 0.0398 29.71); /* #E4C2BC */
+  --destructive-bg: oklch(0.9753 0.0076 27.23); /* #FCF5F4 */
   --toggle-off: oklch(0.9056 0.0054 106.51); /* #E0E0DC */
   --knob: oklch(1 0 0);
   --scrim: oklch(0.2389 0.0019 106.54 / 34%); /* ink at 34% */
@@ -183,6 +187,8 @@
   --offline-line: oklch(0.3315 0.0357 89.46); /* #3D3520 */
   --offline-text: oklch(0.8363 0.097 87.68); /* #E4C67E */
   --overdue: oklch(0.7215 0.107 30.68); /* #E08B7C */
+  --destructive-line: oklch(0.3868 0.0499 30.46); /* #5C3A34 */
+  --destructive-bg: oklch(0.2472 0.0193 30.46); /* a dark tint of the same hue */
   --toggle-off: oklch(0.3197 0.0069 106.79); /* #33332F */
   --knob: oklch(0.168 0.002 106.62); /* #0F0F0E */
   --scrim: oklch(0 0 0 / 55%); /* ink at 55% */

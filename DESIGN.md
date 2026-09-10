@@ -68,8 +68,8 @@ Each has exactly one job. Nothing else is coloured.
 | `#FBF6E9` / `#EDE1C4` / `#6B4A0E` | `--offline-bg` / `--offline-line` / `--offline-text` | The offline banner |
 | `#A03A2E` | `--overdue` | Overdue dates |
 | `#8E3B31` | `--destructive` | Error text, destructive button label |
-| `#E4C2BC` | — | Error and destructive borders |
-| `#FCF5F4` | — | Rejected input, errored row |
+| `#E4C2BC` | `--destructive-line` | Error and destructive borders |
+| `#FCF5F4` | `--destructive-bg` | Rejected input, errored row |
 
 Plus `--knob` (`#FFFFFF`, the toggle knob) and `--scrim` (ink at 34%).
 

@@ -84,14 +84,41 @@ what became of the Member's work. Never "Something went wrong".
 
 ## 5. Frontend specifics
 
-- Presentation and data fetching stay separate: a component that renders a List row does not know the
-  transport. Server state is TanStack Query's; local UI state is `useState`. There is no third store.
-- Components follow `DESIGN.md`. No colour, radius, or size literal in a component — tokens only.
-- shadcn primitives are used as generated. Restyle by token, not by patching each instance.
-- Accessibility is not a later pass: real `<button>`s, labelled inputs, visible 2px focus rings, 44px
-  hit areas, and keyboard paths for everything in `DESIGN.md` §12.
+**Generated shadcn components are never edited.** `src/components/ui/` is output from
+`pnpm dlx shadcn@latest add <component>` and must stay byte-for-byte what the generator
+produces, so that adding or updating a component never clobbers a local change. Nooks'
+own components live in `src/components/ds/` and compose those primitives. When something
+needs to look or behave differently, in this order:
 
----
+1. Wrap it in `ds/`, passing `className` or props.
+2. Change a token in `src/index.css` — which fixes every instance rather than one.
+3. Only if neither works, discuss it before touching `ui/`.
+
+**`useEffect` is a last resort, not a default.** Most of what it gets used for has a
+better tool:
+
+| Instead of an effect that… | Use |
+| --- | --- |
+| Subscribes to something outside React (media queries, storage, sockets) | `useSyncExternalStore` |
+| Derives a value from props or state | Compute it during render |
+| Resets state when a prop changes | A `key`, or compute it during render |
+| Fetches data | TanStack Query |
+| Responds to a user action | The event handler that caused it |
+| Writes to the DOM the module already owns | That module, synchronously |
+
+What is left — genuinely synchronising with an external system, and nothing else — is
+what `useEffect` is for. If a case seems to need one, raise it rather than reaching for
+it quietly.
+
+Otherwise:
+
+- Presentation and data fetching stay separate: a component that renders a List row does
+  not know the transport. Server state is TanStack Query's; local UI state is `useState`.
+  There is no third store.
+- Components follow `DESIGN.md`. No colour, radius, or size literal in a component —
+  tokens only.
+- Accessibility is not a later pass: real `<button>`s, labelled inputs, visible 2px focus
+  rings, 44px hit areas, and keyboard paths for everything in `DESIGN.md` §12.
 
 ## 6. Commits and review
 

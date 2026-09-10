@@ -29,6 +29,14 @@ export function upcomingQuery(from: Date) {
   })
 }
 
+/** Everything due within an explicit window — what the calendar draws. */
+export function datedRangeQuery(from: DueDate, to: DueDate) {
+  return queryOptions({
+    queryKey: ["dated", from, to],
+    queryFn: () => listClient.listDatedItems({ from, to }),
+  })
+}
+
 /** groupByDay buckets dated Items by their due date, keeping the order they arrived in. */
 export function groupByDay<T extends { item?: { dueOn: string } }>(
   items: readonly T[],

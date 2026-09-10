@@ -17,7 +17,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M1 · Skeleton that runs | `[x]` |
 | M2 · Auth and first run | `[x]` |
 | M3 · Lists and Items — the core | `[~]` lists, items, search and the list view |
-| M4 · Views: Today, Upcoming, Calendar | `[~]` Today and Upcoming done |
+| M4 · Views: Today, Upcoming, Calendar | `[x]` |
 | M5 · Notes | `[ ]` |
 | M6 · Sharing, presence, Activity | `[ ]` |
 | M7 · Members and Groups | `[ ]` |
@@ -132,8 +132,9 @@ The single most important milestone; everything else is furniture.
 - [x] Today: overdue and due-today sections, gathered from every reachable List. No lower
       bound, so a backlog surfaces rather than being buried by a date range
 - [x] Upcoming: next two weeks, grouped by day
-- [ ] Calendar: month grid, 1060px column, **dated Items only**
-- [ ] Add row that targets a List and a date from context
+- [x] Calendar: month grid, 1060px column, **dated Items only**. Weeks start on Monday,
+      and the grid pads to whole weeks either side
+- [ ] Add row that targets a List and a date from context — needs the date parser
 - [x] Empty states for both views
 
 ---

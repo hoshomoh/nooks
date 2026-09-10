@@ -143,6 +143,20 @@
     "todayEmptyTitle": "Nothing is due today",
     "todayEmptyBody": "Undated items are still sitting on their own lists. Nothing here is a good outcome, not a gap.",
     "upcomingEmptyTitle": "Nothing in the next two weeks",
-    "upcomingEmptyBody": "Undated items stay where they are. A date is for something that has to happen on a day, not for everything."
+    "upcomingEmptyBody": "Undated items stay where they are. A date is for something that has to happen on a day, not for everything.",
+    "calendar": "Calendar",
+    "list": "List",
+    "calendarSubtitle": "Everything with a date, from every list",
+    "datedCount": "{{count}} dated item",
+    "datedCount_other": "{{count}} dated items",
+    "weekdays": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    }
   }
 }

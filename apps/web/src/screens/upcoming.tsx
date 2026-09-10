@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { getRouteApi } from "@tanstack/react-router"
+import { getRouteApi, Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
 import { AppShell } from "@/components/ds/app-shell"
+import { Button } from "@/components/ds/button"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
 import { SectionHeading } from "@/components/ds/section-heading"
@@ -42,7 +43,16 @@ export function UpcomingScreen() {
       onSearch={palette.open}
       onAddList={palette.openAddList}
     >
-      <ChromeBar crumbs={[t("views.upcoming")]} />
+      <ChromeBar
+        crumbs={[t("views.upcoming")]}
+        actions={
+          <Link to="/calendar">
+            <Button tone="quiet" scale="toolbar">
+              {t("views.calendar")}
+            </Button>
+          </Link>
+        }
+      />
 
       <div className="flex justify-center px-5.5 pt-14 pb-22">
         <div className="w-full max-w-content">

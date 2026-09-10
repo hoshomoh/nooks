@@ -129,6 +129,45 @@ export interface DueRange {
   end: DueDate
 }
 
+/** What a moment needs in order to read in a Member's own language. */
+export interface MomentLabelOptions {
+  /** The moment to measure against, usually now. */
+  from: Date
+  /** The date-fns locale, so weekday and month names match the language. */
+  locale: DateLocale
+  /** The word for the day before this one. */
+  yesterdayWord: string
+}
+
+/**
+ * momentLabel is when something happened, at the resolution that is still useful.
+ *
+ * Today it is a clock time, because "18:44" is how a Member remembers this morning.
+ * Further back the clock stops mattering and the day is what is left.
+ */
+export function momentLabel(at: Date, options: MomentLabelOptions): string {
+  const days = differenceInCalendarDays(startOfDay(options.from), startOfDay(at))
+  if (days <= 0) {
+    return format(at, "HH:mm", { locale: options.locale })
+  }
+  if (days === 1) {
+    return options.yesterdayWord
+  }
+  if (days < 7) {
+    return format(at, "EEEE", { locale: options.locale })
+  }
+  return format(at, "d MMM", { locale: options.locale })
+}
+
+/** parseMoment reads an RFC 3339 timestamp, or null when it is not one. */
+export function parseMoment(value: string): Date | null {
+  if (!value) {
+    return null
+  }
+  const parsed = parseISO(value)
+  return isValid(parsed) ? parsed : null
+}
+
 /** rangeFrom returns the stored dates bounding a window of days starting at from. */
 export function rangeFrom(from: Date, days: number): DueRange {
   return { start: toStored(from), end: toStored(addDays(from, days)) }

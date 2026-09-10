@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
 import { AppShell } from "@/components/ds/app-shell"
+import { ActivityControl } from "@/components/ds/activity-control"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
 import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
@@ -60,7 +61,7 @@ export function TodayScreen() {
       onSearch={palette.open}
       onAddList={palette.openAddList}
     >
-      <ChromeBar crumbs={[t("views.today")]} />
+      <ChromeBar crumbs={[t("views.today")]} actions={<ActivityControl />} />
 
       <div className="flex justify-center px-5.5 pt-14 pb-22">
         <div className="w-full max-w-content">

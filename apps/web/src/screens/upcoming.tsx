@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next"
 
 import { AppShell } from "@/components/ds/app-shell"
 import { Button } from "@/components/ds/button"
+import { ActivityControl } from "@/components/ds/activity-control"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
 import { SectionHeading } from "@/components/ds/section-heading"
@@ -58,11 +59,14 @@ export function UpcomingScreen() {
       <ChromeBar
         crumbs={[t("views.upcoming")]}
         actions={
-          <Link to="/calendar">
-            <Button tone="quiet" scale="toolbar">
-              {t("views.calendar")}
-            </Button>
-          </Link>
+          <>
+            <Link to="/calendar">
+              <Button tone="quiet" scale="toolbar">
+                {t("views.calendar")}
+              </Button>
+            </Link>
+            <ActivityControl />
+          </>
         }
       />
 

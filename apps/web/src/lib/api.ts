@@ -1,5 +1,12 @@
 import { createClient } from "@connectrpc/connect"
-import { AuthService, InstanceService, ListService } from "@nooks/api"
+import {
+  ActivityService,
+  AuthService,
+  InstanceService,
+  ListService,
+  MemberService,
+  RequestService,
+} from "@nooks/api"
 
 import { transport } from "./transport"
 
@@ -7,3 +14,6 @@ import { transport } from "./transport"
 export const instanceClient = createClient(InstanceService, transport)
 export const authClient = createClient(AuthService, transport)
 export const listClient = createClient(ListService, transport)
+export const memberClient = createClient(MemberService, transport)
+export const activityClient = createClient(ActivityService, transport)
+export const requestClient = createClient(RequestService, transport)

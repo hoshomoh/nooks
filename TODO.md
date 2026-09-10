@@ -19,7 +19,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M3 · Lists and Items — the core | `[~]` lists, items, search and the list view |
 | M4 · Views: Today, Upcoming, Calendar | `[~]` add row from context left |
 | M5 · Notes | `[x]` |
-| M6 · Sharing, presence, Activity | `[~]` store and permissions |
+| M6 · Sharing, presence, Activity | `[~]` live updates and presence left |
 | M7 · Members and Groups | `[ ]` |
 | M8 · Public list | `[ ]` |
 | M9 · Print | `[ ]` |
@@ -164,17 +164,17 @@ The single most important milestone; everything else is furniture.
 ## M6 · Sharing, presence, Activity
 
 - [x] Sharing model: private / everyone on the Instance / specific Members and Groups
-- [~] Can-edit toggle; read-only means see and print, not tick or add. Store and
-      `accessTo` done; the dialog arrives with the UI below
+- [x] Can-edit toggle; read-only means see and print, not tick or add
 - [x] Groups, named shares and the Activity table, on both drivers
-- [ ] Share dialog, and the specific-people dialog (Groups first, then individuals)
-- [ ] Copy list address
+- [x] Share dialog, and the specific-people dialog (Groups first, then individuals)
+- [x] Copy list address
 - [ ] Live updates — someone else's tick lands with a one-second highlight, then settles.
       **No toast, no sound.**
 - [ ] Presence: "Jonas is here", avatar ring in `done`
-- [ ] Activity panel: join requests, reset requests, shares, conflicts, token use
+- [x] Activity panel: join requests, reset requests and shares. Conflicts arrive with M13,
+      token use with M10
 - [ ] Approve and ignore actions. **Ignore is silent and never notifies the sender.**
-- [ ] Unread state and the dot on the Activity control
+- [x] Unread state and the dot on the Activity control
 
 ---
 

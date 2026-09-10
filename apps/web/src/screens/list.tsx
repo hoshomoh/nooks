@@ -3,12 +3,15 @@ import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-q
 import { getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
+import { ActivityControl } from "@/components/ds/activity-control"
 import { AddRow, type AddRowSubmission } from "@/components/ds/add-row"
 import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
 import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
 import { NoteSheet, type NoteSheetField } from "@/components/ds/note-sheet"
+import { ShareDialog, type ShareDecision } from "@/components/ds/share-dialog"
+import { Button } from "@/components/ds/button"
 import { listClient } from "@/lib/api"
 import { listQuery } from "@/lib/list-queries"
 import { refreshLists } from "@/lib/refresh"
@@ -18,7 +21,7 @@ import { isOverdue, today } from "@/lib/dates"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useSignedInData } from "@/lib/use-signed-in-data"
-import type { Item } from "@nooks/api"
+import { Sharing, type Item } from "@nooks/api"
 
 const route = getRouteApi("/lists/$listUid")
 
@@ -42,6 +45,10 @@ export function ListScreen() {
   // Which Item's sheet is open. The List keeps its place behind it, so this is the
   // screen's own state rather than a route.
   const [openItemUid, setOpenItemUid] = useState<string | null>(null)
+
+  // Sharing is a decision the owner makes in a dialog, so whether it is open is the
+  // screen's own state.
+  const [sharingOpen, setSharingOpen] = useState(false)
 
   const refresh = () => refreshLists(queryClient)
 
@@ -87,6 +94,12 @@ export function ListScreen() {
     onSuccess: refresh,
   })
 
+  const share = useMutation({
+    mutationFn: (decision: ShareDecision) =>
+      listClient.setListSharing({ listUid, ...decision }),
+    onSuccess: refresh,
+  })
+
   const rowLabels: ListRowLabels = { name: t("note.itemName"), open: t("list.openItem") }
 
   const openItem = list.items.find((item) => item.uid === openItemUid)
@@ -103,14 +116,38 @@ export function ListScreen() {
       onSearch={palette.open}
       onAddList={palette.openAddList}
     >
-      <ChromeBar crumbs={[t(list.list?.isOwner ? "list.myListsCrumb" : "list.sharedCrumb"), list.list?.name ?? ""]} />
+      <ChromeBar
+        crumbs={[t(list.list?.isOwner ? "list.myListsCrumb" : "list.sharedCrumb"), list.list?.name ?? ""]}
+        actions={
+          <>
+            {list.list?.isOwner && (
+              <Button tone="secondary" scale="toolbar" onClick={() => setSharingOpen(true)}>
+                {t("share.action")}
+              </Button>
+            )}
+            <ActivityControl />
+          </>
+        }
+      />
+
+      {list.list && (
+        <ShareDialog
+          list={list.list}
+          instanceName={instanceName}
+          open={sharingOpen}
+          onOpenChange={setSharingOpen}
+          onSave={(decision) => share.mutate(decision)}
+        />
+      )}
 
       <div className="relative flex flex-1 justify-center px-5.5 pt-14 pb-22">
         <div className="w-full max-w-content">
           <header className="mb-8.5 flex flex-col gap-3.5">
             <h1 className="text-display">{list.list?.name}</h1>
             <div className="flex items-center gap-3 text-meta text-secondary-foreground">
-              <span>{t(sharingKey(list.list?.sharing ?? 0, list.list?.canEdit ?? false))}</span>
+              <span>
+                {t(sharingKey(list.list?.sharing ?? Sharing.UNSPECIFIED, list.list?.canEdit ?? false))}
+              </span>
               <span className="h-3 w-px bg-border" />
               <span>{open.length === 0 ? t("list.nothingYet") : t("list.openCount", { count: open.length })}</span>
             </div>
@@ -214,10 +251,12 @@ function noteFields(
 }
 
 /** Which line under the title says who can reach this List. */
-function sharingKey(sharing: number, canEdit: boolean): string {
-  // 1 is SHARING_PRIVATE, 2 is SHARING_INSTANCE.
-  if (sharing === 1) {
+function sharingKey(sharing: Sharing, canEdit: boolean): string {
+  if (sharing === Sharing.PRIVATE) {
     return "list.onlyYou"
+  }
+  if (sharing === Sharing.SPECIFIC) {
+    return canEdit ? "list.namedCanEdit" : "list.namedReadOnly"
   }
   return canEdit ? "list.sharedCanEdit" : "list.sharedReadOnly"
 }

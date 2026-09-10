@@ -111,7 +111,9 @@
     "addToList": "Add to {{name}}",
     "addToListDue": "Add to {{name}}, due {{date}}",
     "addItemDue": "Add an item, due {{date}}",
-    "openItem": "Open item"
+    "openItem": "Open item",
+    "namedCanEdit": "Shared with specific people · they can edit",
+    "namedReadOnly": "Shared with specific people · read-only"
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",
@@ -131,7 +133,8 @@
     "clearDate": "Clear the date",
     "dueChip": "due",
     "quantityChip": "quantity",
-    "dueLabel": "Due date"
+    "dueLabel": "Due date",
+    "yesterday": "Yesterday"
   },
   "error": {
     "unreachable": "Something went wrong reaching the server.",
@@ -215,5 +218,40 @@
       "ml",
       "x"
     ]
+  },
+  "share": {
+    "action": "Share",
+    "title": "Share “{{name}}”",
+    "blurb": "Who can reach this list. Everything else in nooks stays private either way.",
+    "private": "Private",
+    "privateBlurb": "Only you. Nobody else sees it in their sidebar.",
+    "instance": "Everyone at {{name}}",
+    "instanceBlurb": "Everyone here, including anyone who joins later.",
+    "specific": "Specific people or a group",
+    "specificBlurb": "Choose who. Flatmates, family, or one person.",
+    "canEdit": "They can edit",
+    "canEditBlurb": "Off means read-only: see and print, not tick or add.",
+    "copyAddress": "Copy list address",
+    "copied": "Copied",
+    "save": "Save",
+    "peopleTitle": "Specific people",
+    "peopleBlurb": "Groups first, then individuals. Picking a group shares with everyone in it, including people added to it later.",
+    "peopleFooter": "It lands in their “Shared with me”.",
+    "back": "Back",
+    "shareWith": "Share with {{count}}",
+    "shareWith_zero": "Share with nobody",
+    "groupMembers": "{{names}}",
+    "readOnly": "read-only",
+    "choose": "Choose people"
+  },
+  "activity": {
+    "action": "Activity",
+    "title": "Activity",
+    "inAppOnly": "in app only · no email",
+    "noMailServer": "nooks has no mail server to configure. Everything that needs your attention waits here.",
+    "empty": "Nothing is waiting for you.",
+    "approve": "Approve",
+    "open": "Open",
+    "seeBoth": "See both"
   }
 }

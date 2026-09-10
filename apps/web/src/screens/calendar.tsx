@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
 import { AppShell } from "@/components/ds/app-shell"
+import { ActivityControl } from "@/components/ds/activity-control"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { Button } from "@/components/ds/button"
 import { buildMonth, byDay, type CalendarDay } from "@/lib/calendar"
@@ -45,11 +46,14 @@ export function CalendarScreen() {
       <ChromeBar
         crumbs={[t("views.upcoming"), t("views.calendar")]}
         actions={
-          <Link to="/upcoming">
-            <Button tone="quiet" scale="toolbar">
-              {t("views.list")}
-            </Button>
-          </Link>
+          <>
+            <Link to="/upcoming">
+              <Button tone="quiet" scale="toolbar">
+                {t("views.list")}
+              </Button>
+            </Link>
+            <ActivityControl />
+          </>
         }
       />
 

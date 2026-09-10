@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 
 import { AppShell } from "@/components/ds/app-shell"
 import { Button } from "@/components/ds/button"
+import { ActivityControl } from "@/components/ds/activity-control"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
 import { useCommandPalette } from "@/lib/use-command-palette"
@@ -26,7 +27,7 @@ export function Home() {
       onSearch={palette.open}
       onAddList={palette.openAddList}
     >
-      <ChromeBar crumbs={[t("list.allLists")]} />
+      <ChromeBar crumbs={[t("list.allLists")]} actions={<ActivityControl />} />
 
       <div className="flex justify-center px-5.5 pt-14 pb-22">
         <div className="w-full max-w-content">

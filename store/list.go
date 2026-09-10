@@ -98,17 +98,41 @@ func (s *sqlStore) ListByUID(ctx context.Context, uid string) (List, error) {
 	return row.toList()
 }
 
-// ListsForMember returns every live List a Member can reach: their own, and everything
-// shared with the whole Instance. Named sharing arrives with Groups in M6.
+// whereListVisible narrows a query to the Lists a Member can reach: their own,
+// everything shared with the whole Instance, and everything shared with them by name.
+//
+// Every query that returns rows belonging to Lists goes through this, so a new kind of
+// sharing is added in one place rather than found by grep. Columns are qualified with
+// the list table, which is how it also works for queries that join to it.
+func whereListVisible(query *bun.SelectQuery, memberID int64, named []int64) *bun.SelectQuery {
+	return query.WhereGroup(" AND ", func(q *bun.SelectQuery) *bun.SelectQuery {
+		q = q.Where("list.owner_id = ?", memberID).
+			WhereOr("list.sharing = ?", string(SharingInstance))
+		if len(named) > 0 {
+			q = q.WhereOr("list.id IN (?)", bun.In(named))
+		}
+		return q
+	})
+}
+
+// ListsForMember returns every live List a Member can reach: their own, everything
+// shared with the whole Instance, and everything shared with them by name — directly or
+// through a Group they are in.
 func (s *sqlStore) ListsForMember(ctx context.Context, memberID int64) ([]List, error) {
-	var rows []listModel
-	err := s.db.NewSelect().
-		Model(&rows).
-		Where("deleted_at = ''").
-		Where("owner_id = ? OR sharing = ?", memberID, string(SharingInstance)).
-		Order("name ASC").
-		Scan(ctx)
+	named, err := s.SharedListIDs(ctx, memberID)
 	if err != nil {
+		return nil, err
+	}
+
+	query := s.db.NewSelect().
+		Model((*listModel)(nil)).
+		Where("deleted_at = ''").
+		Order("name ASC")
+
+	query = whereListVisible(query, memberID, named)
+
+	var rows []listModel
+	if err := query.Model(&rows).Scan(ctx); err != nil {
 		return nil, fmt.Errorf("read lists: %w", err)
 	}
 

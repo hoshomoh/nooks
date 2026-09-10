@@ -27,23 +27,69 @@ const (
 	AccessOwn
 )
 
+// namedShares is the set of Lists a named share reaches for one Member, by internal
+// identity — shared with them directly, or with a Group they are in.
+//
+// Whether a share reaches somebody is a fact about the database rather than about the
+// List, so it is read once and passed in. That is what keeps accessTo a pure function
+// of its arguments, and what lets one read answer a whole page of Lists.
+type namedShares map[int64]bool
+
 // accessTo works out what a Member may do with a List.
 //
-// It is a pure function of the two values, so every rule below can be read in one place
+// It is a pure function of its arguments, so every rule below can be read in one place
 // and tested without a database.
-func accessTo(list store.List, member store.Member) Access {
+func accessTo(list store.List, member store.Member, shares namedShares) Access {
 	if list.OwnerID == member.ID {
 		return AccessOwn
 	}
-	if list.Sharing == store.SharingInstance {
-		// Read-only sharing means see and print, not tick or add.
-		if list.CanEdit {
-			return AccessWrite
-		}
-		return AccessRead
+	if !reaches(list, shares) {
+		return AccessNone
 	}
-	// Named sharing arrives with Groups in M6. Until then, anything else is invisible.
-	return AccessNone
+	// Read-only sharing means see and print, not tick or add.
+	if list.CanEdit {
+		return AccessWrite
+	}
+	return AccessRead
+}
+
+// reaches reports whether a List is shared with the Member at all.
+func reaches(list store.List, shares namedShares) bool {
+	switch list.Sharing {
+	case store.SharingInstance:
+		// Everyone on the Instance, including whoever joins later.
+		return true
+	case store.SharingSpecific:
+		return shares[list.ID]
+	default:
+		return false
+	}
+}
+
+// namedSharesFor reads the Member's named shares once.
+func (s *ListService) namedSharesFor(ctx context.Context, member store.Member) (namedShares, error) {
+	ids, err := s.store.SharedListIDs(ctx, member.ID)
+	if err != nil {
+		return nil, internalError("read shared lists", err)
+	}
+	shares := make(namedShares, len(ids))
+	for _, id := range ids {
+		shares[id] = true
+	}
+	return shares, nil
+}
+
+// sharesReaching is namedSharesFor for a single List, and reads nothing unless the List
+// is shared by name — which most are not.
+func (s *ListService) sharesReaching(
+	ctx context.Context,
+	list store.List,
+	member store.Member,
+) (namedShares, error) {
+	if list.Sharing != store.SharingSpecific || list.OwnerID == member.ID {
+		return nil, nil
+	}
+	return s.namedSharesFor(ctx, member)
 }
 
 // errListNotFound is returned both for a List that does not exist and for one the
@@ -73,7 +119,12 @@ func (s *ListService) listWithAccess(
 		return store.List{}, internalError("read list", err)
 	}
 
-	switch have := accessTo(list, member); {
+	shares, err := s.sharesReaching(ctx, list, member)
+	if err != nil {
+		return store.List{}, err
+	}
+
+	switch have := accessTo(list, member, shares); {
 	case have >= need:
 		return list, nil
 	case have == AccessNone:
@@ -122,11 +173,15 @@ func (s *ListService) listByIDWithAccess(
 	if err != nil {
 		return store.List{}, internalError("read lists", err)
 	}
+	shares, err := s.namedSharesFor(ctx, member)
+	if err != nil {
+		return store.List{}, err
+	}
 	for _, list := range lists {
 		if list.ID != id {
 			continue
 		}
-		if accessTo(list, member) >= need {
+		if accessTo(list, member, shares) >= need {
 			return list, nil
 		}
 		if need == AccessOwn {

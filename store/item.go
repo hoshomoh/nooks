@@ -128,14 +128,19 @@ func (s *sqlStore) ItemByUID(ctx context.Context, uid string) (Item, error) {
 // An empty from means no lower bound, which is how Today gathers everything overdue
 // rather than only what is due on the day itself.
 func (s *sqlStore) DatedItemsForMember(ctx context.Context, memberID int64, from, to string) ([]Item, error) {
+	named, err := s.SharedListIDs(ctx, memberID)
+	if err != nil {
+		return nil, err
+	}
+
 	query := s.db.NewSelect().
 		Model((*itemModel)(nil)).
 		Join("JOIN list ON list.id = item.list_id").
 		Where("item.deleted_at = '' AND item.done_at = '' AND item.due_on <> ''").
 		Where("list.deleted_at = ''").
-		Where("list.owner_id = ? OR list.sharing = ?", memberID, string(SharingInstance)).
 		Where("item.due_on <= ?", to).
 		Order("item.due_on ASC", "item.position ASC")
+	query = whereListVisible(query, memberID, named)
 
 	if from != "" {
 		query = query.Where("item.due_on >= ?", from)

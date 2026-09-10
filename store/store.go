@@ -165,6 +165,45 @@ type Store interface {
 	Index(ctx context.Context, entry IndexEntry) error
 	Unindex(ctx context.Context, kind SearchKind, uid string) error
 
+	// CreateGroup adds a Group — a shortcut for sharing, with no permissions of its own.
+	CreateGroup(ctx context.Context, uid, name string, at time.Time) (Group, error)
+
+	// GroupByUID returns ErrNotFound when there is no such Group.
+	GroupByUID(ctx context.Context, uid string) (Group, error)
+
+	// Groups lists every Group on the Instance.
+	Groups(ctx context.Context) ([]Group, error)
+
+	// AddToGroup and RemoveFromGroup change who is in a Group. Removing someone takes
+	// away the Lists they reached through it, and nothing else.
+	AddToGroup(ctx context.Context, groupID, memberID int64) error
+	RemoveFromGroup(ctx context.Context, groupID, memberID int64) error
+
+	// GroupMemberIDs lists who is in a Group.
+	GroupMemberIDs(ctx context.Context, groupID int64) ([]int64, error)
+
+	// ReplaceListShares sets exactly who a List is shared with by name.
+	ReplaceListShares(ctx context.Context, listID int64, memberIDs, groupIDs []int64) error
+
+	// ListShares reads who a List is shared with by name.
+	ListShares(ctx context.Context, listID int64) ([]Share, error)
+
+	// SharedListIDs is every List reaching a Member by name, directly or via a Group.
+	SharedListIDs(ctx context.Context, memberID int64) ([]int64, error)
+
+	// CreateActivity records something for a Member to see. Nooks sends no email, so
+	// this is the only place it surfaces.
+	CreateActivity(ctx context.Context, params CreateActivityParams) (Activity, error)
+
+	// ActivityFor returns what is waiting for one Member, newest first.
+	ActivityFor(ctx context.Context, memberID int64) ([]Activity, error)
+
+	// MarkActivityRead marks everything a Member has now seen.
+	MarkActivityRead(ctx context.Context, memberID int64, at time.Time) error
+
+	// AdminIDs lists the Members who can act on a request.
+	AdminIDs(ctx context.Context) ([]int64, error)
+
 	// Close releases the underlying database handle.
 	Close() error
 }

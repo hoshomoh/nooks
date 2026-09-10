@@ -55,10 +55,14 @@ func (s *ListService) reachableLists(ctx context.Context, member store.Member) (
 	if err != nil {
 		return nil, internalError("read lists", err)
 	}
+	shares, err := s.namedSharesFor(ctx, member)
+	if err != nil {
+		return nil, err
+	}
 
 	reachable := make(map[int64]store.List, len(lists))
 	for _, list := range lists {
-		if accessTo(list, member) >= AccessRead {
+		if accessTo(list, member, shares) >= AccessRead {
 			reachable[list.ID] = list
 		}
 	}

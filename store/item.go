@@ -120,19 +120,27 @@ func (s *sqlStore) ItemByUID(ctx context.Context, uid string) (Item, error) {
 }
 
 // DatedItemsForMember returns every live, unticked Item with a due date on a List the
-// Member can reach, earliest first. It is what Today and Upcoming are built from.
+// Member can reach, earliest first. It is what Today, Upcoming and the calendar are all
+// built from.
+//
+// An empty from means no lower bound, which is how Today gathers everything overdue
+// rather than only what is due on the day itself.
 func (s *sqlStore) DatedItemsForMember(ctx context.Context, memberID int64, from, to string) ([]Item, error) {
-	var rows []itemModel
-	err := s.db.NewSelect().
-		Model(&rows).
+	query := s.db.NewSelect().
+		Model((*itemModel)(nil)).
 		Join("JOIN list ON list.id = item.list_id").
 		Where("item.deleted_at = '' AND item.done_at = '' AND item.due_on <> ''").
 		Where("list.deleted_at = ''").
 		Where("list.owner_id = ? OR list.sharing = ?", memberID, string(SharingInstance)).
-		Where("item.due_on >= ? AND item.due_on <= ?", from, to).
-		Order("item.due_on ASC", "item.position ASC").
-		Scan(ctx)
-	if err != nil {
+		Where("item.due_on <= ?", to).
+		Order("item.due_on ASC", "item.position ASC")
+
+	if from != "" {
+		query = query.Where("item.due_on >= ?", from)
+	}
+
+	var rows []itemModel
+	if err := query.Model(&rows).Scan(ctx); err != nil {
 		return nil, fmt.Errorf("read dated items: %w", err)
 	}
 	return toItems(rows)

@@ -126,5 +126,23 @@
   "error": {
     "unreachable": "Something went wrong reaching the server.",
     "cannotReach": "Can't reach the server."
+  },
+  "views": {
+    "today": "Today",
+    "upcoming": "Upcoming",
+    "todaySubtitle": "{{date}}",
+    "upcomingSubtitle": "Next two weeks",
+    "overdue": "Overdue",
+    "overdueSince": "since {{date}}",
+    "dueToday": "Due today",
+    "dueCount": "{{count}} due",
+    "overdueCount": "{{count}} overdue",
+    "itemCount": "{{count}} item",
+    "itemCount_other": "{{count}} items",
+    "nothingDue": "Nothing due",
+    "todayEmptyTitle": "Nothing is due today",
+    "todayEmptyBody": "Undated items are still sitting on their own lists. Nothing here is a good outcome, not a gap.",
+    "upcomingEmptyTitle": "Nothing in the next two weeks",
+    "upcomingEmptyBody": "Undated items stay where they are. A date is for something that has to happen on a day, not for everything."
   }
 }

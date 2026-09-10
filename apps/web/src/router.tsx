@@ -5,6 +5,8 @@ import { forgotPasswordRoute } from "./routes/forgot-password"
 import { indexRoute } from "./routes/index"
 import { joinRoute } from "./routes/join"
 import { listRoute } from "./routes/list"
+import { todayRoute } from "./routes/today"
+import { upcomingRoute } from "./routes/upcoming"
 import { replacePasswordRoute } from "./routes/replace-password"
 import { rootRoute } from "./routes/root"
 import { setupRoute } from "./routes/setup"
@@ -18,6 +20,8 @@ const routeTree = rootRoute.addChildren([
   joinRoute,
   forgotPasswordRoute,
   listRoute,
+  todayRoute,
+  upcomingRoute,
 ])
 
 /** buildRouter takes the query client so loaders can prime the cache before rendering. */

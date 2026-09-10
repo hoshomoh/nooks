@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 
-import { Sidebar } from "./sidebar"
+import { Sidebar, type SidebarViewCounts } from "./sidebar"
 import type { List } from "@nooks/api"
 
 /**
@@ -12,6 +12,8 @@ export type AppShellProps = {
   lists: List[]
   /** The List currently open, so the sidebar can mark it. */
   activeListUid?: string
+  /** The numbers beside Today and Upcoming. */
+  counts?: SidebarViewCounts
   onSearch: () => void
   onAddList: () => void
   children: ReactNode
@@ -22,6 +24,7 @@ export function AppShell({
   memberName,
   lists,
   activeListUid,
+  counts,
   onSearch,
   onAddList,
   children,
@@ -33,6 +36,7 @@ export function AppShell({
         memberName={memberName}
         lists={lists}
         activeListUid={activeListUid}
+        counts={counts}
         onSearch={onSearch}
         onAddList={onAddList}
       />

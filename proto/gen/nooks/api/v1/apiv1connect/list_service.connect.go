@@ -59,6 +59,9 @@ const (
 	ListServiceMoveItemProcedure = "/nooks.api.v1.ListService/MoveItem"
 	// ListServiceDeleteItemProcedure is the fully-qualified name of the ListService's DeleteItem RPC.
 	ListServiceDeleteItemProcedure = "/nooks.api.v1.ListService/DeleteItem"
+	// ListServiceListDatedItemsProcedure is the fully-qualified name of the ListService's
+	// ListDatedItems RPC.
+	ListServiceListDatedItemsProcedure = "/nooks.api.v1.ListService/ListDatedItems"
 	// ListServiceSearchProcedure is the fully-qualified name of the ListService's Search RPC.
 	ListServiceSearchProcedure = "/nooks.api.v1.ListService/Search"
 )
@@ -94,6 +97,10 @@ type ListServiceClient interface {
 	MoveItem(context.Context, *connect.Request[v1.MoveItemRequest]) (*connect.Response[v1.MoveItemResponse], error)
 	// DeleteItem removes an Item.
 	DeleteItem(context.Context, *connect.Request[v1.DeleteItemRequest]) (*connect.Response[v1.DeleteItemResponse], error)
+	// ListDatedItems returns unticked Items with a due date, across every List the
+	// Member can reach. Today, Upcoming and the calendar are all views over this: a
+	// calendar is a lens on dates, not a second home for Lists.
+	ListDatedItems(context.Context, *connect.Request[v1.ListDatedItemsRequest]) (*connect.Response[v1.ListDatedItemsResponse], error)
 	// Search finds Lists and Items by what a Member wrote in them. It is what ⌘K reads.
 	// Results narrow while they are still typing, and never include anything they could
 	// not already open.
@@ -183,6 +190,12 @@ func NewListServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(listServiceMethods.ByName("DeleteItem")),
 			connect.WithClientOptions(opts...),
 		),
+		listDatedItems: connect.NewClient[v1.ListDatedItemsRequest, v1.ListDatedItemsResponse](
+			httpClient,
+			baseURL+ListServiceListDatedItemsProcedure,
+			connect.WithSchema(listServiceMethods.ByName("ListDatedItems")),
+			connect.WithClientOptions(opts...),
+		),
 		search: connect.NewClient[v1.SearchRequest, v1.SearchResponse](
 			httpClient,
 			baseURL+ListServiceSearchProcedure,
@@ -206,6 +219,7 @@ type listServiceClient struct {
 	setItemDone    *connect.Client[v1.SetItemDoneRequest, v1.SetItemDoneResponse]
 	moveItem       *connect.Client[v1.MoveItemRequest, v1.MoveItemResponse]
 	deleteItem     *connect.Client[v1.DeleteItemRequest, v1.DeleteItemResponse]
+	listDatedItems *connect.Client[v1.ListDatedItemsRequest, v1.ListDatedItemsResponse]
 	search         *connect.Client[v1.SearchRequest, v1.SearchResponse]
 }
 
@@ -269,6 +283,11 @@ func (c *listServiceClient) DeleteItem(ctx context.Context, req *connect.Request
 	return c.deleteItem.CallUnary(ctx, req)
 }
 
+// ListDatedItems calls nooks.api.v1.ListService.ListDatedItems.
+func (c *listServiceClient) ListDatedItems(ctx context.Context, req *connect.Request[v1.ListDatedItemsRequest]) (*connect.Response[v1.ListDatedItemsResponse], error) {
+	return c.listDatedItems.CallUnary(ctx, req)
+}
+
 // Search calls nooks.api.v1.ListService.Search.
 func (c *listServiceClient) Search(ctx context.Context, req *connect.Request[v1.SearchRequest]) (*connect.Response[v1.SearchResponse], error) {
 	return c.search.CallUnary(ctx, req)
@@ -305,6 +324,10 @@ type ListServiceHandler interface {
 	MoveItem(context.Context, *connect.Request[v1.MoveItemRequest]) (*connect.Response[v1.MoveItemResponse], error)
 	// DeleteItem removes an Item.
 	DeleteItem(context.Context, *connect.Request[v1.DeleteItemRequest]) (*connect.Response[v1.DeleteItemResponse], error)
+	// ListDatedItems returns unticked Items with a due date, across every List the
+	// Member can reach. Today, Upcoming and the calendar are all views over this: a
+	// calendar is a lens on dates, not a second home for Lists.
+	ListDatedItems(context.Context, *connect.Request[v1.ListDatedItemsRequest]) (*connect.Response[v1.ListDatedItemsResponse], error)
 	// Search finds Lists and Items by what a Member wrote in them. It is what ⌘K reads.
 	// Results narrow while they are still typing, and never include anything they could
 	// not already open.
@@ -390,6 +413,12 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(listServiceMethods.ByName("DeleteItem")),
 		connect.WithHandlerOptions(opts...),
 	)
+	listServiceListDatedItemsHandler := connect.NewUnaryHandler(
+		ListServiceListDatedItemsProcedure,
+		svc.ListDatedItems,
+		connect.WithSchema(listServiceMethods.ByName("ListDatedItems")),
+		connect.WithHandlerOptions(opts...),
+	)
 	listServiceSearchHandler := connect.NewUnaryHandler(
 		ListServiceSearchProcedure,
 		svc.Search,
@@ -422,6 +451,8 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 			listServiceMoveItemHandler.ServeHTTP(w, r)
 		case ListServiceDeleteItemProcedure:
 			listServiceDeleteItemHandler.ServeHTTP(w, r)
+		case ListServiceListDatedItemsProcedure:
+			listServiceListDatedItemsHandler.ServeHTTP(w, r)
 		case ListServiceSearchProcedure:
 			listServiceSearchHandler.ServeHTTP(w, r)
 		default:
@@ -479,6 +510,10 @@ func (UnimplementedListServiceHandler) MoveItem(context.Context, *connect.Reques
 
 func (UnimplementedListServiceHandler) DeleteItem(context.Context, *connect.Request[v1.DeleteItemRequest]) (*connect.Response[v1.DeleteItemResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.DeleteItem is not implemented"))
+}
+
+func (UnimplementedListServiceHandler) ListDatedItems(context.Context, *connect.Request[v1.ListDatedItemsRequest]) (*connect.Response[v1.ListDatedItemsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.ListDatedItems is not implemented"))
 }
 
 func (UnimplementedListServiceHandler) Search(context.Context, *connect.Request[v1.SearchRequest]) (*connect.Response[v1.SearchResponse], error) {

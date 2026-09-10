@@ -17,7 +17,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M1 · Skeleton that runs | `[x]` |
 | M2 · Auth and first run | `[x]` |
 | M3 · Lists and Items — the core | `[~]` lists, items, search and the list view |
-| M4 · Views: Today, Upcoming, Calendar | `[ ]` |
+| M4 · Views: Today, Upcoming, Calendar | `[~]` Today and Upcoming done |
 | M5 · Notes | `[ ]` |
 | M6 · Sharing, presence, Activity | `[ ]` |
 | M7 · Members and Groups | `[ ]` |
@@ -105,8 +105,8 @@ The single most important milestone; everything else is furniture.
 
 - [x] List and Item schema, ordering, soft delete. Positions are floats so an Item drops
       between two others without renumbering; both drivers tested
-- [~] Sidebar: Search, Pinned / My lists / Shared with me, Add a list, Member footer.
-      Today and Upcoming arrive with M4
+- [x] Sidebar: Search, Today / Upcoming / All lists, Pinned / My lists / Shared with me,
+      Add a list, Member footer
 - [x] App shell: 258px sidebar, 44px chrome bar, 660px content column
 - [~] List view: title, orientation line, count, the hairline rule. Avatars arrive with
       sharing in M6
@@ -129,11 +129,12 @@ The single most important milestone; everything else is furniture.
 
 ## M4 · Views: Today, Upcoming, Calendar
 
-- [ ] Today: overdue and due-today sections, gathered from every reachable List
-- [ ] Upcoming: next two weeks, grouped by day
+- [x] Today: overdue and due-today sections, gathered from every reachable List. No lower
+      bound, so a backlog surfaces rather than being buried by a date range
+- [x] Upcoming: next two weeks, grouped by day
 - [ ] Calendar: month grid, 1060px column, **dated Items only**
 - [ ] Add row that targets a List and a date from context
-- [ ] Empty states: nothing due today says what is next, and does not apologise
+- [x] Empty states for both views
 
 ---
 

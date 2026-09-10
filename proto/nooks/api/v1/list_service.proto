@@ -46,6 +46,11 @@ service ListService {
   // DeleteItem removes an Item.
   rpc DeleteItem(DeleteItemRequest) returns (DeleteItemResponse);
 
+  // ListDatedItems returns unticked Items with a due date, across every List the
+  // Member can reach. Today, Upcoming and the calendar are all views over this: a
+  // calendar is a lens on dates, not a second home for Lists.
+  rpc ListDatedItems(ListDatedItemsRequest) returns (ListDatedItemsResponse);
+
   // Search finds Lists and Items by what a Member wrote in them. It is what ⌘K reads.
   // Results narrow while they are still typing, and never include anything they could
   // not already open.
@@ -238,4 +243,24 @@ message SearchRequest {
 
 message SearchResponse {
   repeated SearchHit hits = 1;
+}
+
+// DatedItem is an Item with enough of its List to render a row away from it.
+message DatedItem {
+  Item item = 1;
+  string list_uid = 2;
+  string list_name = 3;
+}
+
+message ListDatedItemsRequest {
+  // The earliest day to include, YYYY-MM-DD. Empty means no lower bound, which is how
+  // Today gathers everything overdue as well as everything due.
+  string from = 1;
+
+  // The latest day to include, YYYY-MM-DD. Required.
+  string to = 2;
+}
+
+message ListDatedItemsResponse {
+  repeated DatedItem items = 1;
 }

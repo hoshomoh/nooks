@@ -5,12 +5,21 @@ import type { List } from "@nooks/api"
 
 import { Mark } from "@/components/mark"
 
-type SidebarProps = {
+export type SidebarViewCounts = {
+  /** How many Items are overdue or due today. */
+  today: number
+  /** How many are due in the next two weeks. */
+  upcoming: number
+}
+
+export type SidebarProps = {
   instanceName: string
   memberName: string
   lists: List[]
   /** The List currently open, so it can be marked. */
   activeListUid?: string
+  /** The numbers beside Today and Upcoming. */
+  counts?: SidebarViewCounts
   onSearch: () => void
   onAddList: () => void
 }
@@ -26,6 +35,7 @@ export function Sidebar({
   memberName,
   lists,
   activeListUid,
+  counts,
   onSearch,
   onAddList,
 }: SidebarProps) {
@@ -54,6 +64,12 @@ export function Sidebar({
         </button>
       </div>
 
+      <div className="flex flex-col gap-px">
+        <ViewLink to="/today" label={t("views.today")} count={counts?.today} accent />
+        <ViewLink to="/upcoming" label={t("views.upcoming")} count={counts?.upcoming} />
+        <ViewLink to="/" label={t("list.allLists")} count={lists.length} />
+      </div>
+
       <ListGroup label={t("sidebar.pinned")} lists={pinned} activeListUid={activeListUid} />
       <ListGroup label={t("sidebar.myLists")} lists={mine} activeListUid={activeListUid} />
       <ListGroup label={t("sidebar.sharedWithMe")} lists={shared} activeListUid={activeListUid} />
@@ -74,6 +90,33 @@ export function Sidebar({
         <span className="truncate text-small text-secondary-foreground">{memberName}</span>
       </div>
     </aside>
+  )
+}
+
+type ViewLinkProps = {
+  to: "/today" | "/upcoming" | "/"
+  label: string
+  count?: number
+  /** Today's count is the one number in the sidebar that takes the shared colour. */
+  accent?: boolean
+}
+
+/** One of the three views above the Lists. */
+function ViewLink({ to, label, count, accent }: ViewLinkProps) {
+  return (
+    <Link
+      to={to}
+      className="flex h-7.5 items-center rounded-md px-2 text-secondary text-secondary-foreground hover:bg-secondary"
+      activeProps={{ className: "bg-secondary font-medium text-foreground" }}
+      activeOptions={{ exact: true }}
+    >
+      {label}
+      {count !== undefined && count > 0 && (
+        <span className={accent ? "ml-auto text-[11.5px] text-shared" : "ml-auto text-[11.5px] text-muted-foreground"}>
+          {count}
+        </span>
+      )}
+    </Link>
   )
 }
 

@@ -436,3 +436,121 @@ func TestEverythingNeedsASession(t *testing.T) {
 		t.Errorf("Search signed out = %v, want unauthenticated", got)
 	}
 }
+
+// addDatedItem puts an Item on a List with a due date.
+func (f listFixture) addDatedItem(t *testing.T, listUid, label, dueOn string) {
+	t.Helper()
+	if _, err := f.svc.CreateItem(f.as(t, f.anna), connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: listUid, Label: label, DueOn: dueOn,
+	})); err != nil {
+		t.Fatalf("CreateItem %s: %v", label, err)
+	}
+}
+
+// Today gathers everything overdue as well as everything due, which is what an empty
+// lower bound is for.
+func TestDatedItemsWithNoLowerBoundIncludeOverdue(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+
+	f.addDatedItem(t, uid, "Return the deposit form", "2026-08-22")
+	f.addDatedItem(t, uid, "Descale the kettle", "2026-08-25")
+	f.addDatedItem(t, uid, "Ferry tickets", "2026-09-05")
+
+	res, err := f.svc.ListDatedItems(f.as(t, f.anna), connect.NewRequest(&apiv1.ListDatedItemsRequest{
+		To: "2026-08-25",
+	}))
+	if err != nil {
+		t.Fatalf("ListDatedItems: %v", err)
+	}
+	if len(res.Msg.GetItems()) != 2 {
+		t.Fatalf("items = %d, want the overdue one and today's", len(res.Msg.GetItems()))
+	}
+	// Earliest first.
+	if got := res.Msg.GetItems()[0].GetItem().GetLabel(); got != "Return the deposit form" {
+		t.Errorf("first = %q, want the overdue one", got)
+	}
+}
+
+// Upcoming is the same answer with both bounds.
+func TestDatedItemsWithinAWindow(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+
+	f.addDatedItem(t, uid, "Return the deposit form", "2026-08-22")
+	f.addDatedItem(t, uid, "Ferry tickets", "2026-09-05")
+
+	res, err := f.svc.ListDatedItems(f.as(t, f.anna), connect.NewRequest(&apiv1.ListDatedItemsRequest{
+		From: "2026-08-26", To: "2026-09-08",
+	}))
+	if err != nil {
+		t.Fatalf("ListDatedItems: %v", err)
+	}
+	if len(res.Msg.GetItems()) != 1 {
+		t.Fatalf("items = %d, want only the one inside the window", len(res.Msg.GetItems()))
+	}
+	if got := res.Msg.GetItems()[0].GetListName(); got != "Groceries" {
+		t.Errorf("ListName = %q, want the List named so the row reads away from it", got)
+	}
+}
+
+// Undated Items never appear: a calendar is a lens on dates, not a second home.
+func TestDatedItemsExcludeUndatedAndTicked(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+	ctx := f.as(t, f.anna)
+
+	f.addDatedItem(t, uid, "Descale the kettle", "2026-08-25")
+	if _, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: uid, Label: "Baking paper",
+	})); err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+
+	ticked, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: uid, Label: "Milk", DueOn: "2026-08-25",
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+	if _, err := f.svc.SetItemDone(ctx, connect.NewRequest(&apiv1.SetItemDoneRequest{
+		ItemUid: ticked.Msg.GetItem().GetUid(), Done: true,
+	})); err != nil {
+		t.Fatalf("SetItemDone: %v", err)
+	}
+
+	res, err := f.svc.ListDatedItems(ctx, connect.NewRequest(&apiv1.ListDatedItemsRequest{
+		To: "2026-08-31",
+	}))
+	if err != nil {
+		t.Fatalf("ListDatedItems: %v", err)
+	}
+	if len(res.Msg.GetItems()) != 1 {
+		t.Fatalf("items = %d, want only the dated, unticked one", len(res.Msg.GetItems()))
+	}
+}
+
+// Dated views must not reach further than the Member's own Lists.
+func TestDatedItemsRespectSharing(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Secret plans")
+	f.addDatedItem(t, uid, "Surprise party", "2026-08-25")
+
+	res, err := f.svc.ListDatedItems(f.as(t, f.jonas), connect.NewRequest(&apiv1.ListDatedItemsRequest{
+		To: "2026-08-31",
+	}))
+	if err != nil {
+		t.Fatalf("ListDatedItems: %v", err)
+	}
+	if len(res.Msg.GetItems()) != 0 {
+		t.Errorf("items = %d, want none of somebody else's private List", len(res.Msg.GetItems()))
+	}
+}
+
+func TestDatedItemsNeedsALastDay(t *testing.T) {
+	f := newListFixture(t)
+	_, err := f.svc.ListDatedItems(f.as(t, f.anna), connect.NewRequest(&apiv1.ListDatedItemsRequest{}))
+	if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
+		t.Errorf("code = %v, want invalid_argument", got)
+	}
+}

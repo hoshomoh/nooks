@@ -8,10 +8,10 @@ file and update this guide.
 
 Nook is a self-hosted household todo app. See `CONTEXT.md` for the domain glossary — use those terms.
 
-- Backend: Go, Echo, Connect RPC, gRPC-Gateway, Protocol Buffers.
+- Backend: Go, Connect RPC, Protocol Buffers. gRPC-Gateway and OpenAPI arrive with the REST API in M10.
 - Frontend: React, TypeScript, Vite, Tailwind CSS v4, shadcn/ui, TanStack Query, TanStack Router.
 - Storage: SQLite (default — one file the user can copy) and Postgres, behind one store interface.
-- Generated API outputs: `proto/gen/` for Go and OpenAPI, `web/src/types/proto/` for TypeScript.
+- Generated API outputs: `proto/gen/` for Go, `web/src/types/proto/` for TypeScript.
 - Ships as one binary: the SPA is built into `server/router/frontend/dist` and embedded.
 
 ## Working Rules

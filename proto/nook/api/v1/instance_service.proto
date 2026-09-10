@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package nook.api.v1;
+
+// InstanceService reports what this copy of Nook is and how it is configured.
+service InstanceService {
+  // GetInstance returns the public profile of this Instance. It is reachable without
+  // authentication because the sign-in page and the Public list both need it before
+  // anyone has signed in.
+  rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse);
+}
+
+message GetInstanceRequest {}
+
+message GetInstanceResponse {
+  // The mutable display label chosen at first run, e.g. "Brunnen Street". Empty
+  // until first run completes.
+  string name = 1;
+
+  // The build of Nook that is running, e.g. "1.0.2".
+  string version = 2;
+
+  // True until the first Admin exists. The app shows first run rather than sign in.
+  bool needs_setup = 3;
+
+  // When false, every account starts as a join request an Admin approves.
+  bool public_signup = 4;
+}

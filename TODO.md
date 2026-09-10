@@ -54,8 +54,9 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 The goal is a binary that serves an empty page, and a `buf generate` that produces both Go and
 TypeScript. No features. Everything after this is filling in.
 
-- [ ] `proto/` module: `buf.yaml`, `buf.gen.yaml` (Go, Connect, gateway, OpenAPI, TS via `@bufbuild/es`)
-- [ ] First service definition end to end, to prove the pipeline
+- [x] `proto/` module: `buf.yaml`, `buf.gen.yaml` — Go, Connect, TS via `@bufbuild/es`.
+      Gateway and OpenAPI deferred to M10, when REST is actually specified
+- [x] First service definition end to end — `InstanceService`, generating Go and TypeScript
 - [ ] Store interface + SQLite and Postgres drivers, migration runner, `LATEST.sql` for each
 - [ ] Config: flags and env (port, data directory, driver, DSN)
 - [ ] HTTP server: routing, graceful shutdown, request logging

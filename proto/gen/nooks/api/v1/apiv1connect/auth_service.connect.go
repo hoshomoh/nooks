@@ -46,6 +46,23 @@ const (
 	// AuthServiceReplacePasswordProcedure is the fully-qualified name of the AuthService's
 	// ReplacePassword RPC.
 	AuthServiceReplacePasswordProcedure = "/nooks.api.v1.AuthService/ReplacePassword"
+	// AuthServiceRequestJoinProcedure is the fully-qualified name of the AuthService's RequestJoin RPC.
+	AuthServiceRequestJoinProcedure = "/nooks.api.v1.AuthService/RequestJoin"
+	// AuthServiceGetJoinRequestProcedure is the fully-qualified name of the AuthService's
+	// GetJoinRequest RPC.
+	AuthServiceGetJoinRequestProcedure = "/nooks.api.v1.AuthService/GetJoinRequest"
+	// AuthServiceCompleteJoinProcedure is the fully-qualified name of the AuthService's CompleteJoin
+	// RPC.
+	AuthServiceCompleteJoinProcedure = "/nooks.api.v1.AuthService/CompleteJoin"
+	// AuthServiceRequestPasswordResetProcedure is the fully-qualified name of the AuthService's
+	// RequestPasswordReset RPC.
+	AuthServiceRequestPasswordResetProcedure = "/nooks.api.v1.AuthService/RequestPasswordReset"
+	// AuthServiceGetResetRequestProcedure is the fully-qualified name of the AuthService's
+	// GetResetRequest RPC.
+	AuthServiceGetResetRequestProcedure = "/nooks.api.v1.AuthService/GetResetRequest"
+	// AuthServiceCompletePasswordResetProcedure is the fully-qualified name of the AuthService's
+	// CompletePasswordReset RPC.
+	AuthServiceCompletePasswordResetProcedure = "/nooks.api.v1.AuthService/CompletePasswordReset"
 )
 
 // AuthServiceClient is a client for the nooks.api.v1.AuthService service.
@@ -62,6 +79,22 @@ type AuthServiceClient interface {
 	// ReplacePassword sets a new password for the signed-in Member. A Member who was
 	// given a temporary password must call this before they can use Nooks.
 	ReplacePassword(context.Context, *connect.Request[v1.ReplacePasswordRequest]) (*connect.Response[v1.ReplacePasswordResponse], error)
+	// RequestJoin asks an Admin for an account. It is how a Visitor gets in when public
+	// signup is off, which is the default.
+	RequestJoin(context.Context, *connect.Request[v1.RequestJoinRequest]) (*connect.Response[v1.RequestJoinResponse], error)
+	// GetJoinRequest reports whether an Admin has decided yet. The Visitor's browser
+	// remembers the request id and comes back to the same address.
+	GetJoinRequest(context.Context, *connect.Request[v1.GetJoinRequestRequest]) (*connect.Response[v1.GetJoinRequestResponse], error)
+	// CompleteJoin turns an approved Join request into an account, once the Visitor
+	// chooses a password.
+	CompleteJoin(context.Context, *connect.Request[v1.CompleteJoinRequest]) (*connect.Response[v1.CompleteJoinResponse], error)
+	// RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
+	// the Admin checks it is really them however they like, then approves.
+	RequestPasswordReset(context.Context, *connect.Request[v1.RequestPasswordResetRequest]) (*connect.Response[v1.RequestPasswordResetResponse], error)
+	// GetResetRequest reports whether an Admin has approved a reset yet.
+	GetResetRequest(context.Context, *connect.Request[v1.GetResetRequestRequest]) (*connect.Response[v1.GetResetRequestResponse], error)
+	// CompletePasswordReset sets a new password against an approved reset.
+	CompletePasswordReset(context.Context, *connect.Request[v1.CompletePasswordResetRequest]) (*connect.Response[v1.CompletePasswordResetResponse], error)
 }
 
 // NewAuthServiceClient constructs a client for the nooks.api.v1.AuthService service. By default, it
@@ -105,16 +138,58 @@ func NewAuthServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(authServiceMethods.ByName("ReplacePassword")),
 			connect.WithClientOptions(opts...),
 		),
+		requestJoin: connect.NewClient[v1.RequestJoinRequest, v1.RequestJoinResponse](
+			httpClient,
+			baseURL+AuthServiceRequestJoinProcedure,
+			connect.WithSchema(authServiceMethods.ByName("RequestJoin")),
+			connect.WithClientOptions(opts...),
+		),
+		getJoinRequest: connect.NewClient[v1.GetJoinRequestRequest, v1.GetJoinRequestResponse](
+			httpClient,
+			baseURL+AuthServiceGetJoinRequestProcedure,
+			connect.WithSchema(authServiceMethods.ByName("GetJoinRequest")),
+			connect.WithClientOptions(opts...),
+		),
+		completeJoin: connect.NewClient[v1.CompleteJoinRequest, v1.CompleteJoinResponse](
+			httpClient,
+			baseURL+AuthServiceCompleteJoinProcedure,
+			connect.WithSchema(authServiceMethods.ByName("CompleteJoin")),
+			connect.WithClientOptions(opts...),
+		),
+		requestPasswordReset: connect.NewClient[v1.RequestPasswordResetRequest, v1.RequestPasswordResetResponse](
+			httpClient,
+			baseURL+AuthServiceRequestPasswordResetProcedure,
+			connect.WithSchema(authServiceMethods.ByName("RequestPasswordReset")),
+			connect.WithClientOptions(opts...),
+		),
+		getResetRequest: connect.NewClient[v1.GetResetRequestRequest, v1.GetResetRequestResponse](
+			httpClient,
+			baseURL+AuthServiceGetResetRequestProcedure,
+			connect.WithSchema(authServiceMethods.ByName("GetResetRequest")),
+			connect.WithClientOptions(opts...),
+		),
+		completePasswordReset: connect.NewClient[v1.CompletePasswordResetRequest, v1.CompletePasswordResetResponse](
+			httpClient,
+			baseURL+AuthServiceCompletePasswordResetProcedure,
+			connect.WithSchema(authServiceMethods.ByName("CompletePasswordReset")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // authServiceClient implements AuthServiceClient.
 type authServiceClient struct {
-	completeSetup    *connect.Client[v1.CompleteSetupRequest, v1.CompleteSetupResponse]
-	signIn           *connect.Client[v1.SignInRequest, v1.SignInResponse]
-	signOut          *connect.Client[v1.SignOutRequest, v1.SignOutResponse]
-	getCurrentMember *connect.Client[v1.GetCurrentMemberRequest, v1.GetCurrentMemberResponse]
-	replacePassword  *connect.Client[v1.ReplacePasswordRequest, v1.ReplacePasswordResponse]
+	completeSetup         *connect.Client[v1.CompleteSetupRequest, v1.CompleteSetupResponse]
+	signIn                *connect.Client[v1.SignInRequest, v1.SignInResponse]
+	signOut               *connect.Client[v1.SignOutRequest, v1.SignOutResponse]
+	getCurrentMember      *connect.Client[v1.GetCurrentMemberRequest, v1.GetCurrentMemberResponse]
+	replacePassword       *connect.Client[v1.ReplacePasswordRequest, v1.ReplacePasswordResponse]
+	requestJoin           *connect.Client[v1.RequestJoinRequest, v1.RequestJoinResponse]
+	getJoinRequest        *connect.Client[v1.GetJoinRequestRequest, v1.GetJoinRequestResponse]
+	completeJoin          *connect.Client[v1.CompleteJoinRequest, v1.CompleteJoinResponse]
+	requestPasswordReset  *connect.Client[v1.RequestPasswordResetRequest, v1.RequestPasswordResetResponse]
+	getResetRequest       *connect.Client[v1.GetResetRequestRequest, v1.GetResetRequestResponse]
+	completePasswordReset *connect.Client[v1.CompletePasswordResetRequest, v1.CompletePasswordResetResponse]
 }
 
 // CompleteSetup calls nooks.api.v1.AuthService.CompleteSetup.
@@ -142,6 +217,36 @@ func (c *authServiceClient) ReplacePassword(ctx context.Context, req *connect.Re
 	return c.replacePassword.CallUnary(ctx, req)
 }
 
+// RequestJoin calls nooks.api.v1.AuthService.RequestJoin.
+func (c *authServiceClient) RequestJoin(ctx context.Context, req *connect.Request[v1.RequestJoinRequest]) (*connect.Response[v1.RequestJoinResponse], error) {
+	return c.requestJoin.CallUnary(ctx, req)
+}
+
+// GetJoinRequest calls nooks.api.v1.AuthService.GetJoinRequest.
+func (c *authServiceClient) GetJoinRequest(ctx context.Context, req *connect.Request[v1.GetJoinRequestRequest]) (*connect.Response[v1.GetJoinRequestResponse], error) {
+	return c.getJoinRequest.CallUnary(ctx, req)
+}
+
+// CompleteJoin calls nooks.api.v1.AuthService.CompleteJoin.
+func (c *authServiceClient) CompleteJoin(ctx context.Context, req *connect.Request[v1.CompleteJoinRequest]) (*connect.Response[v1.CompleteJoinResponse], error) {
+	return c.completeJoin.CallUnary(ctx, req)
+}
+
+// RequestPasswordReset calls nooks.api.v1.AuthService.RequestPasswordReset.
+func (c *authServiceClient) RequestPasswordReset(ctx context.Context, req *connect.Request[v1.RequestPasswordResetRequest]) (*connect.Response[v1.RequestPasswordResetResponse], error) {
+	return c.requestPasswordReset.CallUnary(ctx, req)
+}
+
+// GetResetRequest calls nooks.api.v1.AuthService.GetResetRequest.
+func (c *authServiceClient) GetResetRequest(ctx context.Context, req *connect.Request[v1.GetResetRequestRequest]) (*connect.Response[v1.GetResetRequestResponse], error) {
+	return c.getResetRequest.CallUnary(ctx, req)
+}
+
+// CompletePasswordReset calls nooks.api.v1.AuthService.CompletePasswordReset.
+func (c *authServiceClient) CompletePasswordReset(ctx context.Context, req *connect.Request[v1.CompletePasswordResetRequest]) (*connect.Response[v1.CompletePasswordResetResponse], error) {
+	return c.completePasswordReset.CallUnary(ctx, req)
+}
+
 // AuthServiceHandler is an implementation of the nooks.api.v1.AuthService service.
 type AuthServiceHandler interface {
 	// CompleteSetup creates the first Admin and names the Instance, in one step. It is
@@ -156,6 +261,22 @@ type AuthServiceHandler interface {
 	// ReplacePassword sets a new password for the signed-in Member. A Member who was
 	// given a temporary password must call this before they can use Nooks.
 	ReplacePassword(context.Context, *connect.Request[v1.ReplacePasswordRequest]) (*connect.Response[v1.ReplacePasswordResponse], error)
+	// RequestJoin asks an Admin for an account. It is how a Visitor gets in when public
+	// signup is off, which is the default.
+	RequestJoin(context.Context, *connect.Request[v1.RequestJoinRequest]) (*connect.Response[v1.RequestJoinResponse], error)
+	// GetJoinRequest reports whether an Admin has decided yet. The Visitor's browser
+	// remembers the request id and comes back to the same address.
+	GetJoinRequest(context.Context, *connect.Request[v1.GetJoinRequestRequest]) (*connect.Response[v1.GetJoinRequestResponse], error)
+	// CompleteJoin turns an approved Join request into an account, once the Visitor
+	// chooses a password.
+	CompleteJoin(context.Context, *connect.Request[v1.CompleteJoinRequest]) (*connect.Response[v1.CompleteJoinResponse], error)
+	// RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
+	// the Admin checks it is really them however they like, then approves.
+	RequestPasswordReset(context.Context, *connect.Request[v1.RequestPasswordResetRequest]) (*connect.Response[v1.RequestPasswordResetResponse], error)
+	// GetResetRequest reports whether an Admin has approved a reset yet.
+	GetResetRequest(context.Context, *connect.Request[v1.GetResetRequestRequest]) (*connect.Response[v1.GetResetRequestResponse], error)
+	// CompletePasswordReset sets a new password against an approved reset.
+	CompletePasswordReset(context.Context, *connect.Request[v1.CompletePasswordResetRequest]) (*connect.Response[v1.CompletePasswordResetResponse], error)
 }
 
 // NewAuthServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -195,6 +316,42 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(authServiceMethods.ByName("ReplacePassword")),
 		connect.WithHandlerOptions(opts...),
 	)
+	authServiceRequestJoinHandler := connect.NewUnaryHandler(
+		AuthServiceRequestJoinProcedure,
+		svc.RequestJoin,
+		connect.WithSchema(authServiceMethods.ByName("RequestJoin")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceGetJoinRequestHandler := connect.NewUnaryHandler(
+		AuthServiceGetJoinRequestProcedure,
+		svc.GetJoinRequest,
+		connect.WithSchema(authServiceMethods.ByName("GetJoinRequest")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceCompleteJoinHandler := connect.NewUnaryHandler(
+		AuthServiceCompleteJoinProcedure,
+		svc.CompleteJoin,
+		connect.WithSchema(authServiceMethods.ByName("CompleteJoin")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceRequestPasswordResetHandler := connect.NewUnaryHandler(
+		AuthServiceRequestPasswordResetProcedure,
+		svc.RequestPasswordReset,
+		connect.WithSchema(authServiceMethods.ByName("RequestPasswordReset")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceGetResetRequestHandler := connect.NewUnaryHandler(
+		AuthServiceGetResetRequestProcedure,
+		svc.GetResetRequest,
+		connect.WithSchema(authServiceMethods.ByName("GetResetRequest")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceCompletePasswordResetHandler := connect.NewUnaryHandler(
+		AuthServiceCompletePasswordResetProcedure,
+		svc.CompletePasswordReset,
+		connect.WithSchema(authServiceMethods.ByName("CompletePasswordReset")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/nooks.api.v1.AuthService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AuthServiceCompleteSetupProcedure:
@@ -207,6 +364,18 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 			authServiceGetCurrentMemberHandler.ServeHTTP(w, r)
 		case AuthServiceReplacePasswordProcedure:
 			authServiceReplacePasswordHandler.ServeHTTP(w, r)
+		case AuthServiceRequestJoinProcedure:
+			authServiceRequestJoinHandler.ServeHTTP(w, r)
+		case AuthServiceGetJoinRequestProcedure:
+			authServiceGetJoinRequestHandler.ServeHTTP(w, r)
+		case AuthServiceCompleteJoinProcedure:
+			authServiceCompleteJoinHandler.ServeHTTP(w, r)
+		case AuthServiceRequestPasswordResetProcedure:
+			authServiceRequestPasswordResetHandler.ServeHTTP(w, r)
+		case AuthServiceGetResetRequestProcedure:
+			authServiceGetResetRequestHandler.ServeHTTP(w, r)
+		case AuthServiceCompletePasswordResetProcedure:
+			authServiceCompletePasswordResetHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -234,4 +403,28 @@ func (UnimplementedAuthServiceHandler) GetCurrentMember(context.Context, *connec
 
 func (UnimplementedAuthServiceHandler) ReplacePassword(context.Context, *connect.Request[v1.ReplacePasswordRequest]) (*connect.Response[v1.ReplacePasswordResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.AuthService.ReplacePassword is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) RequestJoin(context.Context, *connect.Request[v1.RequestJoinRequest]) (*connect.Response[v1.RequestJoinResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.AuthService.RequestJoin is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) GetJoinRequest(context.Context, *connect.Request[v1.GetJoinRequestRequest]) (*connect.Response[v1.GetJoinRequestResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.AuthService.GetJoinRequest is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) CompleteJoin(context.Context, *connect.Request[v1.CompleteJoinRequest]) (*connect.Response[v1.CompleteJoinResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.AuthService.CompleteJoin is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) RequestPasswordReset(context.Context, *connect.Request[v1.RequestPasswordResetRequest]) (*connect.Response[v1.RequestPasswordResetResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.AuthService.RequestPasswordReset is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) GetResetRequest(context.Context, *connect.Request[v1.GetResetRequestRequest]) (*connect.Response[v1.GetResetRequestResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.AuthService.GetResetRequest is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) CompletePasswordReset(context.Context, *connect.Request[v1.CompletePasswordResetRequest]) (*connect.Response[v1.CompletePasswordResetResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.AuthService.CompletePasswordReset is not implemented"))
 }

@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nooks/api/v1/auth_service.proto.
  */
 export const file_nooks_api_v1_auth_service: GenFile = /*@__PURE__*/
-  fileDesc("Ch9ub29rcy9hcGkvdjEvYXV0aF9zZXJ2aWNlLnByb3RvEgxub29rcy5hcGkudjEicgoGTWVtYmVyEgsKA3VpZBgBIAEoCRIMCgRuYW1lGAIgASgJEg0KBWVtYWlsGAMgASgJEiAKBHJvbGUYBCABKA4yEi5ub29rcy5hcGkudjEuUm9sZRIcChRtdXN0X2NoYW5nZV9wYXNzd29yZBgFIAEoCCJcChRDb21wbGV0ZVNldHVwUmVxdWVzdBIMCgRuYW1lGAEgASgJEg0KBWVtYWlsGAIgASgJEhAKCHBhc3N3b3JkGAMgASgJEhUKDWluc3RhbmNlX25hbWUYBCABKAkiPQoVQ29tcGxldGVTZXR1cFJlc3BvbnNlEiQKBm1lbWJlchgBIAEoCzIULm5vb2tzLmFwaS52MS5NZW1iZXIiMAoNU2lnbkluUmVxdWVzdBINCgVlbWFpbBgBIAEoCRIQCghwYXNzd29yZBgCIAEoCSI2Cg5TaWduSW5SZXNwb25zZRIkCgZtZW1iZXIYASABKAsyFC5ub29rcy5hcGkudjEuTWVtYmVyIhAKDlNpZ25PdXRSZXF1ZXN0IhEKD1NpZ25PdXRSZXNwb25zZSIZChdHZXRDdXJyZW50TWVtYmVyUmVxdWVzdCJAChhHZXRDdXJyZW50TWVtYmVyUmVzcG9uc2USJAoGbWVtYmVyGAEgASgLMhQubm9va3MuYXBpLnYxLk1lbWJlciJIChZSZXBsYWNlUGFzc3dvcmRSZXF1ZXN0EhgKEGN1cnJlbnRfcGFzc3dvcmQYASABKAkSFAoMbmV3X3Bhc3N3b3JkGAIgASgJIj8KF1JlcGxhY2VQYXNzd29yZFJlc3BvbnNlEiQKBm1lbWJlchgBIAEoCzIULm5vb2tzLmFwaS52MS5NZW1iZXIqPQoEUm9sZRIUChBST0xFX1VOU1BFQ0lGSUVEEAASDgoKUk9MRV9BRE1JThABEg8KC1JPTEVfTUVNQkVSEAIytwMKC0F1dGhTZXJ2aWNlElgKDUNvbXBsZXRlU2V0dXASIi5ub29rcy5hcGkudjEuQ29tcGxldGVTZXR1cFJlcXVlc3QaIy5ub29rcy5hcGkudjEuQ29tcGxldGVTZXR1cFJlc3BvbnNlEkMKBlNpZ25JbhIbLm5vb2tzLmFwaS52MS5TaWduSW5SZXF1ZXN0Ghwubm9va3MuYXBpLnYxLlNpZ25JblJlc3BvbnNlEkYKB1NpZ25PdXQSHC5ub29rcy5hcGkudjEuU2lnbk91dFJlcXVlc3QaHS5ub29rcy5hcGkudjEuU2lnbk91dFJlc3BvbnNlEmEKEEdldEN1cnJlbnRNZW1iZXISJS5ub29rcy5hcGkudjEuR2V0Q3VycmVudE1lbWJlclJlcXVlc3QaJi5ub29rcy5hcGkudjEuR2V0Q3VycmVudE1lbWJlclJlc3BvbnNlEl4KD1JlcGxhY2VQYXNzd29yZBIkLm5vb2tzLmFwaS52MS5SZXBsYWNlUGFzc3dvcmRSZXF1ZXN0GiUubm9va3MuYXBpLnYxLlJlcGxhY2VQYXNzd29yZFJlc3BvbnNlQq4BChBjb20ubm9va3MuYXBpLnYxQhBBdXRoU2VydmljZVByb3RvUAFaNmdpdGh1Yi5jb20vaG9zaG9tb2gvbm9va3MvcHJvdG8vZ2VuL25vb2tzL2FwaS92MTthcGl2MaICA05BWKoCDE5vb2tzLkFwaS5WMcoCDE5vb2tzXEFwaVxWMeICGE5vb2tzXEFwaVxWMVxHUEJNZXRhZGF0YeoCDk5vb2tzOjpBcGk6OlYxYgZwcm90bzM");
+  fileDesc("Ch9ub29rcy9hcGkvdjEvYXV0aF9zZXJ2aWNlLnByb3RvEgxub29rcy5hcGkudjEicgoGTWVtYmVyEgsKA3VpZBgBIAEoCRIMCgRuYW1lGAIgASgJEg0KBWVtYWlsGAMgASgJEiAKBHJvbGUYBCABKA4yEi5ub29rcy5hcGkudjEuUm9sZRIcChRtdXN0X2NoYW5nZV9wYXNzd29yZBgFIAEoCCJcChRDb21wbGV0ZVNldHVwUmVxdWVzdBIMCgRuYW1lGAEgASgJEg0KBWVtYWlsGAIgASgJEhAKCHBhc3N3b3JkGAMgASgJEhUKDWluc3RhbmNlX25hbWUYBCABKAkiPQoVQ29tcGxldGVTZXR1cFJlc3BvbnNlEiQKBm1lbWJlchgBIAEoCzIULm5vb2tzLmFwaS52MS5NZW1iZXIiMAoNU2lnbkluUmVxdWVzdBINCgVlbWFpbBgBIAEoCRIQCghwYXNzd29yZBgCIAEoCSI2Cg5TaWduSW5SZXNwb25zZRIkCgZtZW1iZXIYASABKAsyFC5ub29rcy5hcGkudjEuTWVtYmVyIhAKDlNpZ25PdXRSZXF1ZXN0IhEKD1NpZ25PdXRSZXNwb25zZSIZChdHZXRDdXJyZW50TWVtYmVyUmVxdWVzdCJAChhHZXRDdXJyZW50TWVtYmVyUmVzcG9uc2USJAoGbWVtYmVyGAEgASgLMhQubm9va3MuYXBpLnYxLk1lbWJlciJIChZSZXBsYWNlUGFzc3dvcmRSZXF1ZXN0EhgKEGN1cnJlbnRfcGFzc3dvcmQYASABKAkSFAoMbmV3X3Bhc3N3b3JkGAIgASgJIj8KF1JlcGxhY2VQYXNzd29yZFJlc3BvbnNlEiQKBm1lbWJlchgBIAEoCzIULm5vb2tzLmFwaS52MS5NZW1iZXIiQgoSUmVxdWVzdEpvaW5SZXF1ZXN0EgwKBG5hbWUYASABKAkSDQoFZW1haWwYAiABKAkSDwoHbWVzc2FnZRgDIAEoCSIqChNSZXF1ZXN0Sm9pblJlc3BvbnNlEhMKC3JlcXVlc3RfdWlkGAEgASgJIiwKFUdldEpvaW5SZXF1ZXN0UmVxdWVzdBITCgtyZXF1ZXN0X3VpZBgBIAEoCSJiChZHZXRKb2luUmVxdWVzdFJlc3BvbnNlEisKBnN0YXR1cxgBIAEoDjIbLm5vb2tzLmFwaS52MS5SZXF1ZXN0U3RhdHVzEgwKBG5hbWUYAiABKAkSDQoFZW1haWwYAyABKAkiSgoTQ29tcGxldGVKb2luUmVxdWVzdBITCgtyZXF1ZXN0X3VpZBgBIAEoCRIMCgRuYW1lGAIgASgJEhAKCHBhc3N3b3JkGAMgASgJIjwKFENvbXBsZXRlSm9pblJlc3BvbnNlEiQKBm1lbWJlchgBIAEoCzIULm5vb2tzLmFwaS52MS5NZW1iZXIiNAobUmVxdWVzdFBhc3N3b3JkUmVzZXRSZXF1ZXN0EhUKDWVtYWlsX29yX25hbWUYASABKAkiMwocUmVxdWVzdFBhc3N3b3JkUmVzZXRSZXNwb25zZRITCgtyZXF1ZXN0X3VpZBgBIAEoCSItChZHZXRSZXNldFJlcXVlc3RSZXF1ZXN0EhMKC3JlcXVlc3RfdWlkGAEgASgJIkYKF0dldFJlc2V0UmVxdWVzdFJlc3BvbnNlEisKBnN0YXR1cxgBIAEoDjIbLm5vb2tzLmFwaS52MS5SZXF1ZXN0U3RhdHVzIkkKHENvbXBsZXRlUGFzc3dvcmRSZXNldFJlcXVlc3QSEwoLcmVxdWVzdF91aWQYASABKAkSFAoMbmV3X3Bhc3N3b3JkGAIgASgJIkUKHUNvbXBsZXRlUGFzc3dvcmRSZXNldFJlc3BvbnNlEiQKBm1lbWJlchgBIAEoCzIULm5vb2tzLmFwaS52MS5NZW1iZXIqhAEKDVJlcXVlc3RTdGF0dXMSHgoaUkVRVUVTVF9TVEFUVVNfVU5TUEVDSUZJRUQQABIaChZSRVFVRVNUX1NUQVRVU19QRU5ESU5HEAESGwoXUkVRVUVTVF9TVEFUVVNfQVBQUk9WRUQQAhIaChZSRVFVRVNUX1NUQVRVU19JR05PUkVEEAMqPQoEUm9sZRIUChBST0xFX1VOU1BFQ0lGSUVEEAASDgoKUk9MRV9BRE1JThABEg8KC1JPTEVfTUVNQkVSEAIygAgKC0F1dGhTZXJ2aWNlElgKDUNvbXBsZXRlU2V0dXASIi5ub29rcy5hcGkudjEuQ29tcGxldGVTZXR1cFJlcXVlc3QaIy5ub29rcy5hcGkudjEuQ29tcGxldGVTZXR1cFJlc3BvbnNlEkMKBlNpZ25JbhIbLm5vb2tzLmFwaS52MS5TaWduSW5SZXF1ZXN0Ghwubm9va3MuYXBpLnYxLlNpZ25JblJlc3BvbnNlEkYKB1NpZ25PdXQSHC5ub29rcy5hcGkudjEuU2lnbk91dFJlcXVlc3QaHS5ub29rcy5hcGkudjEuU2lnbk91dFJlc3BvbnNlEmEKEEdldEN1cnJlbnRNZW1iZXISJS5ub29rcy5hcGkudjEuR2V0Q3VycmVudE1lbWJlclJlcXVlc3QaJi5ub29rcy5hcGkudjEuR2V0Q3VycmVudE1lbWJlclJlc3BvbnNlEl4KD1JlcGxhY2VQYXNzd29yZBIkLm5vb2tzLmFwaS52MS5SZXBsYWNlUGFzc3dvcmRSZXF1ZXN0GiUubm9va3MuYXBpLnYxLlJlcGxhY2VQYXNzd29yZFJlc3BvbnNlElIKC1JlcXVlc3RKb2luEiAubm9va3MuYXBpLnYxLlJlcXVlc3RKb2luUmVxdWVzdBohLm5vb2tzLmFwaS52MS5SZXF1ZXN0Sm9pblJlc3BvbnNlElsKDkdldEpvaW5SZXF1ZXN0EiMubm9va3MuYXBpLnYxLkdldEpvaW5SZXF1ZXN0UmVxdWVzdBokLm5vb2tzLmFwaS52MS5HZXRKb2luUmVxdWVzdFJlc3BvbnNlElUKDENvbXBsZXRlSm9pbhIhLm5vb2tzLmFwaS52MS5Db21wbGV0ZUpvaW5SZXF1ZXN0GiIubm9va3MuYXBpLnYxLkNvbXBsZXRlSm9pblJlc3BvbnNlEm0KFFJlcXVlc3RQYXNzd29yZFJlc2V0Eikubm9va3MuYXBpLnYxLlJlcXVlc3RQYXNzd29yZFJlc2V0UmVxdWVzdBoqLm5vb2tzLmFwaS52MS5SZXF1ZXN0UGFzc3dvcmRSZXNldFJlc3BvbnNlEl4KD0dldFJlc2V0UmVxdWVzdBIkLm5vb2tzLmFwaS52MS5HZXRSZXNldFJlcXVlc3RSZXF1ZXN0GiUubm9va3MuYXBpLnYxLkdldFJlc2V0UmVxdWVzdFJlc3BvbnNlEnAKFUNvbXBsZXRlUGFzc3dvcmRSZXNldBIqLm5vb2tzLmFwaS52MS5Db21wbGV0ZVBhc3N3b3JkUmVzZXRSZXF1ZXN0Gisubm9va3MuYXBpLnYxLkNvbXBsZXRlUGFzc3dvcmRSZXNldFJlc3BvbnNlQq4BChBjb20ubm9va3MuYXBpLnYxQhBBdXRoU2VydmljZVByb3RvUAFaNmdpdGh1Yi5jb20vaG9zaG9tb2gvbm9va3MvcHJvdG8vZ2VuL25vb2tzL2FwaS92MTthcGl2MaICA05BWKoCDE5vb2tzLkFwaS5WMcoCDE5vb2tzXEFwaVxWMeICGE5vb2tzXEFwaVxWMVxHUEJNZXRhZGF0YeoCDk5vb2tzOjpBcGk6OlYxYgZwcm90bzM");
 
 /**
  * Member is a person with an account on this Instance, as seen over the wire. It
@@ -251,6 +251,288 @@ export const ReplacePasswordResponseSchema: GenMessage<ReplacePasswordResponse> 
   messageDesc(file_nooks_api_v1_auth_service, 10);
 
 /**
+ * @generated from message nooks.api.v1.RequestJoinRequest
+ */
+export type RequestJoinRequest = Message<"nooks.api.v1.RequestJoinRequest"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string email = 2;
+   */
+  email: string;
+
+  /**
+   * Anything the Visitor wants to add, e.g. "It's Til, from upstairs". Optional.
+   *
+   * @generated from field: string message = 3;
+   */
+  message: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.RequestJoinRequest.
+ * Use `create(RequestJoinRequestSchema)` to create a new message.
+ */
+export const RequestJoinRequestSchema: GenMessage<RequestJoinRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_auth_service, 11);
+
+/**
+ * @generated from message nooks.api.v1.RequestJoinResponse
+ */
+export type RequestJoinResponse = Message<"nooks.api.v1.RequestJoinResponse"> & {
+  /**
+   * The identifier the Visitor's browser remembers so it can check back.
+   *
+   * @generated from field: string request_uid = 1;
+   */
+  requestUid: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.RequestJoinResponse.
+ * Use `create(RequestJoinResponseSchema)` to create a new message.
+ */
+export const RequestJoinResponseSchema: GenMessage<RequestJoinResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_auth_service, 12);
+
+/**
+ * @generated from message nooks.api.v1.GetJoinRequestRequest
+ */
+export type GetJoinRequestRequest = Message<"nooks.api.v1.GetJoinRequestRequest"> & {
+  /**
+   * @generated from field: string request_uid = 1;
+   */
+  requestUid: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.GetJoinRequestRequest.
+ * Use `create(GetJoinRequestRequestSchema)` to create a new message.
+ */
+export const GetJoinRequestRequestSchema: GenMessage<GetJoinRequestRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_auth_service, 13);
+
+/**
+ * @generated from message nooks.api.v1.GetJoinRequestResponse
+ */
+export type GetJoinRequestResponse = Message<"nooks.api.v1.GetJoinRequestResponse"> & {
+  /**
+   * @generated from field: nooks.api.v1.RequestStatus status = 1;
+   */
+  status: RequestStatus;
+
+  /**
+   * Carried back so the Visitor does not retype them. Empty unless approved.
+   *
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string email = 3;
+   */
+  email: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.GetJoinRequestResponse.
+ * Use `create(GetJoinRequestResponseSchema)` to create a new message.
+ */
+export const GetJoinRequestResponseSchema: GenMessage<GetJoinRequestResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_auth_service, 14);
+
+/**
+ * @generated from message nooks.api.v1.CompleteJoinRequest
+ */
+export type CompleteJoinRequest = Message<"nooks.api.v1.CompleteJoinRequest"> & {
+  /**
+   * @generated from field: string request_uid = 1;
+   */
+  requestUid: string;
+
+  /**
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string password = 3;
+   */
+  password: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.CompleteJoinRequest.
+ * Use `create(CompleteJoinRequestSchema)` to create a new message.
+ */
+export const CompleteJoinRequestSchema: GenMessage<CompleteJoinRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_auth_service, 15);
+
+/**
+ * @generated from message nooks.api.v1.CompleteJoinResponse
+ */
+export type CompleteJoinResponse = Message<"nooks.api.v1.CompleteJoinResponse"> & {
+  /**
+   * @generated from field: nooks.api.v1.Member member = 1;
+   */
+  member?: Member | undefined;
+};
+
+/**
+ * Describes the message nooks.api.v1.CompleteJoinResponse.
+ * Use `create(CompleteJoinResponseSchema)` to create a new message.
+ */
+export const CompleteJoinResponseSchema: GenMessage<CompleteJoinResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_auth_service, 16);
+
+/**
+ * @generated from message nooks.api.v1.RequestPasswordResetRequest
+ */
+export type RequestPasswordResetRequest = Message<"nooks.api.v1.RequestPasswordResetRequest"> & {
+  /**
+   * An email or a name — whatever the Member remembers.
+   *
+   * @generated from field: string email_or_name = 1;
+   */
+  emailOrName: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.RequestPasswordResetRequest.
+ * Use `create(RequestPasswordResetRequestSchema)` to create a new message.
+ */
+export const RequestPasswordResetRequestSchema: GenMessage<RequestPasswordResetRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_auth_service, 17);
+
+/**
+ * @generated from message nooks.api.v1.RequestPasswordResetResponse
+ */
+export type RequestPasswordResetResponse = Message<"nooks.api.v1.RequestPasswordResetResponse"> & {
+  /**
+   * @generated from field: string request_uid = 1;
+   */
+  requestUid: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.RequestPasswordResetResponse.
+ * Use `create(RequestPasswordResetResponseSchema)` to create a new message.
+ */
+export const RequestPasswordResetResponseSchema: GenMessage<RequestPasswordResetResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_auth_service, 18);
+
+/**
+ * @generated from message nooks.api.v1.GetResetRequestRequest
+ */
+export type GetResetRequestRequest = Message<"nooks.api.v1.GetResetRequestRequest"> & {
+  /**
+   * @generated from field: string request_uid = 1;
+   */
+  requestUid: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.GetResetRequestRequest.
+ * Use `create(GetResetRequestRequestSchema)` to create a new message.
+ */
+export const GetResetRequestRequestSchema: GenMessage<GetResetRequestRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_auth_service, 19);
+
+/**
+ * @generated from message nooks.api.v1.GetResetRequestResponse
+ */
+export type GetResetRequestResponse = Message<"nooks.api.v1.GetResetRequestResponse"> & {
+  /**
+   * @generated from field: nooks.api.v1.RequestStatus status = 1;
+   */
+  status: RequestStatus;
+};
+
+/**
+ * Describes the message nooks.api.v1.GetResetRequestResponse.
+ * Use `create(GetResetRequestResponseSchema)` to create a new message.
+ */
+export const GetResetRequestResponseSchema: GenMessage<GetResetRequestResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_auth_service, 20);
+
+/**
+ * @generated from message nooks.api.v1.CompletePasswordResetRequest
+ */
+export type CompletePasswordResetRequest = Message<"nooks.api.v1.CompletePasswordResetRequest"> & {
+  /**
+   * @generated from field: string request_uid = 1;
+   */
+  requestUid: string;
+
+  /**
+   * @generated from field: string new_password = 2;
+   */
+  newPassword: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.CompletePasswordResetRequest.
+ * Use `create(CompletePasswordResetRequestSchema)` to create a new message.
+ */
+export const CompletePasswordResetRequestSchema: GenMessage<CompletePasswordResetRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_auth_service, 21);
+
+/**
+ * @generated from message nooks.api.v1.CompletePasswordResetResponse
+ */
+export type CompletePasswordResetResponse = Message<"nooks.api.v1.CompletePasswordResetResponse"> & {
+  /**
+   * @generated from field: nooks.api.v1.Member member = 1;
+   */
+  member?: Member | undefined;
+};
+
+/**
+ * Describes the message nooks.api.v1.CompletePasswordResetResponse.
+ * Use `create(CompletePasswordResetResponseSchema)` to create a new message.
+ */
+export const CompletePasswordResetResponseSchema: GenMessage<CompletePasswordResetResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_auth_service, 22);
+
+/**
+ * RequestStatus is where a request has got to.
+ *
+ * @generated from enum nooks.api.v1.RequestStatus
+ */
+export enum RequestStatus {
+  /**
+   * @generated from enum value: REQUEST_STATUS_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: REQUEST_STATUS_PENDING = 1;
+   */
+  PENDING = 1,
+
+  /**
+   * @generated from enum value: REQUEST_STATUS_APPROVED = 2;
+   */
+  APPROVED = 2,
+
+  /**
+   * REQUEST_STATUS_IGNORED is never reported to the sender: ignoring is silent.
+   *
+   * @generated from enum value: REQUEST_STATUS_IGNORED = 3;
+   */
+  IGNORED = 3,
+}
+
+/**
+ * Describes the enum nooks.api.v1.RequestStatus.
+ */
+export const RequestStatusSchema: GenEnum<RequestStatus> = /*@__PURE__*/
+  enumDesc(file_nooks_api_v1_auth_service, 0);
+
+/**
  * Role is what a Member may do on this Instance.
  *
  * @generated from enum nooks.api.v1.Role
@@ -279,7 +561,7 @@ export enum Role {
  * Describes the enum nooks.api.v1.Role.
  */
 export const RoleSchema: GenEnum<Role> = /*@__PURE__*/
-  enumDesc(file_nooks_api_v1_auth_service, 0);
+  enumDesc(file_nooks_api_v1_auth_service, 1);
 
 /**
  * AuthService covers getting into a Nooks Instance: first run, signing in, signing
@@ -342,6 +624,70 @@ export const AuthService: GenService<{
     methodKind: "unary";
     input: typeof ReplacePasswordRequestSchema;
     output: typeof ReplacePasswordResponseSchema;
+  },
+  /**
+   * RequestJoin asks an Admin for an account. It is how a Visitor gets in when public
+   * signup is off, which is the default.
+   *
+   * @generated from rpc nooks.api.v1.AuthService.RequestJoin
+   */
+  requestJoin: {
+    methodKind: "unary";
+    input: typeof RequestJoinRequestSchema;
+    output: typeof RequestJoinResponseSchema;
+  },
+  /**
+   * GetJoinRequest reports whether an Admin has decided yet. The Visitor's browser
+   * remembers the request id and comes back to the same address.
+   *
+   * @generated from rpc nooks.api.v1.AuthService.GetJoinRequest
+   */
+  getJoinRequest: {
+    methodKind: "unary";
+    input: typeof GetJoinRequestRequestSchema;
+    output: typeof GetJoinRequestResponseSchema;
+  },
+  /**
+   * CompleteJoin turns an approved Join request into an account, once the Visitor
+   * chooses a password.
+   *
+   * @generated from rpc nooks.api.v1.AuthService.CompleteJoin
+   */
+  completeJoin: {
+    methodKind: "unary";
+    input: typeof CompleteJoinRequestSchema;
+    output: typeof CompleteJoinResponseSchema;
+  },
+  /**
+   * RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
+   * the Admin checks it is really them however they like, then approves.
+   *
+   * @generated from rpc nooks.api.v1.AuthService.RequestPasswordReset
+   */
+  requestPasswordReset: {
+    methodKind: "unary";
+    input: typeof RequestPasswordResetRequestSchema;
+    output: typeof RequestPasswordResetResponseSchema;
+  },
+  /**
+   * GetResetRequest reports whether an Admin has approved a reset yet.
+   *
+   * @generated from rpc nooks.api.v1.AuthService.GetResetRequest
+   */
+  getResetRequest: {
+    methodKind: "unary";
+    input: typeof GetResetRequestRequestSchema;
+    output: typeof GetResetRequestResponseSchema;
+  },
+  /**
+   * CompletePasswordReset sets a new password against an approved reset.
+   *
+   * @generated from rpc nooks.api.v1.AuthService.CompletePasswordReset
+   */
+  completePasswordReset: {
+    methodKind: "unary";
+    input: typeof CompletePasswordResetRequestSchema;
+    output: typeof CompletePasswordResetResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_nooks_api_v1_auth_service, 0);

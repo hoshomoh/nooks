@@ -86,9 +86,11 @@ func (s *sqlStore) CreateMember(ctx context.Context, params CreateMemberParams) 
 	}
 
 	if _, err := s.db.NewInsert().Model(row).Returning("*").Exec(ctx); err != nil {
-		if isUniqueViolation(err) {
+		if isUniqueViolationOn(err, "email") {
 			return Member{}, ErrEmailTaken
 		}
+		// Any other unique violation — a UID collision, say — is a bug rather than
+		// something the caller did, so it surfaces as itself.
 		return Member{}, fmt.Errorf("create member: %w", err)
 	}
 	return row.toMember()
@@ -185,14 +187,21 @@ func requireOneRow(result sql.Result, what string) error {
 	return nil
 }
 
-// isUniqueViolation reports whether an error is a unique-constraint failure. The two
-// drivers word it differently and neither exposes a portable code through
-// database/sql, so the text is matched.
-func isUniqueViolation(err error) bool {
+// isUniqueViolationOn reports whether an error is a unique-constraint failure naming
+// the given column.
+//
+// The column matters: mapping every unique violation onto one error told a caller
+// their email was taken when it was really a UID collision. Neither driver exposes a
+// portable constraint name through database/sql, so the message is matched — but both
+// name the column in it:
+//
+//	sqlite:   UNIQUE constraint failed: member.email
+//	postgres: duplicate key value violates unique constraint "member_email_key"
+func isUniqueViolationOn(err error, column string) bool {
 	if err == nil {
 		return false
 	}
 	text := strings.ToLower(err.Error())
-	return strings.Contains(text, "unique constraint") ||
-		strings.Contains(text, "duplicate key")
+	isUnique := strings.Contains(text, "unique constraint") || strings.Contains(text, "duplicate key")
+	return isUnique && strings.Contains(text, strings.ToLower(column))
 }

@@ -24,6 +24,37 @@ service AuthService {
   // ReplacePassword sets a new password for the signed-in Member. A Member who was
   // given a temporary password must call this before they can use Nooks.
   rpc ReplacePassword(ReplacePasswordRequest) returns (ReplacePasswordResponse);
+
+  // RequestJoin asks an Admin for an account. It is how a Visitor gets in when public
+  // signup is off, which is the default.
+  rpc RequestJoin(RequestJoinRequest) returns (RequestJoinResponse);
+
+  // GetJoinRequest reports whether an Admin has decided yet. The Visitor's browser
+  // remembers the request id and comes back to the same address.
+  rpc GetJoinRequest(GetJoinRequestRequest) returns (GetJoinRequestResponse);
+
+  // CompleteJoin turns an approved Join request into an account, once the Visitor
+  // chooses a password.
+  rpc CompleteJoin(CompleteJoinRequest) returns (CompleteJoinResponse);
+
+  // RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
+  // the Admin checks it is really them however they like, then approves.
+  rpc RequestPasswordReset(RequestPasswordResetRequest) returns (RequestPasswordResetResponse);
+
+  // GetResetRequest reports whether an Admin has approved a reset yet.
+  rpc GetResetRequest(GetResetRequestRequest) returns (GetResetRequestResponse);
+
+  // CompletePasswordReset sets a new password against an approved reset.
+  rpc CompletePasswordReset(CompletePasswordResetRequest) returns (CompletePasswordResetResponse);
+}
+
+// RequestStatus is where a request has got to.
+enum RequestStatus {
+  REQUEST_STATUS_UNSPECIFIED = 0;
+  REQUEST_STATUS_PENDING = 1;
+  REQUEST_STATUS_APPROVED = 2;
+  // REQUEST_STATUS_IGNORED is never reported to the sender: ignoring is silent.
+  REQUEST_STATUS_IGNORED = 3;
 }
 
 // Role is what a Member may do on this Instance.
@@ -96,5 +127,66 @@ message ReplacePasswordRequest {
 }
 
 message ReplacePasswordResponse {
+  Member member = 1;
+}
+
+message RequestJoinRequest {
+  string name = 1;
+  string email = 2;
+
+  // Anything the Visitor wants to add, e.g. "It's Til, from upstairs". Optional.
+  string message = 3;
+}
+
+message RequestJoinResponse {
+  // The identifier the Visitor's browser remembers so it can check back.
+  string request_uid = 1;
+}
+
+message GetJoinRequestRequest {
+  string request_uid = 1;
+}
+
+message GetJoinRequestResponse {
+  RequestStatus status = 1;
+
+  // Carried back so the Visitor does not retype them. Empty unless approved.
+  string name = 2;
+  string email = 3;
+}
+
+message CompleteJoinRequest {
+  string request_uid = 1;
+  string name = 2;
+  string password = 3;
+}
+
+message CompleteJoinResponse {
+  Member member = 1;
+}
+
+message RequestPasswordResetRequest {
+  // An email or a name — whatever the Member remembers.
+  string email_or_name = 1;
+}
+
+message RequestPasswordResetResponse {
+  string request_uid = 1;
+}
+
+message GetResetRequestRequest {
+  string request_uid = 1;
+}
+
+message GetResetRequestResponse {
+  RequestStatus status = 1;
+}
+
+message CompletePasswordResetRequest {
+  string request_uid = 1;
+  string new_password = 2;
+}
+
+message CompletePasswordResetResponse {
   Member member = 1;
 }

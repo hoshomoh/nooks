@@ -133,6 +133,21 @@ func (s *sqlStore) DecideJoinRequest(ctx context.Context, uid string, status Req
 	return requireOneRow(result, "pending join request")
 }
 
+// UseJoinRequest spends an approved request, so one approval creates one account. It
+// reports ErrNotFound if the request was never approved or has already been used.
+func (s *sqlStore) UseJoinRequest(ctx context.Context, uid string, at time.Time) error {
+	result, err := s.db.NewUpdate().
+		Model((*joinRequestModel)(nil)).
+		Set("status = ?", string(StatusIgnored)).
+		Set("decided_at = ?", formatTime(at)).
+		Where("uid = ? AND status = ?", uid, string(StatusApproved)).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("use join request: %w", err)
+	}
+	return requireOneRow(result, "approved join request")
+}
+
 // CreateResetRequest records a Member's request to replace a forgotten password.
 func (s *sqlStore) CreateResetRequest(ctx context.Context, uid string, memberID int64, at time.Time) (ResetRequest, error) {
 	row := &resetRequestModel{

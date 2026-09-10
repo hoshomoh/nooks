@@ -21,6 +21,60 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// RequestStatus is where a request has got to.
+type RequestStatus int32
+
+const (
+	RequestStatus_REQUEST_STATUS_UNSPECIFIED RequestStatus = 0
+	RequestStatus_REQUEST_STATUS_PENDING     RequestStatus = 1
+	RequestStatus_REQUEST_STATUS_APPROVED    RequestStatus = 2
+	// REQUEST_STATUS_IGNORED is never reported to the sender: ignoring is silent.
+	RequestStatus_REQUEST_STATUS_IGNORED RequestStatus = 3
+)
+
+// Enum value maps for RequestStatus.
+var (
+	RequestStatus_name = map[int32]string{
+		0: "REQUEST_STATUS_UNSPECIFIED",
+		1: "REQUEST_STATUS_PENDING",
+		2: "REQUEST_STATUS_APPROVED",
+		3: "REQUEST_STATUS_IGNORED",
+	}
+	RequestStatus_value = map[string]int32{
+		"REQUEST_STATUS_UNSPECIFIED": 0,
+		"REQUEST_STATUS_PENDING":     1,
+		"REQUEST_STATUS_APPROVED":    2,
+		"REQUEST_STATUS_IGNORED":     3,
+	}
+)
+
+func (x RequestStatus) Enum() *RequestStatus {
+	p := new(RequestStatus)
+	*p = x
+	return p
+}
+
+func (x RequestStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RequestStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_nooks_api_v1_auth_service_proto_enumTypes[0].Descriptor()
+}
+
+func (RequestStatus) Type() protoreflect.EnumType {
+	return &file_nooks_api_v1_auth_service_proto_enumTypes[0]
+}
+
+func (x RequestStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use RequestStatus.Descriptor instead.
+func (RequestStatus) EnumDescriptor() ([]byte, []int) {
+	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{0}
+}
+
 // Role is what a Member may do on this Instance.
 type Role int32
 
@@ -57,11 +111,11 @@ func (x Role) String() string {
 }
 
 func (Role) Descriptor() protoreflect.EnumDescriptor {
-	return file_nooks_api_v1_auth_service_proto_enumTypes[0].Descriptor()
+	return file_nooks_api_v1_auth_service_proto_enumTypes[1].Descriptor()
 }
 
 func (Role) Type() protoreflect.EnumType {
-	return &file_nooks_api_v1_auth_service_proto_enumTypes[0]
+	return &file_nooks_api_v1_auth_service_proto_enumTypes[1]
 }
 
 func (x Role) Number() protoreflect.EnumNumber {
@@ -70,7 +124,7 @@ func (x Role) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Role.Descriptor instead.
 func (Role) EnumDescriptor() ([]byte, []int) {
-	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{0}
+	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{1}
 }
 
 // Member is a person with an account on this Instance, as seen over the wire. It
@@ -616,6 +670,594 @@ func (x *ReplacePasswordResponse) GetMember() *Member {
 	return nil
 }
 
+type RequestJoinRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Email string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	// Anything the Visitor wants to add, e.g. "It's Til, from upstairs". Optional.
+	Message       string `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RequestJoinRequest) Reset() {
+	*x = RequestJoinRequest{}
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RequestJoinRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RequestJoinRequest) ProtoMessage() {}
+
+func (x *RequestJoinRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RequestJoinRequest.ProtoReflect.Descriptor instead.
+func (*RequestJoinRequest) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *RequestJoinRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *RequestJoinRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *RequestJoinRequest) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type RequestJoinResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The identifier the Visitor's browser remembers so it can check back.
+	RequestUid    string `protobuf:"bytes,1,opt,name=request_uid,json=requestUid,proto3" json:"request_uid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RequestJoinResponse) Reset() {
+	*x = RequestJoinResponse{}
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RequestJoinResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RequestJoinResponse) ProtoMessage() {}
+
+func (x *RequestJoinResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RequestJoinResponse.ProtoReflect.Descriptor instead.
+func (*RequestJoinResponse) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *RequestJoinResponse) GetRequestUid() string {
+	if x != nil {
+		return x.RequestUid
+	}
+	return ""
+}
+
+type GetJoinRequestRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RequestUid    string                 `protobuf:"bytes,1,opt,name=request_uid,json=requestUid,proto3" json:"request_uid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetJoinRequestRequest) Reset() {
+	*x = GetJoinRequestRequest{}
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetJoinRequestRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetJoinRequestRequest) ProtoMessage() {}
+
+func (x *GetJoinRequestRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetJoinRequestRequest.ProtoReflect.Descriptor instead.
+func (*GetJoinRequestRequest) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetJoinRequestRequest) GetRequestUid() string {
+	if x != nil {
+		return x.RequestUid
+	}
+	return ""
+}
+
+type GetJoinRequestResponse struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Status RequestStatus          `protobuf:"varint,1,opt,name=status,proto3,enum=nooks.api.v1.RequestStatus" json:"status,omitempty"`
+	// Carried back so the Visitor does not retype them. Empty unless approved.
+	Name          string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Email         string `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetJoinRequestResponse) Reset() {
+	*x = GetJoinRequestResponse{}
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetJoinRequestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetJoinRequestResponse) ProtoMessage() {}
+
+func (x *GetJoinRequestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetJoinRequestResponse.ProtoReflect.Descriptor instead.
+func (*GetJoinRequestResponse) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetJoinRequestResponse) GetStatus() RequestStatus {
+	if x != nil {
+		return x.Status
+	}
+	return RequestStatus_REQUEST_STATUS_UNSPECIFIED
+}
+
+func (x *GetJoinRequestResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *GetJoinRequestResponse) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+type CompleteJoinRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RequestUid    string                 `protobuf:"bytes,1,opt,name=request_uid,json=requestUid,proto3" json:"request_uid,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CompleteJoinRequest) Reset() {
+	*x = CompleteJoinRequest{}
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompleteJoinRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompleteJoinRequest) ProtoMessage() {}
+
+func (x *CompleteJoinRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompleteJoinRequest.ProtoReflect.Descriptor instead.
+func (*CompleteJoinRequest) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *CompleteJoinRequest) GetRequestUid() string {
+	if x != nil {
+		return x.RequestUid
+	}
+	return ""
+}
+
+func (x *CompleteJoinRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CompleteJoinRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type CompleteJoinResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Member        *Member                `protobuf:"bytes,1,opt,name=member,proto3" json:"member,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CompleteJoinResponse) Reset() {
+	*x = CompleteJoinResponse{}
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompleteJoinResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompleteJoinResponse) ProtoMessage() {}
+
+func (x *CompleteJoinResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompleteJoinResponse.ProtoReflect.Descriptor instead.
+func (*CompleteJoinResponse) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *CompleteJoinResponse) GetMember() *Member {
+	if x != nil {
+		return x.Member
+	}
+	return nil
+}
+
+type RequestPasswordResetRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// An email or a name — whatever the Member remembers.
+	EmailOrName   string `protobuf:"bytes,1,opt,name=email_or_name,json=emailOrName,proto3" json:"email_or_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RequestPasswordResetRequest) Reset() {
+	*x = RequestPasswordResetRequest{}
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RequestPasswordResetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RequestPasswordResetRequest) ProtoMessage() {}
+
+func (x *RequestPasswordResetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RequestPasswordResetRequest.ProtoReflect.Descriptor instead.
+func (*RequestPasswordResetRequest) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *RequestPasswordResetRequest) GetEmailOrName() string {
+	if x != nil {
+		return x.EmailOrName
+	}
+	return ""
+}
+
+type RequestPasswordResetResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RequestUid    string                 `protobuf:"bytes,1,opt,name=request_uid,json=requestUid,proto3" json:"request_uid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RequestPasswordResetResponse) Reset() {
+	*x = RequestPasswordResetResponse{}
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RequestPasswordResetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RequestPasswordResetResponse) ProtoMessage() {}
+
+func (x *RequestPasswordResetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RequestPasswordResetResponse.ProtoReflect.Descriptor instead.
+func (*RequestPasswordResetResponse) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *RequestPasswordResetResponse) GetRequestUid() string {
+	if x != nil {
+		return x.RequestUid
+	}
+	return ""
+}
+
+type GetResetRequestRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RequestUid    string                 `protobuf:"bytes,1,opt,name=request_uid,json=requestUid,proto3" json:"request_uid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetResetRequestRequest) Reset() {
+	*x = GetResetRequestRequest{}
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetResetRequestRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetResetRequestRequest) ProtoMessage() {}
+
+func (x *GetResetRequestRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetResetRequestRequest.ProtoReflect.Descriptor instead.
+func (*GetResetRequestRequest) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *GetResetRequestRequest) GetRequestUid() string {
+	if x != nil {
+		return x.RequestUid
+	}
+	return ""
+}
+
+type GetResetRequestResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        RequestStatus          `protobuf:"varint,1,opt,name=status,proto3,enum=nooks.api.v1.RequestStatus" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetResetRequestResponse) Reset() {
+	*x = GetResetRequestResponse{}
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetResetRequestResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetResetRequestResponse) ProtoMessage() {}
+
+func (x *GetResetRequestResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetResetRequestResponse.ProtoReflect.Descriptor instead.
+func (*GetResetRequestResponse) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetResetRequestResponse) GetStatus() RequestStatus {
+	if x != nil {
+		return x.Status
+	}
+	return RequestStatus_REQUEST_STATUS_UNSPECIFIED
+}
+
+type CompletePasswordResetRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RequestUid    string                 `protobuf:"bytes,1,opt,name=request_uid,json=requestUid,proto3" json:"request_uid,omitempty"`
+	NewPassword   string                 `protobuf:"bytes,2,opt,name=new_password,json=newPassword,proto3" json:"new_password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CompletePasswordResetRequest) Reset() {
+	*x = CompletePasswordResetRequest{}
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompletePasswordResetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompletePasswordResetRequest) ProtoMessage() {}
+
+func (x *CompletePasswordResetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompletePasswordResetRequest.ProtoReflect.Descriptor instead.
+func (*CompletePasswordResetRequest) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *CompletePasswordResetRequest) GetRequestUid() string {
+	if x != nil {
+		return x.RequestUid
+	}
+	return ""
+}
+
+func (x *CompletePasswordResetRequest) GetNewPassword() string {
+	if x != nil {
+		return x.NewPassword
+	}
+	return ""
+}
+
+type CompletePasswordResetResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Member        *Member                `protobuf:"bytes,1,opt,name=member,proto3" json:"member,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CompletePasswordResetResponse) Reset() {
+	*x = CompletePasswordResetResponse{}
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompletePasswordResetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompletePasswordResetResponse) ProtoMessage() {}
+
+func (x *CompletePasswordResetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_auth_service_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompletePasswordResetResponse.ProtoReflect.Descriptor instead.
+func (*CompletePasswordResetResponse) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_auth_service_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *CompletePasswordResetResponse) GetMember() *Member {
+	if x != nil {
+		return x.Member
+	}
+	return nil
+}
+
 var File_nooks_api_v1_auth_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_auth_service_proto_rawDesc = "" +
@@ -648,18 +1290,66 @@ const file_nooks_api_v1_auth_service_proto_rawDesc = "" +
 	"\x10current_password\x18\x01 \x01(\tR\x0fcurrentPassword\x12!\n" +
 	"\fnew_password\x18\x02 \x01(\tR\vnewPassword\"G\n" +
 	"\x17ReplacePasswordResponse\x12,\n" +
-	"\x06member\x18\x01 \x01(\v2\x14.nooks.api.v1.MemberR\x06member*=\n" +
+	"\x06member\x18\x01 \x01(\v2\x14.nooks.api.v1.MemberR\x06member\"X\n" +
+	"\x12RequestJoinRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\"6\n" +
+	"\x13RequestJoinResponse\x12\x1f\n" +
+	"\vrequest_uid\x18\x01 \x01(\tR\n" +
+	"requestUid\"8\n" +
+	"\x15GetJoinRequestRequest\x12\x1f\n" +
+	"\vrequest_uid\x18\x01 \x01(\tR\n" +
+	"requestUid\"w\n" +
+	"\x16GetJoinRequestResponse\x123\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x1b.nooks.api.v1.RequestStatusR\x06status\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\"f\n" +
+	"\x13CompleteJoinRequest\x12\x1f\n" +
+	"\vrequest_uid\x18\x01 \x01(\tR\n" +
+	"requestUid\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\"D\n" +
+	"\x14CompleteJoinResponse\x12,\n" +
+	"\x06member\x18\x01 \x01(\v2\x14.nooks.api.v1.MemberR\x06member\"A\n" +
+	"\x1bRequestPasswordResetRequest\x12\"\n" +
+	"\remail_or_name\x18\x01 \x01(\tR\vemailOrName\"?\n" +
+	"\x1cRequestPasswordResetResponse\x12\x1f\n" +
+	"\vrequest_uid\x18\x01 \x01(\tR\n" +
+	"requestUid\"9\n" +
+	"\x16GetResetRequestRequest\x12\x1f\n" +
+	"\vrequest_uid\x18\x01 \x01(\tR\n" +
+	"requestUid\"N\n" +
+	"\x17GetResetRequestResponse\x123\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x1b.nooks.api.v1.RequestStatusR\x06status\"b\n" +
+	"\x1cCompletePasswordResetRequest\x12\x1f\n" +
+	"\vrequest_uid\x18\x01 \x01(\tR\n" +
+	"requestUid\x12!\n" +
+	"\fnew_password\x18\x02 \x01(\tR\vnewPassword\"M\n" +
+	"\x1dCompletePasswordResetResponse\x12,\n" +
+	"\x06member\x18\x01 \x01(\v2\x14.nooks.api.v1.MemberR\x06member*\x84\x01\n" +
+	"\rRequestStatus\x12\x1e\n" +
+	"\x1aREQUEST_STATUS_UNSPECIFIED\x10\x00\x12\x1a\n" +
+	"\x16REQUEST_STATUS_PENDING\x10\x01\x12\x1b\n" +
+	"\x17REQUEST_STATUS_APPROVED\x10\x02\x12\x1a\n" +
+	"\x16REQUEST_STATUS_IGNORED\x10\x03*=\n" +
 	"\x04Role\x12\x14\n" +
 	"\x10ROLE_UNSPECIFIED\x10\x00\x12\x0e\n" +
 	"\n" +
 	"ROLE_ADMIN\x10\x01\x12\x0f\n" +
-	"\vROLE_MEMBER\x10\x022\xb7\x03\n" +
+	"\vROLE_MEMBER\x10\x022\x80\b\n" +
 	"\vAuthService\x12X\n" +
 	"\rCompleteSetup\x12\".nooks.api.v1.CompleteSetupRequest\x1a#.nooks.api.v1.CompleteSetupResponse\x12C\n" +
 	"\x06SignIn\x12\x1b.nooks.api.v1.SignInRequest\x1a\x1c.nooks.api.v1.SignInResponse\x12F\n" +
 	"\aSignOut\x12\x1c.nooks.api.v1.SignOutRequest\x1a\x1d.nooks.api.v1.SignOutResponse\x12a\n" +
 	"\x10GetCurrentMember\x12%.nooks.api.v1.GetCurrentMemberRequest\x1a&.nooks.api.v1.GetCurrentMemberResponse\x12^\n" +
-	"\x0fReplacePassword\x12$.nooks.api.v1.ReplacePasswordRequest\x1a%.nooks.api.v1.ReplacePasswordResponseB\xae\x01\n" +
+	"\x0fReplacePassword\x12$.nooks.api.v1.ReplacePasswordRequest\x1a%.nooks.api.v1.ReplacePasswordResponse\x12R\n" +
+	"\vRequestJoin\x12 .nooks.api.v1.RequestJoinRequest\x1a!.nooks.api.v1.RequestJoinResponse\x12[\n" +
+	"\x0eGetJoinRequest\x12#.nooks.api.v1.GetJoinRequestRequest\x1a$.nooks.api.v1.GetJoinRequestResponse\x12U\n" +
+	"\fCompleteJoin\x12!.nooks.api.v1.CompleteJoinRequest\x1a\".nooks.api.v1.CompleteJoinResponse\x12m\n" +
+	"\x14RequestPasswordReset\x12).nooks.api.v1.RequestPasswordResetRequest\x1a*.nooks.api.v1.RequestPasswordResetResponse\x12^\n" +
+	"\x0fGetResetRequest\x12$.nooks.api.v1.GetResetRequestRequest\x1a%.nooks.api.v1.GetResetRequestResponse\x12p\n" +
+	"\x15CompletePasswordReset\x12*.nooks.api.v1.CompletePasswordResetRequest\x1a+.nooks.api.v1.CompletePasswordResetResponseB\xae\x01\n" +
 	"\x10com.nooks.api.v1B\x10AuthServiceProtoP\x01Z6github.com/hoshomoh/nooks/proto/gen/nooks/api/v1;apiv1\xa2\x02\x03NAX\xaa\x02\fNooks.Api.V1\xca\x02\fNooks\\Api\\V1\xe2\x02\x18Nooks\\Api\\V1\\GPBMetadata\xea\x02\x0eNooks::Api::V1b\x06proto3"
 
 var (
@@ -674,43 +1364,72 @@ func file_nooks_api_v1_auth_service_proto_rawDescGZIP() []byte {
 	return file_nooks_api_v1_auth_service_proto_rawDescData
 }
 
-var file_nooks_api_v1_auth_service_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_nooks_api_v1_auth_service_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_nooks_api_v1_auth_service_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_nooks_api_v1_auth_service_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_nooks_api_v1_auth_service_proto_goTypes = []any{
-	(Role)(0),                        // 0: nooks.api.v1.Role
-	(*Member)(nil),                   // 1: nooks.api.v1.Member
-	(*CompleteSetupRequest)(nil),     // 2: nooks.api.v1.CompleteSetupRequest
-	(*CompleteSetupResponse)(nil),    // 3: nooks.api.v1.CompleteSetupResponse
-	(*SignInRequest)(nil),            // 4: nooks.api.v1.SignInRequest
-	(*SignInResponse)(nil),           // 5: nooks.api.v1.SignInResponse
-	(*SignOutRequest)(nil),           // 6: nooks.api.v1.SignOutRequest
-	(*SignOutResponse)(nil),          // 7: nooks.api.v1.SignOutResponse
-	(*GetCurrentMemberRequest)(nil),  // 8: nooks.api.v1.GetCurrentMemberRequest
-	(*GetCurrentMemberResponse)(nil), // 9: nooks.api.v1.GetCurrentMemberResponse
-	(*ReplacePasswordRequest)(nil),   // 10: nooks.api.v1.ReplacePasswordRequest
-	(*ReplacePasswordResponse)(nil),  // 11: nooks.api.v1.ReplacePasswordResponse
+	(RequestStatus)(0),                    // 0: nooks.api.v1.RequestStatus
+	(Role)(0),                             // 1: nooks.api.v1.Role
+	(*Member)(nil),                        // 2: nooks.api.v1.Member
+	(*CompleteSetupRequest)(nil),          // 3: nooks.api.v1.CompleteSetupRequest
+	(*CompleteSetupResponse)(nil),         // 4: nooks.api.v1.CompleteSetupResponse
+	(*SignInRequest)(nil),                 // 5: nooks.api.v1.SignInRequest
+	(*SignInResponse)(nil),                // 6: nooks.api.v1.SignInResponse
+	(*SignOutRequest)(nil),                // 7: nooks.api.v1.SignOutRequest
+	(*SignOutResponse)(nil),               // 8: nooks.api.v1.SignOutResponse
+	(*GetCurrentMemberRequest)(nil),       // 9: nooks.api.v1.GetCurrentMemberRequest
+	(*GetCurrentMemberResponse)(nil),      // 10: nooks.api.v1.GetCurrentMemberResponse
+	(*ReplacePasswordRequest)(nil),        // 11: nooks.api.v1.ReplacePasswordRequest
+	(*ReplacePasswordResponse)(nil),       // 12: nooks.api.v1.ReplacePasswordResponse
+	(*RequestJoinRequest)(nil),            // 13: nooks.api.v1.RequestJoinRequest
+	(*RequestJoinResponse)(nil),           // 14: nooks.api.v1.RequestJoinResponse
+	(*GetJoinRequestRequest)(nil),         // 15: nooks.api.v1.GetJoinRequestRequest
+	(*GetJoinRequestResponse)(nil),        // 16: nooks.api.v1.GetJoinRequestResponse
+	(*CompleteJoinRequest)(nil),           // 17: nooks.api.v1.CompleteJoinRequest
+	(*CompleteJoinResponse)(nil),          // 18: nooks.api.v1.CompleteJoinResponse
+	(*RequestPasswordResetRequest)(nil),   // 19: nooks.api.v1.RequestPasswordResetRequest
+	(*RequestPasswordResetResponse)(nil),  // 20: nooks.api.v1.RequestPasswordResetResponse
+	(*GetResetRequestRequest)(nil),        // 21: nooks.api.v1.GetResetRequestRequest
+	(*GetResetRequestResponse)(nil),       // 22: nooks.api.v1.GetResetRequestResponse
+	(*CompletePasswordResetRequest)(nil),  // 23: nooks.api.v1.CompletePasswordResetRequest
+	(*CompletePasswordResetResponse)(nil), // 24: nooks.api.v1.CompletePasswordResetResponse
 }
 var file_nooks_api_v1_auth_service_proto_depIdxs = []int32{
-	0,  // 0: nooks.api.v1.Member.role:type_name -> nooks.api.v1.Role
-	1,  // 1: nooks.api.v1.CompleteSetupResponse.member:type_name -> nooks.api.v1.Member
-	1,  // 2: nooks.api.v1.SignInResponse.member:type_name -> nooks.api.v1.Member
-	1,  // 3: nooks.api.v1.GetCurrentMemberResponse.member:type_name -> nooks.api.v1.Member
-	1,  // 4: nooks.api.v1.ReplacePasswordResponse.member:type_name -> nooks.api.v1.Member
-	2,  // 5: nooks.api.v1.AuthService.CompleteSetup:input_type -> nooks.api.v1.CompleteSetupRequest
-	4,  // 6: nooks.api.v1.AuthService.SignIn:input_type -> nooks.api.v1.SignInRequest
-	6,  // 7: nooks.api.v1.AuthService.SignOut:input_type -> nooks.api.v1.SignOutRequest
-	8,  // 8: nooks.api.v1.AuthService.GetCurrentMember:input_type -> nooks.api.v1.GetCurrentMemberRequest
-	10, // 9: nooks.api.v1.AuthService.ReplacePassword:input_type -> nooks.api.v1.ReplacePasswordRequest
-	3,  // 10: nooks.api.v1.AuthService.CompleteSetup:output_type -> nooks.api.v1.CompleteSetupResponse
-	5,  // 11: nooks.api.v1.AuthService.SignIn:output_type -> nooks.api.v1.SignInResponse
-	7,  // 12: nooks.api.v1.AuthService.SignOut:output_type -> nooks.api.v1.SignOutResponse
-	9,  // 13: nooks.api.v1.AuthService.GetCurrentMember:output_type -> nooks.api.v1.GetCurrentMemberResponse
-	11, // 14: nooks.api.v1.AuthService.ReplacePassword:output_type -> nooks.api.v1.ReplacePasswordResponse
-	10, // [10:15] is the sub-list for method output_type
-	5,  // [5:10] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	1,  // 0: nooks.api.v1.Member.role:type_name -> nooks.api.v1.Role
+	2,  // 1: nooks.api.v1.CompleteSetupResponse.member:type_name -> nooks.api.v1.Member
+	2,  // 2: nooks.api.v1.SignInResponse.member:type_name -> nooks.api.v1.Member
+	2,  // 3: nooks.api.v1.GetCurrentMemberResponse.member:type_name -> nooks.api.v1.Member
+	2,  // 4: nooks.api.v1.ReplacePasswordResponse.member:type_name -> nooks.api.v1.Member
+	0,  // 5: nooks.api.v1.GetJoinRequestResponse.status:type_name -> nooks.api.v1.RequestStatus
+	2,  // 6: nooks.api.v1.CompleteJoinResponse.member:type_name -> nooks.api.v1.Member
+	0,  // 7: nooks.api.v1.GetResetRequestResponse.status:type_name -> nooks.api.v1.RequestStatus
+	2,  // 8: nooks.api.v1.CompletePasswordResetResponse.member:type_name -> nooks.api.v1.Member
+	3,  // 9: nooks.api.v1.AuthService.CompleteSetup:input_type -> nooks.api.v1.CompleteSetupRequest
+	5,  // 10: nooks.api.v1.AuthService.SignIn:input_type -> nooks.api.v1.SignInRequest
+	7,  // 11: nooks.api.v1.AuthService.SignOut:input_type -> nooks.api.v1.SignOutRequest
+	9,  // 12: nooks.api.v1.AuthService.GetCurrentMember:input_type -> nooks.api.v1.GetCurrentMemberRequest
+	11, // 13: nooks.api.v1.AuthService.ReplacePassword:input_type -> nooks.api.v1.ReplacePasswordRequest
+	13, // 14: nooks.api.v1.AuthService.RequestJoin:input_type -> nooks.api.v1.RequestJoinRequest
+	15, // 15: nooks.api.v1.AuthService.GetJoinRequest:input_type -> nooks.api.v1.GetJoinRequestRequest
+	17, // 16: nooks.api.v1.AuthService.CompleteJoin:input_type -> nooks.api.v1.CompleteJoinRequest
+	19, // 17: nooks.api.v1.AuthService.RequestPasswordReset:input_type -> nooks.api.v1.RequestPasswordResetRequest
+	21, // 18: nooks.api.v1.AuthService.GetResetRequest:input_type -> nooks.api.v1.GetResetRequestRequest
+	23, // 19: nooks.api.v1.AuthService.CompletePasswordReset:input_type -> nooks.api.v1.CompletePasswordResetRequest
+	4,  // 20: nooks.api.v1.AuthService.CompleteSetup:output_type -> nooks.api.v1.CompleteSetupResponse
+	6,  // 21: nooks.api.v1.AuthService.SignIn:output_type -> nooks.api.v1.SignInResponse
+	8,  // 22: nooks.api.v1.AuthService.SignOut:output_type -> nooks.api.v1.SignOutResponse
+	10, // 23: nooks.api.v1.AuthService.GetCurrentMember:output_type -> nooks.api.v1.GetCurrentMemberResponse
+	12, // 24: nooks.api.v1.AuthService.ReplacePassword:output_type -> nooks.api.v1.ReplacePasswordResponse
+	14, // 25: nooks.api.v1.AuthService.RequestJoin:output_type -> nooks.api.v1.RequestJoinResponse
+	16, // 26: nooks.api.v1.AuthService.GetJoinRequest:output_type -> nooks.api.v1.GetJoinRequestResponse
+	18, // 27: nooks.api.v1.AuthService.CompleteJoin:output_type -> nooks.api.v1.CompleteJoinResponse
+	20, // 28: nooks.api.v1.AuthService.RequestPasswordReset:output_type -> nooks.api.v1.RequestPasswordResetResponse
+	22, // 29: nooks.api.v1.AuthService.GetResetRequest:output_type -> nooks.api.v1.GetResetRequestResponse
+	24, // 30: nooks.api.v1.AuthService.CompletePasswordReset:output_type -> nooks.api.v1.CompletePasswordResetResponse
+	20, // [20:31] is the sub-list for method output_type
+	9,  // [9:20] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_nooks_api_v1_auth_service_proto_init() }
@@ -723,8 +1442,8 @@ func file_nooks_api_v1_auth_service_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_nooks_api_v1_auth_service_proto_rawDesc), len(file_nooks_api_v1_auth_service_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   11,
+			NumEnums:      2,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

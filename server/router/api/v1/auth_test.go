@@ -34,9 +34,17 @@ func newAuthService(t *testing.T) (*AuthService, store.Store) {
 	// Tokens are numbered rather than fixed: signing in twice must produce two
 	// sessions, which a constant token would collide on.
 	issued := 0
+	uids := 0
 	svc := NewAuthService(s, AuthServiceOptions{
-		Now:    func() time.Time { return testClock },
-		NewUID: func() (string, error) { return "mem_test", nil },
+		Now: func() time.Time { return testClock },
+		NewUID: func() (string, error) {
+			uids++
+			if uids == 1 {
+				// The first Member is the one tests look up by name.
+				return "mem_test", nil
+			}
+			return fmt.Sprintf("uid-%d", uids), nil
+		},
 		NewToken: func() (string, string, error) {
 			issued++
 			token := fmt.Sprintf("token-%d", issued)

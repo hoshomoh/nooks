@@ -85,6 +85,9 @@ type Store interface {
 	// DecideJoinRequest records an Admin's decision on a pending request.
 	DecideJoinRequest(ctx context.Context, uid string, status RequestStatus, at time.Time) error
 
+	// UseJoinRequest spends an approved request, so one approval creates one account.
+	UseJoinRequest(ctx context.Context, uid string, at time.Time) error
+
 	// CreateResetRequest records a Member's request to replace a forgotten password.
 	CreateResetRequest(ctx context.Context, uid string, memberID int64, at time.Time) (ResetRequest, error)
 

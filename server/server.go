@@ -10,8 +10,11 @@ import (
 	"net/http"
 	"time"
 
+	"connectrpc.com/connect"
+
 	"github.com/hoshomoh/nooks/internal/profile"
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1/apiv1connect"
+	"github.com/hoshomoh/nooks/server/auth"
 	v1 "github.com/hoshomoh/nooks/server/router/api/v1"
 	"github.com/hoshomoh/nooks/server/router/frontend"
 	"github.com/hoshomoh/nooks/store"
@@ -36,8 +39,16 @@ func New(cfg profile.Config, s store.Store, log *slog.Logger) (*Server, error) {
 		return nil, errors.New("server: logger is required")
 	}
 
+	// Every request passes through the resolver, which attaches the signed-in Member
+	// when there is one. It never rejects: first run, sign-in and the Public list are
+	// all legitimately anonymous.
+	interceptors := connect.WithInterceptors(auth.NewResolver(s, nil).Interceptor())
+
+	authService := v1.NewAuthService(s, v1.AuthServiceOptions{Secure: cfg.SecureCookies})
+
 	mux := http.NewServeMux()
-	mux.Handle(apiv1.NewInstanceServiceHandler(v1.NewInstanceService(s)))
+	mux.Handle(apiv1.NewInstanceServiceHandler(v1.NewInstanceService(s), interceptors))
+	mux.Handle(apiv1.NewAuthServiceHandler(authService, interceptors))
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("ok"))

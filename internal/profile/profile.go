@@ -45,6 +45,11 @@ type Config struct {
 	DSN string
 	// Mode is prod or dev.
 	Mode Mode
+	// SecureCookies marks session cookies Secure, so a browser only sends them over
+	// HTTPS. Set it when the Instance is served over TLS, directly or behind a proxy.
+	// It cannot be detected here: behind a reverse proxy the server itself sees plain
+	// HTTP even though the Member does not.
+	SecureCookies bool
 }
 
 // ErrHelp reports that the caller asked for usage rather than a running server.
@@ -70,6 +75,8 @@ func Parse(args []string, env func(string) string, out io.Writer) (Config, error
 	driver := set.String("driver", envOr(env, "NOOKS_DRIVER", string(DriverSQLite)), "database driver: sqlite or postgres")
 	dsn := set.String("dsn", envOr(env, "NOOKS_DSN", ""), "postgres connection string")
 	mode := set.String("mode", envOr(env, "NOOKS_MODE", string(ModeProd)), "prod or dev")
+	secure := set.Bool("secure-cookies", envOr(env, "NOOKS_SECURE_COOKIES", "") == "true",
+		"mark session cookies Secure; set this when the instance is served over HTTPS")
 
 	if err := set.Parse(args); err != nil {
 		return Config{}, err
@@ -81,6 +88,8 @@ func Parse(args []string, env func(string) string, out io.Writer) (Config, error
 		Driver: Driver(strings.TrimSpace(*driver)),
 		DSN:    strings.TrimSpace(*dsn),
 		Mode:   Mode(strings.TrimSpace(*mode)),
+
+		SecureCookies: *secure,
 	}
 	if err := cfg.validate(); err != nil {
 		return Config{}, err

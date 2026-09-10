@@ -106,6 +106,12 @@ control: `#B4B4AE` light, `#5A5A55` dark.
 **Theme selection.** Light / Dark / System, a three-segment control in Settings → Appearance. System is
 the default, and follows the machine live rather than being read once at load.
 
+**Language.** A select beside it in the same Appearance section, listing each language by its own
+name, with a note saying which are translated so far. It sets the words, how dates read, and how
+numbers and money are written — one choice, not three. An Admin also sets an Instance **default
+language** under Instance settings, used for public lists, printed sheets, and anyone who has not
+chosen their own.
+
 ---
 
 ## 3. Type
@@ -223,7 +229,39 @@ border-radius: 6px;
   indented 10px, in the label column, with `+N lines` after it.
 
 **Add row.** Same grid, `border-top: 1px solid var(--hair)`, a `+` in the checkbox column, placeholder
-in `--muted-foreground`, and a mono `↵` keycap at the right. Enter adds and keeps focus for the next one.
+in `--muted-foreground`, then the date control and a mono `↵` keycap at the right. Enter adds and
+keeps focus for the next one, because the common case is adding several.
+
+Nothing but a name is needed: the row must accept `Milk` and Enter.
+
+*Chips.* A quantity or a date written into the sentence is lifted out of it and drawn where the words
+were — the sentence and its chips are one field, not a tray beside it. A chip is radius 4 on
+`--shared-bg`, the value in `--shared` (mono for a quantity, not for a date), and the kind — `quantity`,
+`due` — after it in `--muted-foreground` at 10.5.
+
+*What is recognised.* A quantity is a number with an optional unit (`2`, `1kg`, `250 g`), normalised
+to `value unit`. A date is a near-day word, a weekday, or a written date (`tomorrow`, `sat`, `30/8`,
+`30 aug`), day first, a bare weekday meaning the **next** one with today excluded. At most one of
+each. Only the trailing words are read, and the scan stops at the first word it does not recognise —
+which is what keeps `Call 2 plumbers` a name.
+
+*When.* A word becomes a chip only once a space or Enter follows it, never mid-word, so `1` does not
+become a quantity while `1kg` is still being typed. Backspace immediately after a chip returns it to
+text. A quoted token is never read. **When a token is ambiguous, leave it as text** — a wrong silent
+chip is worse than no chip, because the Member has to notice it before they can fix it.
+
+Adding a language translates the near-day words and the units. Weekday and month names come from the
+language's own calendar, so nobody retypes a calendar into a locale file.
+
+*Date control.* Always in the row, whether or not a date was typed — parsing is the shortcut, not the
+requirement. Three appearances: **empty**, the calendar glyph and "Add a date" in
+`--secondary-foreground` on a 1px `--border`; **the view's default**, the word the view supplies
+(Today on Today, Tomorrow on Upcoming), which applies unless the Member clears or overrides it; and
+**set**, the resolved date in `--shared` on `--shared-bg`, borderless. It and the typed date are one
+value, and the last action wins.
+
+Quantity has no permanent control — only the date earned one, because a date is the one field whose
+absence changes where the Item appears. Notes, assignment and moving between Lists are all sheet-level.
 
 ---
 
@@ -290,7 +328,9 @@ never been used greys its name and its last column, **not the whole row**.
 single full-width column.
 
 **Settings row** — `190px 1fr` grid, 24px gap, min-height 48px, split by 1px `--hair`. Label 14
-with a 12.5 `--muted-foreground` explanation under it; control right-aligned.
+with a 12.5 `--muted-foreground` explanation under it; control right-aligned. The controls a row
+carries are an input, a segment, a toggle, a select, or a button with a note to its left. A **select**
+is 280 × 36, radius 7, 1px `--border`, the value at 14.5 with a chevron in `--control` at the right.
 
 **Empty state** — 1px **dashed** `--border`, radius 8, padding `30px 26px`, **left-aligned, never
 centred**. 17 / 500 statement of fact, then one 14 / 1.6 sentence capped at 440px saying what the thing

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "release": "vite build --outDir ../server/router/frontend/dist --emptyOutDir",
+    "release": "vite build --outDir ../../server/router/frontend/dist --emptyOutDir",
     "lint": "tsc --noEmit && oxlint",
     "lint:fix": "oxlint --fix",
     "preview": "vite preview"
@@ -14,7 +14,8 @@
     "@base-ui/react": "^1.8.0",
     "@connectrpc/connect": "^2.1.1",
     "@connectrpc/connect-web": "^2.1.1",
-    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/public-sans": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
     "@nooks/api": "workspace:*",
     "@tanstack/react-query": "^5.100.9",
     "@tanstack/react-router": "^1.135.2",

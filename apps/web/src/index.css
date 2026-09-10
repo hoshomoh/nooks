@@ -1,130 +1,210 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
+
+/* Self-hosted: a Nooks Instance may run on a machine with no internet, and a CDN call
+   would also tell Google that the Instance exists. See DESIGN.md §3. */
+@import "@fontsource-variable/public-sans";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif;
-    --color-sidebar-ring: var(--sidebar-ring);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar: var(--sidebar);
-    --color-chart-5: var(--chart-5);
-    --color-chart-4: var(--chart-4);
-    --color-chart-3: var(--chart-3);
-    --color-chart-2: var(--chart-2);
-    --color-chart-1: var(--chart-1);
-    --color-ring: var(--ring);
-    --color-input: var(--input);
-    --color-border: var(--border);
-    --color-destructive: var(--destructive);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-accent: var(--accent);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-muted: var(--muted);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-secondary: var(--secondary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-primary: var(--primary);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-popover: var(--popover);
-    --color-card-foreground: var(--card-foreground);
-    --color-card: var(--card);
-    --color-foreground: var(--foreground);
-    --color-background: var(--background);
-    --radius-sm: calc(var(--radius) * 0.6);
-    --radius-md: calc(var(--radius) * 0.8);
-    --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) * 1.4);
-    --radius-2xl: calc(var(--radius) * 1.8);
-    --radius-3xl: calc(var(--radius) * 2.2);
-    --radius-4xl: calc(var(--radius) * 2.6);
+  --font-sans: "Public Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Radius means something — DESIGN.md §4. shadcn components reach for sm/md/lg/xl,
+     so those are mapped onto Nooks' five radii rather than derived from one value. */
+  --radius-sm: 4px; /* checkbox, small badge */
+  --radius-md: 6px; /* row, toolbar button, menu item */
+  --radius-lg: 7px; /* control: button, input, toggle track */
+  --radius-xl: 8px; /* inner surface: card, empty state, banner */
+  --radius-2xl: 10px; /* surface: panel, dialog */
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Nooks' own tokens. Four meaning colours, each with exactly one job, plus the
+     surfaces and rules shadcn has no name for. DESIGN.md §2. */
+  --color-desk: var(--desk);
+  --color-hair: var(--hair);
+  --color-control: var(--control);
+  --color-chip: var(--chip);
+  --color-shared: var(--shared);
+  --color-shared-bg: var(--shared-bg);
+  --color-shared-line: var(--shared-line);
+  --color-done: var(--done);
+  --color-done-bg: var(--done-bg);
+  --color-offline: var(--offline);
+  --color-offline-bg: var(--offline-bg);
+  --color-offline-line: var(--offline-line);
+  --color-offline-text: var(--offline-text);
+  --color-overdue: var(--overdue);
+  --color-toggle-off: var(--toggle-off);
+  --color-knob: var(--knob);
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+  --radius: 7px;
+
+  /* shadcn's semantics, filled with Nooks' palette. DESIGN.md §16 maps these. */
+  --background: oklch(1 0 0); /* paper #FFFFFF */
+  --foreground: oklch(0.2389 0.0019 106.54); /* ink #1F1F1E */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2389 0.0019 106.54);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2389 0.0019 106.54);
+  --primary: oklch(0.2389 0.0019 106.54); /* the primary button is ink… */
+  --primary-foreground: oklch(1 0 0); /* …on paper */
+  --secondary: oklch(0.9516 0.0027 106.45); /* selected #EFEFED */
+  --secondary-foreground: oklch(0.3666 0.005 106.65); /* sub #3F3F3C */
+  --muted: oklch(0.9516 0.0027 106.45); /* a surface, not a text colour */
+  --muted-foreground: oklch(0.4842 0.0063 106.63); /* muted text #5F5F5B */
+  --accent: oklch(0.9516 0.0027 106.45); /* shadcn's hover surface — NOT Nooks' accent */
+  --accent-foreground: oklch(0.2389 0.0019 106.54);
+  --destructive: oklch(0.463 0.1151 29.14); /* error text #8E3B31 */
+  --border: oklch(0.9241 0.004 106.48); /* line #E6E6E3 */
+  --input: oklch(0.8747 0.0068 106.54); /* input-line #D6D6D1, darker than border */
+  --ring: oklch(0.4836 0.0883 252.04); /* the 2px focus ring is shared #37618F */
+
+  /* Unused — Nooks has no charts. Set so shadcn's defaults never leak in. */
+  --chart-1: oklch(0.4836 0.0883 252.04);
+  --chart-2: oklch(0.5314 0.0946 161.86);
+  --chart-3: oklch(0.5629 0.1115 76.44);
+  --chart-4: oklch(0.4906 0.138 29.59);
+  --chart-5: oklch(0.6485 0.0073 106.6);
+
+  --sidebar: oklch(0.9878 0.0013 106.42); /* sidebar #FBFBFA */
+  --sidebar-foreground: oklch(0.3666 0.005 106.65);
+  --sidebar-primary: oklch(0.2389 0.0019 106.54);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.9516 0.0027 106.45);
+  --sidebar-accent-foreground: oklch(0.2389 0.0019 106.54);
+  --sidebar-border: oklch(0.9241 0.004 106.48);
+  --sidebar-ring: oklch(0.4836 0.0883 252.04);
+
+  /* Nooks' own */
+  --desk: oklch(0.9606 0.0027 106.45); /* #F2F2F0 */
+  --hair: oklch(0.9546 0.0027 106.45); /* #F0F0EE — the row rule */
+  --control: oklch(0.6485 0.0073 106.6); /* #8F8F8A — checkbox borders at rest */
+  --chip: oklch(0.9453 0.004 106.48); /* #EDEDEA */
+  --shared: oklch(0.4836 0.0883 252.04); /* #37618F */
+  --shared-bg: oklch(0.9708 0.0086 247.91); /* #F1F6FB */
+  --shared-line: oklch(0.8811 0.0309 249.71); /* #C9DAEC */
+  --done: oklch(0.5314 0.0946 161.86); /* #2E7D5B */
+  --done-bg: oklch(0.975 0.0068 145.52); /* #F4F8F4 */
+  --offline: oklch(0.5629 0.1115 76.44); /* #9A6B14 */
+  --offline-bg: oklch(0.9735 0.018 89.36); /* #FBF6E9 */
+  --offline-line: oklch(0.9118 0.0405 88.2); /* #EDE1C4 */
+  --offline-text: oklch(0.435 0.0843 76.76); /* #6B4A0E */
+  --overdue: oklch(0.4906 0.138 29.59); /* #A03A2E */
+  --toggle-off: oklch(0.9056 0.0054 106.51); /* #E0E0DC */
+  --knob: oklch(1 0 0);
+  --scrim: oklch(0.2389 0.0019 106.54 / 34%); /* ink at 34% */
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+  --background: oklch(0.213 0.0019 106.56); /* paper #191918 */
+  --foreground: oklch(0.9425 0.0027 106.45); /* ink #ECECEA */
+  --card: oklch(0.213 0.0019 106.56);
+  --card-foreground: oklch(0.9425 0.0027 106.45);
+  --popover: oklch(0.213 0.0019 106.56);
+  --popover-foreground: oklch(0.9425 0.0027 106.45);
+  --primary: oklch(0.9425 0.0027 106.45);
+  --primary-foreground: oklch(0.213 0.0019 106.56);
+  --secondary: oklch(0.2554 0.0037 106.66); /* selected #232321 */
+  --secondary-foreground: oklch(0.8314 0.0069 106.55); /* sub #C8C8C3 */
+  --muted: oklch(0.2554 0.0037 106.66);
+  --muted-foreground: oklch(0.6847 0.0072 106.59); /* #9A9A95 */
+  --accent: oklch(0.2554 0.0037 106.66);
+  --accent-foreground: oklch(0.9425 0.0027 106.45);
+  --destructive: oklch(0.7215 0.107 30.68); /* #D98A7E */
+  --border: oklch(0.3001 0.0053 106.71); /* line #2E2E2B */
+  --input: oklch(0.3001 0.0053 106.71);
+  --ring: oklch(0.7183 0.0785 250.71); /* shared #7FA8D4 */
+
+  --chart-1: oklch(0.7183 0.0785 250.71);
+  --chart-2: oklch(0.6776 0.0882 165.01);
+  --chart-3: oklch(0.76 0.1343 84.13);
+  --chart-4: oklch(0.7215 0.107 30.68);
+  --chart-5: oklch(0.5774 0.0105 106.72);
+
+  --sidebar: oklch(0.1953 0.002 106.58); /* #151514 */
+  --sidebar-foreground: oklch(0.8314 0.0069 106.55);
+  --sidebar-primary: oklch(0.9425 0.0027 106.45);
+  --sidebar-primary-foreground: oklch(0.213 0.0019 106.56);
+  --sidebar-accent: oklch(0.2554 0.0037 106.66);
+  --sidebar-accent-foreground: oklch(0.9425 0.0027 106.45);
+  --sidebar-border: oklch(0.3001 0.0053 106.71);
+  --sidebar-ring: oklch(0.7183 0.0785 250.71);
+
+  --desk: oklch(0.1772 0.002 106.6); /* #111110 */
+  --hair: oklch(0.2596 0.0037 106.65); /* #242422 */
+  --control: oklch(0.5774 0.0105 106.72); /* #7A7A73 */
+  --chip: oklch(0.2839 0.0054 106.74); /* #2A2A27 */
+  --shared: oklch(0.7183 0.0785 250.71); /* #7FA8D4 */
+  --shared-bg: oklch(0.2454 0.0177 255.69); /* #1B2129 */
+  --shared-line: oklch(0.3878 0.0448 252.57); /* #33465C */
+  --done: oklch(0.6776 0.0882 165.01); /* #5FA98A */
+  --done-bg: oklch(0.2472 0.0193 167.23); /* #18241F */
+  --offline: oklch(0.76 0.1343 84.13); /* #D9A93C */
+  --offline-bg: oklch(0.2621 0.0301 90.72); /* #2A2413 */
+  --offline-line: oklch(0.3315 0.0357 89.46); /* #3D3520 */
+  --offline-text: oklch(0.8363 0.097 87.68); /* #E4C67E */
+  --overdue: oklch(0.7215 0.107 30.68); /* #E08B7C */
+  --toggle-off: oklch(0.3197 0.0069 106.79); /* #33332F */
+  --knob: oklch(0.168 0.002 106.62); /* #0F0F0E */
+  --scrim: oklch(0 0 0 / 55%); /* ink at 55% */
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-    }
+    @apply border-border;
+  }
+
+  /* Focus is a 2px ring at 2px offset, everywhere. DESIGN.md §7. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
   body {
     @apply bg-background text-foreground;
-    }
+    font-feature-settings: "cv11";
+  }
+
   html {
     @apply font-sans;
-    }
+  }
 }

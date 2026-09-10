@@ -1,6 +1,6 @@
 # Nooks — plan and status
 
-Everything in the design canvas, broken into shippable milestones. This file is both the plan and the
+Every feature Nooks ships, broken into milestones. This file is both the plan and the
 status board: update the checkbox in the same commit as the work.
 
 Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are in `STANDARDS.md`.

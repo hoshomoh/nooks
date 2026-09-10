@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nooks/api/v1/list_service.proto.
  */
 export const file_nooks_api_v1_list_service: GenFile = /*@__PURE__*/
-  fileDesc("Ch9ub29rcy9hcGkvdjEvbGlzdF9zZXJ2aWNlLnByb3RvEgxub29rcy5hcGkudjEilAEKBExpc3QSCwoDdWlkGAEgASgJEgwKBG5hbWUYAiABKAkSJgoHc2hhcmluZxgDIAEoDjIVLm5vb2tzLmFwaS52MS5TaGFyaW5nEhAKCGNhbl9lZGl0GAQgASgIEhAKCGlzX293bmVyGAUgASgIEhEKCWlzX3Bpbm5lZBgGIAEoCBISCgpvcGVuX2NvdW50GAcgASgFIn8KBEl0ZW0SCwoDdWlkGAEgASgJEg0KBWxhYmVsGAIgASgJEhAKCHF1YW50aXR5GAMgASgJEg4KBmR1ZV9vbhgEIAEoCRIMCgRkb25lGAUgASgIEhUKDWFkZGVkX2J5X25hbWUYBiABKAkSFAoMZG9uZV9ieV9uYW1lGAcgASgJIhIKEExpc3RMaXN0c1JlcXVlc3QiNgoRTGlzdExpc3RzUmVzcG9uc2USIQoFbGlzdHMYASADKAsyEi5ub29rcy5hcGkudjEuTGlzdCIiCg5HZXRMaXN0UmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCSJWCg9HZXRMaXN0UmVzcG9uc2USIAoEbGlzdBgBIAEoCzISLm5vb2tzLmFwaS52MS5MaXN0EiEKBWl0ZW1zGAIgAygLMhIubm9va3MuYXBpLnYxLkl0ZW0iIQoRQ3JlYXRlTGlzdFJlcXVlc3QSDAoEbmFtZRgBIAEoCSI2ChJDcmVhdGVMaXN0UmVzcG9uc2USIAoEbGlzdBgBIAEoCzISLm5vb2tzLmFwaS52MS5MaXN0IjMKEVJlbmFtZUxpc3RSZXF1ZXN0EhAKCGxpc3RfdWlkGAEgASgJEgwKBG5hbWUYAiABKAkiNgoSUmVuYW1lTGlzdFJlc3BvbnNlEiAKBGxpc3QYASABKAsyEi5ub29rcy5hcGkudjEuTGlzdCJjChVTZXRMaXN0U2hhcmluZ1JlcXVlc3QSEAoIbGlzdF91aWQYASABKAkSJgoHc2hhcmluZxgCIAEoDjIVLm5vb2tzLmFwaS52MS5TaGFyaW5nEhAKCGNhbl9lZGl0GAMgASgIIjoKFlNldExpc3RTaGFyaW5nUmVzcG9uc2USIAoEbGlzdBgBIAEoCzISLm5vb2tzLmFwaS52MS5MaXN0IiUKEURlbGV0ZUxpc3RSZXF1ZXN0EhAKCGxpc3RfdWlkGAEgASgJIhQKEkRlbGV0ZUxpc3RSZXNwb25zZSI4ChRTZXRMaXN0UGlubmVkUmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCRIOCgZwaW5uZWQYAiABKAgiFwoVU2V0TGlzdFBpbm5lZFJlc3BvbnNlIlYKEUNyZWF0ZUl0ZW1SZXF1ZXN0EhAKCGxpc3RfdWlkGAEgASgJEg0KBWxhYmVsGAIgASgJEhAKCHF1YW50aXR5GAMgASgJEg4KBmR1ZV9vbhgEIAEoCSI2ChJDcmVhdGVJdGVtUmVzcG9uc2USIAoEaXRlbRgBIAEoCzISLm5vb2tzLmFwaS52MS5JdGVtIocBChFVcGRhdGVJdGVtUmVxdWVzdBIQCghpdGVtX3VpZBgBIAEoCRISCgVsYWJlbBgCIAEoCUgAiAEBEhUKCHF1YW50aXR5GAMgASgJSAGIAQESEwoGZHVlX29uGAQgASgJSAKIAQFCCAoGX2xhYmVsQgsKCV9xdWFudGl0eUIJCgdfZHVlX29uIjYKElVwZGF0ZUl0ZW1SZXNwb25zZRIgCgRpdGVtGAEgASgLMhIubm9va3MuYXBpLnYxLkl0ZW0iNAoSU2V0SXRlbURvbmVSZXF1ZXN0EhAKCGl0ZW1fdWlkGAEgASgJEgwKBGRvbmUYAiABKAgiNwoTU2V0SXRlbURvbmVSZXNwb25zZRIgCgRpdGVtGAEgASgLMhIubm9va3MuYXBpLnYxLkl0ZW0iOwoPTW92ZUl0ZW1SZXF1ZXN0EhAKCGl0ZW1fdWlkGAEgASgJEhYKDmFmdGVyX2l0ZW1fdWlkGAIgASgJIhIKEE1vdmVJdGVtUmVzcG9uc2UiJQoRRGVsZXRlSXRlbVJlcXVlc3QSEAoIaXRlbV91aWQYASABKAkiFAoSRGVsZXRlSXRlbVJlc3BvbnNlKmMKB1NoYXJpbmcSFwoTU0hBUklOR19VTlNQRUNJRklFRBAAEhMKD1NIQVJJTkdfUFJJVkFURRABEhQKEFNIQVJJTkdfSU5TVEFOQ0UQAhIUChBTSEFSSU5HX1NQRUNJRklDEAMy3wcKC0xpc3RTZXJ2aWNlEkwKCUxpc3RMaXN0cxIeLm5vb2tzLmFwaS52MS5MaXN0TGlzdHNSZXF1ZXN0Gh8ubm9va3MuYXBpLnYxLkxpc3RMaXN0c1Jlc3BvbnNlEkYKB0dldExpc3QSHC5ub29rcy5hcGkudjEuR2V0TGlzdFJlcXVlc3QaHS5ub29rcy5hcGkudjEuR2V0TGlzdFJlc3BvbnNlEk8KCkNyZWF0ZUxpc3QSHy5ub29rcy5hcGkudjEuQ3JlYXRlTGlzdFJlcXVlc3QaIC5ub29rcy5hcGkudjEuQ3JlYXRlTGlzdFJlc3BvbnNlEk8KClJlbmFtZUxpc3QSHy5ub29rcy5hcGkudjEuUmVuYW1lTGlzdFJlcXVlc3QaIC5ub29rcy5hcGkudjEuUmVuYW1lTGlzdFJlc3BvbnNlElsKDlNldExpc3RTaGFyaW5nEiMubm9va3MuYXBpLnYxLlNldExpc3RTaGFyaW5nUmVxdWVzdBokLm5vb2tzLmFwaS52MS5TZXRMaXN0U2hhcmluZ1Jlc3BvbnNlEk8KCkRlbGV0ZUxpc3QSHy5ub29rcy5hcGkudjEuRGVsZXRlTGlzdFJlcXVlc3QaIC5ub29rcy5hcGkudjEuRGVsZXRlTGlzdFJlc3BvbnNlElgKDVNldExpc3RQaW5uZWQSIi5ub29rcy5hcGkudjEuU2V0TGlzdFBpbm5lZFJlcXVlc3QaIy5ub29rcy5hcGkudjEuU2V0TGlzdFBpbm5lZFJlc3BvbnNlEk8KCkNyZWF0ZUl0ZW0SHy5ub29rcy5hcGkudjEuQ3JlYXRlSXRlbVJlcXVlc3QaIC5ub29rcy5hcGkudjEuQ3JlYXRlSXRlbVJlc3BvbnNlEk8KClVwZGF0ZUl0ZW0SHy5ub29rcy5hcGkudjEuVXBkYXRlSXRlbVJlcXVlc3QaIC5ub29rcy5hcGkudjEuVXBkYXRlSXRlbVJlc3BvbnNlElIKC1NldEl0ZW1Eb25lEiAubm9va3MuYXBpLnYxLlNldEl0ZW1Eb25lUmVxdWVzdBohLm5vb2tzLmFwaS52MS5TZXRJdGVtRG9uZVJlc3BvbnNlEkkKCE1vdmVJdGVtEh0ubm9va3MuYXBpLnYxLk1vdmVJdGVtUmVxdWVzdBoeLm5vb2tzLmFwaS52MS5Nb3ZlSXRlbVJlc3BvbnNlEk8KCkRlbGV0ZUl0ZW0SHy5ub29rcy5hcGkudjEuRGVsZXRlSXRlbVJlcXVlc3QaIC5ub29rcy5hcGkudjEuRGVsZXRlSXRlbVJlc3BvbnNlQq4BChBjb20ubm9va3MuYXBpLnYxQhBMaXN0U2VydmljZVByb3RvUAFaNmdpdGh1Yi5jb20vaG9zaG9tb2gvbm9va3MvcHJvdG8vZ2VuL25vb2tzL2FwaS92MTthcGl2MaICA05BWKoCDE5vb2tzLkFwaS5WMcoCDE5vb2tzXEFwaVxWMeICGE5vb2tzXEFwaVxWMVxHUEJNZXRhZGF0YeoCDk5vb2tzOjpBcGk6OlYxYgZwcm90bzM");
+  fileDesc("Ch9ub29rcy9hcGkvdjEvbGlzdF9zZXJ2aWNlLnByb3RvEgxub29rcy5hcGkudjEilAEKBExpc3QSCwoDdWlkGAEgASgJEgwKBG5hbWUYAiABKAkSJgoHc2hhcmluZxgDIAEoDjIVLm5vb2tzLmFwaS52MS5TaGFyaW5nEhAKCGNhbl9lZGl0GAQgASgIEhAKCGlzX293bmVyGAUgASgIEhEKCWlzX3Bpbm5lZBgGIAEoCBISCgpvcGVuX2NvdW50GAcgASgFIn8KBEl0ZW0SCwoDdWlkGAEgASgJEg0KBWxhYmVsGAIgASgJEhAKCHF1YW50aXR5GAMgASgJEg4KBmR1ZV9vbhgEIAEoCRIMCgRkb25lGAUgASgIEhUKDWFkZGVkX2J5X25hbWUYBiABKAkSFAoMZG9uZV9ieV9uYW1lGAcgASgJIhIKEExpc3RMaXN0c1JlcXVlc3QiNgoRTGlzdExpc3RzUmVzcG9uc2USIQoFbGlzdHMYASADKAsyEi5ub29rcy5hcGkudjEuTGlzdCIiCg5HZXRMaXN0UmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCSJWCg9HZXRMaXN0UmVzcG9uc2USIAoEbGlzdBgBIAEoCzISLm5vb2tzLmFwaS52MS5MaXN0EiEKBWl0ZW1zGAIgAygLMhIubm9va3MuYXBpLnYxLkl0ZW0iIQoRQ3JlYXRlTGlzdFJlcXVlc3QSDAoEbmFtZRgBIAEoCSI2ChJDcmVhdGVMaXN0UmVzcG9uc2USIAoEbGlzdBgBIAEoCzISLm5vb2tzLmFwaS52MS5MaXN0IjMKEVJlbmFtZUxpc3RSZXF1ZXN0EhAKCGxpc3RfdWlkGAEgASgJEgwKBG5hbWUYAiABKAkiNgoSUmVuYW1lTGlzdFJlc3BvbnNlEiAKBGxpc3QYASABKAsyEi5ub29rcy5hcGkudjEuTGlzdCJjChVTZXRMaXN0U2hhcmluZ1JlcXVlc3QSEAoIbGlzdF91aWQYASABKAkSJgoHc2hhcmluZxgCIAEoDjIVLm5vb2tzLmFwaS52MS5TaGFyaW5nEhAKCGNhbl9lZGl0GAMgASgIIjoKFlNldExpc3RTaGFyaW5nUmVzcG9uc2USIAoEbGlzdBgBIAEoCzISLm5vb2tzLmFwaS52MS5MaXN0IiUKEURlbGV0ZUxpc3RSZXF1ZXN0EhAKCGxpc3RfdWlkGAEgASgJIhQKEkRlbGV0ZUxpc3RSZXNwb25zZSI4ChRTZXRMaXN0UGlubmVkUmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCRIOCgZwaW5uZWQYAiABKAgiFwoVU2V0TGlzdFBpbm5lZFJlc3BvbnNlIlYKEUNyZWF0ZUl0ZW1SZXF1ZXN0EhAKCGxpc3RfdWlkGAEgASgJEg0KBWxhYmVsGAIgASgJEhAKCHF1YW50aXR5GAMgASgJEg4KBmR1ZV9vbhgEIAEoCSI2ChJDcmVhdGVJdGVtUmVzcG9uc2USIAoEaXRlbRgBIAEoCzISLm5vb2tzLmFwaS52MS5JdGVtIocBChFVcGRhdGVJdGVtUmVxdWVzdBIQCghpdGVtX3VpZBgBIAEoCRISCgVsYWJlbBgCIAEoCUgAiAEBEhUKCHF1YW50aXR5GAMgASgJSAGIAQESEwoGZHVlX29uGAQgASgJSAKIAQFCCAoGX2xhYmVsQgsKCV9xdWFudGl0eUIJCgdfZHVlX29uIjYKElVwZGF0ZUl0ZW1SZXNwb25zZRIgCgRpdGVtGAEgASgLMhIubm9va3MuYXBpLnYxLkl0ZW0iNAoSU2V0SXRlbURvbmVSZXF1ZXN0EhAKCGl0ZW1fdWlkGAEgASgJEgwKBGRvbmUYAiABKAgiNwoTU2V0SXRlbURvbmVSZXNwb25zZRIgCgRpdGVtGAEgASgLMhIubm9va3MuYXBpLnYxLkl0ZW0iOwoPTW92ZUl0ZW1SZXF1ZXN0EhAKCGl0ZW1fdWlkGAEgASgJEhYKDmFmdGVyX2l0ZW1fdWlkGAIgASgJIhIKEE1vdmVJdGVtUmVzcG9uc2UiJQoRRGVsZXRlSXRlbVJlcXVlc3QSEAoIaXRlbV91aWQYASABKAkiFAoSRGVsZXRlSXRlbVJlc3BvbnNlInsKCVNlYXJjaEhpdBIpCgRraW5kGAEgASgOMhsubm9va3MuYXBpLnYxLlNlYXJjaEhpdEtpbmQSEAoIbGlzdF91aWQYAiABKAkSEAoIaXRlbV91aWQYAyABKAkSDAoEdGV4dBgEIAEoCRIRCglsaXN0X25hbWUYBSABKAkiHgoNU2VhcmNoUmVxdWVzdBINCgVxdWVyeRgBIAEoCSI3Cg5TZWFyY2hSZXNwb25zZRIlCgRoaXRzGAEgAygLMhcubm9va3MuYXBpLnYxLlNlYXJjaEhpdCpjCgdTaGFyaW5nEhcKE1NIQVJJTkdfVU5TUEVDSUZJRUQQABITCg9TSEFSSU5HX1BSSVZBVEUQARIUChBTSEFSSU5HX0lOU1RBTkNFEAISFAoQU0hBUklOR19TUEVDSUZJQxADKn4KDVNlYXJjaEhpdEtpbmQSHwobU0VBUkNIX0hJVF9LSU5EX1VOU1BFQ0lGSUVEEAASGAoUU0VBUkNIX0hJVF9LSU5EX0xJU1QQARIYChRTRUFSQ0hfSElUX0tJTkRfSVRFTRACEhgKFFNFQVJDSF9ISVRfS0lORF9OT1RFEAMypAgKC0xpc3RTZXJ2aWNlEkwKCUxpc3RMaXN0cxIeLm5vb2tzLmFwaS52MS5MaXN0TGlzdHNSZXF1ZXN0Gh8ubm9va3MuYXBpLnYxLkxpc3RMaXN0c1Jlc3BvbnNlEkYKB0dldExpc3QSHC5ub29rcy5hcGkudjEuR2V0TGlzdFJlcXVlc3QaHS5ub29rcy5hcGkudjEuR2V0TGlzdFJlc3BvbnNlEk8KCkNyZWF0ZUxpc3QSHy5ub29rcy5hcGkudjEuQ3JlYXRlTGlzdFJlcXVlc3QaIC5ub29rcy5hcGkudjEuQ3JlYXRlTGlzdFJlc3BvbnNlEk8KClJlbmFtZUxpc3QSHy5ub29rcy5hcGkudjEuUmVuYW1lTGlzdFJlcXVlc3QaIC5ub29rcy5hcGkudjEuUmVuYW1lTGlzdFJlc3BvbnNlElsKDlNldExpc3RTaGFyaW5nEiMubm9va3MuYXBpLnYxLlNldExpc3RTaGFyaW5nUmVxdWVzdBokLm5vb2tzLmFwaS52MS5TZXRMaXN0U2hhcmluZ1Jlc3BvbnNlEk8KCkRlbGV0ZUxpc3QSHy5ub29rcy5hcGkudjEuRGVsZXRlTGlzdFJlcXVlc3QaIC5ub29rcy5hcGkudjEuRGVsZXRlTGlzdFJlc3BvbnNlElgKDVNldExpc3RQaW5uZWQSIi5ub29rcy5hcGkudjEuU2V0TGlzdFBpbm5lZFJlcXVlc3QaIy5ub29rcy5hcGkudjEuU2V0TGlzdFBpbm5lZFJlc3BvbnNlEk8KCkNyZWF0ZUl0ZW0SHy5ub29rcy5hcGkudjEuQ3JlYXRlSXRlbVJlcXVlc3QaIC5ub29rcy5hcGkudjEuQ3JlYXRlSXRlbVJlc3BvbnNlEk8KClVwZGF0ZUl0ZW0SHy5ub29rcy5hcGkudjEuVXBkYXRlSXRlbVJlcXVlc3QaIC5ub29rcy5hcGkudjEuVXBkYXRlSXRlbVJlc3BvbnNlElIKC1NldEl0ZW1Eb25lEiAubm9va3MuYXBpLnYxLlNldEl0ZW1Eb25lUmVxdWVzdBohLm5vb2tzLmFwaS52MS5TZXRJdGVtRG9uZVJlc3BvbnNlEkkKCE1vdmVJdGVtEh0ubm9va3MuYXBpLnYxLk1vdmVJdGVtUmVxdWVzdBoeLm5vb2tzLmFwaS52MS5Nb3ZlSXRlbVJlc3BvbnNlEk8KCkRlbGV0ZUl0ZW0SHy5ub29rcy5hcGkudjEuRGVsZXRlSXRlbVJlcXVlc3QaIC5ub29rcy5hcGkudjEuRGVsZXRlSXRlbVJlc3BvbnNlEkMKBlNlYXJjaBIbLm5vb2tzLmFwaS52MS5TZWFyY2hSZXF1ZXN0Ghwubm9va3MuYXBpLnYxLlNlYXJjaFJlc3BvbnNlQq4BChBjb20ubm9va3MuYXBpLnYxQhBMaXN0U2VydmljZVByb3RvUAFaNmdpdGh1Yi5jb20vaG9zaG9tb2gvbm9va3MvcHJvdG8vZ2VuL25vb2tzL2FwaS92MTthcGl2MaICA05BWKoCDE5vb2tzLkFwaS5WMcoCDE5vb2tzXEFwaVxWMeICGE5vb2tzXEFwaVxWMVxHUEJNZXRhZGF0YeoCDk5vb2tzOjpBcGk6OlYxYgZwcm90bzM");
 
 /**
  * List is a named, ordered collection of Items.
@@ -585,6 +585,89 @@ export const DeleteItemResponseSchema: GenMessage<DeleteItemResponse> = /*@__PUR
   messageDesc(file_nooks_api_v1_list_service, 25);
 
 /**
+ * SearchHit is one match.
+ *
+ * @generated from message nooks.api.v1.SearchHit
+ */
+export type SearchHit = Message<"nooks.api.v1.SearchHit"> & {
+  /**
+   * @generated from field: nooks.api.v1.SearchHitKind kind = 1;
+   */
+  kind: SearchHitKind;
+
+  /**
+   * What to open: the List itself, or the List the Item sits on.
+   *
+   * @generated from field: string list_uid = 2;
+   */
+  listUid: string;
+
+  /**
+   * The Item, when the hit is one.
+   *
+   * @generated from field: string item_uid = 3;
+   */
+  itemUid: string;
+
+  /**
+   * The matched text, for showing the result.
+   *
+   * @generated from field: string text = 4;
+   */
+  text: string;
+
+  /**
+   * The name of the List the hit belongs to, so a result reads in context.
+   *
+   * @generated from field: string list_name = 5;
+   */
+  listName: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.SearchHit.
+ * Use `create(SearchHitSchema)` to create a new message.
+ */
+export const SearchHitSchema: GenMessage<SearchHit> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_list_service, 26);
+
+/**
+ * @generated from message nooks.api.v1.SearchRequest
+ */
+export type SearchRequest = Message<"nooks.api.v1.SearchRequest"> & {
+  /**
+   * What the Member typed. The last word is treated as a prefix.
+   *
+   * @generated from field: string query = 1;
+   */
+  query: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.SearchRequest.
+ * Use `create(SearchRequestSchema)` to create a new message.
+ */
+export const SearchRequestSchema: GenMessage<SearchRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_list_service, 27);
+
+/**
+ * @generated from message nooks.api.v1.SearchResponse
+ */
+export type SearchResponse = Message<"nooks.api.v1.SearchResponse"> & {
+  /**
+   * @generated from field: repeated nooks.api.v1.SearchHit hits = 1;
+   */
+  hits: SearchHit[];
+};
+
+/**
+ * Describes the message nooks.api.v1.SearchResponse.
+ * Use `create(SearchResponseSchema)` to create a new message.
+ */
+export const SearchResponseSchema: GenMessage<SearchResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_list_service, 28);
+
+/**
  * Sharing is who can reach a List.
  *
  * @generated from enum nooks.api.v1.Sharing
@@ -622,6 +705,39 @@ export enum Sharing {
  */
 export const SharingSchema: GenEnum<Sharing> = /*@__PURE__*/
   enumDesc(file_nooks_api_v1_list_service, 0);
+
+/**
+ * SearchHitKind says what a hit is.
+ *
+ * @generated from enum nooks.api.v1.SearchHitKind
+ */
+export enum SearchHitKind {
+  /**
+   * @generated from enum value: SEARCH_HIT_KIND_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: SEARCH_HIT_KIND_LIST = 1;
+   */
+  LIST = 1,
+
+  /**
+   * @generated from enum value: SEARCH_HIT_KIND_ITEM = 2;
+   */
+  ITEM = 2,
+
+  /**
+   * @generated from enum value: SEARCH_HIT_KIND_NOTE = 3;
+   */
+  NOTE = 3,
+}
+
+/**
+ * Describes the enum nooks.api.v1.SearchHitKind.
+ */
+export const SearchHitKindSchema: GenEnum<SearchHitKind> = /*@__PURE__*/
+  enumDesc(file_nooks_api_v1_list_service, 1);
 
 /**
  * ListService covers Lists and the Items on them — the whole of Nooks, really.
@@ -754,6 +870,18 @@ export const ListService: GenService<{
     methodKind: "unary";
     input: typeof DeleteItemRequestSchema;
     output: typeof DeleteItemResponseSchema;
+  },
+  /**
+   * Search finds Lists and Items by what a Member wrote in them. It is what ⌘K reads.
+   * Results narrow while they are still typing, and never include anything they could
+   * not already open.
+   *
+   * @generated from rpc nooks.api.v1.ListService.Search
+   */
+  search: {
+    methodKind: "unary";
+    input: typeof SearchRequestSchema;
+    output: typeof SearchResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_nooks_api_v1_list_service, 0);

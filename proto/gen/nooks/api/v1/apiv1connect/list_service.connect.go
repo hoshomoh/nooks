@@ -59,6 +59,8 @@ const (
 	ListServiceMoveItemProcedure = "/nooks.api.v1.ListService/MoveItem"
 	// ListServiceDeleteItemProcedure is the fully-qualified name of the ListService's DeleteItem RPC.
 	ListServiceDeleteItemProcedure = "/nooks.api.v1.ListService/DeleteItem"
+	// ListServiceSearchProcedure is the fully-qualified name of the ListService's Search RPC.
+	ListServiceSearchProcedure = "/nooks.api.v1.ListService/Search"
 )
 
 // ListServiceClient is a client for the nooks.api.v1.ListService service.
@@ -92,6 +94,10 @@ type ListServiceClient interface {
 	MoveItem(context.Context, *connect.Request[v1.MoveItemRequest]) (*connect.Response[v1.MoveItemResponse], error)
 	// DeleteItem removes an Item.
 	DeleteItem(context.Context, *connect.Request[v1.DeleteItemRequest]) (*connect.Response[v1.DeleteItemResponse], error)
+	// Search finds Lists and Items by what a Member wrote in them. It is what ⌘K reads.
+	// Results narrow while they are still typing, and never include anything they could
+	// not already open.
+	Search(context.Context, *connect.Request[v1.SearchRequest]) (*connect.Response[v1.SearchResponse], error)
 }
 
 // NewListServiceClient constructs a client for the nooks.api.v1.ListService service. By default, it
@@ -177,6 +183,12 @@ func NewListServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(listServiceMethods.ByName("DeleteItem")),
 			connect.WithClientOptions(opts...),
 		),
+		search: connect.NewClient[v1.SearchRequest, v1.SearchResponse](
+			httpClient,
+			baseURL+ListServiceSearchProcedure,
+			connect.WithSchema(listServiceMethods.ByName("Search")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -194,6 +206,7 @@ type listServiceClient struct {
 	setItemDone    *connect.Client[v1.SetItemDoneRequest, v1.SetItemDoneResponse]
 	moveItem       *connect.Client[v1.MoveItemRequest, v1.MoveItemResponse]
 	deleteItem     *connect.Client[v1.DeleteItemRequest, v1.DeleteItemResponse]
+	search         *connect.Client[v1.SearchRequest, v1.SearchResponse]
 }
 
 // ListLists calls nooks.api.v1.ListService.ListLists.
@@ -256,6 +269,11 @@ func (c *listServiceClient) DeleteItem(ctx context.Context, req *connect.Request
 	return c.deleteItem.CallUnary(ctx, req)
 }
 
+// Search calls nooks.api.v1.ListService.Search.
+func (c *listServiceClient) Search(ctx context.Context, req *connect.Request[v1.SearchRequest]) (*connect.Response[v1.SearchResponse], error) {
+	return c.search.CallUnary(ctx, req)
+}
+
 // ListServiceHandler is an implementation of the nooks.api.v1.ListService service.
 type ListServiceHandler interface {
 	// ListLists returns every List the signed-in Member can reach, with the counts the
@@ -287,6 +305,10 @@ type ListServiceHandler interface {
 	MoveItem(context.Context, *connect.Request[v1.MoveItemRequest]) (*connect.Response[v1.MoveItemResponse], error)
 	// DeleteItem removes an Item.
 	DeleteItem(context.Context, *connect.Request[v1.DeleteItemRequest]) (*connect.Response[v1.DeleteItemResponse], error)
+	// Search finds Lists and Items by what a Member wrote in them. It is what ⌘K reads.
+	// Results narrow while they are still typing, and never include anything they could
+	// not already open.
+	Search(context.Context, *connect.Request[v1.SearchRequest]) (*connect.Response[v1.SearchResponse], error)
 }
 
 // NewListServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -368,6 +390,12 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(listServiceMethods.ByName("DeleteItem")),
 		connect.WithHandlerOptions(opts...),
 	)
+	listServiceSearchHandler := connect.NewUnaryHandler(
+		ListServiceSearchProcedure,
+		svc.Search,
+		connect.WithSchema(listServiceMethods.ByName("Search")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/nooks.api.v1.ListService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ListServiceListListsProcedure:
@@ -394,6 +422,8 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 			listServiceMoveItemHandler.ServeHTTP(w, r)
 		case ListServiceDeleteItemProcedure:
 			listServiceDeleteItemHandler.ServeHTTP(w, r)
+		case ListServiceSearchProcedure:
+			listServiceSearchHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -449,4 +479,8 @@ func (UnimplementedListServiceHandler) MoveItem(context.Context, *connect.Reques
 
 func (UnimplementedListServiceHandler) DeleteItem(context.Context, *connect.Request[v1.DeleteItemRequest]) (*connect.Response[v1.DeleteItemResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.DeleteItem is not implemented"))
+}
+
+func (UnimplementedListServiceHandler) Search(context.Context, *connect.Request[v1.SearchRequest]) (*connect.Response[v1.SearchResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.Search is not implemented"))
 }

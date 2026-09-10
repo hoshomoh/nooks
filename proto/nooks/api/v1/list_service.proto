@@ -45,6 +45,11 @@ service ListService {
 
   // DeleteItem removes an Item.
   rpc DeleteItem(DeleteItemRequest) returns (DeleteItemResponse);
+
+  // Search finds Lists and Items by what a Member wrote in them. It is what ⌘K reads.
+  // Results narrow while they are still typing, and never include anything they could
+  // not already open.
+  rpc Search(SearchRequest) returns (SearchResponse);
 }
 
 // Sharing is who can reach a List.
@@ -200,3 +205,37 @@ message DeleteItemRequest {
 }
 
 message DeleteItemResponse {}
+
+// SearchHitKind says what a hit is.
+enum SearchHitKind {
+  SEARCH_HIT_KIND_UNSPECIFIED = 0;
+  SEARCH_HIT_KIND_LIST = 1;
+  SEARCH_HIT_KIND_ITEM = 2;
+  SEARCH_HIT_KIND_NOTE = 3;
+}
+
+// SearchHit is one match.
+message SearchHit {
+  SearchHitKind kind = 1;
+
+  // What to open: the List itself, or the List the Item sits on.
+  string list_uid = 2;
+
+  // The Item, when the hit is one.
+  string item_uid = 3;
+
+  // The matched text, for showing the result.
+  string text = 4;
+
+  // The name of the List the hit belongs to, so a result reads in context.
+  string list_name = 5;
+}
+
+message SearchRequest {
+  // What the Member typed. The last word is treated as a prefix.
+  string query = 1;
+}
+
+message SearchResponse {
+  repeated SearchHit hits = 1;
+}

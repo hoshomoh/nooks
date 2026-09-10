@@ -74,5 +74,14 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Lint and typecheck
         run: pnpm --filter @nooks/web lint
+      - name: Test
+        run: pnpm --filter @nooks/web test
       - name: Build
         run: pnpm --filter @nooks/web build
+      # The release output path is relative to apps/web, so a directory move can
+      # silently start writing the bundle somewhere the binary does not embed.
+      - name: Release lands where go:embed reads
+        run: |
+          pnpm --filter @nooks/web release
+          test -d server/router/frontend/dist/assets
+          test ! -e apps/server

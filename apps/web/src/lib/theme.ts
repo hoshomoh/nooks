@@ -52,10 +52,15 @@ export function storeTheme(storage: Pick<Storage, "setItem">, theme: Theme): voi
   }
 }
 
+/** The part of an element applyTheme needs. Narrow enough to fake in a test. */
+export type ClassListLike = {
+  toggle(token: string, force?: boolean): boolean
+}
+
 /**
- * applyTheme puts the resolved theme on the document. shadcn's dark variant is
+ * applyTheme puts the resolved theme on the given element. shadcn's dark variant is
  * `&:is(.dark *)`, so the class is the whole contract — see DESIGN.md §16.
  */
-export function applyTheme(root: Element, resolved: ResolvedTheme): void {
+export function applyTheme(root: { classList: ClassListLike }, resolved: ResolvedTheme): void {
   root.classList.toggle("dark", resolved === "dark")
 }

@@ -8,7 +8,9 @@
     "release": "vite build --outDir ../../server/router/frontend/dist --emptyOutDir",
     "lint": "tsc --noEmit && oxlint",
     "lint:fix": "oxlint --fix",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -36,6 +38,7 @@
     "oxlint": "^1.79.0",
     "tailwindcss": "^4.2.4",
     "typescript": "~6.0.2",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "vitest": "^5.0.0"
   }
 }

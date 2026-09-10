@@ -14,7 +14,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | Milestone | State |
 | --- | --- |
 | M0 · Groundwork | `[x]` |
-| M1 · Skeleton that runs | `[~]` |
+| M1 · Skeleton that runs | `[~]` all but TanStack Router |
 | M2 · Auth and first run | `[ ]` |
 | M3 · Lists and Items — the core | `[ ]` |
 | M4 · Views: Today, Upcoming, Calendar | `[ ]` |
@@ -62,16 +62,14 @@ TypeScript. No features. Everything after this is filling in.
       The suite runs against both; CI provides a Postgres service so the driver cannot rot
 - [x] Config: flags and env (port, data directory, driver, DSN), parsed as a pure function
 - [x] HTTP server: routing, graceful shutdown, request logging
-- [~] `web/`: Vite + React + TypeScript — scaffolded; install blocked by pnpm's
-      `minimumReleaseAge` supply-chain policy on a transitive package, retrying
-- [ ] Tailwind v4 + `shadcn init`; **verify what the CLI emits against `DESIGN.md` §16 and amend the
-      spec if they disagree**
-- [ ] Tokens: full light and dark palettes, Nooks's own tokens, radii
-- [ ] Self-host Public Sans and IBM Plex Mono *(see open questions — a home server may have no
-      internet, so Google Fonts CDN is not acceptable — open question 1)*
-- [ ] Theme: light / dark / system, `.dark` class, persisted
-- [ ] TanStack Query + TanStack Router
-- [ ] Connect-web transport wired to the generated client
+- [x] `apps/web`: Vite + React + TypeScript
+- [x] Tailwind v4 + `shadcn init` (Base UI, Nova). Verified against `DESIGN.md` §16 and the spec
+      amended: `@import "shadcn/tailwind.css"` is real, and the five radii map onto `sm`–`2xl`
+- [x] Tokens: full light and dark palettes in OKLCH, Nooks' own tokens, radii
+- [x] Self-host Public Sans and IBM Plex Mono, bundled and served from the binary
+- [x] Theme: light / dark / system, `.dark` class, persisted, follows the machine live
+- [~] TanStack Query wired; TanStack Router lands with the first real routes in M2
+- [x] Connect-web transport wired to the generated client
 - [x] SPA embedded into the binary; one process serves API and app, with SPA fallback
 - [x] CI: `go build`/`vet`/`test -race`/`gofmt`, `buf lint` and `buf format -d`, web typecheck,
       lint and build
@@ -275,7 +273,7 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
 | Database drivers, v1 | **SQLite and Postgres** | Every schema change ships migrations and `LATEST.sql` for both, plus driver tests. SQLite stays the default — the About screen promises "one file you can copy" |
 | Live updates | **SSE** | One-directional, plain HTTP, self-reconnecting, fine behind a reverse proxy. Enough for ticks, presence and Activity |
 | buf | Workspace devDependency | `pnpm exec buf`; no global install for contributors |
-| Token naming | shadcn's names; Nooks's accent is `shared` | Avoids colliding with shadcn's `--accent` hover surface |
+| Token naming | shadcn's names; Nooks' accent is `shared` | Avoids colliding with shadcn's `--accent` hover surface |
 | Repository shape | **Monorepo**: `apps/*` and `packages/*`, Go at the root | Room for the website now and Expo later; shared code lives in a package rather than inside one app |
 | Generated TS client | `packages/api` (`@nooks/api`) | Two known consumers — the web app now, Expo later — so it is a package from the start rather than a later extraction |
 | Website stack | **Next.js + Fumadocs**, in v1 | Same React/Tailwind/shadcn stack as the app, so `DESIGN.md` carries over. `fumadocs-openapi` turns the spec into API docs |
@@ -283,15 +281,12 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
 
 ## Open questions
 
-Resolve, then delete from this list.
+None outstanding.
 
-1. **Fonts offline.** The canvas loads Public Sans and IBM Plex Mono from Google Fonts. A home server
-   may have no internet, and a CDN call also leaks that the Instance exists. Recommendation: self-host
-   both, subset, and serve them from the binary.
-
-Resolved: the print type scale (canvas now says 27/16/13, matching the Print artboard); the accent
-tint (collapsed to one value, `#F1F6FB`); `@import "shadcn/tailwind.css"` (confirmed — it is what
-`shadcn init` emits).
+Resolved so far: the print type scale (canvas now says 27/16/13, matching the Print artboard); the
+accent tint (collapsed to one value, `#F1F6FB`); `@import "shadcn/tailwind.css"` (confirmed — it is
+what `shadcn init` emits); fonts offline (Public Sans and IBM Plex Mono are self-hosted via
+`@fontsource`, bundled and served from the binary).
 
 ---
 

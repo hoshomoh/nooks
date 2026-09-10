@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/uptrace/bun"
 )
 
 // ErrNotFound reports that the row a caller asked for does not exist. Callers compare
@@ -64,9 +66,6 @@ type CreateMemberParams struct {
 	CreatedAt          time.Time
 }
 
-const memberColumns = `id, uid, name, email, role, password_hash, must_change_password,
-	created_at, last_signed_in_at`
-
 // CreateMember adds a Member and returns it as stored.
 func (s *sqlStore) CreateMember(ctx context.Context, params CreateMemberParams) (Member, error) {
 	if params.Email == "" {
@@ -76,71 +75,63 @@ func (s *sqlStore) CreateMember(ctx context.Context, params CreateMemberParams) 
 		return Member{}, errors.New("store: password hash is required")
 	}
 
-	query := fmt.Sprintf(`INSERT INTO member
-		(uid, name, email, role, password_hash, must_change_password, created_at, last_signed_in_at)
-		VALUES (%s, %s, %s, %s, %s, %s, %s, '')
-		RETURNING %s`,
-		s.dialect.placeholder(1), s.dialect.placeholder(2), s.dialect.placeholder(3),
-		s.dialect.placeholder(4), s.dialect.placeholder(5), s.dialect.placeholder(6),
-		s.dialect.placeholder(7), memberColumns)
+	row := &memberModel{
+		UID:                params.UID,
+		Name:               params.Name,
+		Email:              normaliseEmail(params.Email),
+		Role:               string(params.Role),
+		PasswordHash:       params.PasswordHash,
+		MustChangePassword: params.MustChangePassword,
+		CreatedAt:          formatTime(params.CreatedAt),
+	}
 
-	row := s.db.QueryRowContext(ctx, query,
-		params.UID, params.Name, normaliseEmail(params.Email), string(params.Role),
-		params.PasswordHash, boolToInt(params.MustChangePassword),
-		formatTime(params.CreatedAt))
-
-	member, err := scanMember(row)
-	if err != nil {
+	if _, err := s.db.NewInsert().Model(row).Returning("*").Exec(ctx); err != nil {
 		if isUniqueViolation(err) {
 			return Member{}, ErrEmailTaken
 		}
 		return Member{}, fmt.Errorf("create member: %w", err)
 	}
-	return member, nil
+	return row.toMember()
 }
 
 // MemberByEmail finds a Member by the email they sign in with.
 func (s *sqlStore) MemberByEmail(ctx context.Context, email string) (Member, error) {
-	query := fmt.Sprintf(`SELECT %s FROM member WHERE email = %s`,
-		memberColumns, s.dialect.placeholder(1))
-	return s.oneMember(ctx, query, normaliseEmail(email))
+	return s.oneMember(ctx, "email", normaliseEmail(email))
 }
 
 // MemberByUID finds a Member by their public identifier.
 func (s *sqlStore) MemberByUID(ctx context.Context, uid string) (Member, error) {
-	query := fmt.Sprintf(`SELECT %s FROM member WHERE uid = %s`,
-		memberColumns, s.dialect.placeholder(1))
-	return s.oneMember(ctx, query, uid)
+	return s.oneMember(ctx, "uid", uid)
 }
 
 // MemberByID finds a Member by internal identity.
 func (s *sqlStore) MemberByID(ctx context.Context, id int64) (Member, error) {
-	query := fmt.Sprintf(`SELECT %s FROM member WHERE id = %s`,
-		memberColumns, s.dialect.placeholder(1))
-	return s.oneMember(ctx, query, id)
+	return s.oneMember(ctx, "id", id)
 }
 
 // CountMembers reports how many Members exist. First run is complete once this is
 // above zero.
 func (s *sqlStore) CountMembers(ctx context.Context) (int, error) {
-	var count int
-	if err := s.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM member`).Scan(&count); err != nil {
+	count, err := s.db.NewSelect().Model((*memberModel)(nil)).Count(ctx)
+	if err != nil {
 		return 0, fmt.Errorf("count members: %w", err)
 	}
 	return count, nil
 }
 
-// SetMemberPassword replaces a Member's password and clears the
-// must-change-password flag, because replacing it is exactly what clears it.
+// SetMemberPassword replaces a Member's password and clears the must-change-password
+// flag, because replacing it is exactly what clears it.
 func (s *sqlStore) SetMemberPassword(ctx context.Context, id int64, hash string) error {
 	if hash == "" {
 		return errors.New("store: password hash is required")
 	}
-	query := fmt.Sprintf(
-		`UPDATE member SET password_hash = %s, must_change_password = 0 WHERE id = %s`,
-		s.dialect.placeholder(1), s.dialect.placeholder(2))
 
-	result, err := s.db.ExecContext(ctx, query, hash, id)
+	result, err := s.db.NewUpdate().
+		Model((*memberModel)(nil)).
+		Set("password_hash = ?", hash).
+		Set("must_change_password = ?", false).
+		Where("id = ?", id).
+		Exec(ctx)
 	if err != nil {
 		return fmt.Errorf("set member password: %w", err)
 	}
@@ -149,91 +140,37 @@ func (s *sqlStore) SetMemberPassword(ctx context.Context, id int64, hash string)
 
 // MarkMemberSignedIn records that a Member has just signed in.
 func (s *sqlStore) MarkMemberSignedIn(ctx context.Context, id int64, at time.Time) error {
-	query := fmt.Sprintf(`UPDATE member SET last_signed_in_at = %s WHERE id = %s`,
-		s.dialect.placeholder(1), s.dialect.placeholder(2))
-
-	result, err := s.db.ExecContext(ctx, query, formatTime(at), id)
+	result, err := s.db.NewUpdate().
+		Model((*memberModel)(nil)).
+		Set("last_signed_in_at = ?", formatTime(at)).
+		Where("id = ?", id).
+		Exec(ctx)
 	if err != nil {
 		return fmt.Errorf("mark member signed in: %w", err)
 	}
 	return requireOneRow(result, "member")
 }
 
-// oneMember runs a query expected to match at most one Member.
-func (s *sqlStore) oneMember(ctx context.Context, query string, arg any) (Member, error) {
-	member, err := scanMember(s.db.QueryRowContext(ctx, query, arg))
+// oneMember finds the Member whose column matches value.
+//
+// The column name is supplied by this package's own methods and never by a caller, so
+// interpolating it cannot carry outside input.
+func (s *sqlStore) oneMember(ctx context.Context, column string, value any) (Member, error) {
+	row := new(memberModel)
+	err := s.db.NewSelect().Model(row).Where("? = ?", bun.Ident(column), value).Scan(ctx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return Member{}, ErrNotFound
 		}
 		return Member{}, fmt.Errorf("read member: %w", err)
 	}
-	return member, nil
-}
-
-// rowScanner is satisfied by *sql.Row and *sql.Rows alike.
-type rowScanner interface {
-	Scan(dest ...any) error
-}
-
-// scanMember reads one row in memberColumns order.
-func scanMember(row rowScanner) (Member, error) {
-	var (
-		m                  Member
-		role               string
-		mustChangePassword int64
-		createdAt          string
-		lastSignedInAt     string
-	)
-	err := row.Scan(&m.ID, &m.UID, &m.Name, &m.Email, &role, &m.PasswordHash,
-		&mustChangePassword, &createdAt, &lastSignedInAt)
-	if err != nil {
-		return Member{}, err
-	}
-
-	m.Role = Role(role)
-	m.MustChangePassword = mustChangePassword != 0
-	if m.CreatedAt, err = parseTime(createdAt); err != nil {
-		return Member{}, err
-	}
-	if m.LastSignedInAt, err = parseTime(lastSignedInAt); err != nil {
-		return Member{}, err
-	}
-	return m, nil
+	return row.toMember()
 }
 
 // normaliseEmail makes sign-in case-insensitive, since nobody thinks of their address
 // as case-sensitive even where the standard allows it.
 func normaliseEmail(email string) string {
 	return strings.ToLower(strings.TrimSpace(email))
-}
-
-func boolToInt(b bool) int {
-	if b {
-		return 1
-	}
-	return 0
-}
-
-// formatTime renders a timestamp for storage. The zero value stores as empty text,
-// which is how "never" is represented.
-func formatTime(t time.Time) string {
-	if t.IsZero() {
-		return ""
-	}
-	return t.UTC().Format(time.RFC3339)
-}
-
-// parseTime is the inverse of formatTime.
-func parseTime(raw string) (time.Time, error) {
-	if raw == "" {
-		return time.Time{}, nil
-	}
-	parsed, err := time.Parse(time.RFC3339, raw)
-	if err != nil {
-		return time.Time{}, fmt.Errorf("parse timestamp %q: %w", raw, err)
-	}
-	return parsed, nil
 }
 
 // requireOneRow turns "updated nothing" into ErrNotFound.

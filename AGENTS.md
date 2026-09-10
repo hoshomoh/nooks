@@ -10,7 +10,8 @@ Nooks is a self-hosted household todo app. See `CONTEXT.md` for the domain gloss
 
 - Backend: Go, Connect RPC, Protocol Buffers. gRPC-Gateway and OpenAPI arrive with the REST API in M10.
 - Frontend: React, TypeScript, Vite, Tailwind CSS v4, shadcn/ui, TanStack Query, TanStack Router.
-- Storage: SQLite (default — one file the user can copy) and Postgres, behind one store interface.
+- Storage: SQLite (default — one file the user can copy) and Postgres, behind one store interface,
+  via Bun. One query serves both dialects; migrations are raw SQL, one directory per driver.
 - Generated API outputs: `proto/gen/` for Go, `packages/api/src/gen/` for TypeScript.
 - Ships as one binary: the SPA is built into `server/router/frontend/dist` and embedded.
 - Monorepo: Go at the root, JavaScript in `apps/*` and `packages/*`.

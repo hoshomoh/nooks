@@ -20,7 +20,7 @@ func OpenPostgres(ctx context.Context, dsn string) (Store, error) {
 		return nil, fmt.Errorf("open postgres: %w", err)
 	}
 
-	store, err := open(ctx, db, postgresDialect)
+	store, err := open(ctx, db, postgresDialect(), "postgres")
 	if err != nil {
 		_ = db.Close()
 		return nil, err

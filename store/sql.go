@@ -6,88 +6,60 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"time"
+
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
+	"github.com/uptrace/bun/dialect/sqlitedialect"
+	"github.com/uptrace/bun/schema"
 )
 
-// Setting keys. Instance configuration is a handful of rows rather than a table of
-// one row, so adding a setting never needs a migration.
+// Setting keys. Instance configuration is a handful of rows rather than a table of one
+// row, so adding a setting never needs a migration.
 const (
 	settingInstanceName     = "instance.name"
 	settingPublicSignup     = "instance.public_signup"
 	settingSetupCompletedAt = "instance.setup_completed_at"
 )
 
-// dialect carries the few things that differ between SQLite and Postgres. It exists
-// because two drivers share every query but not their placeholder syntax; it is not
-// an abstraction over databases in general.
-type dialect struct {
-	// name identifies the dialect in errors and in the migration table.
-	name string
-	// placeholder renders the nth (1-based) bind parameter.
-	placeholder func(n int) string
-}
-
-var (
-	sqliteDialect   = dialect{name: "sqlite", placeholder: func(int) string { return "?" }}
-	postgresDialect = dialect{name: "postgres", placeholder: func(n int) string { return "$" + strconv.Itoa(n) }}
-)
-
-// sqlStore implements Store over any database/sql handle.
+// sqlStore implements Store over Bun.
+//
+// Bun carries the dialect, so a query is written once and runs on both drivers. The
+// only per-driver knowledge left in this package is which dialect to construct and
+// which migration directory to read.
 type sqlStore struct {
-	db      *sql.DB
-	dialect dialect
+	db *bun.DB
+	// name identifies the driver in errors and picks its migration directory.
+	name string
 }
 
 // InstanceSettings reads the Instance's own configuration.
 func (s *sqlStore) InstanceSettings(ctx context.Context) (InstanceSettings, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT key, value FROM setting`)
-	if err != nil {
+	var rows []settingModel
+	if err := s.db.NewSelect().Model(&rows).Scan(ctx); err != nil {
 		return InstanceSettings{}, fmt.Errorf("read instance settings: %w", err)
 	}
-	defer rows.Close()
 
-	values := map[string]string{}
-	for rows.Next() {
-		var key, value string
-		if err := rows.Scan(&key, &value); err != nil {
-			return InstanceSettings{}, fmt.Errorf("scan setting: %w", err)
-		}
-		values[key] = value
-	}
-	if err := rows.Err(); err != nil {
-		return InstanceSettings{}, fmt.Errorf("read instance settings: %w", err)
+	values := make(map[string]string, len(rows))
+	for _, row := range rows {
+		values[row.Key] = row.Value
 	}
 	return settingsFromValues(values)
 }
 
 // SaveInstanceSettings writes the Instance's own configuration in full.
 func (s *sqlStore) SaveInstanceSettings(ctx context.Context, settings InstanceSettings) error {
-	tx, err := s.db.BeginTx(ctx, nil)
-	if err != nil {
-		return fmt.Errorf("begin: %w", err)
-	}
-	defer func() { _ = tx.Rollback() }()
-
+	rows := make([]settingModel, 0, 3)
 	for key, value := range valuesFromSettings(settings) {
-		if err := s.upsertSetting(ctx, tx, key, value); err != nil {
-			return err
-		}
+		rows = append(rows, settingModel{Key: key, Value: value})
 	}
-	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("commit instance settings: %w", err)
-	}
-	return nil
-}
 
-// upsertSetting writes one key, replacing any existing value.
-func (s *sqlStore) upsertSetting(ctx context.Context, tx *sql.Tx, key, value string) error {
-	query := fmt.Sprintf(
-		`INSERT INTO setting (key, value) VALUES (%s, %s)
-		 ON CONFLICT (key) DO UPDATE SET value = excluded.value`,
-		s.dialect.placeholder(1), s.dialect.placeholder(2),
-	)
-	if _, err := tx.ExecContext(ctx, query, key, value); err != nil {
-		return fmt.Errorf("write setting %s: %w", key, err)
+	_, err := s.db.NewInsert().
+		Model(&rows).
+		On("CONFLICT (key) DO UPDATE").
+		Set("value = EXCLUDED.value").
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("write instance settings: %w", err)
 	}
 	return nil
 }
@@ -95,7 +67,7 @@ func (s *sqlStore) upsertSetting(ctx context.Context, tx *sql.Tx, key, value str
 // Close releases the underlying database handle.
 func (s *sqlStore) Close() error {
 	if err := s.db.Close(); err != nil {
-		return fmt.Errorf("close %s store: %w", s.dialect.name, err)
+		return fmt.Errorf("close %s store: %w", s.name, err)
 	}
 	return nil
 }
@@ -108,13 +80,9 @@ func settingsFromValues(values map[string]string) (InstanceSettings, error) {
 		PublicSignup: values[settingPublicSignup] == "true",
 	}
 
-	raw, ok := values[settingSetupCompletedAt]
-	if !ok || raw == "" {
-		return settings, nil
-	}
-	completedAt, err := time.Parse(time.RFC3339, raw)
+	completedAt, err := parseTime(values[settingSetupCompletedAt])
 	if err != nil {
-		return InstanceSettings{}, fmt.Errorf("parse %s %q: %w", settingSetupCompletedAt, raw, err)
+		return InstanceSettings{}, fmt.Errorf("parse %s: %w", settingSetupCompletedAt, err)
 	}
 	settings.SetupCompletedAt = completedAt
 	return settings, nil
@@ -122,27 +90,29 @@ func settingsFromValues(values map[string]string) (InstanceSettings, error) {
 
 // valuesFromSettings is the inverse of settingsFromValues.
 func valuesFromSettings(settings InstanceSettings) map[string]string {
-	completedAt := ""
-	if !settings.SetupCompletedAt.IsZero() {
-		completedAt = settings.SetupCompletedAt.UTC().Format(time.RFC3339)
-	}
 	return map[string]string{
 		settingInstanceName:     settings.Name,
 		settingPublicSignup:     strconv.FormatBool(settings.PublicSignup),
-		settingSetupCompletedAt: completedAt,
+		settingSetupCompletedAt: formatTime(settings.SetupCompletedAt),
 	}
 }
 
-// open verifies the handle and brings the schema up to date.
-func open(ctx context.Context, db *sql.DB, d dialect) (Store, error) {
+// open wraps a database handle in Bun, verifies it, and brings the schema up to date.
+func open(ctx context.Context, db *sql.DB, dialect schema.Dialect, name string) (Store, error) {
 	if db == nil {
 		return nil, errors.New("store: database handle is required")
 	}
 	if err := db.PingContext(ctx); err != nil {
-		return nil, fmt.Errorf("reach %s database: %w", d.name, err)
+		return nil, fmt.Errorf("reach %s database: %w", name, err)
 	}
-	if err := migrate(ctx, db, d); err != nil {
+
+	bunDB := bun.NewDB(db, dialect)
+	if err := migrate(ctx, bunDB, name); err != nil {
 		return nil, err
 	}
-	return &sqlStore{db: db, dialect: d}, nil
+	return &sqlStore{db: bunDB, name: name}, nil
 }
+
+// sqliteDialect and postgresDialect are the two Bun dialects Nooks supports.
+func sqliteDialect() schema.Dialect   { return sqlitedialect.New() }
+func postgresDialect() schema.Dialect { return pgdialect.New() }

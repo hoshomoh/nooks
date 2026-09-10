@@ -18,7 +18,7 @@ CREATE TABLE member (
   password_hash        TEXT    NOT NULL,
   -- Set when an Admin creates the account with a temporary password. The Member must
   -- replace it before they can use Nooks.
-  must_change_password INTEGER NOT NULL DEFAULT 0,
+  must_change_password BOOLEAN NOT NULL DEFAULT FALSE,
   created_at           TEXT    NOT NULL,
   -- Empty until the Member has signed in at least once.
   last_signed_in_at    TEXT    NOT NULL DEFAULT ''

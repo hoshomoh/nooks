@@ -28,7 +28,7 @@ func OpenSQLite(ctx context.Context, path string) (Store, error) {
 		return nil, fmt.Errorf("open sqlite %s: %w", path, err)
 	}
 
-	store, err := open(ctx, db, sqliteDialect)
+	store, err := open(ctx, db, sqliteDialect(), "sqlite")
 	if err != nil {
 		_ = db.Close()
 		return nil, err

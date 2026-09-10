@@ -273,6 +273,7 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
 | Database drivers, v1 | **SQLite and Postgres** | Every schema change ships migrations and `LATEST.sql` for both, plus driver tests. SQLite stays the default — the About screen promises "one file you can copy" |
 | Live updates | **SSE** | One-directional, plain HTTP, self-reconnecting, fine behind a reverse proxy. Enough for ticks, presence and Activity |
 | buf | Workspace devDependency | `pnpm exec buf`; no global install for contributors |
+| Data access | **Bun** | SQL-first, and the only option giving both dialects from one query set. memos writes every query three times, once per driver |
 | Token naming | shadcn's names; Nooks' accent is `shared` | Avoids colliding with shadcn's `--accent` hover surface |
 | Repository shape | **Monorepo**: `apps/*` and `packages/*`, Go at the root | Room for the website now and Expo later; shared code lives in a package rather than inside one app |
 | Generated TS client | `packages/api` (`@nooks/api`) | Two known consumers — the web app now, Expo later — so it is a package from the start rather than a later extraction |

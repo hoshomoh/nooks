@@ -21,7 +21,8 @@ and the A4 pagination element). They are not app code and nothing here ports the
 
 ## Pulling a file locally
 
-Cached copies of two artboards sit in this directory. To refresh one, or pull any of the others:
+A cached copy of Foundations sits in this directory, because it is the artboard the whole UI is
+built against. The rest are pulled on demand — a stale cache is worse than none:
 
 ```
 DesignSync get_file projectId=e1148b43-1103-4b0e-9507-20c38d1db5b8 path=Nook-List-View.dc.html

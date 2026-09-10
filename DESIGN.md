@@ -50,8 +50,7 @@ things being displayed.
 | Token | Value | Job |
 | --- | --- | --- |
 | `--nooks-accent` | `#37618F` | Shared, links, focus ring, quiet buttons, due dates |
-| `--nooks-accent-bg` | `#EEF2F7` | Accent badge fill |
-| `--nooks-accent-panel` | `#F1F6FB` | Accent panel fill — secret, selected share option |
+| `--nooks-accent-bg` | `#F1F6FB` | Accent fill — badges, the secret panel, a selected share option |
 | `--nooks-accent-line` | `#C9DAEC` | Accent panel border |
 | `--nooks-done` | `#2E7D5B` | Done, and presence of another Member |
 | `--nooks-done-bg` | `#F4F8F4` | Row just ticked by someone else |
@@ -83,7 +82,7 @@ things being displayed.
 | `--nooks-ink` | `#ECECEA` |
 | `--nooks-chip` | `#2A2A27` |
 | `--nooks-accent` | `#7FA8D4` |
-| `--nooks-accent-bg` / `--nooks-accent-panel` | `#1B2129` |
+| `--nooks-accent-bg` | `#1B2129` |
 | `--nooks-accent-line` | `#33465C` |
 | `--nooks-done` | `#5FA98A` |
 | `--nooks-done-bg` | `#18241F` |
@@ -307,7 +306,7 @@ screen: chrome bar, checkbox and title, detail row, hairline, Note, footer bar. 
 in a wrapping row of 12.5 label + 13 value pairs. **Opening an Item never replaces the List with a
 page.**
 
-**Secret shown once** — accent panel (`--nooks-accent-panel` on 1px `--nooks-accent-line`, radius 8),
+**Secret shown once** — accent panel (`--nooks-accent-bg` on 1px `--nooks-accent-line`, radius 8),
 mono 13.5 with `word-break: break-all`, a primary Copy button, and a sentence saying plainly that it
 cannot be shown again. **Never a warning triangle.**
 
@@ -376,15 +375,43 @@ Member's outlined in accent, with `Keep mine` and `Keep both`.
 
 ## 14. Identity
 
-The monogram is one letter at one weight — `N`, 600, `--nooks-paper` on `--nooks-ink`.
+The mark is the design's own signature element drawn small: a list title, the hairline rule under it,
+and two items. It is not a letter, and it is never set in a typeface.
 
-| Context | Box / radius / letter |
-| --- | --- |
-| App icon | 64 / 14 / 34 · 32 / 7 / 17 · 16 / 4 / 9 |
-| Wordmark | 30 / 7 / 16, beside "Nooks" at 30 / 600 / −0.035em |
-| Sidebar | 20 / 5 / 11.5 |
+Canonical geometry, in a `24 × 24` viewBox, `fill="none"`:
 
-Tab title is `<List> · Nooks`.
+| Path | Stroke | Cap | Colour | Is |
+| --- | --- | --- | --- | --- |
+| `M3 6h9` | 2.2 | square | ink | The list title |
+| `M3 11h18` | 1 | butt | ink | **The hairline rule** |
+| `M3 15.5h14  M3 19.5h9` | 1.6 | square | control | Two items |
+
+**At 16px the mark simplifies to two paths** — the four-line version fills in at that size. This is an
+optical size, not a scale: `M4 8h8` at stroke 3, and `M4 14h16` at stroke 1.5.
+
+**Wordmark** is lowercase — `nooks`, 600, −0.02em. It sits beside the mark, never above it.
+
+| Context | Mark | Wordmark |
+| --- | --- | --- |
+| Wordmark, light | 32 | 30 |
+| Wordmark, dark | 28 | 26 |
+| Sidebar | 20 | 14 |
+
+**App icon** is the mark reversed out of an ink square: 64 / radius 14 / glyph 38 · 32 / 7 / 20 ·
+16 / 4 / 11 (the simplified two-path mark).
+
+**Colour by ground:**
+
+| Ground | Title and rule | Items |
+| --- | --- | --- |
+| Paper | ink | control |
+| Dark paper | `#ECECEA` | `#8B8B85` |
+| Ink (app icon) | `#FFFFFF` | `#9A9A94` |
+
+Tab title is `<List> · nooks`.
+
+The product is **Nooks** in prose and **nooks** as a logotype. Sentences capitalise it; the wordmark,
+the tab title and the app icon do not.
 
 ---
 
@@ -402,10 +429,7 @@ The Print sheet is a deliverable, not a screenshot. A4, 210 × 297mm, margins `1
   and 5.5mm boxes. **Never below 13pt.**
 - Footer: a sentence left, and `Nooks · A4 210 × 297 mm · n/N` right in mono 8.5pt.
 
-> **Open conflict to resolve.** The Foundations artboard states *"Print steps up, not down: 40pt title,
-> 20pt items, 15pt when a list goes two-up."* The Print artboard actually renders **27pt / 16pt /
-> 13pt**. The Print artboard is the rendered A4 page, so this file follows it — but the two should be
-> reconciled in the canvas.
+
 
 ---
 
@@ -472,7 +496,7 @@ and shadcn keeps `--accent` for its own job. Everywhere §2 says *accent*, the t
 Added the documented way — declared in `:root` and `.dark`, exposed through `@theme inline` as
 `--color-<name>`, which is what generates the `bg-*` / `text-*` / `border-*` utilities:
 
-`shared`, `shared-bg`, `shared-panel`, `shared-line`, `done`, `done-bg`, `offline`, `offline-bg`,
+`shared`, `shared-bg`, `shared-line`, `done`, `done-bg`, `offline`, `offline-bg`,
 `offline-line`, `offline-text`, `overdue`, `hair`, `control`, `chip`, `desk`, `toggle-off`, `knob`.
 
 ### Radius
@@ -502,8 +526,7 @@ explicit tokens: `--radius-checkbox` 4, `--radius-row` 6, `--radius-control` 7, 
 | sub | `#3F3F3C` | `oklch(0.3666 0.0050 106.65)` |
 | ink | `#1F1F1E` | `oklch(0.2389 0.0019 106.54)` |
 | shared | `#37618F` | `oklch(0.4836 0.0883 252.04)` |
-| shared-bg | `#EEF2F7` | `oklch(0.9595 0.0080 253.85)` |
-| shared-panel | `#F1F6FB` | `oklch(0.9708 0.0086 247.91)` |
+| shared-bg | `#F1F6FB` | `oklch(0.9708 0.0086 247.91)` |
 | shared-line | `#C9DAEC` | `oklch(0.8811 0.0309 249.71)` |
 | done | `#2E7D5B` | `oklch(0.5314 0.0946 161.86)` |
 | done-bg | `#F4F8F4` | `oklch(0.9750 0.0068 145.52)` |
@@ -534,7 +557,7 @@ explicit tokens: `--radius-checkbox` 4, `--radius-row` 6, `--radius-control` 7, 
 | sub | `#C8C8C3` | `oklch(0.8314 0.0069 106.55)` |
 | ink | `#ECECEA` | `oklch(0.9425 0.0027 106.45)` |
 | shared | `#7FA8D4` | `oklch(0.7183 0.0785 250.71)` |
-| shared-bg / shared-panel | `#1B2129` | `oklch(0.2454 0.0177 255.69)` |
+| shared-bg | `#1B2129` | `oklch(0.2454 0.0177 255.69)` |
 | shared-line | `#33465C` | `oklch(0.3878 0.0448 252.57)` |
 | done | `#5FA98A` | `oklch(0.6776 0.0882 165.01)` |
 | done-bg | `#18241F` | `oklch(0.2472 0.0193 167.23)` |

@@ -8,8 +8,8 @@
     "allowArbitraryExtensions": true,
     "skipLibCheck": true,
 
-    /* Path alias — shadcn/ui and our own imports both use "@/…" */
-    "baseUrl": ".",
+    /* Path alias. No baseUrl: TypeScript 6 deprecates it, and relative
+       path patterns work without one. */
     "paths": {
       "@/*": ["./src/*"]
     },

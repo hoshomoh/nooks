@@ -21,8 +21,8 @@
 
 <div style="max-width: 720px; display: flex; flex-direction: column; gap: 18px;">
   <div style="display: flex; align-items: center; gap: 12px;">
-    <span style="width: 28px; height: 28px; border-radius: 7px; background: #1F1F1E; display: grid; place-items: center; color: #FFFFFF; font-size: 15px; font-weight: 600;">N</span>
-    <span style="font-size: 26px; font-weight: 600; letter-spacing: -0.03em;">Nook</span>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="flex: none;"><path d="M3 6h9" stroke="#1F1F1E" stroke-width="2.2" stroke-linecap="square"/><path d="M3 11h18" stroke="#1F1F1E" stroke-width="1"/><path d="M3 15.5h14M3 19.5h9" stroke="#8F8F8A" stroke-width="1.6" stroke-linecap="square"/></svg>
+    <span style="font-size: 26px; font-weight: 600; letter-spacing: -0.02em;">nooks</span>
   </div>
   <p style="margin: 0; font-size: 16.5px; line-height: 1.65; color: #3F3F3C;">A household todo app that looks like a document, not a dashboard. One list primitive, one action to add something, and a printed page that is a real deliverable rather than a fallback. The signature element is the hairline rule under the list title: everything on screen hangs off it, and it is the one mark that survives onto paper.</p>
 </div>
@@ -73,7 +73,7 @@
         <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">IBM Plex Mono 400 · quantities, keycaps, links</span>
         <span style="font-size: 12.5px; color: #5F5F5B;">Utility. Never for prose.</span>
       </div>
-      <div style="font-size: 13.5px; color: #5F5F5B; line-height: 1.6; padding-top: 6px; border-top: 1px solid #F0F0EE;">Print steps up, not down: 40pt title, 20pt items, 15pt when a list goes two-up.</div>
+      <div style="font-size: 13.5px; color: #5F5F5B; line-height: 1.6; padding-top: 6px; border-top: 1px solid #F0F0EE;">Print steps up, not down: 27pt title, 16pt items, 13pt when a list goes two-up — never below 13pt.</div>
     </div>
   </div>
 
@@ -169,7 +169,7 @@
         <span style="display: flex;"><span style="width: 24px; height: 24px; border-radius: 50%; background: #EDEDEA; border: 1.5px solid #FFFFFF; display: grid; place-items: center; font-size: 10px; color: #5F5F5B;">AN</span><span style="width: 24px; height: 24px; border-radius: 50%; background: #EDEDEA; border: 1.5px solid #2E7D5B; margin-left: -6px; display: grid; place-items: center; font-size: 10px; color: #5F5F5B;">JO</span></span>
       </div>
       <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-        <span style="font-size: 11.5px; color: #37618F; background: #EEF2F7; border-radius: 4px; padding: 2px 7px;">flat</span>
+        <span style="font-size: 11.5px; color: #37618F; background: #F1F6FB; border-radius: 4px; padding: 2px 7px;">flat</span>
         <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #5F5F5B; border: 1px solid #E6E6E3; border-radius: 4px; padding: 1px 5px;">2</span>
         <span style="font-size: 12px; color: #37618F; border: 1px solid #C9DAEC; background: #F1F6FB; border-radius: 4px; padding: 1px 7px;">admins only</span>
         <span style="font-size: 12.5px; color: #A03A2E;">Fri, 22 Aug</span>
@@ -198,7 +198,7 @@
         <span style="width: 17px; height: 17px; border: 1.5px solid #8F8F8A; border-radius: 4px;"></span>
         <span style="display: flex; align-items: center; gap: 10px; min-width: 0;">
           <span style="font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Call the plumber about the bathroom tap</span>
-          <span style="font-size: 11.5px; color: #37618F; background: #EEF2F7; border-radius: 4px; padding: 2px 6px; white-space: nowrap;">flat</span>
+          <span style="font-size: 11.5px; color: #37618F; background: #F1F6FB; border-radius: 4px; padding: 2px 6px; white-space: nowrap;">flat</span>
         </span>
         <span style="display: flex; align-items: center; gap: 12px; font-size: 12.5px; color: #6B6B68; white-space: nowrap;">
           <span>2 subtasks</span><span>1 comment</span><span style="color: #3F3F3C;">Fri</span><span>Jonas</span>
@@ -379,19 +379,19 @@
   <div style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #63635E;">Overlays and the note editor</div>
   <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 32px; display: flex; flex-wrap: wrap; gap: 40px;">
 
-    <div style="display: flex; flex-direction: column; gap: 12px; width: 560px;">
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 620px;">
       <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Dialog — 560px, scrim, footer bar carries the actions</div>
       <div style="background: #EDEDEB; border-radius: 10px; padding: 26px; display: flex; justify-content: center;">
-        <div style="width: 460px; background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; box-shadow: 0 24px 60px rgba(0,0,0,0.14);">
-          <div style="padding: 20px 22px 0; display: flex; flex-direction: column; gap: 8px;">
+        <div style="width: 560px; background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; box-shadow: 0 24px 60px rgba(0,0,0,0.14);">
+          <div style="padding: 24px 26px 0; display: flex; flex-direction: column; gap: 8px;">
             <div style="font-size: 21px; font-weight: 600; letter-spacing: -0.015em;">Add a token</div>
             <div style="font-size: 14px; line-height: 1.6; color: #3F3F3C;">Name it after the thing that will hold it, not the person.</div>
           </div>
-          <div style="padding: 18px 22px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="padding: 20px 26px; display: flex; flex-direction: column; gap: 8px;">
             <span style="font-size: 13px; font-weight: 500; color: #3F3F3C;">Name</span>
             <span style="height: 38px; border: 1.5px solid #37618F; border-radius: 7px; padding: 0 12px; display: flex; align-items: center; font-size: 14.5px;">Kitchen tablet</span>
           </div>
-          <div style="border-top: 1px solid #F0F0EE; padding: 14px 22px; display: flex; align-items: center; gap: 12px;">
+          <div style="border-top: 1px solid #F0F0EE; padding: 14px 26px; display: flex; align-items: center; gap: 12px;">
             <span style="font-size: 12.5px; color: #6B6B68;">Expires in 90 days</span>
             <span style="flex: 1;"></span>
             <span style="height: 34px; padding: 0 14px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; border: 1px solid #E6E6E3; font-size: 14px; color: #3F3F3C;">Cancel</span>
@@ -399,7 +399,7 @@
           </div>
         </div>
       </div>
-      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">Title, one explaining line, body, then a bordered footer: consequence text left, cancel then confirm right. Scrim is ink at 34% in light, 55% in dark.</div>
+      <div style="font-size: 13px; color: #5F5F5B; line-height: 1.6;">Title, one explaining line, body, then a bordered footer: consequence text left, cancel then confirm right. Scrim is ink #1F1F1E at 34% in light, near-black #080807 at 55% in dark.</div>
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 12px; width: 560px;">
@@ -505,31 +505,31 @@
     <div style="display: flex; flex-direction: column; gap: 14px;">
       <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Wordmark</div>
       <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="width: 30px; height: 30px; border-radius: 7px; background: #1F1F1E; display: grid; place-items: center; color: #FFFFFF; font-size: 16px; font-weight: 600;">N</span>
-        <span style="font-size: 30px; font-weight: 600; letter-spacing: -0.035em;">Nook</span>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="flex: none;"><path d="M3 6h9" stroke="#1F1F1E" stroke-width="2.2" stroke-linecap="square"/><path d="M3 11h18" stroke="#1F1F1E" stroke-width="1"/><path d="M3 15.5h14M3 19.5h9" stroke="#8F8F8A" stroke-width="1.6" stroke-linecap="square"/></svg>
+        <span style="font-size: 30px; font-weight: 600; letter-spacing: -0.02em;">nooks</span>
       </div>
       <div style="display: flex; align-items: center; gap: 12px; background: #191918; padding: 14px 18px; border-radius: 8px;">
-        <span style="width: 26px; height: 26px; border-radius: 6px; background: #ECECEA; display: grid; place-items: center; color: #191918; font-size: 14px; font-weight: 600;">N</span>
-        <span style="font-size: 26px; font-weight: 600; letter-spacing: -0.035em; color: #ECECEA;">Nook</span>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="flex: none;"><path d="M3 6h9" stroke="#ECECEA" stroke-width="2.2" stroke-linecap="square"/><path d="M3 11h18" stroke="#ECECEA" stroke-width="1"/><path d="M3 15.5h14M3 19.5h9" stroke="#8B8B85" stroke-width="1.6" stroke-linecap="square"/></svg>
+        <span style="font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: #ECECEA;">nooks</span>
       </div>
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 14px;">
       <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">App icon at 64, 32, 16</div>
       <div style="display: flex; align-items: flex-end; gap: 16px;">
-        <span style="width: 64px; height: 64px; border-radius: 14px; background: #1F1F1E; display: grid; place-items: center; color: #FFFFFF; font-size: 34px; font-weight: 600;">N</span>
-        <span style="width: 32px; height: 32px; border-radius: 7px; background: #1F1F1E; display: grid; place-items: center; color: #FFFFFF; font-size: 17px; font-weight: 600;">N</span>
-        <span style="width: 16px; height: 16px; border-radius: 4px; background: #1F1F1E; display: grid; place-items: center; color: #FFFFFF; font-size: 9px; font-weight: 600;">N</span>
+        <span style="width: 64px; height: 64px; border-radius: 14px; background: #1F1F1E; display: grid; place-items: center;"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" style="flex: none;"><path d="M3 6h9" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="square"/><path d="M3 11h18" stroke="#FFFFFF" stroke-width="1"/><path d="M3 15.5h14M3 19.5h9" stroke="#9A9A94" stroke-width="1.6" stroke-linecap="square"/></svg></span>
+        <span style="width: 32px; height: 32px; border-radius: 7px; background: #1F1F1E; display: grid; place-items: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex: none;"><path d="M3 6h9" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="square"/><path d="M3 11h18" stroke="#FFFFFF" stroke-width="1"/><path d="M3 15.5h14M3 19.5h9" stroke="#9A9A94" stroke-width="1.6" stroke-linecap="square"/></svg></span>
+        <span style="width: 16px; height: 16px; border-radius: 4px; background: #1F1F1E; display: grid; place-items: center;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="flex: none;"><path d="M4 8h8" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square"/><path d="M4 14h16" stroke="#FFFFFF" stroke-width="1.5"/></svg></span>
       </div>
-      <div style="font-size: 12.5px; color: #5F5F5B; max-width: 34ch; line-height: 1.6;">One letter at one weight. A tab strip is where an icon competes hardest, so there is nothing in it to lose.</div>
+      <div style="font-size: 12.5px; color: #5F5F5B; max-width: 34ch; line-height: 1.6;">The mark sits bare on paper in app chrome and only takes a filled square where the platform demands one — dock, tab strip, favicon. Below 20px the two item lines drop and the rule thickens; title and rule alone survive to 16px.</div>
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 14px;">
       <div style="font-size: 12.5px; font-weight: 600; color: #6B6B68;">Favicon in a tab</div>
       <div style="display: flex; align-items: center; gap: 0; background: #DEDEDA; padding: 8px 8px 0; border-radius: 8px 8px 0 0;">
         <span style="display: flex; align-items: center; gap: 8px; background: #FFFFFF; border-radius: 6px 6px 0 0; padding: 8px 14px;">
-          <span style="width: 16px; height: 16px; border-radius: 4px; background: #1F1F1E; display: grid; place-items: center; color: #FFFFFF; font-size: 9px; font-weight: 600;">N</span>
-          <span style="font-size: 12.5px;">Groceries · Nook</span>
+          <span style="width: 16px; height: 16px; border-radius: 4px; background: #1F1F1E; display: grid; place-items: center;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="flex: none;"><path d="M4 8h8" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square"/><path d="M4 14h16" stroke="#FFFFFF" stroke-width="1.5"/></svg></span>
+          <span style="font-size: 12.5px;">Groceries · nooks</span>
         </span>
         <span style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; opacity: 0.5;">
           <span style="width: 16px; height: 16px; border-radius: 4px; background: #B4B4AF;"></span>
@@ -565,7 +565,7 @@
     <div style="background: #FFFFFF; border: 1px solid #E6E6E3; border-radius: 10px; padding: 44px 40px; min-height: 300px; display: flex; flex-direction: column; gap: 26px;">
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <h2 style="margin: 0; font-size: 27px; font-weight: 600; letter-spacing: -0.02em;">Nothing here yet, Til.</h2>
-        <p style="margin: 0; font-size: 15px; line-height: 1.65; color: #3F3F3C; max-width: 46ch;">A list is a name and some things under it. Groceries, films, questions for the landlord — Nook doesn’t care which.</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.65; color: #3F3F3C; max-width: 46ch;">A list is a name and some things under it. Groceries, films, questions for the landlord — nooks doesn’t care which.</p>
       </div>
       <div style="display: flex; align-items: center; gap: 12px;">
         <span style="height: 34px; padding: 0 16px; display: grid; place-items: center; white-space: nowrap; border-radius: 7px; background: #1F1F1E; color: #FFFFFF; font-size: 14px; font-weight: 500;">Add a list</span>
@@ -656,7 +656,7 @@
           <span style="font-size: 16px;">Coffee — the good beans from the market</span>
           <span style="font-size: 13.5px; color: #5F5F5B;">Mira renamed this while you were editing. Keep one:</span>
           <div style="display: flex; flex-direction: column; gap: 6px;">
-            <span style="font-size: 14.5px; border: 1.5px solid #37618F; border-radius: 6px; padding: 9px 12px; background: #F7FAFD;">Coffee — the good beans from the market <span style="font-size: 12.5px; color: #5F5F5B;">· yours</span></span>
+            <span style="font-size: 14.5px; border: 1.5px solid #37618F; border-radius: 6px; padding: 9px 12px; background: #F1F6FB;">Coffee — the good beans from the market <span style="font-size: 12.5px; color: #5F5F5B;">· yours</span></span>
             <span style="font-size: 14.5px; border: 1px solid #E6E6E3; border-radius: 6px; padding: 9px 12px;">Coffee beans, 1 kg <span style="font-size: 12.5px; color: #5F5F5B;">· Mira, 2 min ago</span></span>
           </div>
           <div style="display: flex; align-items: center; gap: 10px; margin-top: 2px;">

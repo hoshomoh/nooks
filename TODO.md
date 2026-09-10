@@ -287,11 +287,11 @@ Resolve, then delete from this list.
 
 1. **Fonts offline.** The canvas loads Public Sans and IBM Plex Mono from Google Fonts. A home server
    may have no internet, and a CDN call also leaks that the Instance exists. Recommendation: self-host
-   both, subset, and embed in the binary.
-2. **Print type scale.** Foundations says 40pt / 20pt / 15pt; the Print artboard renders 27pt / 16pt /
-   13pt. `DESIGN.md` follows the artboard. The canvas should be reconciled.
-3. **`@import "shadcn/tailwind.css"`.** Taken from the docs page but not yet confirmed against what
-   `shadcn init` actually emits. M1 settles it.
+   both, subset, and serve them from the binary.
+
+Resolved: the print type scale (canvas now says 27/16/13, matching the Print artboard); the accent
+tint (collapsed to one value, `#F1F6FB`); `@import "shadcn/tailwind.css"` (confirmed — it is what
+`shadcn init` emits).
 
 ---
 

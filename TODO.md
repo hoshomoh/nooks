@@ -242,9 +242,9 @@ From `Nook-Print.dc.html`.
 
 - [ ] Docker image, `docker-compose.yml`, and a one-line run command
 - [ ] Release workflow, versioned binaries
-- [ ] `README.md`: what it is, how to run it, how to back it up
+- [x] `README.md`: what it is, how to run it, how to back it up
 - [ ] `CONTRIBUTING.md` pointing at `STANDARDS.md`, `CONTEXT.md`, `DESIGN.md`
-- [ ] Licence — the design says AGPL-3.0
+- [x] Licence — AGPL-3.0
 - [ ] Accessibility pass: focus order, labels, contrast, 44px hit areas
 - [ ] Seed data for a believable first run
 

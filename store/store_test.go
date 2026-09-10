@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -54,18 +55,42 @@ func openPostgresForTest(t *testing.T) Store {
 	t.Cleanup(func() { _ = s.Close() })
 
 	// Postgres is shared between runs, unlike the per-test SQLite file, so each test
-	// starts by emptying it. Sessions go with their Members via ON DELETE CASCADE.
+	// starts by emptying it. Every table is truncated rather than a named list, so
+	// adding a table cannot quietly leave rows behind for the next test.
 	concrete, ok := s.(*sqlStore)
 	if !ok {
 		t.Fatalf("OpenPostgres returned %T, want *sqlStore", s)
 	}
-	if _, err := concrete.db.ExecContext(t.Context(), `TRUNCATE member RESTART IDENTITY CASCADE`); err != nil {
-		t.Fatalf("truncate member: %v", err)
-	}
+	truncateAll(t, concrete)
+
 	if err := s.SaveInstanceSettings(t.Context(), InstanceSettings{}); err != nil {
 		t.Fatalf("reset instance settings: %v", err)
 	}
 	return s
+}
+
+// truncateAll empties every table except the migration ledger, which records work that
+// has genuinely been done.
+func truncateAll(t *testing.T, s *sqlStore) {
+	t.Helper()
+
+	var tables []string
+	err := s.db.NewSelect().
+		ColumnExpr("tablename").
+		TableExpr("pg_tables").
+		Where("schemaname = current_schema() AND tablename <> ?", "schema_migration").
+		Scan(t.Context(), &tables)
+	if err != nil {
+		t.Fatalf("list tables: %v", err)
+	}
+	if len(tables) == 0 {
+		return
+	}
+
+	query := "TRUNCATE " + strings.Join(tables, ", ") + " RESTART IDENTITY CASCADE"
+	if _, err := s.db.ExecContext(t.Context(), query); err != nil {
+		t.Fatalf("truncate: %v", err)
+	}
 }
 
 func TestInstanceSettingsBeforeFirstRun(t *testing.T) {

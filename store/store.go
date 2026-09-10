@@ -73,6 +73,33 @@ type Store interface {
 	// DeleteExpiredSessions clears out Sessions past their expiry.
 	DeleteExpiredSessions(ctx context.Context, now time.Time) (int64, error)
 
+	// CreateJoinRequest records a Visitor's request for an account.
+	CreateJoinRequest(ctx context.Context, params CreateJoinRequestParams) (JoinRequest, error)
+
+	// PendingJoinRequests lists what is waiting for an Admin, oldest first.
+	PendingJoinRequests(ctx context.Context) ([]JoinRequest, error)
+
+	// JoinRequestByUID returns ErrNotFound when there is no such request.
+	JoinRequestByUID(ctx context.Context, uid string) (JoinRequest, error)
+
+	// DecideJoinRequest records an Admin's decision on a pending request.
+	DecideJoinRequest(ctx context.Context, uid string, status RequestStatus, at time.Time) error
+
+	// CreateResetRequest records a Member's request to replace a forgotten password.
+	CreateResetRequest(ctx context.Context, uid string, memberID int64, at time.Time) (ResetRequest, error)
+
+	// PendingResetRequests lists what is waiting for an Admin, oldest first.
+	PendingResetRequests(ctx context.Context) ([]ResetRequest, error)
+
+	// ResetRequestByUID returns ErrNotFound when there is no such request.
+	ResetRequestByUID(ctx context.Context, uid string) (ResetRequest, error)
+
+	// DecideResetRequest records an Admin's decision. An approval carries an expiry.
+	DecideResetRequest(ctx context.Context, uid string, status RequestStatus, at time.Time) error
+
+	// UseResetRequest spends an approved request, so one approval sets one password.
+	UseResetRequest(ctx context.Context, uid string) error
+
 	// Close releases the underlying database handle.
 	Close() error
 }

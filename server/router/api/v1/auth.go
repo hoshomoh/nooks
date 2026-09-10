@@ -23,6 +23,8 @@ type AuthService struct {
 	newUID  func() (string, error)
 	secure  bool
 	newAuth func() (token string, hash string, err error)
+	// announce is nil when nobody is watching. A join request is still recorded.
+	announce Announcer
 }
 
 // AuthServiceOptions carries what the service needs from its surroundings.
@@ -57,6 +59,13 @@ func NewAuthService(s store.Store, opts AuthServiceOptions) *AuthService {
 		svc.newAuth = auth.NewToken
 	}
 	return svc
+}
+
+// WithAnnouncer wires live updates in and returns the service, so the server can build
+// and wire it in one expression.
+func (s *AuthService) WithAnnouncer(a Announcer) *AuthService {
+	s.announce = a
+	return s
 }
 
 // CompleteSetup creates the first Admin and names the Instance.
@@ -307,7 +316,7 @@ func requireText(value, what string) error {
 // activity records entries in the panel, from the same clock and identifiers this
 // service already has.
 func (s *AuthService) activity() activityRecorder {
-	return activityRecorder{store: s.store, now: s.now, newUID: s.newUID}
+	return activityRecorder{store: s.store, now: s.now, newUID: s.newUID, announce: s.announce}
 }
 
 // memberToProto converts a stored Member to its wire form. It never copies the hash.

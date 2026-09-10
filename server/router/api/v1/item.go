@@ -43,6 +43,8 @@ func (s *ListService) CreateItem(
 	if err != nil {
 		return nil, internalError("create item", err)
 	}
+	s.announceListChanged(ctx, list)
+
 	return connect.NewResponse(&apiv1.CreateItemResponse{
 		Item: itemToProto(item, map[int64]string{member.ID: member.Name}),
 	}), nil
@@ -57,7 +59,7 @@ func (s *ListService) UpdateItem(
 	if err != nil {
 		return nil, err
 	}
-	item, _, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), member, AccessWrite)
+	item, list, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), member, AccessWrite)
 	if err != nil {
 		return nil, err
 	}
@@ -81,6 +83,8 @@ func (s *ListService) UpdateItem(
 	if err := s.store.UpdateItem(ctx, item.UID, params, s.now()); err != nil {
 		return nil, internalError("update item", err)
 	}
+	s.announceListChanged(ctx, list)
+
 	updated, err := s.readItem(ctx, item.UID)
 	if err != nil {
 		return nil, err
@@ -99,7 +103,7 @@ func (s *ListService) SetItemDone(
 	if err != nil {
 		return nil, err
 	}
-	item, _, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), member, AccessWrite)
+	item, list, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), member, AccessWrite)
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +116,8 @@ func (s *ListService) SetItemDone(
 	if err != nil {
 		return nil, internalError("tick item", err)
 	}
+	s.announceListChanged(ctx, list)
+
 	updated, err := s.readItem(ctx, item.UID)
 	if err != nil {
 		return nil, err
@@ -146,6 +152,7 @@ func (s *ListService) MoveItem(
 	if err := s.store.MoveItem(ctx, item.UID, position, s.now()); err != nil {
 		return nil, internalError("move item", err)
 	}
+	s.announceListChanged(ctx, list)
 	return connect.NewResponse(&apiv1.MoveItemResponse{}), nil
 }
 
@@ -158,13 +165,15 @@ func (s *ListService) DeleteItem(
 	if err != nil {
 		return nil, err
 	}
-	item, _, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), member, AccessWrite)
+	item, list, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), member, AccessWrite)
 	if err != nil {
 		return nil, err
 	}
 	if err := s.store.DeleteItem(ctx, item.UID, s.now()); err != nil {
 		return nil, internalError("delete item", err)
 	}
+	s.announceListChanged(ctx, list)
+
 	return connect.NewResponse(&apiv1.DeleteItemResponse{}), nil
 }
 

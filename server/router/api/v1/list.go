@@ -12,11 +12,22 @@ import (
 	"github.com/hoshomoh/nooks/store"
 )
 
+// Announcer tells the Members watching that something has changed.
+//
+// Live updates are a courtesy on top of a change that is already saved, so a service
+// with no announcer works exactly as well — it is what a test uses, and what an
+// Instance nobody is watching does anyway.
+type Announcer interface {
+	ListChanged(ctx context.Context, list store.List)
+	ActivityArrived(memberID int64)
+}
+
 // ListService covers Lists and the Items on them.
 type ListService struct {
-	store  store.Store
-	now    func() time.Time
-	newUID func() (string, error)
+	store    store.Store
+	now      func() time.Time
+	newUID   func() (string, error)
+	announce Announcer
 }
 
 // NewListService builds the service. now and newUID may be nil, in which case the real
@@ -31,10 +42,24 @@ func NewListService(s store.Store, now func() time.Time, newUID func() (string, 
 	return &ListService{store: s, now: now, newUID: newUID}
 }
 
+// WithAnnouncer wires live updates in and returns the service, so the server can build
+// and wire it in one expression.
+func (s *ListService) WithAnnouncer(a Announcer) *ListService {
+	s.announce = a
+	return s
+}
+
+// announceListChanged tells whoever is watching, when anyone is.
+func (s *ListService) announceListChanged(ctx context.Context, list store.List) {
+	if s.announce != nil {
+		s.announce.ListChanged(ctx, list)
+	}
+}
+
 // activity records entries in the panel, from the same clock and identifiers this
 // service already has.
 func (s *ListService) activity() activityRecorder {
-	return activityRecorder{store: s.store, now: s.now, newUID: s.newUID}
+	return activityRecorder{store: s.store, now: s.now, newUID: s.newUID, announce: s.announce}
 }
 
 // ListLists returns every List the signed-in Member can reach.
@@ -152,6 +177,7 @@ func (s *ListService) RenameList(
 	if err := s.store.RenameList(ctx, list.UID, req.Msg.GetName(), s.now()); err != nil {
 		return nil, internalError("rename list", err)
 	}
+	s.announceListChanged(ctx, list)
 
 	list.Name = req.Msg.GetName()
 	return connect.NewResponse(&apiv1.RenameListResponse{
@@ -190,6 +216,8 @@ func (s *ListService) SetListSharing(
 
 	list.Sharing = sharing
 	list.CanEdit = req.Msg.GetCanEdit()
+	// Who can reach it changed, so the sidebars that show it did too.
+	s.announceListChanged(ctx, list)
 	return connect.NewResponse(&apiv1.SetListSharingResponse{
 		List: listToProto(list, member, false, 0),
 	}), nil

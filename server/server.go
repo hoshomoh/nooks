@@ -15,8 +15,10 @@ import (
 	"github.com/hoshomoh/nooks/internal/profile"
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1/apiv1connect"
 	"github.com/hoshomoh/nooks/server/auth"
+	"github.com/hoshomoh/nooks/server/events"
 	v1 "github.com/hoshomoh/nooks/server/router/api/v1"
 	"github.com/hoshomoh/nooks/server/router/frontend"
+	"github.com/hoshomoh/nooks/server/router/live"
 	"github.com/hoshomoh/nooks/store"
 )
 
@@ -59,16 +61,28 @@ func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
 	// Every request passes through the resolver, which attaches the signed-in Member
 	// when there is one. It never rejects: first run, sign-in and the Public list are
 	// all legitimately anonymous.
-	interceptors := connect.WithInterceptors(auth.NewResolver(s, nil).Interceptor())
-	authService := v1.NewAuthService(s, v1.AuthServiceOptions{Secure: cfg.SecureCookies})
+	resolver := auth.NewResolver(s, nil)
+	interceptors := connect.WithInterceptors(resolver.Interceptor())
+
+	// One broker per process. Nooks is one binary on one machine, so there is nothing
+	// to coordinate between.
+	broker := events.NewBroker()
+	publisher := live.NewPublisher(s, broker)
+
+	authService := v1.NewAuthService(s, v1.AuthServiceOptions{
+		Secure: cfg.SecureCookies,
+	}).WithAnnouncer(publisher)
 
 	mux := http.NewServeMux()
 	mux.Handle(apiv1.NewInstanceServiceHandler(v1.NewInstanceService(s), interceptors))
 	mux.Handle(apiv1.NewAuthServiceHandler(authService, interceptors))
 	mux.Handle(apiv1.NewRequestServiceHandler(v1.NewRequestService(s, nil), interceptors))
-	mux.Handle(apiv1.NewListServiceHandler(v1.NewListService(s, nil, nil), interceptors))
+	mux.Handle(apiv1.NewListServiceHandler(
+		v1.NewListService(s, nil, nil).WithAnnouncer(publisher), interceptors,
+	))
 	mux.Handle(apiv1.NewMemberServiceHandler(v1.NewMemberService(s, nil, nil), interceptors))
 	mux.Handle(apiv1.NewActivityServiceHandler(v1.NewActivityService(s, nil), interceptors))
+	mux.Handle("GET /api/v1/events", live.NewHandler(s, broker, resolver))
 	mux.HandleFunc("GET /healthz", handleHealthz)
 
 	// In dev the Vite server serves the app and proxies here, so the binary serves only

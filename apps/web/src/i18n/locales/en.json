@@ -123,7 +123,13 @@
     "addListBlurb": "Groceries, flat jobs, a book you keep meaning to find. It starts private.",
     "name": "Name",
     "addListSubmit": "Add list",
-    "adding": "Adding…"
+    "adding": "Adding…",
+    "placeholder": "Search or jump to…",
+    "goTo": "Go to",
+    "lists": "Lists",
+    "results": "Results",
+    "actions": "Actions",
+    "empty": "Nothing matches."
   },
   "date": {
     "today": "Today",

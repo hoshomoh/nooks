@@ -12,10 +12,13 @@ import { markerOf, type BlockKind } from "./markers"
  * displayed back to the Member." So a line reads as a heading rather than as `###
  * Where`, and a phrase reads as bold rather than as `**this**`.
  *
- * A marker reappears only while the caret is touching that marker itself — not the
- * whole line. That is the narrowest reveal that still leaves a way to take a marker off
- * again: typing `###` shows it, and it disappears as soon as the heading's first word
- * is typed.
+ * A block's shorthand is never shown: `### ` is gone the moment the space that made it
+ * a heading is typed, and a line inserted from the `/` menu never shows it at all. It
+ * is still removable — one Backspace takes the space back, the line stops being a
+ * heading, and the `###` is ordinary text again.
+ *
+ * Inline markup is different, because it has no line of its own to leave: `**` shows
+ * while the caret is in the phrase it wraps, and both ends of a pair show together.
  *
  * Only the visible ranges are decorated, so a long Note costs nothing to scroll.
  */
@@ -101,9 +104,8 @@ function addBlockMarks(
 
     marks.push(Decoration.line({ class: BLOCK_CLASS[marker.kind] }).range(line.from))
 
-    const markerEnd = line.from + marker.length
-    if (marker.length > 0 && !touching(state, line.from, markerEnd)) {
-      marks.push(hidden.range(line.from, markerEnd))
+    if (marker.length > 0) {
+      marks.push(hidden.range(line.from, line.from + marker.length))
     }
 
     position = line.to + 1

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { describe, expect, it } from "vitest"
 
-import { cn, NOOKS_COLORS, NOOKS_TEXT_SIZES } from "./cn"
+import { cn, NOOKS_COLORS, NOOKS_CONTAINERS, NOOKS_SPACING, NOOKS_TEXT_SIZES } from "./cn"
 
 // Read rather than imported: Vitest stubs CSS imports, so `?raw` would hand back an
 // empty string and the check would pass without checking anything.
@@ -29,6 +29,14 @@ describe("the tokens cn is told about", () => {
     expect([...NOOKS_TEXT_SIZES].sort()).toEqual(tokensNamed("text").sort())
   })
 
+  it("covers every width the layout is measured in", () => {
+    expect([...NOOKS_CONTAINERS].sort()).toEqual(tokensNamed("container").sort())
+  })
+
+  it("covers every height a control is measured in", () => {
+    expect([...NOOKS_SPACING].sort()).toEqual(tokensNamed("spacing").sort())
+  })
+
   it("covers every colour that shadcn does not already name", () => {
     const shadcnColors = tokensNamed("color").filter((name) => !NOOKS_COLORS.includes(name))
     // Whatever is left must be a name cn already knows, or merging it would drop it.
@@ -47,5 +55,12 @@ describe("merging Nooks' own classes", () => {
 
   it("still lets a later colour win over an earlier one", () => {
     expect(cn("text-shared text-overdue")).toBe("text-overdue")
+  })
+
+  // A generated shadcn component sets its own width; a Nooks one overrides it.
+  it("lets a Nooks width win over the one a shadcn component sets", () => {
+    expect(cn("max-w-[calc(100%-2rem)] sm:max-w-sm", "max-w-dialog sm:max-w-dialog")).toBe(
+      "max-w-dialog sm:max-w-dialog",
+    )
   })
 })

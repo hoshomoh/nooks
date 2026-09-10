@@ -55,6 +55,30 @@ export const NOOKS_TEXT_SIZES = [
   "keycap",
 ]
 
+/** Every width the layout is measured in — DESIGN.md §5. */
+export const NOOKS_CONTAINERS = [
+  "content",
+  "calendar",
+  "sheet",
+  "dialog",
+  "form",
+]
+
+/** Every height a control is measured in — DESIGN.md §4 and §7. */
+export const NOOKS_SPACING = [
+  "control",
+  "control-compact",
+  "control-toolbar",
+  "input",
+  "row",
+  "chrome",
+  "chrome-auth",
+  "sheet-footer",
+]
+
+/** The two together: a spacing token is a valid width as well as a valid height. */
+const SIZES = [...NOOKS_CONTAINERS, ...NOOKS_SPACING]
+
 export const cn = createCn({
   extend: {
     classGroups: {
@@ -62,6 +86,13 @@ export const cn = createCn({
       "text-color": [{ text: NOOKS_COLORS }],
       "bg-color": [{ bg: NOOKS_COLORS }],
       "border-color": [{ border: NOOKS_COLORS }],
+      w: [{ w: SIZES }],
+      "min-w": [{ "min-w": SIZES }],
+      "max-w": [{ "max-w": SIZES }],
+      h: [{ h: SIZES }],
+      "min-h": [{ "min-h": SIZES }],
+      "max-h": [{ "max-h": SIZES }],
+      size: [{ size: SIZES }],
     },
   },
 })

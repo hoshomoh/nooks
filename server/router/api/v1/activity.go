@@ -16,6 +16,8 @@ type activityRecorder struct {
 	store  store.Store
 	now    func() time.Time
 	newUID func() (string, error)
+	// announce is nil when nobody is watching, which is most of the time.
+	announce Announcer
 }
 
 // record puts one entry in front of one Member.
@@ -40,6 +42,9 @@ func (r activityRecorder) record(
 	})
 	if err != nil {
 		return internalError("record activity", err)
+	}
+	if r.announce != nil {
+		r.announce.ActivityArrived(memberID)
 	}
 	return nil
 }

@@ -55,14 +55,23 @@ describe("what a Note shows", () => {
   })
 })
 
-// A marker has to be reachable, or there would be no way to take it off again.
 describe("what the caret reveals", () => {
-  it("shows the marker it is sitting in", () => {
-    expect(shown("### Where", 2)).toBe("### Where")
+  // A block's shorthand is never shown, wherever the caret is. It was typed to make a
+  // heading, and the heading is what it made.
+  it("keeps a block's shorthand hidden even under the caret", () => {
+    expect(shown("### Where", 2)).toBe("Where")
+    expect(shown("### Where", 4)).toBe("Where")
+    expect(shown("### Where", 9)).toBe("Where")
   })
 
-  it("hides it again once the heading is being written", () => {
-    expect(shown("### Where", 9)).toBe("Where")
+  // Which is the whole reason it can be inserted from a menu without looking wrong.
+  it("hides a checklist marker the moment it is inserted", () => {
+    expect(shown("- [ ] ", 6)).toBe("")
+  })
+
+  // One Backspace takes the space back, and the line stops being a heading.
+  it("gives the shorthand back as text once it no longer makes a block", () => {
+    expect(shown("###Where", 3)).toBe("###Where")
   })
 
   it("reveals only the marker the caret touches, not the whole line", () => {

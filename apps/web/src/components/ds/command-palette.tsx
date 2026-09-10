@@ -2,42 +2,63 @@ import { useDeferredValue, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "@tanstack/react-router"
-import { SearchHitKind } from "@nooks/api"
+import { SearchHitKind, type SearchHit } from "@nooks/api"
 
 import { Button } from "./button"
 import { Field } from "./field"
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandShortcut,
+} from "@/components/ui/command"
 import { listClient } from "@/lib/api"
-import { searchQuery } from "@/lib/list-queries"
+import { listsQuery, searchQuery } from "@/lib/list-queries"
 import { refreshLists } from "@/lib/refresh"
 import { useCommandPalette } from "@/lib/use-command-palette"
 
 /**
- * ⌘K: jump to anything, and add a List.
+ * ⌘K: go anywhere, and find anything.
  *
- * The results are whatever the server returns, which already excludes anything the
- * Member could not open — search is not a second permission system.
+ * One field for both, because a Member looking for "Groceries" does not know or care
+ * whether it is a place in the app or a line inside one. Destinations are matched here;
+ * content is matched by the server, which already excludes anything the Member could
+ * not open — search is not a second permission system.
  */
 export function CommandPalette() {
   const palette = useCommandPalette()
 
-  if (palette.mode === "closed") {
-    return null
-  }
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex animate-scrim-in items-start justify-center bg-[var(--scrim)] pt-[12vh] px-6"
-      onClick={palette.close}
+    <CommandDialog
+      open={palette.mode !== "closed"}
+      onOpenChange={(open) => {
+        if (!open) {
+          palette.close()
+        }
+      }}
+      className="max-w-dialog"
     >
-      <div
-        className="w-full max-w-[560px] animate-panel-in overflow-hidden rounded-2xl border border-border bg-popover shadow-[0_24px_60px_rgba(0,0,0,0.22)]"
-        onClick={(event) => event.stopPropagation()}
-      >
-        {palette.mode === "search" ? <SearchPanel /> : <AddListPanel />}
-      </div>
-    </div>
+      {palette.mode === "add-list" ? <AddListPanel /> : <SearchPanel />}
+    </CommandDialog>
   )
 }
+
+/** Where a Member can go that is not a List. */
+interface Destination {
+  to: "/today" | "/upcoming" | "/calendar" | "/"
+  labelKey: string
+}
+
+const DESTINATIONS: Destination[] = [
+  { to: "/today", labelKey: "views.today" },
+  { to: "/upcoming", labelKey: "views.upcoming" },
+  { to: "/calendar", labelKey: "views.calendar" },
+  { to: "/", labelKey: "list.allLists" },
+]
 
 function SearchPanel() {
   const [query, setQuery] = useState("")
@@ -46,59 +67,90 @@ function SearchPanel() {
   const { t } = useTranslation()
 
   // The field stays exactly as fast as the typing; the search follows a beat behind.
-  // React's own deferral rather than a timer, so there is nothing to clean up and
-  // nothing to synchronise.
+  // React's own deferral rather than a timer, so there is nothing to clean up.
   const searching = useDeferredValue(query)
   const results = useQuery(searchQuery(searching))
+  const lists = useQuery(listsQuery)
 
-  const go = async (listUid: string) => {
+  const hits = results.data?.hits ?? []
+  const destinations = DESTINATIONS.filter((place) => matches(t(place.labelKey), query))
+  const reachable = (lists.data?.lists ?? []).filter((list) => matches(list.name, query))
+
+  const go = async (to: Destination["to"]) => {
+    palette.close()
+    await navigate({ to })
+  }
+
+  const openList = async (listUid: string) => {
     palette.close()
     await navigate({ to: "/lists/$listUid", params: { listUid } })
   }
 
-  const hits = results.data?.hits ?? []
-
   return (
-    <div className="flex flex-col">
-      <input
+    // The server decides which content matches; destinations and Lists are matched
+    // here. One of the two has to be turned off, and it is easier to read when both
+    // are matched the same way.
+    <Command shouldFilter={false}>
+      <CommandInput
         autoFocus
         value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        placeholder={t("palette.searchPlaceholder")}
-        className="h-input border-b border-hair px-4 text-field outline-none placeholder:text-muted-foreground"
+        onValueChange={setQuery}
+        placeholder={t("palette.placeholder")}
       />
+      <CommandList>
+        <CommandEmpty>{t("palette.empty")}</CommandEmpty>
 
-      <div className="max-h-[50vh] overflow-y-auto p-1.5">
-        {query.trim() === "" && (
-          <p className="px-3 py-3 text-meta text-muted-foreground">
-            {t("palette.searchHint")}
-          </p>
+        {destinations.length > 0 && (
+          <CommandGroup heading={t("palette.goTo")}>
+            {destinations.map((place) => (
+              <CommandItem key={place.to} onSelect={() => void go(place.to)}>
+                {t(place.labelKey)}
+              </CommandItem>
+            ))}
+          </CommandGroup>
         )}
-        {/* Only once the answer is in: saying "nothing" while still looking is worse
-            than saying nothing at all. */}
-        {searching.trim() !== "" && hits.length === 0 && results.isSuccess && (
-          <p className="px-3 py-3 text-meta text-muted-foreground">
-            {t("palette.noResults", { query: searching })}
-          </p>
+
+        {reachable.length > 0 && (
+          <CommandGroup heading={t("palette.lists")}>
+            {reachable.map((list) => (
+              <CommandItem key={list.uid} onSelect={() => void openList(list.uid)}>
+                {list.name}
+                {list.openCount > 0 && <CommandShortcut>{list.openCount}</CommandShortcut>}
+              </CommandItem>
+            ))}
+          </CommandGroup>
         )}
-        {hits.map((hit) => (
-          <button
-            key={`${hit.kind}-${hit.itemUid || hit.listUid}`}
-            type="button"
-            onClick={() => go(hit.listUid)}
-            className="flex w-full items-baseline gap-3 rounded-md px-3 py-2 text-left hover:bg-secondary"
-          >
-            <span className="truncate text-chrome">{hit.text}</span>
-            {hit.kind === SearchHitKind.ITEM && (
-              <span className="ml-auto shrink-0 text-micro text-muted-foreground">
-                {hit.listName}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-    </div>
+
+        {hits.length > 0 && (
+          <CommandGroup heading={t("palette.results")}>
+            {hits.map((hit) => (
+              <CommandItem
+                key={`${hit.kind}-${hit.itemUid || hit.listUid}`}
+                onSelect={() => void openList(hit.listUid)}
+              >
+                <span className="truncate">{hit.text}</span>
+                {namesItsList(hit) && <CommandShortcut>{hit.listName}</CommandShortcut>}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        )}
+
+        <CommandGroup heading={t("palette.actions")}>
+          <CommandItem onSelect={palette.openAddList}>{t("palette.addListTitle")}</CommandItem>
+        </CommandGroup>
+      </CommandList>
+    </Command>
   )
+}
+
+/** matches is how a destination or a List name is compared with what was typed. */
+function matches(name: string, query: string): boolean {
+  return name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())
+}
+
+/** namesItsList reports whether a hit needs to say which List it came from. */
+function namesItsList(hit: SearchHit): boolean {
+  return hit.kind !== SearchHitKind.LIST
 }
 
 function AddListPanel() {
@@ -131,9 +183,7 @@ function AddListPanel() {
     >
       <div className="flex flex-col gap-2">
         <h2 className="text-dialog">{t("palette.addListTitle")}</h2>
-        <p className="text-chrome leading-[1.6] text-secondary-foreground">
-          {t("palette.addListBlurb")}
-        </p>
+        <p className="text-field text-secondary-foreground">{t("palette.addListBlurb")}</p>
       </div>
 
       <Field
@@ -141,15 +191,15 @@ function AddListPanel() {
         value={name}
         onChange={(event) => setName(event.target.value)}
         autoFocus
-        required
       />
 
       <div className="flex items-center gap-3">
+        <span className="flex-1" />
+        <Button tone="secondary" type="button" onClick={palette.close}>
+          {t("action.cancel")}
+        </Button>
         <Button type="submit" disabled={addList.isPending}>
           {addList.isPending ? t("palette.adding") : t("palette.addListSubmit")}
-        </Button>
-        <Button type="button" tone="secondary" onClick={palette.close}>
-          {t("action.cancel")}
         </Button>
       </div>
     </form>

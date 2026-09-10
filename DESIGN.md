@@ -387,11 +387,15 @@ converts a block as it is typed but is **never displayed back to the Member**.
 | Quote | 15.5 `--secondary-foreground` | 14.5 | 2px `--border` left rule, 13px indent, padding `10px 0` |
 | Code | mono 13 `--secondary-foreground` | 12.5 | padding `10px 0` |
 
+**A block's shorthand is never shown**, not even under the caret. `### ` disappears the moment the
+space that made it a heading is typed, and a line inserted from the `/` menu never shows one at all.
+It stays removable: one Backspace takes the space back, the line stops being a heading, and the `###`
+is ordinary text again.
+
 **Inline markup is markup too.** `**bold**`, `*italic*`, `~~struck~~`, `` `code` `` and
 `[text](url)` are drawn as what they mean and the punctuation is taken away — including a link's
-address. A marker reappears only while the caret is touching **that marker**, never the whole line
-around it: typing `###` shows it, and it is gone by the time the heading's first word is typed. That
-is the narrowest reveal that still leaves a way to take a marker off again.
+address. These do reappear, because they have no line of their own to leave: a pair shows while the
+caret is inside the phrase it wraps, and both ends show together.
 
 **The `/` menu** — 300px, radius 9, 1px `--border`, 6px padding, shadow `0 12px 32px rgba(0,0,0,0.14)`,
 opened by `/` on an empty line and filtered as typing continues. An 11.5 uppercase `--muted-foreground`

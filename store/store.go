@@ -103,6 +103,56 @@ type Store interface {
 	// UseResetRequest spends an approved request, so one approval sets one password.
 	UseResetRequest(ctx context.Context, uid string) error
 
+	// CreateList adds a List.
+	CreateList(ctx context.Context, params CreateListParams) (List, error)
+
+	// ListByUID returns ErrNotFound when there is no such live List.
+	ListByUID(ctx context.Context, uid string) (List, error)
+
+	// ListsForMember returns every live List a Member can reach.
+	ListsForMember(ctx context.Context, memberID int64) ([]List, error)
+
+	// RenameList changes a List's name.
+	RenameList(ctx context.Context, uid string, name string, at time.Time) error
+
+	// SetListSharing changes who can reach a List and whether they may edit it.
+	SetListSharing(ctx context.Context, uid string, sharing Sharing, canEdit bool, at time.Time) error
+
+	// DeleteList removes a List. The removal is soft.
+	DeleteList(ctx context.Context, uid string, at time.Time) error
+
+	// PinList and UnpinList change one Member's own sidebar, and nobody else's.
+	PinList(ctx context.Context, memberID, listID int64) error
+	UnpinList(ctx context.Context, memberID, listID int64) error
+
+	// PinnedListIDs returns the Lists one Member has pinned.
+	PinnedListIDs(ctx context.Context, memberID int64) ([]int64, error)
+
+	// CreateItem appends an Item to a List.
+	CreateItem(ctx context.Context, params CreateItemParams) (Item, error)
+
+	// ItemsOnList returns a List's live Items in their manual order.
+	ItemsOnList(ctx context.Context, listID int64) ([]Item, error)
+
+	// ItemByUID returns ErrNotFound when there is no such live Item.
+	ItemByUID(ctx context.Context, uid string) (Item, error)
+
+	// DatedItemsForMember returns unticked, dated Items across every reachable List.
+	DatedItemsForMember(ctx context.Context, memberID int64, from, to string) ([]Item, error)
+
+	// UpdateItem changes an Item's own fields; a nil field is left alone.
+	UpdateItem(ctx context.Context, uid string, params UpdateItemParams, at time.Time) error
+
+	// SetItemDone and SetItemNotDone tick and untick. Ticking never conflicts.
+	SetItemDone(ctx context.Context, uid string, doneBy int64, at time.Time) error
+	SetItemNotDone(ctx context.Context, uid string, at time.Time) error
+
+	// MoveItem places an Item at a position worked out from its new neighbours.
+	MoveItem(ctx context.Context, uid string, position float64, at time.Time) error
+
+	// DeleteItem removes an Item. The removal is soft.
+	DeleteItem(ctx context.Context, uid string, at time.Time) error
+
 	// Close releases the underlying database handle.
 	Close() error
 }

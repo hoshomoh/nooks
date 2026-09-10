@@ -14,9 +14,9 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | Milestone | State |
 | --- | --- |
 | M0 · Groundwork | `[x]` |
-| M1 · Skeleton that runs | `[~]` all but TanStack Router |
-| M2 · Auth and first run | `[~]` server done; join and reset screens remain |
-| M3 · Lists and Items — the core | `[ ]` |
+| M1 · Skeleton that runs | `[x]` |
+| M2 · Auth and first run | `[x]` |
+| M3 · Lists and Items — the core | `[~]` schema and store done |
 | M4 · Views: Today, Upcoming, Calendar | `[ ]` |
 | M5 · Notes | `[ ]` |
 | M6 · Sharing, presence, Activity | `[ ]` |
@@ -68,7 +68,8 @@ TypeScript. No features. Everything after this is filling in.
 - [x] Tokens: full light and dark palettes in OKLCH, Nooks' own tokens, radii
 - [x] Self-host Public Sans and IBM Plex Mono, bundled and served from the binary
 - [x] Theme: light / dark / system, `.dark` class, persisted, follows the machine live
-- [~] TanStack Query wired; TanStack Router lands with the first real routes in M2
+- [x] TanStack Query and TanStack Router, with route loaders deciding where an arriving
+      Member lands
 - [x] Connect-web transport wired to the generated client
 - [x] SPA embedded into the binary; one process serves API and app, with SPA fallback
 - [x] CI: `go build`/`vet`/`test -race`/`gofmt`, `buf lint` and `buf format -d`, web typecheck,
@@ -78,7 +79,7 @@ TypeScript. No features. Everything after this is filling in.
 
 ## M2 · Auth and first run
 
-From `Nooks-Auth-Onboarding.dc.html`.
+From `Nooks-Auth-Onboarding.dc.html`. **Done.**
 
 - [ ] Member and Instance schema; password hashing; sessions
 - [ ] Password rule: twelve characters or more, **no other rules**
@@ -89,8 +90,10 @@ From `Nooks-Auth-Onboarding.dc.html`.
       creates one account; an ignored request is indistinguishable from a pending one
 - [x] Reset request: request → Admin approves out of band → Member sets a new password.
       **Approval expires in an hour**, and one approval sets one password
-- [ ] Signed-out shell: 52px chrome bar, centred card, eyebrow / title / blurb / fields / footer links
-- [ ] Guard: no route reachable before first run completes
+- [x] Signed-out shell: 52px chrome bar, centred column, eyebrow / title / blurb / fields /
+      footer links, as one `AuthShell` rather than five copies
+- [x] Guard: the landing loader redirects to first run, sign in, or password replacement
+      before anything renders — no screen flashes on the way through
 
 ---
 
@@ -98,7 +101,8 @@ From `Nooks-Auth-Onboarding.dc.html`.
 
 From `Nooks-List-View.dc.html`. The single most important milestone; everything else is furniture.
 
-- [ ] List and Item schema, ordering, soft delete
+- [x] List and Item schema, ordering, soft delete. Positions are floats so an Item drops
+      between two others without renumbering; both drivers tested
 - [ ] Sidebar: Instance switcher, Search, Today / Upcoming / All lists, Pinned / My lists / Shared with
       me, Add a list, Member footer
 - [ ] App shell: 258px sidebar, 44px chrome bar, 660px content column
@@ -106,14 +110,14 @@ From `Nooks-List-View.dc.html`. The single most important milestone; everything 
 - [ ] **The list row** — 44px, `20px 1fr auto`, truncation in the label, metadata right-aligned
 - [ ] Checkbox states: rest, hover, focus, done, just ticked by someone else
 - [ ] Add row: `+`, placeholder, `↵` keycap, stays focused after adding
-- [ ] Quantity as free text, shown as a mono badge
+- [~] Quantity as free text — store done, UI next
 - [ ] Due dates, and date parsing from the typed text (`milk friday`)
-- [ ] Tick and untick, with attribution
+- [~] Tick and untick, with attribution — store done, RPCs and UI next
 - [ ] Completed Items: placement and the "3 done today" row
 - [ ] Empty states: empty List, cold-start All lists
 - [ ] List menu (`···`): rename, pin, duplicate, print, sort, completed placement, export as plain
       text, delete
-- [ ] Pinning, per Member
+- [x] Pinning, per Member — store done, and it never touches anyone else's sidebar
 - [ ] Keyboard: `↵`, `↑` `↓`, `space`, `⌘K` jump-to-list
 
 ---

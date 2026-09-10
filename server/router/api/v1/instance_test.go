@@ -13,7 +13,13 @@ import (
 )
 
 // fakeStore stands in for a database so that service policy can be tested without one.
+//
+// It embeds store.Store so that only the methods a test actually exercises need to be
+// written; anything else panics with a nil-pointer dereference, which is the right
+// outcome for a method the test did not expect to be called.
 type fakeStore struct {
+	store.Store
+
 	settings store.InstanceSettings
 	err      error
 }
@@ -21,12 +27,6 @@ type fakeStore struct {
 func (f *fakeStore) InstanceSettings(context.Context) (store.InstanceSettings, error) {
 	return f.settings, f.err
 }
-
-func (f *fakeStore) SaveInstanceSettings(context.Context, store.InstanceSettings) error {
-	return f.err
-}
-
-func (f *fakeStore) Close() error { return nil }
 
 func TestGetInstanceBeforeFirstRun(t *testing.T) {
 	svc := NewInstanceService(&fakeStore{})

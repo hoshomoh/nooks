@@ -42,6 +42,37 @@ type Store interface {
 	// SaveInstanceSettings writes the Instance's own configuration in full.
 	SaveInstanceSettings(ctx context.Context, settings InstanceSettings) error
 
+	// CreateMember adds a Member, returning ErrEmailTaken if the email is in use.
+	CreateMember(ctx context.Context, params CreateMemberParams) (Member, error)
+
+	// MemberByEmail, MemberByUID and MemberByID each return ErrNotFound when there is
+	// no such Member.
+	MemberByEmail(ctx context.Context, email string) (Member, error)
+	MemberByUID(ctx context.Context, uid string) (Member, error)
+	MemberByID(ctx context.Context, id int64) (Member, error)
+
+	// CountMembers reports how many Members exist.
+	CountMembers(ctx context.Context) (int, error)
+
+	// SetMemberPassword replaces a password and clears the must-change flag.
+	SetMemberPassword(ctx context.Context, id int64, hash string) error
+
+	// MarkMemberSignedIn records that a Member has just signed in.
+	MarkMemberSignedIn(ctx context.Context, id int64, at time.Time) error
+
+	// CreateSession records a signed-in browser.
+	CreateSession(ctx context.Context, session Session) error
+
+	// SessionByTokenHash returns ErrNotFound when there is no such Session. An expired
+	// Session is still returned; expiry is the caller's decision.
+	SessionByTokenHash(ctx context.Context, tokenHash string) (Session, error)
+
+	// DeleteSession signs one browser out, and is not an error if it was already gone.
+	DeleteSession(ctx context.Context, tokenHash string) error
+
+	// DeleteExpiredSessions clears out Sessions past their expiry.
+	DeleteExpiredSessions(ctx context.Context, now time.Time) (int64, error)
+
 	// Close releases the underlying database handle.
 	Close() error
 }

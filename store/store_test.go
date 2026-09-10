@@ -53,6 +53,15 @@ func openPostgresForTest(t *testing.T) Store {
 	}
 	t.Cleanup(func() { _ = s.Close() })
 
+	// Postgres is shared between runs, unlike the per-test SQLite file, so each test
+	// starts by emptying it. Sessions go with their Members via ON DELETE CASCADE.
+	concrete, ok := s.(*sqlStore)
+	if !ok {
+		t.Fatalf("OpenPostgres returned %T, want *sqlStore", s)
+	}
+	if _, err := concrete.db.ExecContext(t.Context(), `TRUNCATE member RESTART IDENTITY CASCADE`); err != nil {
+		t.Fatalf("truncate member: %v", err)
+	}
 	if err := s.SaveInstanceSettings(t.Context(), InstanceSettings{}); err != nil {
 		t.Fatalf("reset instance settings: %v", err)
 	}

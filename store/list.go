@@ -73,7 +73,16 @@ func (s *sqlStore) CreateList(ctx context.Context, params CreateListParams) (Lis
 	if _, err := s.db.NewInsert().Model(row).Returning("*").Exec(ctx); err != nil {
 		return List{}, fmt.Errorf("create list: %w", err)
 	}
-	return row.toList()
+
+	list, err := row.toList()
+	if err != nil {
+		return List{}, err
+	}
+	// Indexing happens with the write, so nothing can exist without being findable.
+	if err := s.indexList(ctx, list); err != nil {
+		return List{}, err
+	}
+	return list, nil
 }
 
 // ListByUID finds a live List by its public identifier.
@@ -119,9 +128,17 @@ func (s *sqlStore) RenameList(ctx context.Context, uid string, name string, at t
 	if name == "" {
 		return errors.New("store: list name is required")
 	}
-	return s.updateList(ctx, uid, at, func(q *bun.UpdateQuery) *bun.UpdateQuery {
+	if err := s.updateList(ctx, uid, at, func(q *bun.UpdateQuery) *bun.UpdateQuery {
 		return q.Set("name = ?", name)
-	})
+	}); err != nil {
+		return err
+	}
+
+	list, err := s.ListByUID(ctx, uid)
+	if err != nil {
+		return err
+	}
+	return s.indexList(ctx, list)
 }
 
 // SetListSharing changes who can reach a List.
@@ -134,8 +151,34 @@ func (s *sqlStore) SetListSharing(ctx context.Context, uid string, sharing Shari
 // DeleteList removes a List, and with it the Items on it. The removal is soft, so a
 // List deleted by mistake is recoverable.
 func (s *sqlStore) DeleteList(ctx context.Context, uid string, at time.Time) error {
-	return s.updateList(ctx, uid, at, func(q *bun.UpdateQuery) *bun.UpdateQuery {
+	list, err := s.ListByUID(ctx, uid)
+	if err != nil {
+		return err
+	}
+	if err := s.updateList(ctx, uid, at, func(q *bun.UpdateQuery) *bun.UpdateQuery {
 		return q.Set("deleted_at = ?", formatTime(at))
+	}); err != nil {
+		return err
+	}
+
+	// A deleted List and its Items must stop being findable, or search would hand back
+	// things the Member can no longer open.
+	items, err := s.ItemsOnList(ctx, list.ID)
+	if err != nil {
+		return err
+	}
+	for _, item := range items {
+		if err := s.Unindex(ctx, KindItem, item.UID); err != nil {
+			return err
+		}
+	}
+	return s.Unindex(ctx, KindList, uid)
+}
+
+// indexList makes a List findable by its name.
+func (s *sqlStore) indexList(ctx context.Context, list List) error {
+	return s.Index(ctx, IndexEntry{
+		Kind: KindList, UID: list.UID, ListID: list.ID, Text: list.Name,
 	})
 }
 

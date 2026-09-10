@@ -66,6 +66,7 @@ func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
 	mux.Handle(apiv1.NewInstanceServiceHandler(v1.NewInstanceService(s), interceptors))
 	mux.Handle(apiv1.NewAuthServiceHandler(authService, interceptors))
 	mux.Handle(apiv1.NewRequestServiceHandler(v1.NewRequestService(s, nil), interceptors))
+	mux.Handle(apiv1.NewListServiceHandler(v1.NewListService(s, nil, nil), interceptors))
 	mux.HandleFunc("GET /healthz", handleHealthz)
 
 	// In dev the Vite server serves the app and proxies here, so the binary serves only

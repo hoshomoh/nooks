@@ -1,8 +1,7 @@
 # Nooks — design system
 
-The specification the UI is built to. Values here are extracted from the design canvas
-(`docs/design/README.md`) and are exact, not approximate. If a component in the app disagrees with
-this file, the component is wrong.
+The specification the UI is built to. The values here are exact, not approximate. If a component in
+the app disagrees with this file, the component is wrong.
 
 Enforcement lives in `apps/web/src/index.css`: every value below exists there as a custom property,
 and no colour, radius or size may be written inline in a component. Use `CONTEXT.md` terms for the

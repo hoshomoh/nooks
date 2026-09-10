@@ -33,7 +33,6 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 
 ## M0 · Groundwork
 
-- [x] Clone `usememos/memos` into `reference/`, gitignored, as a worked example of this stack
 - [x] Install toolchain: Go 1.27.1, Node 24.21.0 LTS, pnpm 12.3.4, buf 1.72.0
 - [x] Pin buf as a workspace devDependency — no global install for contributors
 - [x] `CONTEXT.md` — domain glossary, 26 terms, each with what not to call it
@@ -79,7 +78,7 @@ TypeScript. No features. Everything after this is filling in.
 
 ## M2 · Auth and first run
 
-From `Nooks-Auth-Onboarding.dc.html`. **Done.**
+**Done.**
 
 - [ ] Member and Instance schema; password hashing; sessions
 - [ ] Password rule: twelve characters or more, **no other rules**
@@ -99,7 +98,10 @@ From `Nooks-Auth-Onboarding.dc.html`. **Done.**
 
 ## M3 · Lists and Items — the core
 
-From `Nooks-List-View.dc.html`. The single most important milestone; everything else is furniture.
+The single most important milestone; everything else is furniture.
+
+- [x] Full-text search over Lists and Items, ranked and prefix-matched, on both drivers.
+      Notes join the same index in M5
 
 - [x] List and Item schema, ordering, soft delete. Positions are floats so an Item drops
       between two others without renumbering; both drivers tested
@@ -118,7 +120,8 @@ From `Nooks-List-View.dc.html`. The single most important milestone; everything 
 - [ ] List menu (`···`): rename, pin, duplicate, print, sort, completed placement, export as plain
       text, delete
 - [x] Pinning, per Member — store done, and it never touches anyone else's sidebar
-- [ ] Keyboard: `↵`, `↑` `↓`, `space`, `⌘K` jump-to-list
+- [~] Keyboard: `↵`, `↑` `↓`, `space`, `⌘K` — full-text search is in the store; the RPC and
+      the ⌘K palette are next
 
 ---
 
@@ -147,8 +150,6 @@ From `Nooks-List-View.dc.html`. The single most important milestone; everything 
 
 ## M6 · Sharing, presence, Activity
 
-From `Nooks-Sharing-Team.dc.html`.
-
 - [ ] Sharing model: private / everyone on the Instance / specific Members and Groups
 - [ ] Can-edit toggle; read-only means see and print, not tick or add
 - [ ] Share dialog, and the specific-people dialog (Groups first, then individuals)
@@ -175,8 +176,6 @@ From `Nooks-Sharing-Team.dc.html`.
 
 ## M8 · Public list
 
-From `Nooks-Public-Access.dc.html`.
-
 - [ ] At most one Public list per Instance, at a stable address, no password, no account
 - [ ] Public page: no sidebar, no attribution, no other List reachable
 - [ ] Settings: which List, show contributor names, show quantities and dates, let visitors ask to join
@@ -189,8 +188,6 @@ From `Nooks-Public-Access.dc.html`.
 ---
 
 ## M9 · Print
-
-From `Nooks-Print.dc.html`.
 
 - [ ] `@page` A4, `18mm 18mm 14mm`, print stylesheet
 - [ ] Header: eyebrow, title, date, counts, and the 0.7pt ink rule
@@ -275,11 +272,12 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
 | Decision | Choice | Consequence |
 | --- | --- | --- |
 | Go module path | `github.com/hoshomoh/nooks` | Clone path and module path agree |
-| Database drivers, v1 | **SQLite and Postgres** | Every schema change ships migrations and `LATEST.sql` for both, plus driver tests. SQLite stays the default — the About screen promises "one file you can copy" |
+| Database drivers, v1 | **SQLite and Postgres** | Every schema change ships migrations and `LATEST.sql` for both, plus driver tests. SQLite stays the default — one file the owner can copy |
 | Live updates | **SSE** | One-directional, plain HTTP, self-reconnecting, fine behind a reverse proxy. Enough for ticks, presence and Activity |
 | buf | Workspace devDependency | `pnpm exec buf`; no global install for contributors |
-| Data access | **Bun** | SQL-first, and the only option giving both dialects from one query set. memos writes every query three times, once per driver |
+| Data access | **Bun** | SQL-first, and the only option giving both dialects from one query set |
 | Token naming | shadcn's names; Nooks' accent is `shared` | Avoids colliding with shadcn's `--accent` hover surface |
+| Search | **Native full-text per driver**, from day one | SQLite FTS5, Postgres `tsvector` + GIN. Ranked and prefix-matched, so ⌘K narrows while you type. The index is maintained on write, and permissions are applied above it so search can never reach further than the Member can |
 | Repository shape | **Monorepo**: `apps/*` and `packages/*`, Go at the root | Room for the website now and Expo later; shared code lives in a package rather than inside one app |
 | Generated TS client | `packages/api` (`@nooks/api`) | Two known consumers — the web app now, Expo later — so it is a package from the start rather than a later extraction |
 | Website stack | **Next.js + Fumadocs**, in v1 | Same React/Tailwind/shadcn stack as the app, so `DESIGN.md` carries over. `fumadocs-openapi` turns the spec into API docs |
@@ -301,8 +299,7 @@ what `shadcn init` emits); fonts offline (Public Sans and IBM Plex Mono are self
 Named so nobody wonders whether they were forgotten. None of these appear in the design.
 
 - Recurring Items · Reminders and push notifications · File attachments · Sub-lists or nesting beyond
-  Note checklists · Full-text search across Notes (⌘K jumps to Lists only) · Multiple Instances behind
-  one deployment · Email, of any kind
+  Note checklists · Multiple Instances behind one deployment · Email, of any kind
 
 The **mobile app is planned but not v1**: Expo, in `apps/mobile`, sharing `@nooks/api` and the design
 tokens. The layout already has room for it.

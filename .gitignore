@@ -1,5 +1,6 @@
-# Reference clone of usememos/memos — read-only, never edited, never shipped.
+# Read-only prior-art clones and local working notes. Never edited, never shipped.
 reference/
+.local/
 
 # Dependencies
 node_modules/
@@ -19,8 +20,8 @@ server/router/frontend/dist/*
 *.db-wal
 /data/
 
-# Machine-specific Claude Code settings (PATH for this machine's toolchain)
-.claude/settings.local.json
+# Machine-specific editor and tooling settings
+.claude/
 
 # Downloaded toolchain archives
 go*.linux-amd64.tar.gz

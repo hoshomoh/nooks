@@ -153,6 +153,18 @@ type Store interface {
 	// DeleteItem removes an Item. The removal is soft.
 	DeleteItem(ctx context.Context, uid string, at time.Time) error
 
+	// Search returns hits for what a Member typed, most relevant first.
+	//
+	// It does not filter by who may see what: that is accessTo's job in the API layer,
+	// and keeping one place in charge is what stops search becoming a way around
+	// permissions.
+	Search(ctx context.Context, query string) ([]SearchHit, error)
+
+	// Index and Unindex maintain the search index. The store calls them on its own
+	// writes; a caller should not need to.
+	Index(ctx context.Context, entry IndexEntry) error
+	Unindex(ctx context.Context, kind SearchKind, uid string) error
+
 	// Close releases the underlying database handle.
 	Close() error
 }

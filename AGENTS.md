@@ -32,8 +32,7 @@ Nooks is a self-hosted household todo app. See `CONTEXT.md` for the domain gloss
 - `useEffect` is a last resort. Prefer `useSyncExternalStore`, render-time computation,
   event handlers, or TanStack Query. See `STANDARDS.md` §5.
 - UI work follows `DESIGN.md`, not improvisation. Tokens live in `web/src/styles/tokens.css`; do not
-  introduce a colour, radius or size that is not in there. `docs/design/` points at the canvas the
-  spec was extracted from.
+  introduce a colour, radius or size that is not in there.
 - One verb for creating things, everywhere: **Add**. Never New, Create, Issue, or Generate.
 - Ask before adding heavy dependencies, changing auth or token behaviour, or altering the Docker and
   release workflows.
@@ -83,11 +82,3 @@ cd proto && buf format -w        # Format proto files
 | `apps/web/` | The app SPA, embedded in the binary |
 | `apps/website/` | Marketing site and docs (Next.js + Fumadocs) |
 | `packages/api/` | Generated TypeScript client, shared by the app and later Expo |
-| `docs/design/` | The design canvas source and notes |
-| `reference/memos/` | Read-only clone of usememos/memos, for reference. Gitignored. Never edit. |
-
-## Reference
-
-`reference/memos/` is a shallow clone of [usememos/memos](https://github.com/usememos/memos), kept as a
-worked example of this exact stack. Consult it for structure, naming, and how a problem was solved
-there. It is not a dependency and nothing imports from it.

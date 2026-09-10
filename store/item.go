@@ -81,7 +81,15 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 	if _, err := s.db.NewInsert().Model(row).Returning("*").Exec(ctx); err != nil {
 		return Item{}, fmt.Errorf("create item: %w", err)
 	}
-	return row.toItem()
+
+	item, err := row.toItem()
+	if err != nil {
+		return Item{}, err
+	}
+	if err := s.indexItem(ctx, item); err != nil {
+		return Item{}, err
+	}
+	return item, nil
 }
 
 // ItemsOnList returns a List's live Items in their manual order.
@@ -162,7 +170,15 @@ func (s *sqlStore) UpdateItem(ctx context.Context, uid string, params UpdateItem
 	if err != nil {
 		return fmt.Errorf("update item: %w", err)
 	}
-	return requireOneRow(result, "item")
+	if err := requireOneRow(result, "item"); err != nil {
+		return err
+	}
+
+	item, err := s.ItemByUID(ctx, uid)
+	if err != nil {
+		return err
+	}
+	return s.indexItem(ctx, item)
 }
 
 // SetItemDone ticks or unticks an Item.
@@ -224,7 +240,22 @@ func (s *sqlStore) DeleteItem(ctx context.Context, uid string, at time.Time) err
 	if err != nil {
 		return fmt.Errorf("delete item: %w", err)
 	}
-	return requireOneRow(result, "item")
+	if err := requireOneRow(result, "item"); err != nil {
+		return err
+	}
+	return s.Unindex(ctx, KindItem, uid)
+}
+
+// indexItem makes an Item findable by its label and quantity — both are text a Member
+// wrote, and "1 kg" is as searchable as "Tomatoes".
+func (s *sqlStore) indexItem(ctx context.Context, item Item) error {
+	text := item.Label
+	if item.Quantity != "" {
+		text += " " + item.Quantity
+	}
+	return s.Index(ctx, IndexEntry{
+		Kind: KindItem, UID: item.UID, ListID: item.ListID, Text: text,
+	})
 }
 
 // nextPosition is one gap past the last Item on the List.

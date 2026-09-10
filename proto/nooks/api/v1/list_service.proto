@@ -1,0 +1,202 @@
+syntax = "proto3";
+
+package nooks.api.v1;
+
+// ListService covers Lists and the Items on them — the whole of Nooks, really.
+// Everything else is a view over these.
+service ListService {
+  // ListLists returns every List the signed-in Member can reach, with the counts the
+  // sidebar shows.
+  rpc ListLists(ListListsRequest) returns (ListListsResponse);
+
+  // GetList returns one List and its Items, in their manual order.
+  rpc GetList(GetListRequest) returns (GetListResponse);
+
+  // CreateList adds a List. It starts private.
+  rpc CreateList(CreateListRequest) returns (CreateListResponse);
+
+  // RenameList changes a List's name. Only its owner may.
+  rpc RenameList(RenameListRequest) returns (RenameListResponse);
+
+  // SetListSharing changes who can reach a List. Only its owner may.
+  rpc SetListSharing(SetListSharingRequest) returns (SetListSharingResponse);
+
+  // DeleteList removes a List and the Items on it. Only its owner may.
+  rpc DeleteList(DeleteListRequest) returns (DeleteListResponse);
+
+  // SetListPinned pins or unpins a List in the signed-in Member's own sidebar. It
+  // never affects anyone else's.
+  rpc SetListPinned(SetListPinnedRequest) returns (SetListPinnedResponse);
+
+  // CreateItem appends an Item to a List.
+  rpc CreateItem(CreateItemRequest) returns (CreateItemResponse);
+
+  // UpdateItem changes an Item's label, quantity or due date. An unset field is left
+  // alone.
+  rpc UpdateItem(UpdateItemRequest) returns (UpdateItemResponse);
+
+  // SetItemDone ticks or unticks an Item. A tick is a tick whoever made it, so this
+  // never conflicts.
+  rpc SetItemDone(SetItemDoneRequest) returns (SetItemDoneResponse);
+
+  // MoveItem places an Item after another one, or at the top when after_item_uid is
+  // empty.
+  rpc MoveItem(MoveItemRequest) returns (MoveItemResponse);
+
+  // DeleteItem removes an Item.
+  rpc DeleteItem(DeleteItemRequest) returns (DeleteItemResponse);
+}
+
+// Sharing is who can reach a List.
+enum Sharing {
+  SHARING_UNSPECIFIED = 0;
+  // SHARING_PRIVATE is only the owner. Nobody else sees it in their sidebar.
+  SHARING_PRIVATE = 1;
+  // SHARING_INSTANCE is everyone here, including whoever joins later.
+  SHARING_INSTANCE = 2;
+  // SHARING_SPECIFIC is named Members and Groups. Arrives with Groups in M6.
+  SHARING_SPECIFIC = 3;
+}
+
+// List is a named, ordered collection of Items.
+message List {
+  string uid = 1;
+  string name = 2;
+  Sharing sharing = 3;
+
+  // False means whoever it is shared with may see and print it, but not tick or add.
+  bool can_edit = 4;
+
+  // Whether the signed-in Member owns it. Only an owner may rename, share or delete.
+  bool is_owner = 5;
+
+  // Whether the signed-in Member has pinned it to their own sidebar.
+  bool is_pinned = 6;
+
+  // How many Items are not yet ticked. The number beside the name in the sidebar.
+  int32 open_count = 7;
+}
+
+// Item is one line on a List.
+message Item {
+  string uid = 1;
+  string label = 2;
+
+  // Free text — "2", "1 kg" — never a number.
+  string quantity = 3;
+
+  // A date, not a time: YYYY-MM-DD, or empty for an Item with no due date.
+  string due_on = 4;
+
+  bool done = 5;
+
+  // Who put it on the List, shown at the right of the row.
+  string added_by_name = 6;
+
+  // Who ticked it, when anyone has.
+  string done_by_name = 7;
+}
+
+message ListListsRequest {}
+
+message ListListsResponse {
+  repeated List lists = 1;
+}
+
+message GetListRequest {
+  string list_uid = 1;
+}
+
+message GetListResponse {
+  List list = 1;
+  repeated Item items = 2;
+}
+
+message CreateListRequest {
+  string name = 1;
+}
+
+message CreateListResponse {
+  List list = 1;
+}
+
+message RenameListRequest {
+  string list_uid = 1;
+  string name = 2;
+}
+
+message RenameListResponse {
+  List list = 1;
+}
+
+message SetListSharingRequest {
+  string list_uid = 1;
+  Sharing sharing = 2;
+  bool can_edit = 3;
+}
+
+message SetListSharingResponse {
+  List list = 1;
+}
+
+message DeleteListRequest {
+  string list_uid = 1;
+}
+
+message DeleteListResponse {}
+
+message SetListPinnedRequest {
+  string list_uid = 1;
+  bool pinned = 2;
+}
+
+message SetListPinnedResponse {}
+
+message CreateItemRequest {
+  string list_uid = 1;
+  string label = 2;
+  string quantity = 3;
+  string due_on = 4;
+}
+
+message CreateItemResponse {
+  Item item = 1;
+}
+
+message UpdateItemRequest {
+  string item_uid = 1;
+
+  // Each field is optional: an unset one is left alone, so changing a quantity does not
+  // have to restate the label.
+  optional string label = 2;
+  optional string quantity = 3;
+  optional string due_on = 4;
+}
+
+message UpdateItemResponse {
+  Item item = 1;
+}
+
+message SetItemDoneRequest {
+  string item_uid = 1;
+  bool done = 2;
+}
+
+message SetItemDoneResponse {
+  Item item = 1;
+}
+
+message MoveItemRequest {
+  string item_uid = 1;
+
+  // The Item to place it after. Empty puts it at the top.
+  string after_item_uid = 2;
+}
+
+message MoveItemResponse {}
+
+message DeleteItemRequest {
+  string item_uid = 1;
+}
+
+message DeleteItemResponse {}

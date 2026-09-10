@@ -10,10 +10,5 @@
   },
   "devDependencies": {
     "@bufbuild/buf": "1.72.0"
-  },
-  "pnpm": {
-    "ignoredBuiltDependencies": [
-      "@bufbuild/buf"
-    ]
   }
 }

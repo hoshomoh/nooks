@@ -97,6 +97,41 @@ func (s *sqlStore) RemoveFromGroup(ctx context.Context, groupID, memberID int64)
 	return nil
 }
 
+// ReplaceGroupMembers sets exactly who is in a Group, replacing whoever was there.
+//
+// Membership is one decision for the same reason sharing is: an Admin picks the people
+// who are in a Group, rather than adding and removing them one at a time and hoping the
+// result is what they meant.
+func (s *sqlStore) ReplaceGroupMembers(ctx context.Context, groupID int64, memberIDs []int64) error {
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin: %w", err)
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	if _, err := tx.NewDelete().
+		Model((*groupMemberModel)(nil)).
+		Where("group_id = ?", groupID).
+		Exec(ctx); err != nil {
+		return fmt.Errorf("clear group members: %w", err)
+	}
+
+	rows := make([]groupMemberModel, 0, len(memberIDs))
+	for _, id := range memberIDs {
+		rows = append(rows, groupMemberModel{GroupID: groupID, MemberID: id})
+	}
+	if len(rows) > 0 {
+		if _, err := tx.NewInsert().Model(&rows).Exec(ctx); err != nil {
+			return fmt.Errorf("write group members: %w", err)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit group members: %w", err)
+	}
+	return nil
+}
+
 // GroupMemberIDs lists who is in a Group.
 func (s *sqlStore) GroupMemberIDs(ctx context.Context, groupID int64) ([]int64, error) {
 	var ids []int64

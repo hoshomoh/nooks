@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package nooks.api.v1;
+
+import "nooks/api/v1/auth_service.proto";
+
+// MemberService covers who is here and how they are grouped.
+//
+// A Group carries no permissions of its own: it is a shortcut for sharing, so that
+// "the flatmates" is one thing to pick rather than three.
+service MemberService {
+  // ListMembers returns everyone on the Instance, by name.
+  rpc ListMembers(ListMembersRequest) returns (ListMembersResponse);
+
+  // ListGroups returns every Group, with who is in it.
+  rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse);
+
+  // CreateGroup adds a Group. Admins only.
+  rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse);
+
+  // SetGroupMembers replaces who is in a Group. Admins only.
+  //
+  // Removing someone takes away the Lists they reached through it, and nothing else.
+  rpc SetGroupMembers(SetGroupMembersRequest) returns (SetGroupMembersResponse);
+}
+
+// Group is a named set of Members.
+message Group {
+  string uid = 1;
+  string name = 2;
+
+  // Who is in it, in the order they read: the dialog shows names, not counts.
+  repeated Member members = 3;
+}
+
+message ListMembersRequest {}
+
+message ListMembersResponse {
+  repeated Member members = 1;
+}
+
+message ListGroupsRequest {}
+
+message ListGroupsResponse {
+  repeated Group groups = 1;
+}
+
+message CreateGroupRequest {
+  string name = 1;
+}
+
+message CreateGroupResponse {
+  Group group = 1;
+}
+
+message SetGroupMembersRequest {
+  string group_uid = 1;
+  repeated string member_uids = 2;
+}
+
+message SetGroupMembersResponse {
+  Group group = 1;
+}

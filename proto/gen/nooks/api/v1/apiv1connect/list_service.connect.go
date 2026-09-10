@@ -44,6 +44,9 @@ const (
 	// ListServiceSetListSharingProcedure is the fully-qualified name of the ListService's
 	// SetListSharing RPC.
 	ListServiceSetListSharingProcedure = "/nooks.api.v1.ListService/SetListSharing"
+	// ListServiceGetListSharesProcedure is the fully-qualified name of the ListService's GetListShares
+	// RPC.
+	ListServiceGetListSharesProcedure = "/nooks.api.v1.ListService/GetListShares"
 	// ListServiceDeleteListProcedure is the fully-qualified name of the ListService's DeleteList RPC.
 	ListServiceDeleteListProcedure = "/nooks.api.v1.ListService/DeleteList"
 	// ListServiceSetListPinnedProcedure is the fully-qualified name of the ListService's SetListPinned
@@ -79,6 +82,8 @@ type ListServiceClient interface {
 	RenameList(context.Context, *connect.Request[v1.RenameListRequest]) (*connect.Response[v1.RenameListResponse], error)
 	// SetListSharing changes who can reach a List. Only its owner may.
 	SetListSharing(context.Context, *connect.Request[v1.SetListSharingRequest]) (*connect.Response[v1.SetListSharingResponse], error)
+	// GetListShares returns who a List reaches by name, for the share dialog.
+	GetListShares(context.Context, *connect.Request[v1.GetListSharesRequest]) (*connect.Response[v1.GetListSharesResponse], error)
 	// DeleteList removes a List and the Items on it. Only its owner may.
 	DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error)
 	// SetListPinned pins or unpins a List in the signed-in Member's own sidebar. It
@@ -148,6 +153,12 @@ func NewListServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(listServiceMethods.ByName("SetListSharing")),
 			connect.WithClientOptions(opts...),
 		),
+		getListShares: connect.NewClient[v1.GetListSharesRequest, v1.GetListSharesResponse](
+			httpClient,
+			baseURL+ListServiceGetListSharesProcedure,
+			connect.WithSchema(listServiceMethods.ByName("GetListShares")),
+			connect.WithClientOptions(opts...),
+		),
 		deleteList: connect.NewClient[v1.DeleteListRequest, v1.DeleteListResponse](
 			httpClient,
 			baseURL+ListServiceDeleteListProcedure,
@@ -212,6 +223,7 @@ type listServiceClient struct {
 	createList     *connect.Client[v1.CreateListRequest, v1.CreateListResponse]
 	renameList     *connect.Client[v1.RenameListRequest, v1.RenameListResponse]
 	setListSharing *connect.Client[v1.SetListSharingRequest, v1.SetListSharingResponse]
+	getListShares  *connect.Client[v1.GetListSharesRequest, v1.GetListSharesResponse]
 	deleteList     *connect.Client[v1.DeleteListRequest, v1.DeleteListResponse]
 	setListPinned  *connect.Client[v1.SetListPinnedRequest, v1.SetListPinnedResponse]
 	createItem     *connect.Client[v1.CreateItemRequest, v1.CreateItemResponse]
@@ -246,6 +258,11 @@ func (c *listServiceClient) RenameList(ctx context.Context, req *connect.Request
 // SetListSharing calls nooks.api.v1.ListService.SetListSharing.
 func (c *listServiceClient) SetListSharing(ctx context.Context, req *connect.Request[v1.SetListSharingRequest]) (*connect.Response[v1.SetListSharingResponse], error) {
 	return c.setListSharing.CallUnary(ctx, req)
+}
+
+// GetListShares calls nooks.api.v1.ListService.GetListShares.
+func (c *listServiceClient) GetListShares(ctx context.Context, req *connect.Request[v1.GetListSharesRequest]) (*connect.Response[v1.GetListSharesResponse], error) {
+	return c.getListShares.CallUnary(ctx, req)
 }
 
 // DeleteList calls nooks.api.v1.ListService.DeleteList.
@@ -306,6 +323,8 @@ type ListServiceHandler interface {
 	RenameList(context.Context, *connect.Request[v1.RenameListRequest]) (*connect.Response[v1.RenameListResponse], error)
 	// SetListSharing changes who can reach a List. Only its owner may.
 	SetListSharing(context.Context, *connect.Request[v1.SetListSharingRequest]) (*connect.Response[v1.SetListSharingResponse], error)
+	// GetListShares returns who a List reaches by name, for the share dialog.
+	GetListShares(context.Context, *connect.Request[v1.GetListSharesRequest]) (*connect.Response[v1.GetListSharesResponse], error)
 	// DeleteList removes a List and the Items on it. Only its owner may.
 	DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error)
 	// SetListPinned pins or unpins a List in the signed-in Member's own sidebar. It
@@ -369,6 +388,12 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 		ListServiceSetListSharingProcedure,
 		svc.SetListSharing,
 		connect.WithSchema(listServiceMethods.ByName("SetListSharing")),
+		connect.WithHandlerOptions(opts...),
+	)
+	listServiceGetListSharesHandler := connect.NewUnaryHandler(
+		ListServiceGetListSharesProcedure,
+		svc.GetListShares,
+		connect.WithSchema(listServiceMethods.ByName("GetListShares")),
 		connect.WithHandlerOptions(opts...),
 	)
 	listServiceDeleteListHandler := connect.NewUnaryHandler(
@@ -437,6 +462,8 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 			listServiceRenameListHandler.ServeHTTP(w, r)
 		case ListServiceSetListSharingProcedure:
 			listServiceSetListSharingHandler.ServeHTTP(w, r)
+		case ListServiceGetListSharesProcedure:
+			listServiceGetListSharesHandler.ServeHTTP(w, r)
 		case ListServiceDeleteListProcedure:
 			listServiceDeleteListHandler.ServeHTTP(w, r)
 		case ListServiceSetListPinnedProcedure:
@@ -482,6 +509,10 @@ func (UnimplementedListServiceHandler) RenameList(context.Context, *connect.Requ
 
 func (UnimplementedListServiceHandler) SetListSharing(context.Context, *connect.Request[v1.SetListSharingRequest]) (*connect.Response[v1.SetListSharingResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.SetListSharing is not implemented"))
+}
+
+func (UnimplementedListServiceHandler) GetListShares(context.Context, *connect.Request[v1.GetListSharesRequest]) (*connect.Response[v1.GetListSharesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.GetListShares is not implemented"))
 }
 
 func (UnimplementedListServiceHandler) DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error) {

@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nooks/api/v1/list_service.proto.
  */
 export const file_nooks_api_v1_list_service: GenFile = /*@__PURE__*/
-  fileDesc("Ch9ub29rcy9hcGkvdjEvbGlzdF9zZXJ2aWNlLnByb3RvEgxub29rcy5hcGkudjEilAEKBExpc3QSCwoDdWlkGAEgASgJEgwKBG5hbWUYAiABKAkSJgoHc2hhcmluZxgDIAEoDjIVLm5vb2tzLmFwaS52MS5TaGFyaW5nEhAKCGNhbl9lZGl0GAQgASgIEhAKCGlzX293bmVyGAUgASgIEhEKCWlzX3Bpbm5lZBgGIAEoCBISCgpvcGVuX2NvdW50GAcgASgFIsQBCgRJdGVtEgsKA3VpZBgBIAEoCRINCgVsYWJlbBgCIAEoCRIQCghxdWFudGl0eRgDIAEoCRIOCgZkdWVfb24YBCABKAkSDAoEZG9uZRgFIAEoCBIVCg1hZGRlZF9ieV9uYW1lGAYgASgJEhQKDGRvbmVfYnlfbmFtZRgHIAEoCRIMCgRub3RlGAggASgJEhcKD25vdGVfZmlyc3RfbGluZRgJIAEoCRIcChRub3RlX3JlbWFpbmluZ19saW5lcxgKIAEoBSISChBMaXN0TGlzdHNSZXF1ZXN0IjYKEUxpc3RMaXN0c1Jlc3BvbnNlEiEKBWxpc3RzGAEgAygLMhIubm9va3MuYXBpLnYxLkxpc3QiIgoOR2V0TGlzdFJlcXVlc3QSEAoIbGlzdF91aWQYASABKAkiVgoPR2V0TGlzdFJlc3BvbnNlEiAKBGxpc3QYASABKAsyEi5ub29rcy5hcGkudjEuTGlzdBIhCgVpdGVtcxgCIAMoCzISLm5vb2tzLmFwaS52MS5JdGVtIiEKEUNyZWF0ZUxpc3RSZXF1ZXN0EgwKBG5hbWUYASABKAkiNgoSQ3JlYXRlTGlzdFJlc3BvbnNlEiAKBGxpc3QYASABKAsyEi5ub29rcy5hcGkudjEuTGlzdCIzChFSZW5hbWVMaXN0UmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCRIMCgRuYW1lGAIgASgJIjYKElJlbmFtZUxpc3RSZXNwb25zZRIgCgRsaXN0GAEgASgLMhIubm9va3MuYXBpLnYxLkxpc3QiYwoVU2V0TGlzdFNoYXJpbmdSZXF1ZXN0EhAKCGxpc3RfdWlkGAEgASgJEiYKB3NoYXJpbmcYAiABKA4yFS5ub29rcy5hcGkudjEuU2hhcmluZxIQCghjYW5fZWRpdBgDIAEoCCI6ChZTZXRMaXN0U2hhcmluZ1Jlc3BvbnNlEiAKBGxpc3QYASABKAsyEi5ub29rcy5hcGkudjEuTGlzdCIlChFEZWxldGVMaXN0UmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCSIUChJEZWxldGVMaXN0UmVzcG9uc2UiOAoUU2V0TGlzdFBpbm5lZFJlcXVlc3QSEAoIbGlzdF91aWQYASABKAkSDgoGcGlubmVkGAIgASgIIhcKFVNldExpc3RQaW5uZWRSZXNwb25zZSJWChFDcmVhdGVJdGVtUmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCRINCgVsYWJlbBgCIAEoCRIQCghxdWFudGl0eRgDIAEoCRIOCgZkdWVfb24YBCABKAkiNgoSQ3JlYXRlSXRlbVJlc3BvbnNlEiAKBGl0ZW0YASABKAsyEi5ub29rcy5hcGkudjEuSXRlbSKjAQoRVXBkYXRlSXRlbVJlcXVlc3QSEAoIaXRlbV91aWQYASABKAkSEgoFbGFiZWwYAiABKAlIAIgBARIVCghxdWFudGl0eRgDIAEoCUgBiAEBEhMKBmR1ZV9vbhgEIAEoCUgCiAEBEhEKBG5vdGUYBSABKAlIA4gBAUIICgZfbGFiZWxCCwoJX3F1YW50aXR5QgkKB19kdWVfb25CBwoFX25vdGUiNgoSVXBkYXRlSXRlbVJlc3BvbnNlEiAKBGl0ZW0YASABKAsyEi5ub29rcy5hcGkudjEuSXRlbSI0ChJTZXRJdGVtRG9uZVJlcXVlc3QSEAoIaXRlbV91aWQYASABKAkSDAoEZG9uZRgCIAEoCCI3ChNTZXRJdGVtRG9uZVJlc3BvbnNlEiAKBGl0ZW0YASABKAsyEi5ub29rcy5hcGkudjEuSXRlbSI7Cg9Nb3ZlSXRlbVJlcXVlc3QSEAoIaXRlbV91aWQYASABKAkSFgoOYWZ0ZXJfaXRlbV91aWQYAiABKAkiEgoQTW92ZUl0ZW1SZXNwb25zZSIlChFEZWxldGVJdGVtUmVxdWVzdBIQCghpdGVtX3VpZBgBIAEoCSIUChJEZWxldGVJdGVtUmVzcG9uc2UiewoJU2VhcmNoSGl0EikKBGtpbmQYASABKA4yGy5ub29rcy5hcGkudjEuU2VhcmNoSGl0S2luZBIQCghsaXN0X3VpZBgCIAEoCRIQCghpdGVtX3VpZBgDIAEoCRIMCgR0ZXh0GAQgASgJEhEKCWxpc3RfbmFtZRgFIAEoCSIeCg1TZWFyY2hSZXF1ZXN0Eg0KBXF1ZXJ5GAEgASgJIjcKDlNlYXJjaFJlc3BvbnNlEiUKBGhpdHMYASADKAsyFy5ub29rcy5hcGkudjEuU2VhcmNoSGl0IlIKCURhdGVkSXRlbRIgCgRpdGVtGAEgASgLMhIubm9va3MuYXBpLnYxLkl0ZW0SEAoIbGlzdF91aWQYAiABKAkSEQoJbGlzdF9uYW1lGAMgASgJIjEKFUxpc3REYXRlZEl0ZW1zUmVxdWVzdBIMCgRmcm9tGAEgASgJEgoKAnRvGAIgASgJIkAKFkxpc3REYXRlZEl0ZW1zUmVzcG9uc2USJgoFaXRlbXMYASADKAsyFy5ub29rcy5hcGkudjEuRGF0ZWRJdGVtKmMKB1NoYXJpbmcSFwoTU0hBUklOR19VTlNQRUNJRklFRBAAEhMKD1NIQVJJTkdfUFJJVkFURRABEhQKEFNIQVJJTkdfSU5TVEFOQ0UQAhIUChBTSEFSSU5HX1NQRUNJRklDEAMqfgoNU2VhcmNoSGl0S2luZBIfChtTRUFSQ0hfSElUX0tJTkRfVU5TUEVDSUZJRUQQABIYChRTRUFSQ0hfSElUX0tJTkRfTElTVBABEhgKFFNFQVJDSF9ISVRfS0lORF9JVEVNEAISGAoUU0VBUkNIX0hJVF9LSU5EX05PVEUQAzKBCQoLTGlzdFNlcnZpY2USTAoJTGlzdExpc3RzEh4ubm9va3MuYXBpLnYxLkxpc3RMaXN0c1JlcXVlc3QaHy5ub29rcy5hcGkudjEuTGlzdExpc3RzUmVzcG9uc2USRgoHR2V0TGlzdBIcLm5vb2tzLmFwaS52MS5HZXRMaXN0UmVxdWVzdBodLm5vb2tzLmFwaS52MS5HZXRMaXN0UmVzcG9uc2USTwoKQ3JlYXRlTGlzdBIfLm5vb2tzLmFwaS52MS5DcmVhdGVMaXN0UmVxdWVzdBogLm5vb2tzLmFwaS52MS5DcmVhdGVMaXN0UmVzcG9uc2USTwoKUmVuYW1lTGlzdBIfLm5vb2tzLmFwaS52MS5SZW5hbWVMaXN0UmVxdWVzdBogLm5vb2tzLmFwaS52MS5SZW5hbWVMaXN0UmVzcG9uc2USWwoOU2V0TGlzdFNoYXJpbmcSIy5ub29rcy5hcGkudjEuU2V0TGlzdFNoYXJpbmdSZXF1ZXN0GiQubm9va3MuYXBpLnYxLlNldExpc3RTaGFyaW5nUmVzcG9uc2USTwoKRGVsZXRlTGlzdBIfLm5vb2tzLmFwaS52MS5EZWxldGVMaXN0UmVxdWVzdBogLm5vb2tzLmFwaS52MS5EZWxldGVMaXN0UmVzcG9uc2USWAoNU2V0TGlzdFBpbm5lZBIiLm5vb2tzLmFwaS52MS5TZXRMaXN0UGlubmVkUmVxdWVzdBojLm5vb2tzLmFwaS52MS5TZXRMaXN0UGlubmVkUmVzcG9uc2USTwoKQ3JlYXRlSXRlbRIfLm5vb2tzLmFwaS52MS5DcmVhdGVJdGVtUmVxdWVzdBogLm5vb2tzLmFwaS52MS5DcmVhdGVJdGVtUmVzcG9uc2USTwoKVXBkYXRlSXRlbRIfLm5vb2tzLmFwaS52MS5VcGRhdGVJdGVtUmVxdWVzdBogLm5vb2tzLmFwaS52MS5VcGRhdGVJdGVtUmVzcG9uc2USUgoLU2V0SXRlbURvbmUSIC5ub29rcy5hcGkudjEuU2V0SXRlbURvbmVSZXF1ZXN0GiEubm9va3MuYXBpLnYxLlNldEl0ZW1Eb25lUmVzcG9uc2USSQoITW92ZUl0ZW0SHS5ub29rcy5hcGkudjEuTW92ZUl0ZW1SZXF1ZXN0Gh4ubm9va3MuYXBpLnYxLk1vdmVJdGVtUmVzcG9uc2USTwoKRGVsZXRlSXRlbRIfLm5vb2tzLmFwaS52MS5EZWxldGVJdGVtUmVxdWVzdBogLm5vb2tzLmFwaS52MS5EZWxldGVJdGVtUmVzcG9uc2USWwoOTGlzdERhdGVkSXRlbXMSIy5ub29rcy5hcGkudjEuTGlzdERhdGVkSXRlbXNSZXF1ZXN0GiQubm9va3MuYXBpLnYxLkxpc3REYXRlZEl0ZW1zUmVzcG9uc2USQwoGU2VhcmNoEhsubm9va3MuYXBpLnYxLlNlYXJjaFJlcXVlc3QaHC5ub29rcy5hcGkudjEuU2VhcmNoUmVzcG9uc2VCrgEKEGNvbS5ub29rcy5hcGkudjFCEExpc3RTZXJ2aWNlUHJvdG9QAVo2Z2l0aHViLmNvbS9ob3Nob21vaC9ub29rcy9wcm90by9nZW4vbm9va3MvYXBpL3YxO2FwaXYxogIDTkFYqgIMTm9va3MuQXBpLlYxygIMTm9va3NcQXBpXFYx4gIYTm9va3NcQXBpXFYxXEdQQk1ldGFkYXRh6gIOTm9va3M6OkFwaTo6VjFiBnByb3RvMw");
+  fileDesc("Ch9ub29rcy9hcGkvdjEvbGlzdF9zZXJ2aWNlLnByb3RvEgxub29rcy5hcGkudjEilAEKBExpc3QSCwoDdWlkGAEgASgJEgwKBG5hbWUYAiABKAkSJgoHc2hhcmluZxgDIAEoDjIVLm5vb2tzLmFwaS52MS5TaGFyaW5nEhAKCGNhbl9lZGl0GAQgASgIEhAKCGlzX293bmVyGAUgASgIEhEKCWlzX3Bpbm5lZBgGIAEoCBISCgpvcGVuX2NvdW50GAcgASgFIsQBCgRJdGVtEgsKA3VpZBgBIAEoCRINCgVsYWJlbBgCIAEoCRIQCghxdWFudGl0eRgDIAEoCRIOCgZkdWVfb24YBCABKAkSDAoEZG9uZRgFIAEoCBIVCg1hZGRlZF9ieV9uYW1lGAYgASgJEhQKDGRvbmVfYnlfbmFtZRgHIAEoCRIMCgRub3RlGAggASgJEhcKD25vdGVfZmlyc3RfbGluZRgJIAEoCRIcChRub3RlX3JlbWFpbmluZ19saW5lcxgKIAEoBSISChBMaXN0TGlzdHNSZXF1ZXN0IjYKEUxpc3RMaXN0c1Jlc3BvbnNlEiEKBWxpc3RzGAEgAygLMhIubm9va3MuYXBpLnYxLkxpc3QiIgoOR2V0TGlzdFJlcXVlc3QSEAoIbGlzdF91aWQYASABKAkiVgoPR2V0TGlzdFJlc3BvbnNlEiAKBGxpc3QYASABKAsyEi5ub29rcy5hcGkudjEuTGlzdBIhCgVpdGVtcxgCIAMoCzISLm5vb2tzLmFwaS52MS5JdGVtIiEKEUNyZWF0ZUxpc3RSZXF1ZXN0EgwKBG5hbWUYASABKAkiNgoSQ3JlYXRlTGlzdFJlc3BvbnNlEiAKBGxpc3QYASABKAsyEi5ub29rcy5hcGkudjEuTGlzdCIzChFSZW5hbWVMaXN0UmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCRIMCgRuYW1lGAIgASgJIjYKElJlbmFtZUxpc3RSZXNwb25zZRIgCgRsaXN0GAEgASgLMhIubm9va3MuYXBpLnYxLkxpc3QijAEKFVNldExpc3RTaGFyaW5nUmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCRImCgdzaGFyaW5nGAIgASgOMhUubm9va3MuYXBpLnYxLlNoYXJpbmcSEAoIY2FuX2VkaXQYAyABKAgSEwoLbWVtYmVyX3VpZHMYBCADKAkSEgoKZ3JvdXBfdWlkcxgFIAMoCSI6ChZTZXRMaXN0U2hhcmluZ1Jlc3BvbnNlEiAKBGxpc3QYASABKAsyEi5ub29rcy5hcGkudjEuTGlzdCIoChRHZXRMaXN0U2hhcmVzUmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCSJAChVHZXRMaXN0U2hhcmVzUmVzcG9uc2USEwoLbWVtYmVyX3VpZHMYASADKAkSEgoKZ3JvdXBfdWlkcxgCIAMoCSIlChFEZWxldGVMaXN0UmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCSIUChJEZWxldGVMaXN0UmVzcG9uc2UiOAoUU2V0TGlzdFBpbm5lZFJlcXVlc3QSEAoIbGlzdF91aWQYASABKAkSDgoGcGlubmVkGAIgASgIIhcKFVNldExpc3RQaW5uZWRSZXNwb25zZSJWChFDcmVhdGVJdGVtUmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCRINCgVsYWJlbBgCIAEoCRIQCghxdWFudGl0eRgDIAEoCRIOCgZkdWVfb24YBCABKAkiNgoSQ3JlYXRlSXRlbVJlc3BvbnNlEiAKBGl0ZW0YASABKAsyEi5ub29rcy5hcGkudjEuSXRlbSKjAQoRVXBkYXRlSXRlbVJlcXVlc3QSEAoIaXRlbV91aWQYASABKAkSEgoFbGFiZWwYAiABKAlIAIgBARIVCghxdWFudGl0eRgDIAEoCUgBiAEBEhMKBmR1ZV9vbhgEIAEoCUgCiAEBEhEKBG5vdGUYBSABKAlIA4gBAUIICgZfbGFiZWxCCwoJX3F1YW50aXR5QgkKB19kdWVfb25CBwoFX25vdGUiNgoSVXBkYXRlSXRlbVJlc3BvbnNlEiAKBGl0ZW0YASABKAsyEi5ub29rcy5hcGkudjEuSXRlbSI0ChJTZXRJdGVtRG9uZVJlcXVlc3QSEAoIaXRlbV91aWQYASABKAkSDAoEZG9uZRgCIAEoCCI3ChNTZXRJdGVtRG9uZVJlc3BvbnNlEiAKBGl0ZW0YASABKAsyEi5ub29rcy5hcGkudjEuSXRlbSI7Cg9Nb3ZlSXRlbVJlcXVlc3QSEAoIaXRlbV91aWQYASABKAkSFgoOYWZ0ZXJfaXRlbV91aWQYAiABKAkiEgoQTW92ZUl0ZW1SZXNwb25zZSIlChFEZWxldGVJdGVtUmVxdWVzdBIQCghpdGVtX3VpZBgBIAEoCSIUChJEZWxldGVJdGVtUmVzcG9uc2UiewoJU2VhcmNoSGl0EikKBGtpbmQYASABKA4yGy5ub29rcy5hcGkudjEuU2VhcmNoSGl0S2luZBIQCghsaXN0X3VpZBgCIAEoCRIQCghpdGVtX3VpZBgDIAEoCRIMCgR0ZXh0GAQgASgJEhEKCWxpc3RfbmFtZRgFIAEoCSIeCg1TZWFyY2hSZXF1ZXN0Eg0KBXF1ZXJ5GAEgASgJIjcKDlNlYXJjaFJlc3BvbnNlEiUKBGhpdHMYASADKAsyFy5ub29rcy5hcGkudjEuU2VhcmNoSGl0IlIKCURhdGVkSXRlbRIgCgRpdGVtGAEgASgLMhIubm9va3MuYXBpLnYxLkl0ZW0SEAoIbGlzdF91aWQYAiABKAkSEQoJbGlzdF9uYW1lGAMgASgJIjEKFUxpc3REYXRlZEl0ZW1zUmVxdWVzdBIMCgRmcm9tGAEgASgJEgoKAnRvGAIgASgJIkAKFkxpc3REYXRlZEl0ZW1zUmVzcG9uc2USJgoFaXRlbXMYASADKAsyFy5ub29rcy5hcGkudjEuRGF0ZWRJdGVtKmMKB1NoYXJpbmcSFwoTU0hBUklOR19VTlNQRUNJRklFRBAAEhMKD1NIQVJJTkdfUFJJVkFURRABEhQKEFNIQVJJTkdfSU5TVEFOQ0UQAhIUChBTSEFSSU5HX1NQRUNJRklDEAMqfgoNU2VhcmNoSGl0S2luZBIfChtTRUFSQ0hfSElUX0tJTkRfVU5TUEVDSUZJRUQQABIYChRTRUFSQ0hfSElUX0tJTkRfTElTVBABEhgKFFNFQVJDSF9ISVRfS0lORF9JVEVNEAISGAoUU0VBUkNIX0hJVF9LSU5EX05PVEUQAzLbCQoLTGlzdFNlcnZpY2USTAoJTGlzdExpc3RzEh4ubm9va3MuYXBpLnYxLkxpc3RMaXN0c1JlcXVlc3QaHy5ub29rcy5hcGkudjEuTGlzdExpc3RzUmVzcG9uc2USRgoHR2V0TGlzdBIcLm5vb2tzLmFwaS52MS5HZXRMaXN0UmVxdWVzdBodLm5vb2tzLmFwaS52MS5HZXRMaXN0UmVzcG9uc2USTwoKQ3JlYXRlTGlzdBIfLm5vb2tzLmFwaS52MS5DcmVhdGVMaXN0UmVxdWVzdBogLm5vb2tzLmFwaS52MS5DcmVhdGVMaXN0UmVzcG9uc2USTwoKUmVuYW1lTGlzdBIfLm5vb2tzLmFwaS52MS5SZW5hbWVMaXN0UmVxdWVzdBogLm5vb2tzLmFwaS52MS5SZW5hbWVMaXN0UmVzcG9uc2USWwoOU2V0TGlzdFNoYXJpbmcSIy5ub29rcy5hcGkudjEuU2V0TGlzdFNoYXJpbmdSZXF1ZXN0GiQubm9va3MuYXBpLnYxLlNldExpc3RTaGFyaW5nUmVzcG9uc2USWAoNR2V0TGlzdFNoYXJlcxIiLm5vb2tzLmFwaS52MS5HZXRMaXN0U2hhcmVzUmVxdWVzdBojLm5vb2tzLmFwaS52MS5HZXRMaXN0U2hhcmVzUmVzcG9uc2USTwoKRGVsZXRlTGlzdBIfLm5vb2tzLmFwaS52MS5EZWxldGVMaXN0UmVxdWVzdBogLm5vb2tzLmFwaS52MS5EZWxldGVMaXN0UmVzcG9uc2USWAoNU2V0TGlzdFBpbm5lZBIiLm5vb2tzLmFwaS52MS5TZXRMaXN0UGlubmVkUmVxdWVzdBojLm5vb2tzLmFwaS52MS5TZXRMaXN0UGlubmVkUmVzcG9uc2USTwoKQ3JlYXRlSXRlbRIfLm5vb2tzLmFwaS52MS5DcmVhdGVJdGVtUmVxdWVzdBogLm5vb2tzLmFwaS52MS5DcmVhdGVJdGVtUmVzcG9uc2USTwoKVXBkYXRlSXRlbRIfLm5vb2tzLmFwaS52MS5VcGRhdGVJdGVtUmVxdWVzdBogLm5vb2tzLmFwaS52MS5VcGRhdGVJdGVtUmVzcG9uc2USUgoLU2V0SXRlbURvbmUSIC5ub29rcy5hcGkudjEuU2V0SXRlbURvbmVSZXF1ZXN0GiEubm9va3MuYXBpLnYxLlNldEl0ZW1Eb25lUmVzcG9uc2USSQoITW92ZUl0ZW0SHS5ub29rcy5hcGkudjEuTW92ZUl0ZW1SZXF1ZXN0Gh4ubm9va3MuYXBpLnYxLk1vdmVJdGVtUmVzcG9uc2USTwoKRGVsZXRlSXRlbRIfLm5vb2tzLmFwaS52MS5EZWxldGVJdGVtUmVxdWVzdBogLm5vb2tzLmFwaS52MS5EZWxldGVJdGVtUmVzcG9uc2USWwoOTGlzdERhdGVkSXRlbXMSIy5ub29rcy5hcGkudjEuTGlzdERhdGVkSXRlbXNSZXF1ZXN0GiQubm9va3MuYXBpLnYxLkxpc3REYXRlZEl0ZW1zUmVzcG9uc2USQwoGU2VhcmNoEhsubm9va3MuYXBpLnYxLlNlYXJjaFJlcXVlc3QaHC5ub29rcy5hcGkudjEuU2VhcmNoUmVzcG9uc2VCrgEKEGNvbS5ub29rcy5hcGkudjFCEExpc3RTZXJ2aWNlUHJvdG9QAVo2Z2l0aHViLmNvbS9ob3Nob21vaC9ub29rcy9wcm90by9nZW4vbm9va3MvYXBpL3YxO2FwaXYxogIDTkFYqgIMTm9va3MuQXBpLlYxygIMTm9va3NcQXBpXFYx4gIYTm9va3NcQXBpXFYxXEdQQk1ldGFkYXRh6gIOTm9va3M6OkFwaTo6VjFiBnByb3RvMw");
 
 /**
  * List is a named, ordered collection of Items.
@@ -308,6 +308,20 @@ export type SetListSharingRequest = Message<"nooks.api.v1.SetListSharingRequest"
    * @generated from field: bool can_edit = 3;
    */
   canEdit: boolean;
+
+  /**
+   * Who it reaches by name, for SHARING_SPECIFIC. Sharing is one decision, not a
+   * sequence of additions: these replace whatever was there, and both are ignored for
+   * any other kind of sharing.
+   *
+   * @generated from field: repeated string member_uids = 4;
+   */
+  memberUids: string[];
+
+  /**
+   * @generated from field: repeated string group_uids = 5;
+   */
+  groupUids: string[];
 };
 
 /**
@@ -335,6 +349,45 @@ export const SetListSharingResponseSchema: GenMessage<SetListSharingResponse> = 
   messageDesc(file_nooks_api_v1_list_service, 11);
 
 /**
+ * @generated from message nooks.api.v1.GetListSharesRequest
+ */
+export type GetListSharesRequest = Message<"nooks.api.v1.GetListSharesRequest"> & {
+  /**
+   * @generated from field: string list_uid = 1;
+   */
+  listUid: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.GetListSharesRequest.
+ * Use `create(GetListSharesRequestSchema)` to create a new message.
+ */
+export const GetListSharesRequestSchema: GenMessage<GetListSharesRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_list_service, 12);
+
+/**
+ * @generated from message nooks.api.v1.GetListSharesResponse
+ */
+export type GetListSharesResponse = Message<"nooks.api.v1.GetListSharesResponse"> & {
+  /**
+   * @generated from field: repeated string member_uids = 1;
+   */
+  memberUids: string[];
+
+  /**
+   * @generated from field: repeated string group_uids = 2;
+   */
+  groupUids: string[];
+};
+
+/**
+ * Describes the message nooks.api.v1.GetListSharesResponse.
+ * Use `create(GetListSharesResponseSchema)` to create a new message.
+ */
+export const GetListSharesResponseSchema: GenMessage<GetListSharesResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_list_service, 13);
+
+/**
  * @generated from message nooks.api.v1.DeleteListRequest
  */
 export type DeleteListRequest = Message<"nooks.api.v1.DeleteListRequest"> & {
@@ -349,7 +402,7 @@ export type DeleteListRequest = Message<"nooks.api.v1.DeleteListRequest"> & {
  * Use `create(DeleteListRequestSchema)` to create a new message.
  */
 export const DeleteListRequestSchema: GenMessage<DeleteListRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 12);
+  messageDesc(file_nooks_api_v1_list_service, 14);
 
 /**
  * @generated from message nooks.api.v1.DeleteListResponse
@@ -362,7 +415,7 @@ export type DeleteListResponse = Message<"nooks.api.v1.DeleteListResponse"> & {
  * Use `create(DeleteListResponseSchema)` to create a new message.
  */
 export const DeleteListResponseSchema: GenMessage<DeleteListResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 13);
+  messageDesc(file_nooks_api_v1_list_service, 15);
 
 /**
  * @generated from message nooks.api.v1.SetListPinnedRequest
@@ -384,7 +437,7 @@ export type SetListPinnedRequest = Message<"nooks.api.v1.SetListPinnedRequest"> 
  * Use `create(SetListPinnedRequestSchema)` to create a new message.
  */
 export const SetListPinnedRequestSchema: GenMessage<SetListPinnedRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 14);
+  messageDesc(file_nooks_api_v1_list_service, 16);
 
 /**
  * @generated from message nooks.api.v1.SetListPinnedResponse
@@ -397,7 +450,7 @@ export type SetListPinnedResponse = Message<"nooks.api.v1.SetListPinnedResponse"
  * Use `create(SetListPinnedResponseSchema)` to create a new message.
  */
 export const SetListPinnedResponseSchema: GenMessage<SetListPinnedResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 15);
+  messageDesc(file_nooks_api_v1_list_service, 17);
 
 /**
  * @generated from message nooks.api.v1.CreateItemRequest
@@ -429,7 +482,7 @@ export type CreateItemRequest = Message<"nooks.api.v1.CreateItemRequest"> & {
  * Use `create(CreateItemRequestSchema)` to create a new message.
  */
 export const CreateItemRequestSchema: GenMessage<CreateItemRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 16);
+  messageDesc(file_nooks_api_v1_list_service, 18);
 
 /**
  * @generated from message nooks.api.v1.CreateItemResponse
@@ -446,7 +499,7 @@ export type CreateItemResponse = Message<"nooks.api.v1.CreateItemResponse"> & {
  * Use `create(CreateItemResponseSchema)` to create a new message.
  */
 export const CreateItemResponseSchema: GenMessage<CreateItemResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 17);
+  messageDesc(file_nooks_api_v1_list_service, 19);
 
 /**
  * @generated from message nooks.api.v1.UpdateItemRequest
@@ -488,7 +541,7 @@ export type UpdateItemRequest = Message<"nooks.api.v1.UpdateItemRequest"> & {
  * Use `create(UpdateItemRequestSchema)` to create a new message.
  */
 export const UpdateItemRequestSchema: GenMessage<UpdateItemRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 18);
+  messageDesc(file_nooks_api_v1_list_service, 20);
 
 /**
  * @generated from message nooks.api.v1.UpdateItemResponse
@@ -505,7 +558,7 @@ export type UpdateItemResponse = Message<"nooks.api.v1.UpdateItemResponse"> & {
  * Use `create(UpdateItemResponseSchema)` to create a new message.
  */
 export const UpdateItemResponseSchema: GenMessage<UpdateItemResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 19);
+  messageDesc(file_nooks_api_v1_list_service, 21);
 
 /**
  * @generated from message nooks.api.v1.SetItemDoneRequest
@@ -527,7 +580,7 @@ export type SetItemDoneRequest = Message<"nooks.api.v1.SetItemDoneRequest"> & {
  * Use `create(SetItemDoneRequestSchema)` to create a new message.
  */
 export const SetItemDoneRequestSchema: GenMessage<SetItemDoneRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 20);
+  messageDesc(file_nooks_api_v1_list_service, 22);
 
 /**
  * @generated from message nooks.api.v1.SetItemDoneResponse
@@ -544,7 +597,7 @@ export type SetItemDoneResponse = Message<"nooks.api.v1.SetItemDoneResponse"> & 
  * Use `create(SetItemDoneResponseSchema)` to create a new message.
  */
 export const SetItemDoneResponseSchema: GenMessage<SetItemDoneResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 21);
+  messageDesc(file_nooks_api_v1_list_service, 23);
 
 /**
  * @generated from message nooks.api.v1.MoveItemRequest
@@ -568,7 +621,7 @@ export type MoveItemRequest = Message<"nooks.api.v1.MoveItemRequest"> & {
  * Use `create(MoveItemRequestSchema)` to create a new message.
  */
 export const MoveItemRequestSchema: GenMessage<MoveItemRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 22);
+  messageDesc(file_nooks_api_v1_list_service, 24);
 
 /**
  * @generated from message nooks.api.v1.MoveItemResponse
@@ -581,7 +634,7 @@ export type MoveItemResponse = Message<"nooks.api.v1.MoveItemResponse"> & {
  * Use `create(MoveItemResponseSchema)` to create a new message.
  */
 export const MoveItemResponseSchema: GenMessage<MoveItemResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 23);
+  messageDesc(file_nooks_api_v1_list_service, 25);
 
 /**
  * @generated from message nooks.api.v1.DeleteItemRequest
@@ -598,7 +651,7 @@ export type DeleteItemRequest = Message<"nooks.api.v1.DeleteItemRequest"> & {
  * Use `create(DeleteItemRequestSchema)` to create a new message.
  */
 export const DeleteItemRequestSchema: GenMessage<DeleteItemRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 24);
+  messageDesc(file_nooks_api_v1_list_service, 26);
 
 /**
  * @generated from message nooks.api.v1.DeleteItemResponse
@@ -611,7 +664,7 @@ export type DeleteItemResponse = Message<"nooks.api.v1.DeleteItemResponse"> & {
  * Use `create(DeleteItemResponseSchema)` to create a new message.
  */
 export const DeleteItemResponseSchema: GenMessage<DeleteItemResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 25);
+  messageDesc(file_nooks_api_v1_list_service, 27);
 
 /**
  * SearchHit is one match.
@@ -658,7 +711,7 @@ export type SearchHit = Message<"nooks.api.v1.SearchHit"> & {
  * Use `create(SearchHitSchema)` to create a new message.
  */
 export const SearchHitSchema: GenMessage<SearchHit> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 26);
+  messageDesc(file_nooks_api_v1_list_service, 28);
 
 /**
  * @generated from message nooks.api.v1.SearchRequest
@@ -677,7 +730,7 @@ export type SearchRequest = Message<"nooks.api.v1.SearchRequest"> & {
  * Use `create(SearchRequestSchema)` to create a new message.
  */
 export const SearchRequestSchema: GenMessage<SearchRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 27);
+  messageDesc(file_nooks_api_v1_list_service, 29);
 
 /**
  * @generated from message nooks.api.v1.SearchResponse
@@ -694,7 +747,7 @@ export type SearchResponse = Message<"nooks.api.v1.SearchResponse"> & {
  * Use `create(SearchResponseSchema)` to create a new message.
  */
 export const SearchResponseSchema: GenMessage<SearchResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 28);
+  messageDesc(file_nooks_api_v1_list_service, 30);
 
 /**
  * DatedItem is an Item with enough of its List to render a row away from it.
@@ -723,7 +776,7 @@ export type DatedItem = Message<"nooks.api.v1.DatedItem"> & {
  * Use `create(DatedItemSchema)` to create a new message.
  */
 export const DatedItemSchema: GenMessage<DatedItem> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 29);
+  messageDesc(file_nooks_api_v1_list_service, 31);
 
 /**
  * @generated from message nooks.api.v1.ListDatedItemsRequest
@@ -750,7 +803,7 @@ export type ListDatedItemsRequest = Message<"nooks.api.v1.ListDatedItemsRequest"
  * Use `create(ListDatedItemsRequestSchema)` to create a new message.
  */
 export const ListDatedItemsRequestSchema: GenMessage<ListDatedItemsRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 30);
+  messageDesc(file_nooks_api_v1_list_service, 32);
 
 /**
  * @generated from message nooks.api.v1.ListDatedItemsResponse
@@ -767,7 +820,7 @@ export type ListDatedItemsResponse = Message<"nooks.api.v1.ListDatedItemsRespons
  * Use `create(ListDatedItemsResponseSchema)` to create a new message.
  */
 export const ListDatedItemsResponseSchema: GenMessage<ListDatedItemsResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 31);
+  messageDesc(file_nooks_api_v1_list_service, 33);
 
 /**
  * Sharing is who can reach a List.
@@ -795,7 +848,7 @@ export enum Sharing {
   INSTANCE = 2,
 
   /**
-   * SHARING_SPECIFIC is named Members and Groups. Arrives with Groups in M6.
+   * SHARING_SPECIFIC is named Members and Groups.
    *
    * @generated from enum value: SHARING_SPECIFIC = 3;
    */
@@ -898,6 +951,16 @@ export const ListService: GenService<{
     methodKind: "unary";
     input: typeof SetListSharingRequestSchema;
     output: typeof SetListSharingResponseSchema;
+  },
+  /**
+   * GetListShares returns who a List reaches by name, for the share dialog.
+   *
+   * @generated from rpc nooks.api.v1.ListService.GetListShares
+   */
+  getListShares: {
+    methodKind: "unary";
+    input: typeof GetListSharesRequestSchema;
+    output: typeof GetListSharesResponseSchema;
   },
   /**
    * DeleteList removes a List and the Items on it. Only its owner may.

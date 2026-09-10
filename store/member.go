@@ -101,6 +101,24 @@ func (s *sqlStore) MemberByEmail(ctx context.Context, email string) (Member, err
 	return s.oneMember(ctx, "email", normaliseEmail(email))
 }
 
+// Members returns everyone on the Instance, by name — who a List can be shared with.
+func (s *sqlStore) Members(ctx context.Context) ([]Member, error) {
+	var rows []memberModel
+	if err := s.db.NewSelect().Model(&rows).Order("name ASC").Scan(ctx); err != nil {
+		return nil, fmt.Errorf("read members: %w", err)
+	}
+
+	members := make([]Member, 0, len(rows))
+	for _, row := range rows {
+		member, err := row.toMember()
+		if err != nil {
+			return nil, err
+		}
+		members = append(members, member)
+	}
+	return members, nil
+}
+
 // MemberByUID finds a Member by their public identifier.
 func (s *sqlStore) MemberByUID(ctx context.Context, uid string) (Member, error) {
 	return s.oneMember(ctx, "uid", uid)

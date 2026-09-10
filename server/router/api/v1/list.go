@@ -31,6 +31,12 @@ func NewListService(s store.Store, now func() time.Time, newUID func() (string, 
 	return &ListService{store: s, now: now, newUID: newUID}
 }
 
+// activity records entries in the panel, from the same clock and identifiers this
+// service already has.
+func (s *ListService) activity() activityRecorder {
+	return activityRecorder{store: s.store, now: s.now, newUID: s.newUID}
+}
+
 // ListLists returns every List the signed-in Member can reach.
 func (s *ListService) ListLists(
 	ctx context.Context,
@@ -170,6 +176,16 @@ func (s *ListService) SetListSharing(
 	}
 	if err := s.store.SetListSharing(ctx, list.UID, sharing, req.Msg.GetCanEdit(), s.now()); err != nil {
 		return nil, internalError("share list", err)
+	}
+
+	// Named shares are replaced in the same call: the dialog is one decision, and a
+	// List that is no longer shared by name should not keep the names it had.
+	memberUIDs, groupUIDs := req.Msg.GetMemberUids(), req.Msg.GetGroupUids()
+	if sharing != store.SharingSpecific {
+		memberUIDs, groupUIDs = nil, nil
+	}
+	if err := s.applyNamedShares(ctx, list, member, memberUIDs, groupUIDs); err != nil {
+		return nil, err
 	}
 
 	list.Sharing = sharing

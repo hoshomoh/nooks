@@ -44,6 +44,13 @@ func (s *AuthService) RequestJoin(
 	if err != nil {
 		return nil, internalError("create join request", err)
 	}
+
+	// Nothing is emailed, so the Activity panel is the only place an Admin will see
+	// this. A request nobody is told about is a request nobody answers.
+	text := msg.GetName() + " asked to join"
+	if err := s.activity().tellAdmins(ctx, store.ActivityJoinRequest, text, request.UID); err != nil {
+		return nil, err
+	}
 	return connect.NewResponse(&apiv1.RequestJoinResponse{RequestUid: request.UID}), nil
 }
 
@@ -147,6 +154,13 @@ func (s *AuthService) RequestPasswordReset(
 
 	if _, err := s.store.CreateResetRequest(ctx, uid, member.ID, s.now()); err != nil {
 		return nil, internalError("create reset request", err)
+	}
+
+	// The panel says to check it is really them before approving: with no mail server
+	// there is nothing else to verify a reset against, and saying so is the safeguard.
+	text := member.Name + " asked for a password reset — check it is them, then approve"
+	if err := s.activity().tellAdmins(ctx, store.ActivityResetRequest, text, uid); err != nil {
+		return nil, err
 	}
 	return connect.NewResponse(&apiv1.RequestPasswordResetResponse{RequestUid: uid}), nil
 }

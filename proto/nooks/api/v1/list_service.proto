@@ -21,6 +21,9 @@ service ListService {
   // SetListSharing changes who can reach a List. Only its owner may.
   rpc SetListSharing(SetListSharingRequest) returns (SetListSharingResponse);
 
+  // GetListShares returns who a List reaches by name, for the share dialog.
+  rpc GetListShares(GetListSharesRequest) returns (GetListSharesResponse);
+
   // DeleteList removes a List and the Items on it. Only its owner may.
   rpc DeleteList(DeleteListRequest) returns (DeleteListResponse);
 
@@ -64,7 +67,7 @@ enum Sharing {
   SHARING_PRIVATE = 1;
   // SHARING_INSTANCE is everyone here, including whoever joins later.
   SHARING_INSTANCE = 2;
-  // SHARING_SPECIFIC is named Members and Groups. Arrives with Groups in M6.
+  // SHARING_SPECIFIC is named Members and Groups.
   SHARING_SPECIFIC = 3;
 }
 
@@ -153,10 +156,25 @@ message SetListSharingRequest {
   string list_uid = 1;
   Sharing sharing = 2;
   bool can_edit = 3;
+
+  // Who it reaches by name, for SHARING_SPECIFIC. Sharing is one decision, not a
+  // sequence of additions: these replace whatever was there, and both are ignored for
+  // any other kind of sharing.
+  repeated string member_uids = 4;
+  repeated string group_uids = 5;
 }
 
 message SetListSharingResponse {
   List list = 1;
+}
+
+message GetListSharesRequest {
+  string list_uid = 1;
+}
+
+message GetListSharesResponse {
+  repeated string member_uids = 1;
+  repeated string group_uids = 2;
 }
 
 message DeleteListRequest {

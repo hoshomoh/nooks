@@ -33,10 +33,10 @@ func newListFixture(t *testing.T) listFixture {
 	}
 	t.Cleanup(func() { _ = s.Close() })
 
-	member := func(uid, name, email string) store.Member {
+	member := func(uid, name, email string, role store.Role) store.Member {
 		t.Helper()
 		m, err := s.CreateMember(t.Context(), store.CreateMemberParams{
-			UID: uid, Name: name, Email: email, Role: store.RoleMember,
+			UID: uid, Name: name, Email: email, Role: role,
 			PasswordHash: "hash", CreatedAt: testClock,
 		})
 		if err != nil {
@@ -54,8 +54,9 @@ func newListFixture(t *testing.T) listFixture {
 	return listFixture{
 		svc:   svc,
 		store: s,
-		anna:  member("mem_anna", "Anna", "anna@brunnen.lan"),
-		jonas: member("mem_jonas", "Jonas", "jonas@brunnen.lan"),
+		// Anna deployed the Instance, so she is its Admin — the first Member always is.
+		anna:  member("mem_anna", "Anna", "anna@brunnen.lan", store.RoleAdmin),
+		jonas: member("mem_jonas", "Jonas", "jonas@brunnen.lan", store.RoleMember),
 	}
 }
 

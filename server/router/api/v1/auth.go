@@ -304,6 +304,12 @@ func requireText(value, what string) error {
 	return nil
 }
 
+// activity records entries in the panel, from the same clock and identifiers this
+// service already has.
+func (s *AuthService) activity() activityRecorder {
+	return activityRecorder{store: s.store, now: s.now, newUID: s.newUID}
+}
+
 // memberToProto converts a stored Member to its wire form. It never copies the hash.
 func memberToProto(m store.Member) *apiv1.Member {
 	return &apiv1.Member{

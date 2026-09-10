@@ -49,6 +49,8 @@ type Store interface {
 	// no such Member.
 	MemberByEmail(ctx context.Context, email string) (Member, error)
 	MemberByUID(ctx context.Context, uid string) (Member, error)
+	// Members returns everyone on the Instance, by name.
+	Members(ctx context.Context) ([]Member, error)
 	MemberByID(ctx context.Context, id int64) (Member, error)
 
 	// CountMembers reports how many Members exist.
@@ -181,6 +183,9 @@ type Store interface {
 
 	// GroupMemberIDs lists who is in a Group.
 	GroupMemberIDs(ctx context.Context, groupID int64) ([]int64, error)
+
+	// ReplaceGroupMembers sets exactly who is in a Group.
+	ReplaceGroupMembers(ctx context.Context, groupID int64, memberIDs []int64) error
 
 	// ReplaceListShares sets exactly who a List is shared with by name.
 	ReplaceListShares(ctx context.Context, listID int64, memberIDs, groupIDs []int64) error

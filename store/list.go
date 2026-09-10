@@ -171,6 +171,9 @@ func (s *sqlStore) DeleteList(ctx context.Context, uid string, at time.Time) err
 		if err := s.Unindex(ctx, KindItem, item.UID); err != nil {
 			return err
 		}
+		if err := s.Unindex(ctx, KindNote, item.UID); err != nil {
+			return err
+		}
 	}
 	return s.Unindex(ctx, KindList, uid)
 }

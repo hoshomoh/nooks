@@ -158,5 +158,23 @@
       "sat": "Sat",
       "sun": "Sun"
     }
+  },
+  "note": {
+    "crumb": "Item",
+    "openFull": "Open full",
+    "close": "Close",
+    "placeholder": "Add a note",
+    "hint": "Press / for headings, checklists and quotes",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "list": "List",
+    "quantity": "Quantity",
+    "due": "Due",
+    "addedBy": "Added by",
+    "add": "Add",
+    "addDate": "Add a date",
+    "moreLines": "+{{count}} line",
+    "moreLines_other": "+{{count}} lines",
+    "marker": "note"
   }
 }

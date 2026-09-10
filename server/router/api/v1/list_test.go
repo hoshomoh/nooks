@@ -554,3 +554,126 @@ func TestDatedItemsNeedsALastDay(t *testing.T) {
 		t.Errorf("code = %v, want invalid_argument", got)
 	}
 }
+
+// A Note is markdown, kept as the Member wrote it.
+func TestANoteIsStoredAndReturnedAsWritten(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+	ctx := f.as(t, f.anna)
+
+	added, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: uid, Label: "Coffee",
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+
+	markdown := "### Where\nSaturday market, second row.\n\n- [ ] Ethiopian, whole bean\n> They pack up around two."
+	updated, err := f.svc.UpdateItem(ctx, connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid: added.Msg.GetItem().GetUid(), Note: &markdown,
+	}))
+	if err != nil {
+		t.Fatalf("UpdateItem: %v", err)
+	}
+	if got := updated.Msg.GetItem().GetNote(); got != markdown {
+		t.Errorf("Note = %q, want it byte for byte", got)
+	}
+}
+
+// The row shows the Note's own first line and a count of the rest — never a summary.
+func TestANoteGivesTheRowItsPreview(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+	ctx := f.as(t, f.anna)
+
+	added, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: uid, Label: "Coffee",
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+
+	markdown := "### Where\nSaturday market.\nThey pack up around two."
+	updated, err := f.svc.UpdateItem(ctx, connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid: added.Msg.GetItem().GetUid(), Note: &markdown,
+	}))
+	if err != nil {
+		t.Fatalf("UpdateItem: %v", err)
+	}
+
+	item := updated.Msg.GetItem()
+	if item.GetNoteFirstLine() != "Where" {
+		t.Errorf("NoteFirstLine = %q, want the heading with its marker stripped", item.GetNoteFirstLine())
+	}
+	if item.GetNoteRemainingLines() != 2 {
+		t.Errorf("NoteRemainingLines = %d, want 2", item.GetNoteRemainingLines())
+	}
+}
+
+// A Note is searchable, so a Member can find an Item by what they wrote about it.
+func TestANoteIsSearchable(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+	ctx := f.as(t, f.anna)
+
+	added, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: uid, Label: "Coffee",
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+
+	markdown := "Saturday market, second row from the Kastanienallee entrance."
+	if _, err := f.svc.UpdateItem(ctx, connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid: added.Msg.GetItem().GetUid(), Note: &markdown,
+	})); err != nil {
+		t.Fatalf("UpdateItem: %v", err)
+	}
+
+	res, err := f.svc.Search(ctx, connect.NewRequest(&apiv1.SearchRequest{Query: "kastanienallee"}))
+	if err != nil {
+		t.Fatalf("Search: %v", err)
+	}
+	if len(res.Msg.GetHits()) == 0 {
+		t.Fatal("searching a word only in the Note found nothing")
+	}
+	if got := res.Msg.GetHits()[0].GetKind(); got != apiv1.SearchHitKind_SEARCH_HIT_KIND_NOTE {
+		t.Errorf("kind = %v, want a note hit so the result can say where the words were", got)
+	}
+}
+
+// Emptying a Note takes it out of the index.
+func TestClearingANoteRemovesItFromSearch(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+	ctx := f.as(t, f.anna)
+
+	added, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: uid, Label: "Coffee",
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+
+	markdown := "Kastanienallee entrance"
+	if _, err := f.svc.UpdateItem(ctx, connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid: added.Msg.GetItem().GetUid(), Note: &markdown,
+	})); err != nil {
+		t.Fatalf("UpdateItem: %v", err)
+	}
+
+	empty := ""
+	if _, err := f.svc.UpdateItem(ctx, connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid: added.Msg.GetItem().GetUid(), Note: &empty,
+	})); err != nil {
+		t.Fatalf("UpdateItem: %v", err)
+	}
+
+	res, err := f.svc.Search(ctx, connect.NewRequest(&apiv1.SearchRequest{Query: "kastanienallee"}))
+	if err != nil {
+		t.Fatalf("Search: %v", err)
+	}
+	if len(res.Msg.GetHits()) != 0 {
+		t.Errorf("hits = %d, want none once the Note is gone", len(res.Msg.GetHits()))
+	}
+}

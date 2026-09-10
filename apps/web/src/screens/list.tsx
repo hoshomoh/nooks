@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { getRouteApi } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
@@ -7,6 +8,7 @@ import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
 import { ListRow } from "@/components/ds/list-row"
+import { NoteSheet, type NoteSheetField } from "@/components/ds/note-sheet"
 import { listClient } from "@/lib/api"
 import { isOverdue, today } from "@/lib/dates"
 import { useDueLabel } from "@/lib/use-due-label"
@@ -18,6 +20,12 @@ const route = getRouteApi("/lists/$listUid")
 type SetDoneVariables = {
   itemUid: string
   done: boolean
+}
+
+/** What the note mutation is told. */
+type SaveNoteVariables = {
+  itemUid: string
+  note: string
 }
 
 export function ListScreen() {
@@ -32,10 +40,19 @@ export function ListScreen() {
   const from = today()
   const due = useDueLabel()
 
+  // Which Item's sheet is open. The List keeps its place behind it, so this is the
+  // screen's own state rather than a route.
+  const [openItemUid, setOpenItemUid] = useState<string | null>(null)
+
   const refresh = () => queryClient.invalidateQueries()
 
   const addItem = useMutation({
     mutationFn: (label: string) => listClient.createItem({ listUid, label }),
+    onSuccess: refresh,
+  })
+
+  const saveNote = useMutation({
+    mutationFn: ({ itemUid, note }: SaveNoteVariables) => listClient.updateItem({ itemUid, note }),
     onSuccess: refresh,
   })
 
@@ -44,6 +61,7 @@ export function ListScreen() {
     onSuccess: refresh,
   })
 
+  const openItem = list.items.find((item) => item.uid === openItemUid)
   const open = list.items.filter((item) => !item.done)
   const done = list.items.filter((item) => item.done)
   const canEdit = list.list?.isOwner || list.list?.canEdit
@@ -59,7 +77,7 @@ export function ListScreen() {
     >
       <ChromeBar crumbs={[t(list.list?.isOwner ? "list.myListsCrumb" : "list.sharedCrumb"), list.list?.name ?? ""]} />
 
-      <div className="flex justify-center px-5.5 pt-14 pb-22">
+      <div className="relative flex flex-1 justify-center px-5.5 pt-14 pb-22">
         <div className="w-full max-w-content">
           <header className="mb-8.5 flex flex-col gap-3.5">
             <h1 className="text-display">{list.list?.name}</h1>
@@ -82,7 +100,10 @@ export function ListScreen() {
                   addedByName={item.addedByName}
                   dueLabel={due.label(item.dueOn)}
                   overdue={isOverdue(item.dueOn, from)}
+                  note={{ firstLine: item.noteFirstLine, remainingLines: item.noteRemainingLines }}
+                  moreLinesLabel={(count) => t("note.moreLines", { count })}
                   onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
+                  onOpen={() => setOpenItemUid(item.uid)}
                 />
               ))}
             </div>
@@ -114,9 +135,37 @@ export function ListScreen() {
             </div>
           )}
         </div>
+
+        {openItem && (
+          <NoteSheet
+            item={openItem}
+            crumbs={[list.list?.name ?? "", t("note.crumb")]}
+            fields={noteFields(t, openItem, list.list?.name ?? "", due.label(openItem.dueOn))}
+            canEdit={Boolean(canEdit)}
+            status={saveNote.isPending ? t("note.saving") : undefined}
+            onNoteChange={(note) => saveNote.mutate({ itemUid: openItem.uid, note })}
+            onToggleDone={(done) => setDone.mutate({ itemUid: openItem.uid, done })}
+            onClose={() => setOpenItemUid(null)}
+          />
+        )}
       </div>
     </AppShell>
   )
+}
+
+/** The detail row in the sheet: what is known about the Item, and what is not yet. */
+function noteFields(
+  t: (key: string, options?: Record<string, unknown>) => string,
+  item: { quantity: string; dueOn: string; addedByName: string },
+  listName: string,
+  dueLabel: string,
+): NoteSheetField[] {
+  return [
+    { label: t("note.list"), value: listName },
+    { label: t("note.quantity"), value: item.quantity || t("note.add"), empty: !item.quantity },
+    { label: t("note.due"), value: dueLabel || t("note.addDate"), empty: !item.dueOn },
+    { label: t("note.addedBy"), value: item.addedByName },
+  ]
 }
 
 /** Which line under the title says who can reach this List. */

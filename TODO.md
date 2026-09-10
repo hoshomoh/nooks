@@ -18,7 +18,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M2 · Auth and first run | `[x]` |
 | M3 · Lists and Items — the core | `[~]` lists, items, search and the list view |
 | M4 · Views: Today, Upcoming, Calendar | `[x]` |
-| M5 · Notes | `[ ]` |
+| M5 · Notes | `[~]` stored, searchable, side sheet |
 | M6 · Sharing, presence, Activity | `[ ]` |
 | M7 · Members and Groups | `[ ]` |
 | M8 · Public list | `[ ]` |
@@ -141,14 +141,16 @@ The single most important milestone; everything else is furniture.
 
 ## M5 · Notes
 
-- [ ] Note and block schema
-- [ ] Side sheet at 520px — opening an Item never replaces the List
+- [x] Notes stored as markdown rather than block rows — markdown is already what
+      "export as plain text" produces, what the conflict rule compares, and what the five
+      block types map onto
+- [x] Side sheet at 520px — opening an Item never replaces the List
 - [ ] Full-screen Note view, and Esc back to the List
-- [ ] Blocks: paragraph, heading, checklist, quote, code — same markup, two scales
+- [ ] Blocks rendered as blocks: paragraph, heading, checklist, quote, code
 - [ ] Markdown shorthand converts as typed, and is never displayed back
 - [ ] `/` block menu, filtered, showing each shortcut
-- [ ] Row preview: the Note's own first line plus `+N lines`. **Never a summary.**
-- [ ] Autosave, and the "Saving… / Saved" footer state
+- [x] Row preview: the Note's own first line with its marker stripped, plus `+N lines`
+- [~] Autosave on blur, with the "Saving…" footer state
 
 ---
 

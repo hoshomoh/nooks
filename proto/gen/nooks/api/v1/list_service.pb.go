@@ -240,9 +240,16 @@ type Item struct {
 	// Who put it on the List, shown at the right of the row.
 	AddedByName string `protobuf:"bytes,6,opt,name=added_by_name,json=addedByName,proto3" json:"added_by_name,omitempty"`
 	// Who ticked it, when anyone has.
-	DoneByName    string `protobuf:"bytes,7,opt,name=done_by_name,json=doneByName,proto3" json:"done_by_name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	DoneByName string `protobuf:"bytes,7,opt,name=done_by_name,json=doneByName,proto3" json:"done_by_name,omitempty"`
+	// The Note attached to the Item, as markdown. Empty when there is none.
+	Note string `protobuf:"bytes,8,opt,name=note,proto3" json:"note,omitempty"`
+	// The Note's own first line, for the row. Nooks never summarises a Member, so this
+	// is what they wrote rather than anything generated.
+	NoteFirstLine string `protobuf:"bytes,9,opt,name=note_first_line,json=noteFirstLine,proto3" json:"note_first_line,omitempty"`
+	// How many further lines the Note has, for the "+N lines" after the first.
+	NoteRemainingLines int32 `protobuf:"varint,10,opt,name=note_remaining_lines,json=noteRemainingLines,proto3" json:"note_remaining_lines,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *Item) Reset() {
@@ -322,6 +329,27 @@ func (x *Item) GetDoneByName() string {
 		return x.DoneByName
 	}
 	return ""
+}
+
+func (x *Item) GetNote() string {
+	if x != nil {
+		return x.Note
+	}
+	return ""
+}
+
+func (x *Item) GetNoteFirstLine() string {
+	if x != nil {
+		return x.NoteFirstLine
+	}
+	return ""
+}
+
+func (x *Item) GetNoteRemainingLines() int32 {
+	if x != nil {
+		return x.NoteRemainingLines
+	}
+	return 0
 }
 
 type ListListsRequest struct {
@@ -1073,9 +1101,11 @@ type UpdateItemRequest struct {
 	ItemUid string                 `protobuf:"bytes,1,opt,name=item_uid,json=itemUid,proto3" json:"item_uid,omitempty"`
 	// Each field is optional: an unset one is left alone, so changing a quantity does not
 	// have to restate the label.
-	Label         *string `protobuf:"bytes,2,opt,name=label,proto3,oneof" json:"label,omitempty"`
-	Quantity      *string `protobuf:"bytes,3,opt,name=quantity,proto3,oneof" json:"quantity,omitempty"`
-	DueOn         *string `protobuf:"bytes,4,opt,name=due_on,json=dueOn,proto3,oneof" json:"due_on,omitempty"`
+	Label    *string `protobuf:"bytes,2,opt,name=label,proto3,oneof" json:"label,omitempty"`
+	Quantity *string `protobuf:"bytes,3,opt,name=quantity,proto3,oneof" json:"quantity,omitempty"`
+	DueOn    *string `protobuf:"bytes,4,opt,name=due_on,json=dueOn,proto3,oneof" json:"due_on,omitempty"`
+	// The Note, as markdown. Sending an empty string removes it.
+	Note          *string `protobuf:"bytes,5,opt,name=note,proto3,oneof" json:"note,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1134,6 +1164,13 @@ func (x *UpdateItemRequest) GetQuantity() string {
 func (x *UpdateItemRequest) GetDueOn() string {
 	if x != nil && x.DueOn != nil {
 		return *x.DueOn
+	}
+	return ""
+}
+
+func (x *UpdateItemRequest) GetNote() string {
+	if x != nil && x.Note != nil {
+		return *x.Note
 	}
 	return ""
 }
@@ -1790,7 +1827,7 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\bis_owner\x18\x05 \x01(\bR\aisOwner\x12\x1b\n" +
 	"\tis_pinned\x18\x06 \x01(\bR\bisPinned\x12\x1d\n" +
 	"\n" +
-	"open_count\x18\a \x01(\x05R\topenCount\"\xbb\x01\n" +
+	"open_count\x18\a \x01(\x05R\topenCount\"\xa9\x02\n" +
 	"\x04Item\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x14\n" +
 	"\x05label\x18\x02 \x01(\tR\x05label\x12\x1a\n" +
@@ -1799,7 +1836,11 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\x04done\x18\x05 \x01(\bR\x04done\x12\"\n" +
 	"\radded_by_name\x18\x06 \x01(\tR\vaddedByName\x12 \n" +
 	"\fdone_by_name\x18\a \x01(\tR\n" +
-	"doneByName\"\x12\n" +
+	"doneByName\x12\x12\n" +
+	"\x04note\x18\b \x01(\tR\x04note\x12&\n" +
+	"\x0fnote_first_line\x18\t \x01(\tR\rnoteFirstLine\x120\n" +
+	"\x14note_remaining_lines\x18\n" +
+	" \x01(\x05R\x12noteRemainingLines\"\x12\n" +
 	"\x10ListListsRequest\"=\n" +
 	"\x11ListListsResponse\x12(\n" +
 	"\x05lists\x18\x01 \x03(\v2\x12.nooks.api.v1.ListR\x05lists\"+\n" +
@@ -1836,15 +1877,17 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\bquantity\x18\x03 \x01(\tR\bquantity\x12\x15\n" +
 	"\x06due_on\x18\x04 \x01(\tR\x05dueOn\"<\n" +
 	"\x12CreateItemResponse\x12&\n" +
-	"\x04item\x18\x01 \x01(\v2\x12.nooks.api.v1.ItemR\x04item\"\xa8\x01\n" +
+	"\x04item\x18\x01 \x01(\v2\x12.nooks.api.v1.ItemR\x04item\"\xca\x01\n" +
 	"\x11UpdateItemRequest\x12\x19\n" +
 	"\bitem_uid\x18\x01 \x01(\tR\aitemUid\x12\x19\n" +
 	"\x05label\x18\x02 \x01(\tH\x00R\x05label\x88\x01\x01\x12\x1f\n" +
 	"\bquantity\x18\x03 \x01(\tH\x01R\bquantity\x88\x01\x01\x12\x1a\n" +
-	"\x06due_on\x18\x04 \x01(\tH\x02R\x05dueOn\x88\x01\x01B\b\n" +
+	"\x06due_on\x18\x04 \x01(\tH\x02R\x05dueOn\x88\x01\x01\x12\x17\n" +
+	"\x04note\x18\x05 \x01(\tH\x03R\x04note\x88\x01\x01B\b\n" +
 	"\x06_labelB\v\n" +
 	"\t_quantityB\t\n" +
-	"\a_due_on\"<\n" +
+	"\a_due_onB\a\n" +
+	"\x05_note\"<\n" +
 	"\x12UpdateItemResponse\x12&\n" +
 	"\x04item\x18\x01 \x01(\v2\x12.nooks.api.v1.ItemR\x04item\"C\n" +
 	"\x12SetItemDoneRequest\x12\x19\n" +

@@ -6,6 +6,7 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/hoshomoh/nooks/internal/note"
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/store"
 )
@@ -75,6 +76,7 @@ func (s *ListService) UpdateItem(
 		Label:    req.Msg.Label,
 		Quantity: req.Msg.Quantity,
 		DueOn:    req.Msg.DueOn,
+		Note:     req.Msg.Note,
 	}
 	if err := s.store.UpdateItem(ctx, item.UID, params, s.now()); err != nil {
 		return nil, internalError("update item", err)
@@ -238,13 +240,17 @@ func (s *ListService) memberNames(ctx context.Context, items []store.Item) (map[
 
 // itemToProto converts an Item for the wire.
 func itemToProto(item store.Item, names map[int64]string) *apiv1.Item {
+	preview := note.PreviewOf(item.Note)
 	return &apiv1.Item{
-		Uid:         item.UID,
-		Label:       item.Label,
-		Quantity:    item.Quantity,
-		DueOn:       item.DueOn,
-		Done:        item.Done(),
-		AddedByName: names[item.AddedByID],
-		DoneByName:  names[item.DoneByID],
+		Uid:                item.UID,
+		Label:              item.Label,
+		Quantity:           item.Quantity,
+		DueOn:              item.DueOn,
+		Done:               item.Done(),
+		AddedByName:        names[item.AddedByID],
+		DoneByName:         names[item.DoneByID],
+		Note:               item.Note,
+		NoteFirstLine:      preview.FirstLine,
+		NoteRemainingLines: int32(preview.RemainingLines),
 	}
 }

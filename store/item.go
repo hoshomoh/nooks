@@ -28,6 +28,8 @@ type Item struct {
 	Quantity string
 	// DueOn is a date, not a time: an Item is due on a day. Empty for no due date.
 	DueOn string
+	// Note is the optional document attached to the Item, as markdown.
+	Note string
 	// Position orders the Item within its List.
 	Position float64
 	// DoneAt is the zero value until the Item is ticked.
@@ -152,6 +154,7 @@ type UpdateItemParams struct {
 	Label    *string
 	Quantity *string
 	DueOn    *string
+	Note     *string
 }
 
 // UpdateItem changes an Item's own fields.
@@ -172,6 +175,9 @@ func (s *sqlStore) UpdateItem(ctx context.Context, uid string, params UpdateItem
 	}
 	if params.DueOn != nil {
 		query = query.Set("due_on = ?", *params.DueOn)
+	}
+	if params.Note != nil {
+		query = query.Set("note = ?", *params.Note)
 	}
 
 	result, err := query.Exec(ctx)
@@ -251,18 +257,38 @@ func (s *sqlStore) DeleteItem(ctx context.Context, uid string, at time.Time) err
 	if err := requireOneRow(result, "item"); err != nil {
 		return err
 	}
-	return s.Unindex(ctx, KindItem, uid)
+	if err := s.Unindex(ctx, KindItem, uid); err != nil {
+		return err
+	}
+	return s.Unindex(ctx, KindNote, uid)
 }
 
 // indexItem makes an Item findable by its label and quantity — both are text a Member
 // wrote, and "1 kg" is as searchable as "Tomatoes".
+//
+// Its Note is indexed separately, so a hit can say whether the words were in the Item
+// or in what was written about it.
 func (s *sqlStore) indexItem(ctx context.Context, item Item) error {
 	text := item.Label
 	if item.Quantity != "" {
 		text += " " + item.Quantity
 	}
-	return s.Index(ctx, IndexEntry{
+	if err := s.Index(ctx, IndexEntry{
 		Kind: KindItem, UID: item.UID, ListID: item.ListID, Text: text,
+	}); err != nil {
+		return err
+	}
+	return s.indexNote(ctx, item)
+}
+
+// indexNote makes an Item's Note findable, and removes it from the index when the Note
+// is emptied.
+func (s *sqlStore) indexNote(ctx context.Context, item Item) error {
+	if item.Note == "" {
+		return s.Unindex(ctx, KindNote, item.UID)
+	}
+	return s.Index(ctx, IndexEntry{
+		Kind: KindNote, UID: item.UID, ListID: item.ListID, Text: item.Note,
 	})
 }
 
@@ -306,6 +332,7 @@ type itemModel struct {
 	ListID    int64   `bun:"list_id,notnull"`
 	Label     string  `bun:"label,notnull"`
 	Quantity  string  `bun:"quantity,notnull"`
+	Note      string  `bun:"note,notnull"`
 	DueOn     string  `bun:"due_on,notnull"`
 	Position  float64 `bun:"position,notnull"`
 	DoneAt    string  `bun:"done_at,notnull"`
@@ -336,7 +363,7 @@ func (m itemModel) toItem() (Item, error) {
 
 	item := Item{
 		ID: m.ID, UID: m.UID, ListID: m.ListID, Label: m.Label, Quantity: m.Quantity,
-		DueOn: m.DueOn, Position: m.Position, DoneAt: doneAt, AddedByID: m.AddedByID,
+		DueOn: m.DueOn, Note: m.Note, Position: m.Position, DoneAt: doneAt, AddedByID: m.AddedByID,
 		CreatedAt: createdAt, UpdatedAt: updatedAt, DeletedAt: deletedAt,
 	}
 	if m.DoneByID != nil {

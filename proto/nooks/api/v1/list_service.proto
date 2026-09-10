@@ -105,6 +105,16 @@ message Item {
 
   // Who ticked it, when anyone has.
   string done_by_name = 7;
+
+  // The Note attached to the Item, as markdown. Empty when there is none.
+  string note = 8;
+
+  // The Note's own first line, for the row. Nooks never summarises a Member, so this
+  // is what they wrote rather than anything generated.
+  string note_first_line = 9;
+
+  // How many further lines the Note has, for the "+N lines" after the first.
+  int32 note_remaining_lines = 10;
 }
 
 message ListListsRequest {}
@@ -181,6 +191,9 @@ message UpdateItemRequest {
   optional string label = 2;
   optional string quantity = 3;
   optional string due_on = 4;
+
+  // The Note, as markdown. Sending an empty string removes it.
+  optional string note = 5;
 }
 
 message UpdateItemResponse {

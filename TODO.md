@@ -279,6 +279,7 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
 | buf | Workspace devDependency | `pnpm exec buf`; no global install for contributors |
 | Data access | **Bun** | SQL-first, and the only option giving both dialects from one query set |
 | Token naming | shadcn's names; Nooks' accent is `shared` | Avoids colliding with shadcn's `--accent` hover surface |
+| Localisation | **i18next + JSON locale files**, from day one | A language is a file in `src/i18n/locales/` plus one entry — never a code change. Dates follow the same language through date-fns; numbers and currency through `Intl` |
 | Search | **Native full-text per driver**, from day one | SQLite FTS5, Postgres `tsvector` + GIN. Ranked and prefix-matched, so ⌘K narrows while you type. The index is maintained on write, and permissions are applied above it so search can never reach further than the Member can |
 | Repository shape | **Monorepo**: `apps/*` and `packages/*`, Go at the root | Room for the website now and Expo later; shared code lives in a package rather than inside one app |
 | Generated TS client | `packages/api` (`@nooks/api`) | Two known consumers — the web app now, Expo later — so it is a package from the start rather than a later extraction |

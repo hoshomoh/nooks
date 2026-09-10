@@ -110,6 +110,37 @@ What is left — genuinely synchronising with an external system, and nothing el
 what `useEffect` is for. If a case seems to need one, raise it rather than reaching for
 it quietly.
 
+**Types are named, never inline.** A prop object written into a signature cannot be
+imported, extended, or read at a glance:
+
+```tsx
+// No.
+function AppShell({ instanceName, lists }: { instanceName: string; lists: List[] }) {}
+
+// Yes.
+export type AppShellProps = {
+  instanceName: string
+  lists: List[]
+}
+
+function AppShell({ instanceName, lists }: AppShellProps) {}
+```
+
+The same applies to mutation variables, hook returns, and anything else with a shape.
+Export the type when anything outside the file could want it.
+
+**Dates go through `lib/dates.ts`, and nothing else.** It wraps date-fns; no component
+parses, formats or compares a date itself. `Intl` is not used for dates: it renders
+September as "Sept" under `en-GB` where the design says "Sep", and its data changes with
+the runtime's ICU version, so the same build would look different on different machines.
+`Intl` **is** right for numbers, currency and lists — those are in `lib/format.ts`.
+
+**Every string a Member reads comes from a locale file.** `src/i18n/locales/en.json` is
+the source language and holds the design's copy; adding a language is adding a JSON file
+and one entry in `i18n/locales.ts`, never a code change. No English in a component.
+Dates follow the same language: `lib/locale-store.ts` owns both the i18next language and
+the date-fns locale, so the two cannot drift.
+
 Otherwise:
 
 - Presentation and data fetching stay separate: a component that renders a List row does

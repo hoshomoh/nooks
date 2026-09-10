@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { RequestStatus } from "@nooks/api"
@@ -27,13 +28,22 @@ export function ForgotPassword() {
   return <CheckResetRequest requestUid={requestUid} onStartOver={() => setRequestUid(null)} />
 }
 
-const backToSignIn = (
-  <Link to="/sign-in" className="text-shared">
-    Back to sign in
-  </Link>
-)
+/** The quiet link back, used by both states of this screen. */
+function BackToSignIn() {
+  const { t } = useTranslation()
+  return (
+    <Link to="/sign-in" className="text-shared">
+      {t("auth.reset.backToSignIn")}
+    </Link>
+  )
+}
 
-function AskForReset({ onSent }: { onSent: (uid: string) => void }) {
+type AskForResetProps = {
+  onSent: (requestUid: string) => void
+}
+
+function AskForReset({ onSent }: AskForResetProps) {
+  const { t } = useTranslation()
   const [emailOrName, setEmailOrName] = useState("")
 
   const requestReset = useMutation({
@@ -46,10 +56,10 @@ function AskForReset({ onSent }: { onSent: (uid: string) => void }) {
 
   return (
     <AuthShell
-      title="Ask for a reset"
-      blurb="Nooks sends no email. An admin sees it in Activity, checks it's really you however they like, and approves it. Then you set a new password yourself."
-      footerLeft={backToSignIn}
-      footerRight="No email, ever"
+      title={t("auth.reset.title")}
+      blurb={t("auth.reset.blurb")}
+      footerLeft={<BackToSignIn />}
+      footerRight={t("auth.reset.footer")}
     >
       <form
         className="flex flex-col gap-5"
@@ -59,10 +69,10 @@ function AskForReset({ onSent }: { onSent: (uid: string) => void }) {
         }}
       >
         <Field
-          label="Your email or name"
+          label={t("auth.reset.emailOrName")}
           value={emailOrName}
           onChange={(event) => setEmailOrName(event.target.value)}
-          hint="So they know whose account to unlock."
+          hint={t("auth.reset.emailOrNameHint")}
           autoComplete="email"
           required
         />
@@ -72,20 +82,20 @@ function AskForReset({ onSent }: { onSent: (uid: string) => void }) {
         )}
 
         <Button type="submit" disabled={requestReset.isPending} className="self-start">
-          {requestReset.isPending ? "Sending…" : "Send the request"}
+          {requestReset.isPending ? t("auth.join.submitting") : t("auth.join.submit")}
         </Button>
       </form>
     </AuthShell>
   )
 }
 
-function CheckResetRequest({
-  requestUid,
-  onStartOver,
-}: {
+type CheckResetRequestProps = {
   requestUid: string
   onStartOver: () => void
-}) {
+}
+
+function CheckResetRequest({ requestUid, onStartOver }: CheckResetRequestProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [newPassword, setNewPassword] = useState("")
@@ -107,11 +117,11 @@ function CheckResetRequest({
   if (request.data?.status !== RequestStatus.APPROVED) {
     return (
       <AuthShell
-        eyebrow="Request sent"
-        title="An admin has it"
-        blurb="They'll ask you something only you would know, then approve it. Come back to this address afterwards — the prompt to choose a password will be waiting."
-        footerLeft={backToSignIn}
-        footerRight="Nothing will arrive by email"
+        eyebrow={t("auth.join.sentEyebrow")}
+        title={t("auth.reset.sentTitle")}
+        blurb={t("auth.reset.sentBlurb")}
+        footerLeft={<BackToSignIn />}
+        footerRight={t("auth.reset.sentFooter")}
       >
         <div className="flex items-center gap-3">
           <Button
@@ -119,10 +129,10 @@ function CheckResetRequest({
             onClick={() => request.refetch()}
             disabled={request.isFetching}
           >
-            {request.isFetching ? "Checking…" : "Check again"}
+            {request.isFetching ? t("auth.join.checking") : t("auth.join.checkAgain")}
           </Button>
           <button type="button" onClick={onStartOver} className="text-muted-foreground text-small">
-            Ask again
+            {t("auth.join.askAgain")}
           </button>
         </div>
       </AuthShell>
@@ -131,9 +141,9 @@ function CheckResetRequest({
 
   return (
     <AuthShell
-      eyebrow="An admin approved your request"
-      title="Set a new password"
-      blurb="Nobody else sees what you choose — not the admin, not the server logs. The approval expires in an hour if you don't use it."
+      eyebrow={t("auth.reset.approvedEyebrow")}
+      title={t("auth.reset.approvedTitle")}
+      blurb={t("auth.reset.approvedBlurb")}
       footerRight=""
     >
       <form
@@ -144,11 +154,11 @@ function CheckResetRequest({
         }}
       >
         <Field
-          label="New password"
+          label={t("auth.reset.newPassword")}
           type="password"
           value={newPassword}
           onChange={(event) => setNewPassword(event.target.value)}
-          hint="Twelve characters or more. No other rules."
+          hint={t("auth.setup.passwordHint")}
           autoComplete="new-password"
           required
         />
@@ -158,7 +168,7 @@ function CheckResetRequest({
         )}
 
         <Button type="submit" disabled={completeReset.isPending} className="self-start">
-          {completeReset.isPending ? "Saving…" : "Save and sign in"}
+          {completeReset.isPending ? t("auth.replacePassword.submitting") : t("auth.reset.submit")}
         </Button>
       </form>
     </AuthShell>

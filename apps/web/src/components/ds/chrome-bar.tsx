@@ -5,7 +5,14 @@ import type { ReactNode } from "react"
  *
  * It carries location and view-level actions only — never the page's primary action.
  */
-export function ChromeBar({ crumbs, actions }: { crumbs: string[]; actions?: ReactNode }) {
+export type ChromeBarProps = {
+  /** The trail of where the Member is, e.g. ["Shared", "Groceries"]. */
+  crumbs: string[]
+  /** View-level actions only — never the page's primary action. */
+  actions?: ReactNode
+}
+
+export function ChromeBar({ crumbs, actions }: ChromeBarProps) {
   return (
     <div className="flex h-chrome items-center gap-2.5 border-b border-hair pr-4 pl-5.5 text-micro text-muted-foreground">
       {crumbs.map((crumb, index) => (

@@ -4,7 +4,7 @@ import { cn } from "cn"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-type FieldProps = Omit<React.ComponentProps<typeof Input>, "id"> & {
+export type FieldProps = Omit<React.ComponentProps<typeof Input>, "id"> & {
   /** The label above the field. Always present: a placeholder is not a label. */
   label: string
   /**

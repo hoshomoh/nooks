@@ -1,13 +1,24 @@
 import { describe, expect, it } from "vitest"
 
-import { daysUntil, dueLabel, isOverdue, parseDue } from "./dates"
+import { enGB } from "date-fns/locale"
+
+import { dayHeading, daysUntil, dueLabel, isOverdue, parseDue, rangeFrom, toStored } from "./dates"
+import type { DateLabelOptions } from "./dates"
 
 // A Tuesday, matching the design's "Tuesday, 25 August".
-const today = new Date("2026-08-25T00:00:00Z")
+const today = new Date(2026, 7, 25)
+
+// The near-day words come from the caller, so a test supplies them directly.
+const labels: DateLabelOptions = {
+  from: today,
+  locale: enGB,
+  todayWord: "Today",
+  tomorrowWord: "Tomorrow",
+}
 
 describe("parseDue", () => {
   it("accepts a stored date", () => {
-    expect(parseDue("2026-08-25")?.toISOString()).toBe("2026-08-25T00:00:00.000Z")
+    expect(toStored(parseDue("2026-08-25") as Date)).toBe("2026-08-25")
   })
 
   it("rejects anything that is not one", () => {
@@ -38,20 +49,20 @@ describe("isOverdue", () => {
 
 describe("dueLabel", () => {
   it("names the near days rather than dating them", () => {
-    expect(dueLabel("2026-08-25", today)).toBe("Today")
-    expect(dueLabel("2026-08-26", today)).toBe("Tomorrow")
+    expect(dueLabel("2026-08-25", labels)).toBe("Today")
+    expect(dueLabel("2026-08-26", labels)).toBe("Tomorrow")
   })
 
   it("uses a weekday within the coming week", () => {
-    expect(dueLabel("2026-08-28", today)).toBe("Fri")
+    expect(dueLabel("2026-08-28", labels)).toBe("Fri")
   })
 
   it("adds the date beyond it", () => {
-    expect(dueLabel("2026-09-05", today)).toBe("Sat 5 Sep")
+    expect(dueLabel("2026-09-05", labels)).toBe("Sat 5 Sep")
   })
 
   it("shows nothing for an Item with no due date", () => {
-    expect(dueLabel("", today)).toBe("")
+    expect(dueLabel("", labels)).toBe("")
   })
 })
 
@@ -65,7 +76,22 @@ describe("month names", () => {
       ["2026-12-25", "Fri 25 Dec"],
     ]
     for (const [due, want] of cases) {
-      expect(dueLabel(due, today)).toBe(want)
+      expect(dueLabel(due, labels)).toBe(want)
     }
+  })
+})
+
+
+describe("dayHeading", () => {
+  it("names the near days and uses a weekday beyond them", () => {
+    expect(dayHeading("2026-08-25", labels)).toBe("Today")
+    expect(dayHeading("2026-08-26", labels)).toBe("Tomorrow")
+    expect(dayHeading("2026-08-28", labels)).toBe("Friday")
+  })
+})
+
+describe("rangeFrom", () => {
+  it("bounds a window of days in stored form", () => {
+    expect(rangeFrom(today, 14)).toEqual({ start: "2026-08-25", end: "2026-09-08" })
   })
 })

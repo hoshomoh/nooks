@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
 import { useNavigate } from "@tanstack/react-router"
 
 import { AuthShell } from "@/components/ds/auth-shell"
@@ -11,6 +12,7 @@ import { messageFrom } from "@/lib/errors"
 export function Setup() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -28,9 +30,9 @@ export function Setup() {
 
   return (
     <AuthShell
-      title="Nooks is running."
-      blurb="Make yourself an account and name the instance. Everything else can wait until someone asks for it."
-      footerRight="People ask to join from the public list; you approve them"
+      title={t("auth.setup.title")}
+      blurb={t("auth.setup.blurb")}
+      footerRight={t("auth.setup.footer")}
     >
       <form
         className="flex flex-col gap-5"
@@ -40,14 +42,14 @@ export function Setup() {
         }}
       >
         <Field
-          label="Your name"
+          label={t("auth.setup.yourName")}
           value={name}
           onChange={(event) => setName(event.target.value)}
           autoComplete="name"
           required
         />
         <Field
-          label="Email"
+          label={t("auth.setup.email")}
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
@@ -55,19 +57,19 @@ export function Setup() {
           required
         />
         <Field
-          label="Password"
+          label={t("auth.setup.password")}
           type="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           autoComplete="new-password"
-          hint="Twelve characters or more. No other rules."
+          hint={t("auth.setup.passwordHint")}
           required
         />
         <Field
-          label="What should this instance be called?"
+          label={t("auth.setup.instanceName")}
           value={instanceName}
           onChange={(event) => setInstanceName(event.target.value)}
-          hint="Shows in the sidebar and on printed lists."
+          hint={t("auth.setup.instanceNameHint")}
           required
         />
 
@@ -78,7 +80,7 @@ export function Setup() {
         )}
 
         <Button type="submit" disabled={completeSetup.isPending} className="self-start">
-          {completeSetup.isPending ? "Creating…" : "Create the instance"}
+          {completeSetup.isPending ? t("auth.setup.submitting") : t("auth.setup.submit")}
         </Button>
       </form>
     </AuthShell>

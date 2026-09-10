@@ -1,4 +1,5 @@
 import { getRouteApi, Link } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 
 import { AppShell } from "@/components/ds/app-shell"
 import { Button } from "@/components/ds/button"
@@ -16,6 +17,7 @@ const route = getRouteApi("/")
 export function Home() {
   const { instance, member, lists } = route.useLoaderData()
   const palette = useCommandPalette()
+  const { t } = useTranslation()
 
   return (
     <AppShell
@@ -25,25 +27,22 @@ export function Home() {
       onSearch={palette.open}
       onAddList={palette.openAddList}
     >
-      <ChromeBar crumbs={["All lists"]} />
+      <ChromeBar crumbs={[t("list.allLists")]} />
 
       <div className="flex justify-center px-5.5 pt-14 pb-22">
         <div className="w-full max-w-content">
           <header className="mb-8.5 flex flex-col gap-3.5">
-            <h1 className="text-display">All lists</h1>
+            <h1 className="text-display">{t("list.allLists")}</h1>
             <p className="text-secondary text-secondary-foreground">
-              Signed in as {member.name}
+              {t("list.signedInAs", { name: member.name })}
             </p>
           </header>
 
           {lists.lists.length === 0 ? (
             <div className="flex flex-col gap-6">
-              <EmptyState
-                title="Start with one list"
-                body="Groceries, flat jobs, a book you keep meaning to find. A list is a name and a first item; sharing it with the household comes later."
-              />
+              <EmptyState title={t("list.coldStartTitle")} body={t("list.coldStartBody")} />
               <Button onClick={palette.openAddList} className="self-start">
-                Add a list
+                {t("sidebar.addList")}
               </Button>
             </div>
           ) : (
@@ -62,7 +61,7 @@ export function Home() {
                     <span className="truncate text-body">{list.name}</span>
                   </span>
                   <span className="text-micro text-muted-foreground">
-                    {list.openCount === 0 ? "nothing open" : `${list.openCount} open`}
+                    {t("list.openCount", { count: list.openCount })}
                   </span>
                 </Link>
               ))}

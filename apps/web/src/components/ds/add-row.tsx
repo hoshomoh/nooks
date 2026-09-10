@@ -7,15 +7,13 @@ import { useState } from "react"
  * Enter adds and keeps the focus, so a Member can type a whole shopping list without
  * touching the mouse.
  */
-export function AddRow({
-  placeholder,
-  onAdd,
-  disabled,
-}: {
+export type AddRowProps = {
   placeholder: string
   onAdd: (label: string) => void
   disabled?: boolean
-}) {
+}
+
+export function AddRow({ placeholder, onAdd, disabled }: AddRowProps) {
   const [label, setLabel] = useState("")
 
   const submit = (event: React.FormEvent) => {

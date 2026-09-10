@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { RequestStatus } from "@nooks/api"
@@ -30,7 +31,13 @@ export function Join() {
   return <CheckJoinRequest requestUid={requestUid} onStartOver={() => setRequestUid(null)} />
 }
 
-function AskToJoin({ onSent }: { onSent: (uid: string) => void }) {
+type AskToJoinProps = {
+  /** Called with the request identifier once it has been sent. */
+  onSent: (requestUid: string) => void
+}
+
+function AskToJoin({ onSent }: AskToJoinProps) {
+  const { t } = useTranslation()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [message, setMessage] = useState("")
@@ -45,9 +52,9 @@ function AskToJoin({ onSent }: { onSent: (uid: string) => void }) {
 
   return (
     <AuthShell
-      title="Ask to join"
-      blurb="An admin approves requests. Public signup is off, so this is the way in."
-      footerRight="Nothing is sent by email — the request waits in Nooks"
+      title={t("auth.join.title")}
+      blurb={t("auth.join.blurb")}
+      footerRight={t("auth.join.footer")}
     >
       <form
         className="flex flex-col gap-5"
@@ -57,27 +64,27 @@ function AskToJoin({ onSent }: { onSent: (uid: string) => void }) {
         }}
       >
         <Field
-          label="Your name"
+          label={t("auth.setup.yourName")}
           value={name}
           onChange={(event) => setName(event.target.value)}
-          placeholder="What should people call you?"
+          placeholder={t("auth.join.namePlaceholder")}
           autoComplete="name"
           required
         />
         <Field
-          label="Email"
+          label={t("auth.setup.email")}
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="So they know who you are"
+          placeholder={t("auth.join.emailPlaceholder")}
           autoComplete="email"
           required
         />
         <Field
-          label="Anything to add — optional"
+          label={t("auth.join.message")}
           value={message}
           onChange={(event) => setMessage(event.target.value)}
-          placeholder="“It's Til, from upstairs”"
+          placeholder={t("auth.join.messagePlaceholder")}
         />
 
         {requestJoin.isError && (
@@ -85,20 +92,21 @@ function AskToJoin({ onSent }: { onSent: (uid: string) => void }) {
         )}
 
         <Button type="submit" disabled={requestJoin.isPending} className="self-start">
-          {requestJoin.isPending ? "Sending…" : "Send the request"}
+          {requestJoin.isPending ? t("auth.join.submitting") : t("auth.join.submit")}
         </Button>
       </form>
     </AuthShell>
   )
 }
 
-function CheckJoinRequest({
-  requestUid,
-  onStartOver,
-}: {
+type CheckJoinRequestProps = {
   requestUid: string
+  /** Forget this request and ask again from the start. */
   onStartOver: () => void
-}) {
+}
+
+function CheckJoinRequest({ requestUid, onStartOver }: CheckJoinRequestProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [name, setName] = useState("")
@@ -123,15 +131,15 @@ function CheckJoinRequest({
   if (!approved) {
     return (
       <AuthShell
-        eyebrow="Request sent"
-        title="An admin has it"
-        blurb="They'll approve it or they won't. This instance can't send email, so nothing will arrive in your inbox — ask them directly if it's taking a while."
+        eyebrow={t("auth.join.sentEyebrow")}
+        title={t("auth.join.sentTitle")}
+        blurb={t("auth.join.sentBlurb")}
         footerLeft={
           <button type="button" onClick={onStartOver} className="text-shared">
-            Ask again
+            {t("auth.join.askAgain")}
           </button>
         }
-        footerRight="Come back to this address once it's approved"
+        footerRight={t("auth.join.sentFooter")}
       >
         <Button
           tone="secondary"
@@ -139,7 +147,7 @@ function CheckJoinRequest({
           disabled={request.isFetching}
           className="self-start"
         >
-          {request.isFetching ? "Checking…" : "Check again"}
+          {request.isFetching ? t("auth.join.checking") : t("auth.join.checkAgain")}
         </Button>
       </AuthShell>
     )
@@ -147,10 +155,10 @@ function CheckJoinRequest({
 
   return (
     <AuthShell
-      eyebrow="An admin approved your request"
-      title="Choose a password"
-      blurb="That's the last step. Nobody else sees what you pick — not the admin, not the server logs."
-      footerRight="Welcome in"
+      eyebrow={t("auth.join.approvedEyebrow")}
+      title={t("auth.join.approvedTitle")}
+      blurb={t("auth.join.approvedBlurb")}
+      footerRight={t("auth.join.approvedFooter")}
     >
       <form
         className="flex flex-col gap-5"
@@ -159,21 +167,21 @@ function CheckJoinRequest({
           completeJoin.mutate()
         }}
       >
-        <NotePanel label="Joining as">{request.data?.email}</NotePanel>
+        <NotePanel label={t("auth.join.joiningAs")}>{request.data?.email}</NotePanel>
 
         <Field
-          label="Name"
+          label={t("palette.name")}
           value={name || (request.data?.name ?? "")}
           onChange={(event) => setName(event.target.value)}
-          hint="From your request. Change it if you like."
+          hint={t("auth.join.nameHint")}
           autoComplete="name"
         />
         <Field
-          label="Password"
+          label={t("auth.setup.password")}
           type="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          hint="Twelve characters or more. No other rules."
+          hint={t("auth.setup.passwordHint")}
           autoComplete="new-password"
           required
         />
@@ -183,7 +191,7 @@ function CheckJoinRequest({
         )}
 
         <Button type="submit" disabled={completeJoin.isPending} className="self-start">
-          {completeJoin.isPending ? "Joining…" : "Join"}
+          {completeJoin.isPending ? t("auth.join.joining") : t("auth.join.submitJoin")}
         </Button>
       </form>
     </AuthShell>

@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
 import { useNavigate } from "@tanstack/react-router"
 import { SearchHitKind } from "@nooks/api"
 
@@ -41,6 +42,7 @@ function SearchPanel() {
   const [query, setQuery] = useState("")
   const navigate = useNavigate()
   const palette = useCommandPalette()
+  const { t } = useTranslation()
   const results = useQuery(searchQuery(query))
 
   const go = async (listUid: string) => {
@@ -56,19 +58,19 @@ function SearchPanel() {
         autoFocus
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        placeholder="Search lists and items"
+        placeholder={t("palette.searchPlaceholder")}
         className="h-input border-b border-hair px-4 text-input outline-none placeholder:text-muted-foreground"
       />
 
       <div className="max-h-[50vh] overflow-y-auto p-1.5">
         {query.trim() === "" && (
           <p className="px-3 py-3 text-secondary text-muted-foreground">
-            Type to find a list or an item.
+            {t("palette.searchHint")}
           </p>
         )}
         {query.trim() !== "" && hits.length === 0 && !results.isFetching && (
           <p className="px-3 py-3 text-secondary text-muted-foreground">
-            Nothing matches “{query}”.
+            {t("palette.noResults", { query })}
           </p>
         )}
         {hits.map((hit) => (
@@ -96,6 +98,7 @@ function AddListPanel() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const palette = useCommandPalette()
+  const { t } = useTranslation()
 
   const addList = useMutation({
     mutationFn: () => listClient.createList({ name }),
@@ -119,14 +122,14 @@ function AddListPanel() {
       }}
     >
       <div className="flex flex-col gap-2">
-        <h2 className="text-dialog">Add a list</h2>
+        <h2 className="text-dialog">{t("palette.addListTitle")}</h2>
         <p className="text-chrome leading-[1.6] text-secondary-foreground">
-          Groceries, flat jobs, a book you keep meaning to find. It starts private.
+          {t("palette.addListBlurb")}
         </p>
       </div>
 
       <Field
-        label="Name"
+        label={t("palette.name")}
         value={name}
         onChange={(event) => setName(event.target.value)}
         autoFocus
@@ -135,10 +138,10 @@ function AddListPanel() {
 
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={addList.isPending}>
-          {addList.isPending ? "Adding…" : "Add list"}
+          {addList.isPending ? t("palette.adding") : t("palette.addListSubmit")}
         </Button>
         <Button type="button" tone="secondary" onClick={palette.close}>
-          Cancel
+          {t("action.cancel")}
         </Button>
       </div>
     </form>

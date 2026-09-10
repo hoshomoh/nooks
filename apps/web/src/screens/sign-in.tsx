@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
 import { getRouteApi, Link, useNavigate } from "@tanstack/react-router"
 
 import { AuthShell } from "@/components/ds/auth-shell"
@@ -14,6 +15,7 @@ export function SignIn() {
   const { instance } = route.useLoaderData()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -28,17 +30,17 @@ export function SignIn() {
 
   return (
     <AuthShell
-      eyebrow="Signing in to"
+      eyebrow={t("auth.signIn.eyebrow")}
       title={instance.name}
-      blurb="Your lists are behind this."
+      blurb={t("auth.signIn.blurb")}
       footerLeft={
         <Link to="/forgot-password" className="text-shared">
-          Forgot your password?
+          {t("auth.signIn.forgot")}
         </Link>
       }
       footerRight={
         <Link to="/join" className="text-shared">
-          New here? Ask to join.
+          {t("auth.signIn.join")}
         </Link>
       }
     >
@@ -50,7 +52,7 @@ export function SignIn() {
         }}
       >
         <Field
-          label="Email"
+          label={t("auth.setup.email")}
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
@@ -58,7 +60,7 @@ export function SignIn() {
           required
         />
         <Field
-          label="Password"
+          label={t("auth.setup.password")}
           type="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
@@ -73,7 +75,7 @@ export function SignIn() {
         )}
 
         <Button type="submit" disabled={signIn.isPending} className="self-start">
-          {signIn.isPending ? "Signing in…" : "Sign in"}
+          {signIn.isPending ? t("auth.signIn.submitting") : t("action.signIn")}
         </Button>
       </form>
     </AuthShell>

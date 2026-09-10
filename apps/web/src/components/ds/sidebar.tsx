@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 import { cn } from "cn"
 import type { List } from "@nooks/api"
 
@@ -28,6 +29,7 @@ export function Sidebar({
   onSearch,
   onAddList,
 }: SidebarProps) {
+  const { t } = useTranslation()
   const pinned = lists.filter((list) => list.isPinned)
   const mine = lists.filter((list) => !list.isPinned && list.isOwner)
   const shared = lists.filter((list) => !list.isPinned && !list.isOwner)
@@ -45,16 +47,16 @@ export function Sidebar({
           onClick={onSearch}
           className="flex h-7.5 items-center rounded-md px-2 text-secondary text-muted-foreground hover:bg-secondary"
         >
-          Search
+          {t("action.search")}
           <span className="ml-auto rounded-sm border border-border px-1.5 py-px font-mono text-keycap">
             ⌘K
           </span>
         </button>
       </div>
 
-      <ListGroup label="Pinned" lists={pinned} activeListUid={activeListUid} />
-      <ListGroup label="My lists" lists={mine} activeListUid={activeListUid} />
-      <ListGroup label="Shared with me" lists={shared} activeListUid={activeListUid} />
+      <ListGroup label={t("sidebar.pinned")} lists={pinned} activeListUid={activeListUid} />
+      <ListGroup label={t("sidebar.myLists")} lists={mine} activeListUid={activeListUid} />
+      <ListGroup label={t("sidebar.sharedWithMe")} lists={shared} activeListUid={activeListUid} />
 
       <button
         type="button"
@@ -62,7 +64,7 @@ export function Sidebar({
         className="flex h-7.5 items-center gap-2.5 rounded-md px-2 text-secondary text-muted-foreground hover:bg-secondary"
       >
         <span>+</span>
-        <span>Add a list</span>
+        <span>{t("sidebar.addList")}</span>
       </button>
 
       <div className="mt-auto flex h-8.5 items-center gap-2.5 px-2">
@@ -75,16 +77,14 @@ export function Sidebar({
   )
 }
 
-/** One labelled group of Lists. An empty group is not rendered at all. */
-function ListGroup({
-  label,
-  lists,
-  activeListUid,
-}: {
+type ListGroupProps = {
   label: string
   lists: List[]
   activeListUid?: string
-}) {
+}
+
+/** One labelled group of Lists. An empty group is not rendered at all. */
+function ListGroup({ label, lists, activeListUid }: ListGroupProps) {
   if (lists.length === 0) {
     return null
   }

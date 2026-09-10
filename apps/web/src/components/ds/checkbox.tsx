@@ -9,14 +9,12 @@ import { Checkbox as ShadcnCheckbox } from "@/components/ui/checkbox"
  * phone in a shop hits it. That is why the padding is on a wrapper rather than the
  * control: growing the control would push the label out of line.
  */
-export function Checkbox({
-  className,
-  justTicked,
-  ...props
-}: React.ComponentProps<typeof ShadcnCheckbox> & {
+export type CheckboxProps = React.ComponentProps<typeof ShadcnCheckbox> & {
   /** Someone else ticked it a moment ago. Holds for a second, then settles. */
   justTicked?: boolean
-}) {
+}
+
+export function Checkbox({ className, justTicked, ...props }: CheckboxProps) {
   return (
     <span className="grid size-row -m-3 place-items-center">
       <ShadcnCheckbox

@@ -1,0 +1,130 @@
+{
+  "app": {
+    "name": "nooks"
+  },
+  "action": {
+    "add": "Add",
+    "cancel": "Cancel",
+    "save": "Save",
+    "signIn": "Sign in",
+    "search": "Search"
+  },
+  "auth": {
+    "setup": {
+      "title": "Nooks is running.",
+      "blurb": "Make yourself an account and name the instance. Everything else can wait until someone asks for it.",
+      "footer": "People ask to join from the public list; you approve them",
+      "yourName": "Your name",
+      "email": "Email",
+      "password": "Password",
+      "passwordHint": "Twelve characters or more. No other rules.",
+      "instanceName": "What should this instance be called?",
+      "instanceNameHint": "Shows in the sidebar and on printed lists.",
+      "submit": "Create the instance",
+      "submitting": "Creating…"
+    },
+    "signIn": {
+      "eyebrow": "Signing in to",
+      "blurb": "Your lists are behind this.",
+      "forgot": "Forgot your password?",
+      "join": "New here? Ask to join.",
+      "submitting": "Signing in…"
+    },
+    "replacePassword": {
+      "eyebrow": "An admin made you an account",
+      "title": "Replace the temporary password",
+      "blurb": "They had to pick the first one, so it can't stay. Choose your own now and theirs stops working.",
+      "footer": "Required before you can use Nooks",
+      "temporary": "Temporary password",
+      "temporaryHint": "The one they gave you.",
+      "yours": "Your password",
+      "submit": "Save and continue",
+      "submitting": "Saving…"
+    },
+    "join": {
+      "title": "Ask to join",
+      "blurb": "An admin approves requests. Public signup is off, so this is the way in.",
+      "footer": "Nothing is sent by email — the request waits in Nooks",
+      "namePlaceholder": "What should people call you?",
+      "emailPlaceholder": "So they know who you are",
+      "message": "Anything to add — optional",
+      "messagePlaceholder": "“It's Til, from upstairs”",
+      "submit": "Send the request",
+      "submitting": "Sending…",
+      "sentEyebrow": "Request sent",
+      "sentTitle": "An admin has it",
+      "sentBlurb": "They'll approve it or they won't. This instance can't send email, so nothing will arrive in your inbox — ask them directly if it's taking a while.",
+      "sentFooter": "Come back to this address once it's approved",
+      "askAgain": "Ask again",
+      "checkAgain": "Check again",
+      "checking": "Checking…",
+      "approvedEyebrow": "An admin approved your request",
+      "approvedTitle": "Choose a password",
+      "approvedBlurb": "That's the last step. Nobody else sees what you pick — not the admin, not the server logs.",
+      "approvedFooter": "Welcome in",
+      "joiningAs": "Joining as",
+      "nameHint": "From your request. Change it if you like.",
+      "submitJoin": "Join",
+      "joining": "Joining…"
+    },
+    "reset": {
+      "title": "Ask for a reset",
+      "blurb": "Nooks sends no email. An admin sees it in Activity, checks it's really you however they like, and approves it. Then you set a new password yourself.",
+      "footer": "No email, ever",
+      "backToSignIn": "Back to sign in",
+      "emailOrName": "Your email or name",
+      "emailOrNameHint": "So they know whose account to unlock.",
+      "sentTitle": "An admin has it",
+      "sentBlurb": "They'll ask you something only you would know, then approve it. Come back to this address afterwards — the prompt to choose a password will be waiting.",
+      "sentFooter": "Nothing will arrive by email",
+      "approvedEyebrow": "An admin approved your request",
+      "approvedTitle": "Set a new password",
+      "approvedBlurb": "Nobody else sees what you choose — not the admin, not the server logs. The approval expires in an hour if you don't use it.",
+      "newPassword": "New password",
+      "submit": "Save and sign in"
+    }
+  },
+  "sidebar": {
+    "pinned": "Pinned",
+    "myLists": "My lists",
+    "sharedWithMe": "Shared with me",
+    "addList": "Add a list"
+  },
+  "list": {
+    "allLists": "All lists",
+    "signedInAs": "Signed in as {{name}}",
+    "onlyYou": "Only you",
+    "sharedCanEdit": "Shared with the household · anyone can edit",
+    "sharedReadOnly": "Shared with the household · read-only",
+    "openCount": "{{count}} open",
+    "openCount_zero": "nothing open",
+    "nothingYet": "Nothing on it yet",
+    "doneCount": "{{count}} done",
+    "addItem": "Add an item",
+    "emptyTitle": "This list is empty",
+    "emptyBody": "Type below and press enter. Items can carry a quantity, a date and a note later — none of that is needed to start.",
+    "coldStartTitle": "Start with one list",
+    "coldStartBody": "Groceries, flat jobs, a book you keep meaning to find. A list is a name and a first item; sharing it with the household comes later.",
+    "myListsCrumb": "My lists",
+    "sharedCrumb": "Shared"
+  },
+  "palette": {
+    "searchPlaceholder": "Search lists and items",
+    "searchHint": "Type to find a list or an item.",
+    "noResults": "Nothing matches “{{query}}”.",
+    "addListTitle": "Add a list",
+    "addListBlurb": "Groceries, flat jobs, a book you keep meaning to find. It starts private.",
+    "name": "Name",
+    "addListSubmit": "Add list",
+    "adding": "Adding…"
+  },
+  "date": {
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "dueToday": "Due today"
+  },
+  "error": {
+    "unreachable": "Something went wrong reaching the server.",
+    "cannotReach": "Can't reach the server."
+  }
+}

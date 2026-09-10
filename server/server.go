@@ -49,6 +49,7 @@ func New(cfg profile.Config, s store.Store, log *slog.Logger) (*Server, error) {
 	mux := http.NewServeMux()
 	mux.Handle(apiv1.NewInstanceServiceHandler(v1.NewInstanceService(s), interceptors))
 	mux.Handle(apiv1.NewAuthServiceHandler(authService, interceptors))
+	mux.Handle(apiv1.NewRequestServiceHandler(v1.NewRequestService(s, nil), interceptors))
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("ok"))

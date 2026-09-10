@@ -15,7 +15,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | --- | --- |
 | M0 · Groundwork | `[x]` |
 | M1 · Skeleton that runs | `[~]` all but TanStack Router |
-| M2 · Auth and first run | `[ ]` |
+| M2 · Auth and first run | `[~]` server done; join and reset screens remain |
 | M3 · Lists and Items — the core | `[ ]` |
 | M4 · Views: Today, Upcoming, Calendar | `[ ]` |
 | M5 · Notes | `[ ]` |
@@ -85,9 +85,10 @@ From `Nooks-Auth-Onboarding.dc.html`.
 - [ ] First run — create the first Admin and name the Instance, in one form
 - [ ] Sign in
 - [ ] Temporary password set by an Admin, and forced replacement on first sign-in
-- [ ] Join request: request → Admin approves → Member chooses a password
-- [ ] Reset request: request → Admin approves out of band → Member sets a new password.
-      **Approval expires in an hour.**
+- [x] Join request: request → Admin approves → Member chooses a password. One approval
+      creates one account; an ignored request is indistinguishable from a pending one
+- [x] Reset request: request → Admin approves out of band → Member sets a new password.
+      **Approval expires in an hour**, and one approval sets one password
 - [ ] Signed-out shell: 52px chrome bar, centred card, eyebrow / title / blurb / fields / footer links
 - [ ] Guard: no route reachable before first run completes
 

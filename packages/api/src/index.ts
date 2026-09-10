@@ -5,3 +5,4 @@
 
 export * from "./gen/nooks/api/v1/auth_service_pb"
 export * from "./gen/nooks/api/v1/instance_service_pb"
+export * from "./gen/nooks/api/v1/request_service_pb"

@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package nooks.api.v1;
+
+import "nooks/api/v1/auth_service.proto";
+
+// RequestService is the Admin's side of the two things that would be emails elsewhere:
+// somebody asking for an account, and somebody asking to replace a forgotten password.
+//
+// Every method here requires an Admin. Nooks has no mail server, so these requests wait
+// in the Instance until an Admin acts on them.
+service RequestService {
+  // ListPendingRequests returns everything waiting for an Admin, oldest first.
+  rpc ListPendingRequests(ListPendingRequestsRequest) returns (ListPendingRequestsResponse);
+
+  // DecideJoinRequest approves or ignores a request for an account. Ignoring is silent
+  // and never notifies the sender.
+  rpc DecideJoinRequest(DecideJoinRequestRequest) returns (DecideJoinRequestResponse);
+
+  // DecideResetRequest approves or ignores a request to replace a password. An
+  // approval expires in an hour.
+  rpc DecideResetRequest(DecideResetRequestRequest) returns (DecideResetRequestResponse);
+}
+
+// PendingJoinRequest is somebody asking for an account.
+message PendingJoinRequest {
+  string request_uid = 1;
+  string name = 2;
+  string email = 3;
+
+  // Anything they added, e.g. "It's Til, from upstairs". May be empty, and an empty one
+  // is worth an Admin's suspicion.
+  string message = 4;
+
+  // When they asked, RFC 3339.
+  string created_at = 5;
+}
+
+// PendingResetRequest is a Member asking to replace a forgotten password.
+message PendingResetRequest {
+  string request_uid = 1;
+
+  // Who is asking. An Admin has to recognise them to check it is really them.
+  Member member = 2;
+
+  string created_at = 3;
+}
+
+message ListPendingRequestsRequest {}
+
+message ListPendingRequestsResponse {
+  repeated PendingJoinRequest join_requests = 1;
+  repeated PendingResetRequest reset_requests = 2;
+}
+
+message DecideJoinRequestRequest {
+  string request_uid = 1;
+
+  // False ignores the request: it disappears silently and the sender is never told.
+  bool approve = 2;
+}
+
+message DecideJoinRequestResponse {}
+
+message DecideResetRequestRequest {
+  string request_uid = 1;
+  bool approve = 2;
+}
+
+message DecideResetRequestResponse {}

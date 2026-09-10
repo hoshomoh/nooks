@@ -36,6 +36,10 @@ export type NoteSheetProps = {
 /**
  * The side sheet, per DESIGN.md §9: 520px, pinned below the chrome bar.
  *
+ * It sits on the sheet layer rather than at the top of the stack: a row's checkbox and
+ * label are lifted above the row's own click target, and without a layer of its own the
+ * sheet would be covered by the rows it is drawn over.
+ *
  * Same order as the full-screen view — chrome bar, checkbox and title, detail row,
  * hairline, Note, footer bar — so the two read as one thing at two widths. Opening an
  * Item never replaces the List with a page: the list keeps its place behind this.
@@ -55,7 +59,7 @@ export function NoteSheet({
   const { t } = useTranslation()
 
   return (
-    <aside className="absolute inset-y-0 right-0 flex w-sheet animate-sheet-in flex-col border-l border-border bg-background">
+    <aside className="absolute inset-y-0 right-0 z-20 flex w-sheet animate-sheet-in flex-col border-l border-border bg-background">
       <div className="flex h-chrome items-center gap-2.5 border-b border-hair pr-4 pl-5.5 text-micro text-muted-foreground">
         <span className="text-secondary-foreground">{crumbs.join(" / ")}</span>
         <span className="flex-1" />

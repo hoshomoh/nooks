@@ -360,6 +360,18 @@ page.**
 mono 13.5 with `word-break: break-all`, a primary Copy button, and a sentence saying plainly that it
 cannot be shown again. **Never a warning triangle.**
 
+**Layers.** Three, and no others. A component that needs to sit above something reaches for the layer
+that describes it rather than for a bigger number.
+
+| Layer | Where |
+| --- | --- |
+| `z-10` | A row's own controls, above the invisible target that opens the row |
+| `z-20` | The side sheet |
+| `z-50` | Anything over a scrim: dialogs, ⌘K |
+
+Nothing is ever raised by inventing a value between them: two things that need to be told apart
+belong to different layers, and if they do not, one of them should not be raised at all.
+
 ---
 
 ## 10. Note blocks

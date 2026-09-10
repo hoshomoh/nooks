@@ -1,0 +1,279 @@
+# Nook — plan and status
+
+Everything in the design canvas, broken into shippable milestones. This file is both the plan and the
+status board: update the checkbox in the same commit as the work.
+
+Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are in `STANDARDS.md`.
+
+**Legend** — `[ ]` not started · `[~]` in progress · `[x]` done
+
+---
+
+## Status
+
+| Milestone | State |
+| --- | --- |
+| M0 · Groundwork | `[x]` |
+| M1 · Skeleton that runs | `[~]` |
+| M2 · Auth and first run | `[ ]` |
+| M3 · Lists and Items — the core | `[ ]` |
+| M4 · Views: Today, Upcoming, Calendar | `[ ]` |
+| M5 · Notes | `[ ]` |
+| M6 · Sharing, presence, Activity | `[ ]` |
+| M7 · Members and Groups | `[ ]` |
+| M8 · Public list | `[ ]` |
+| M9 · Print | `[ ]` |
+| M10 · Access tokens, REST, MCP | `[ ]` |
+| M11 · Settings, export, import | `[ ]` |
+| M12 · Offline and conflicts | `[ ]` |
+| M13 · Ship | `[ ]` |
+
+---
+
+## M0 · Groundwork
+
+- [x] Clone `usememos/memos` into `reference/`, gitignored, as a worked example of this stack
+- [x] Install toolchain: Go 1.27.1, Node 24.21.0 LTS, pnpm 12.3.4, buf 1.72.0
+- [x] Pin buf as a workspace devDependency — no global install for contributors
+- [x] `CONTEXT.md` — domain glossary, 26 terms, each with what not to call it
+- [x] `DESIGN.md` — the design system spec, exact values, OKLCH, shadcn contract
+- [x] `STANDARDS.md` — code standards
+- [x] `AGENTS.md` — repo rules, commands, code map
+- [x] `TODO.md` — this file
+- [x] Decide the Go module path — `github.com/hoshomoh/nooks`
+- [x] Decide v1 database drivers — SQLite and Postgres
+- [x] Decide the live-update transport — SSE
+- [x] `go.mod` (`github.com/hoshomoh/nooks`), `cmd/nook/`, `internal/version/`, `.editorconfig`
+- [x] Licence — AGPL-3.0
+- [x] Commit convention — Conventional Commits, no attribution trailers
+
+---
+
+## M1 · Skeleton that runs
+
+The goal is a binary that serves an empty page, and a `buf generate` that produces both Go and
+TypeScript. No features. Everything after this is filling in.
+
+- [ ] `proto/` module: `buf.yaml`, `buf.gen.yaml` (Go, Connect, gateway, OpenAPI, TS via `@bufbuild/es`)
+- [ ] First service definition end to end, to prove the pipeline
+- [ ] Store interface + SQLite and Postgres drivers, migration runner, `LATEST.sql` for each
+- [ ] Config: flags and env (port, data directory, driver, DSN)
+- [ ] HTTP server: routing, graceful shutdown, request logging
+- [ ] `web/`: Vite + React + TypeScript
+- [ ] Tailwind v4 + `shadcn init`; **verify what the CLI emits against `DESIGN.md` §16 and amend the
+      spec if they disagree**
+- [ ] Tokens: full light and dark palettes, Nook's own tokens, radii
+- [ ] Self-host Public Sans and IBM Plex Mono *(see open questions — a home server may have no
+      internet, so Google Fonts CDN is not acceptable — open question 1)*
+- [ ] Theme: light / dark / system, `.dark` class, persisted
+- [ ] TanStack Query + TanStack Router
+- [ ] Connect-web transport wired to the generated client
+- [ ] SPA embedded into the binary; one process serves API and app
+- [ ] CI: `go test`, `golangci-lint`, `buf lint`, `buf format -d`, web typecheck, lint, test, build
+
+---
+
+## M2 · Auth and first run
+
+From `Nook-Auth-Onboarding.dc.html`.
+
+- [ ] Member and Instance schema; password hashing; sessions
+- [ ] Password rule: twelve characters or more, **no other rules**
+- [ ] First run — create the first Admin and name the Instance, in one form
+- [ ] Sign in
+- [ ] Temporary password set by an Admin, and forced replacement on first sign-in
+- [ ] Join request: request → Admin approves → Member chooses a password
+- [ ] Reset request: request → Admin approves out of band → Member sets a new password.
+      **Approval expires in an hour.**
+- [ ] Signed-out shell: 52px chrome bar, centred card, eyebrow / title / blurb / fields / footer links
+- [ ] Guard: no route reachable before first run completes
+
+---
+
+## M3 · Lists and Items — the core
+
+From `Nook-List-View.dc.html`. The single most important milestone; everything else is furniture.
+
+- [ ] List and Item schema, ordering, soft delete
+- [ ] Sidebar: Instance switcher, Search, Today / Upcoming / All lists, Pinned / My lists / Shared with
+      me, Add a list, Member footer
+- [ ] App shell: 258px sidebar, 44px chrome bar, 660px content column
+- [ ] List view: title, avatars, orientation line, count, the hairline rule
+- [ ] **The list row** — 44px, `20px 1fr auto`, truncation in the label, metadata right-aligned
+- [ ] Checkbox states: rest, hover, focus, done, just ticked by someone else
+- [ ] Add row: `+`, placeholder, `↵` keycap, stays focused after adding
+- [ ] Quantity as free text, shown as a mono badge
+- [ ] Due dates, and date parsing from the typed text (`milk friday`)
+- [ ] Tick and untick, with attribution
+- [ ] Completed Items: placement and the "3 done today" row
+- [ ] Empty states: empty List, cold-start All lists
+- [ ] List menu (`···`): rename, pin, duplicate, print, sort, completed placement, export as plain
+      text, delete
+- [ ] Pinning, per Member
+- [ ] Keyboard: `↵`, `↑` `↓`, `space`, `⌘K` jump-to-list
+
+---
+
+## M4 · Views: Today, Upcoming, Calendar
+
+- [ ] Today: overdue and due-today sections, gathered from every reachable List
+- [ ] Upcoming: next two weeks, grouped by day
+- [ ] Calendar: month grid, 1060px column, **dated Items only**
+- [ ] Add row that targets a List and a date from context
+- [ ] Empty states: nothing due today says what is next, and does not apologise
+
+---
+
+## M5 · Notes
+
+- [ ] Note and block schema
+- [ ] Side sheet at 520px — opening an Item never replaces the List
+- [ ] Full-screen Note view, and Esc back to the List
+- [ ] Blocks: paragraph, heading, checklist, quote, code — same markup, two scales
+- [ ] Markdown shorthand converts as typed, and is never displayed back
+- [ ] `/` block menu, filtered, showing each shortcut
+- [ ] Row preview: the Note's own first line plus `+N lines`. **Never a summary.**
+- [ ] Autosave, and the "Saving… / Saved" footer state
+
+---
+
+## M6 · Sharing, presence, Activity
+
+From `Nook-Sharing-Team.dc.html`.
+
+- [ ] Sharing model: private / everyone on the Instance / specific Members and Groups
+- [ ] Can-edit toggle; read-only means see and print, not tick or add
+- [ ] Share dialog, and the specific-people dialog (Groups first, then individuals)
+- [ ] Copy list address
+- [ ] Live updates — someone else's tick lands with a one-second highlight, then settles.
+      **No toast, no sound.**
+- [ ] Presence: "Jonas is here", avatar ring in `done`
+- [ ] Activity panel: join requests, reset requests, shares, conflicts, token use
+- [ ] Approve and ignore actions. **Ignore is silent and never notifies the sender.**
+- [ ] Unread state and the dot on the Activity control
+
+---
+
+## M7 · Members and Groups
+
+- [ ] Members page: table, roles, added dates, `···` menu
+- [ ] Add a member — sets a temporary password, read out once
+- [ ] A Member who has never signed in greys their name and last column, not the whole row
+- [ ] Groups page: cards two-up, membership, lists shared with the Group
+- [ ] Add a group; add and remove Members
+- [ ] Removing someone from a Group takes away the lists they got through it, and nothing else
+
+---
+
+## M8 · Public list
+
+From `Nook-Public-Access.dc.html`.
+
+- [ ] At most one Public list per Instance, at a stable address, no password, no account
+- [ ] Public page: no sidebar, no attribution, no other List reachable
+- [ ] Settings: which List, show contributor names, show quantities and dates, let visitors ask to join
+- [ ] Sign-in prompt appears **under the row the Visitor touched**, not as a wall
+- [ ] The attempted tick is remembered and applied once they are in
+- [ ] Ask to join dialog, and the request-sent state
+- [ ] Empty state explains the page rather than asking for work
+- [ ] Auto-refresh — it is meant to stay open on the way to the shop
+
+---
+
+## M9 · Print
+
+From `Nook-Print.dc.html`.
+
+- [ ] `@page` A4, `18mm 18mm 14mm`, print stylesheet
+- [ ] Header: eyebrow, title, date, counts, and the 0.7pt ink rule
+- [ ] Rows with real 6mm checkboxes; quantity and attribution
+- [ ] Three blank dashed rows at the end
+- [ ] Two-up for long lists, type down one step, never below 13pt
+- [ ] Footer with page numbers
+- [ ] `⌘P` prints the List you are looking at
+- [ ] Resolve the 40pt/27pt conflict *(open question 2)*
+
+---
+
+## M10 · Access tokens, REST, MCP
+
+- [ ] Access token schema: hashed, scoped to named Lists, permissioned, expiring
+- [ ] Tokens page — a Member's own; an Admin also sees that others' exist
+- [ ] An Admin can revoke another Member's token but **cannot read it or make one in their name**
+- [ ] Add a token dialog: name, List scope picker, permissions, expiry
+- [ ] Secret shown once, with a plain sentence that it cannot be shown again
+- [ ] Unpicked Lists are invisible to a token — it cannot see that they exist
+- [ ] Token activity log
+- [ ] REST API at `/api/v1`
+- [ ] MCP server at `/mcp`, same token
+- [ ] Changes made by a token are attributed to the token in List history
+
+---
+
+## M11 · Settings, export, import
+
+- [ ] Account: name, email, change password
+- [ ] Appearance: theme segment
+- [ ] Instance (admins only): Instance name, public signup toggle
+- [ ] About: version, storage, instance age, counts, licence, **Telemetry: None**
+- [ ] Export everything — one JSON file plus the printed pages as PDFs
+- [ ] Import a backup — the same file the exporter writes, so moving machines is copy and restore
+
+---
+
+## M12 · Offline and conflicts
+
+- [ ] Offline banner, retry, last-seen time
+- [ ] Reading, ticking and adding all work offline; queued changes carry `not synced`
+- [ ] Sync on reconnect
+- [ ] **Ticks never conflict** — last write wins, whoever made it
+- [ ] Competing text prompts, on the row it affects only: Keep mine / Keep both
+- [ ] Error on save keeps the Member's text and offers real options
+- [ ] Loading skeletons that hold the exact height of real rows
+- [ ] "Still waiting on the server" after 4s
+
+---
+
+## M13 · Ship
+
+- [ ] Docker image, `docker-compose.yml`, and a one-line run command
+- [ ] Release workflow, versioned binaries
+- [ ] `README.md`: what it is, how to run it, how to back it up
+- [ ] `CONTRIBUTING.md` pointing at `STANDARDS.md`, `CONTEXT.md`, `DESIGN.md`
+- [ ] Licence — the design says AGPL-3.0
+- [ ] Accessibility pass: focus order, labels, contrast, 44px hit areas
+- [ ] Seed data for a believable first run
+
+---
+
+## Decisions
+
+| Decision | Choice | Consequence |
+| --- | --- | --- |
+| Go module path | `github.com/hoshomoh/nooks` | Clone path and module path agree |
+| Database drivers, v1 | **SQLite and Postgres** | Every schema change ships migrations and `LATEST.sql` for both, plus driver tests. SQLite stays the default — the About screen promises "one file you can copy" |
+| Live updates | **SSE** | One-directional, plain HTTP, self-reconnecting, fine behind a reverse proxy. Enough for ticks, presence and Activity |
+| buf | Workspace devDependency | `pnpm exec buf`; no global install for contributors |
+| Token naming | shadcn's names; Nook's accent is `shared` | Avoids colliding with shadcn's `--accent` hover surface |
+
+## Open questions
+
+Resolve, then delete from this list.
+
+1. **Fonts offline.** The canvas loads Public Sans and IBM Plex Mono from Google Fonts. A home server
+   may have no internet, and a CDN call also leaks that the Instance exists. Recommendation: self-host
+   both, subset, and embed in the binary.
+2. **Print type scale.** Foundations says 40pt / 20pt / 15pt; the Print artboard renders 27pt / 16pt /
+   13pt. `DESIGN.md` follows the artboard. The canvas should be reconciled.
+3. **`@import "shadcn/tailwind.css"`.** Taken from the docs page but not yet confirmed against what
+   `shadcn init` actually emits. M1 settles it.
+
+---
+
+## Explicitly not in v1
+
+Named so nobody wonders whether they were forgotten. None of these appear in the design.
+
+- Recurring Items · Reminders and push notifications · File attachments · Sub-lists or nesting beyond
+  Note checklists · Full-text search across Notes (⌘K jumps to Lists only) · Mobile apps · Multiple
+  Instances behind one deployment · Email, of any kind

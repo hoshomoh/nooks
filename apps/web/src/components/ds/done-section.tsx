@@ -1,5 +1,6 @@
 import { useState } from "react"
 import type { ReactNode } from "react"
+import { Icon } from "./icon"
 
 export interface DoneSectionProps {
   /** How the row reads, e.g. "3 done today". */
@@ -27,7 +28,11 @@ export function DoneSection({ label, children }: DoneSectionProps) {
         aria-expanded={open}
         className="flex items-center gap-2 self-start text-meta text-secondary-foreground"
       >
-        <span className="text-[10px] text-muted-foreground">{open ? "▾" : "▸"}</span>
+        <Icon
+          name={open ? "collapse" : "expand"}
+          size="small"
+          className="text-muted-foreground"
+        />
         <span>{label}</span>
       </button>
 

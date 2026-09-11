@@ -3,9 +3,10 @@ import { useTranslation } from "react-i18next"
 import { cn } from "cn"
 
 import { Button } from "./button"
-import { DotsButton } from "./dots-button"
+import { IconButton } from "./icon-button"
 import { Field } from "./field"
-import { Calendar } from "@/components/ui/calendar"
+import { Icon } from "./icon"
+import { DateCalendar } from "./date-calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { parseDue, toStored, type DueDate } from "@/lib/dates"
 import { useLocale } from "@/lib/use-locale"
@@ -63,7 +64,9 @@ export function ItemMenu({ quantity, dueOn, actions }: ItemMenuProps) {
         }
       }}
     >
-      <PopoverTrigger render={<DotsButton aria-label={t("itemMenu.open")} />} />
+      <PopoverTrigger
+        render={<IconButton name="more" scale="compact" label={t("itemMenu.open")} />}
+      />
 
       <PopoverContent
         align="end"
@@ -132,8 +135,8 @@ function ActionsPanel({ onView, onDate, onQuantity, onDuplicate, onDelete }: Act
       <Entry label={t("itemMenu.view")} shortcut="↵" onSelect={onView} />
       {/* These two open a field rather than leaving: the entry names it, so the entry
           should be where it is. */}
-      <Entry label={t("itemMenu.setDate")} shortcut="▸" onSelect={onDate} />
-      <Entry label={t("itemMenu.setQuantity")} shortcut="▸" onSelect={onQuantity} />
+      <Entry label={t("itemMenu.setDate")} opensPanel onSelect={onDate} />
+      <Entry label={t("itemMenu.setQuantity")} opensPanel onSelect={onQuantity} />
 
       <span className="my-1.5 h-px bg-hair" />
 
@@ -145,13 +148,16 @@ function ActionsPanel({ onView, onDate, onQuantity, onDuplicate, onDelete }: Act
 
 interface EntryProps {
   label: string
+  /** The key that does the same thing, e.g. "↵". Typed, because a keycap is a key. */
   shortcut?: string
+  /** Whether choosing it turns the menu to another of its faces rather than acting. */
+  opensPanel?: boolean
   destructive?: boolean
   onSelect: () => void
 }
 
 /** One row of the menu, at the size DESIGN.md §9 gives a menu item. */
-function Entry({ label, shortcut, destructive, onSelect }: EntryProps) {
+function Entry({ label, shortcut, opensPanel, destructive, onSelect }: EntryProps) {
   return (
     <button
       type="button"
@@ -165,6 +171,7 @@ function Entry({ label, shortcut, destructive, onSelect }: EntryProps) {
       {shortcut && (
         <span className="ml-auto font-mono text-micro text-muted-foreground">{shortcut}</span>
       )}
+      {opensPanel && <Icon name="forward" size="small" className="ml-auto text-muted-foreground" />}
     </button>
   )
 }
@@ -184,13 +191,10 @@ function DatePanel({ dueOn, onPick, onBack }: DatePanelProps) {
   return (
     <div className="flex flex-col">
       <PanelHeading label={t("itemMenu.setDate")} onBack={onBack} />
-      <Calendar
-        mode="single"
+      <DateCalendar
         selected={selected}
-        defaultMonth={selected}
         onSelect={(day) => onPick(day ? toStored(day) : "")}
         locale={dateLocale}
-        autoFocus
       />
       {dueOn && (
         <button
@@ -254,14 +258,13 @@ function PanelHeading({ label, onBack }: PanelHeadingProps) {
 
   return (
     <div className="flex items-center gap-2 px-2.5 pt-1.5 pb-2">
-      <button
-        type="button"
+      <IconButton
+        name="back"
+        scale="compact"
+        label={t("itemMenu.back")}
         onClick={onBack}
-        aria-label={t("itemMenu.back")}
-        className="text-micro text-muted-foreground hover:text-foreground"
-      >
-        ‹
-      </button>
+        className="-ml-1"
+      />
       <span className="text-label text-muted-foreground uppercase">{label}</span>
     </div>
   )

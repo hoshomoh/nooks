@@ -6,7 +6,7 @@ import type { Item, List } from "@nooks/api"
 
 import { Button } from "./button"
 import { ConfirmDialog } from "./confirm-dialog"
-import { DotsButton } from "./dots-button"
+import { IconButton } from "./icon-button"
 import { Menu, MenuItem, MenuSeparator } from "./menu"
 import { PromptDialog } from "./prompt-dialog"
 import { ShareDialog, type ShareDecision } from "./share-dialog"
@@ -102,7 +102,7 @@ export function ListActions({ list, instanceName, items, withControls }: ListAct
       )}
 
       <Menu
-        trigger={<DotsButton aria-label={t("sidebarMenu.open")} />}
+        trigger={<IconButton name="more" scale="compact" label={t("sidebarMenu.open")} />}
       >
         <MenuItem
           shortcut="↵"

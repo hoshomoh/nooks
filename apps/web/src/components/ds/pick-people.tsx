@@ -6,6 +6,7 @@ import type { Member } from "@nooks/api"
 import { Button } from "./button"
 import { DIALOG_SURFACE } from "./dialog-surface"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { TickBox } from "./tick-box"
 
 export interface PickPeopleProps {
   open: boolean
@@ -113,16 +114,7 @@ function PickPeopleForm({
             </span>
             <span className="text-field">{member.name}</span>
             <span className="truncate text-micro text-muted-foreground">{member.email}</span>
-            <span
-              className={cn(
-                "ml-auto grid size-4 shrink-0 place-items-center rounded-sm text-[10px] text-background",
-                chosen.includes(member.uid)
-                  ? "border-[1.5px] border-shared bg-shared"
-                  : "border-[1.5px] border-control",
-              )}
-            >
-              {chosen.includes(member.uid) ? "✓" : ""}
-            </span>
+            <TickBox picked={chosen.includes(member.uid)} className="ml-auto" />
           </button>
         ))}
       </div>

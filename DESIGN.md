@@ -317,6 +317,18 @@ Use the bordered list instead when each choice needs a sentence explaining what 
 `--border`, radius 8, rows padded `12px 14px` split by 1px `--hair`, a 15px checkbox, label 14
 and explanation 12.5 `--muted-foreground`.
 
+### Icons
+
+Icons are drawn by the icon library, at 1.75 stroke, in three sizes: 14, 16 and 18. Nothing is ever
+stood in for by a typed character — `‹`, `▸`, `✕` and `···` are punctuation, and punctuation at a
+small size reads as a font artefact rather than as something that can be pressed.
+
+Every icon is reached through `Icon` by what it means (`back`, `close`, `more`), never by what it
+looks like. An icon that can be pressed on its own is an `IconButton`: a square with a hover ground
+and a label, because a shape with no ground is not a button however it is styled.
+
+Keycaps are the exception and stay typed — `↵`, `⌫`, `⌘P` are keys on a keyboard, not icons.
+
 ---
 
 ## 8. Page furniture

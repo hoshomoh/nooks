@@ -2,8 +2,9 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { cn } from "cn"
 
-import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { DateCalendar } from "./date-calendar"
+import { Icon } from "./icon"
 import { parseDue, toStored, type DueDate } from "@/lib/dates"
 import { useLocale } from "@/lib/use-locale"
 
@@ -70,21 +71,14 @@ export function DateField({
                 : "border border-border text-secondary-foreground hover:bg-secondary",
             )}
           >
-            <CalendarGlyph />
+            <Icon name="date" size="small" />
             <span className="whitespace-nowrap">{label}</span>
           </button>
         }
       />
 
       <PopoverContent align="end" className="w-auto gap-0 p-0">
-        <Calendar
-          mode="single"
-          selected={selected}
-          defaultMonth={selected}
-          onSelect={choose}
-          locale={dateLocale}
-          autoFocus
-        />
+        <DateCalendar selected={selected} onSelect={choose} locale={dateLocale} />
         {value && (
           <button
             type="button"
@@ -96,20 +90,5 @@ export function DateField({
         )}
       </PopoverContent>
     </Popover>
-  )
-}
-
-/** The calendar glyph, drawn at the size the row uses. */
-function CalendarGlyph() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden className="shrink-0">
-      <rect x="1" y="2.2" width="10" height="9" rx="1.6" stroke="currentColor" strokeWidth="1.1" />
-      <path
-        d="M1 5h10M3.6 1v2.2M8.4 1v2.2"
-        stroke="currentColor"
-        strokeWidth="1.1"
-        strokeLinecap="round"
-      />
-    </svg>
   )
 }

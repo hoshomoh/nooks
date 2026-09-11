@@ -8,6 +8,8 @@ import { EditableTitle } from "./editable-title"
 import { NoteEditor } from "./note-editor"
 import type { DueDate } from "@/lib/dates"
 import { useDueLabel } from "@/lib/use-due-label"
+import { Icon } from "./icon"
+import { IconButton } from "./icon-button"
 
 export interface NoteSheetProps {
   item: Item
@@ -75,22 +77,13 @@ export function NoteSheet({
           onClick={onOpenFull}
           className="flex h-control-toolbar items-center gap-1 rounded-md bg-secondary px-2 text-micro text-secondary-foreground transition-colors hover:text-foreground"
         >
-          <span aria-hidden className="text-[11px]">
-            ⤢
-          </span>
+          <Icon name="fullScreen" size="small" className="size-3" />
           <span>{t("note.openFull")}</span>
         </button>
 
-        {/* A glyph, not a word: the crumb already says where this is, and a second
+        {/* An icon, not a word: the crumb already says where this is, and a second
             label beside "Open full" would read as a second destination. */}
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t("note.close")}
-          className="ml-1 grid size-6 place-items-center rounded-md text-[13px] transition-colors hover:bg-secondary hover:text-foreground"
-        >
-          ✕
-        </button>
+        <IconButton name="close" label={t("note.close")} onClick={onClose} className="ml-1" />
       </div>
 
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-7.5 pt-7.5">

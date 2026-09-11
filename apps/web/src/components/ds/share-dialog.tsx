@@ -9,6 +9,7 @@ import { COVERING, INERT, RAISED } from "./covering"
 import { DIALOG_SURFACE } from "./dialog-surface"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { groupsQuery, listSharesQuery, membersQuery } from "@/lib/sharing-queries"
+import { TickBox } from "./tick-box"
 
 /** What the dialog sends back when the Member saves. */
 export interface ShareDecision {
@@ -398,14 +399,7 @@ function PickRow({ badge, name, detail, isGroup, picked, onToggle }: PickRowProp
       </span>
       <span className="text-field">{name}</span>
       {detail && <span className="truncate text-micro text-muted-foreground">{detail}</span>}
-      <span
-        className={cn(
-          "ml-auto grid size-4 shrink-0 place-items-center rounded-sm text-[10px] text-background",
-          picked ? "border-[1.5px] border-shared bg-shared" : "border-[1.5px] border-control",
-        )}
-      >
-        {picked ? "✓" : ""}
-      </span>
+      <TickBox picked={picked} className="ml-auto" />
     </button>
   )
 }

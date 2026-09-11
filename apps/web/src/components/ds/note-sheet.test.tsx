@@ -41,9 +41,12 @@ function show(item: Item = milk, canEdit = true) {
 describe("the item sheet", () => {
   // The crumb already says where this is; a second word beside "Open full" would read
   // as a second destination.
-  it("closes with a glyph, named for a screen reader", () => {
+  it("closes with an icon, named for a screen reader", () => {
     const actions = show()
-    expect(screen.getByRole("button", { name: "Close" })).toHaveTextContent("✕")
+    const close = screen.getByRole("button", { name: "Close" })
+
+    expect(close).toHaveTextContent("")
+    expect(close.querySelector("svg")).not.toBeNull()
     expect(screen.getByRole("button", { name: /Open full/ })).toBeInTheDocument()
     void actions
   })

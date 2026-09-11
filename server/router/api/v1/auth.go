@@ -160,9 +160,9 @@ func (s *AuthService) GetCurrentMember(
 	ctx context.Context,
 	_ *connect.Request[apiv1.GetCurrentMemberRequest],
 ) (*connect.Response[apiv1.GetCurrentMemberResponse], error) {
-	member, ok := auth.MemberFrom(ctx)
-	if !ok {
-		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("not signed in"))
+	member, err := requireMember(ctx)
+	if err != nil {
+		return nil, err
 	}
 	return connect.NewResponse(&apiv1.GetCurrentMemberResponse{Member: memberToProto(member)}), nil
 }
@@ -175,9 +175,11 @@ func (s *AuthService) ReplacePassword(
 	ctx context.Context,
 	req *connect.Request[apiv1.ReplacePasswordRequest],
 ) (*connect.Response[apiv1.ReplacePasswordResponse], error) {
-	member, ok := auth.MemberFrom(ctx)
-	if !ok {
-		return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("not signed in"))
+	// A browser, never a token: a key that reaches somebody's Lists must not be a way
+	// to take the account those Lists belong to.
+	member, err := requireBrowser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := password.Verify(member.PasswordHash, req.Msg.GetCurrentPassword()); err != nil {

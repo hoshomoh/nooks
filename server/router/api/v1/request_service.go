@@ -8,7 +8,6 @@ import (
 	"connectrpc.com/connect"
 
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
-	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
 )
 
@@ -128,20 +127,6 @@ func (s *RequestService) DecideResetRequest(
 		return nil, err
 	}
 	return connect.NewResponse(&apiv1.DecideResetRequestResponse{}), nil
-}
-
-// requireAdmin rejects anyone who is not a signed-in Admin.
-func requireAdmin(ctx context.Context) (store.Member, error) {
-	member, ok := auth.MemberFrom(ctx)
-	if !ok {
-		return store.Member{}, connect.NewError(connect.CodeUnauthenticated,
-			errors.New("not signed in"))
-	}
-	if !member.IsAdmin() {
-		return store.Member{}, connect.NewError(connect.CodePermissionDenied,
-			errors.New("only an admin can do that"))
-	}
-	return member, nil
 }
 
 // decision turns the wire's boolean into a status.

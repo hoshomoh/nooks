@@ -245,3 +245,70 @@ func (s *ListService) listByIDWithAccess(
 	// Not among the Lists they can reach: indistinguishable from not existing.
 	return store.List{}, errItemNotFound
 }
+
+/*
+Who a request is from, and what that lets them do.
+
+Three doors, and which one a method uses is a permission decision in itself:
+
+  - requireGrant for anything that reaches a List. It carries the caller's limits, so
+    accessTo can narrow what a token may see.
+  - requireMember where only the person matters — their own name, their own settings.
+  - requireBrowser for anything that changes the account itself. A token is somebody's
+    access to their Lists; it is never a way to become them.
+
+The third is the one to get right. A Grant puts its Member on the context, so a token
+looks like its owner to anything that only asks who is here — which is what makes the
+whole thing convenient, and exactly why the account-level doors have to say no.
+*/
+
+// requireMember rejects a request from nobody.
+func requireMember(ctx context.Context) (store.Member, error) {
+	grant, err := requireGrant(ctx)
+	if err != nil {
+		return store.Member{}, err
+	}
+	return grant.Member, nil
+}
+
+// requireGrant rejects a request from nobody, and answers with what the caller may do.
+func requireGrant(ctx context.Context) (auth.Grant, error) {
+	grant, ok := auth.GrantFrom(ctx)
+	if !ok {
+		return auth.Grant{}, connect.NewError(connect.CodeUnauthenticated,
+			errors.New("not signed in"))
+	}
+	return grant, nil
+}
+
+// errNotABrowser refuses an account-level change made with a token.
+var errNotABrowser = connect.NewError(connect.CodePermissionDenied,
+	errors.New("an access token cannot change an account"))
+
+// requireBrowser rejects a request that arrived with an Access token.
+//
+// Passwords, roles, who is a Member, and the tokens themselves: a leaked key must not
+// be able to make itself permanent, lock its owner out, or hand itself an Admin.
+func requireBrowser(ctx context.Context) (store.Member, error) {
+	grant, err := requireGrant(ctx)
+	if err != nil {
+		return store.Member{}, err
+	}
+	if grant.Token != nil {
+		return store.Member{}, errNotABrowser
+	}
+	return grant.Member, nil
+}
+
+// requireAdmin rejects anyone who is not a signed-in Admin in a browser.
+func requireAdmin(ctx context.Context) (store.Member, error) {
+	member, err := requireBrowser(ctx)
+	if err != nil {
+		return store.Member{}, err
+	}
+	if !member.IsAdmin() {
+		return store.Member{}, connect.NewError(connect.CodePermissionDenied,
+			errors.New("only an admin can do that"))
+	}
+	return member, nil
+}

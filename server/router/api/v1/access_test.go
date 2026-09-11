@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"testing"
+	"time"
 
 	"connectrpc.com/connect"
 
@@ -270,5 +271,38 @@ func TestRevokingATokenLeavesWhatItAdded(t *testing.T) {
 	}
 	if got := items[0].GetAddedViaToken(); got != "" {
 		t.Errorf("addedViaToken = %q, want nothing once the token is gone", got)
+	}
+}
+
+// A Grant puts its Member on the context, so a token looks like its owner to anything
+// that only asks who is here. That is what makes it convenient, and exactly why the
+// account-level doors have to say no.
+func TestATokenCannotChangeTheAccountItBelongsTo(t *testing.T) {
+	f := newListFixture(t)
+	groceries := f.createList(t, f.anna, "Groceries")
+	ctx := f.withToken(t, f.anna, store.PermissionWrite, groceries)
+
+	auths := NewAuthService(f.store, AuthServiceOptions{Now: func() time.Time { return testClock }})
+	_, err := auths.ReplacePassword(ctx, connect.NewRequest(&apiv1.ReplacePasswordRequest{
+		CurrentPassword: "hunter2-hunter2", NewPassword: "a-much-longer-one",
+	}))
+	if got := connect.CodeOf(err); got != connect.CodePermissionDenied {
+		t.Errorf("ReplacePassword code = %v, want permission_denied", got)
+	}
+}
+
+// Anna is an Admin. Her token must not be.
+func TestATokenCannotActAsAnAdmin(t *testing.T) {
+	f := newListFixture(t)
+	groceries := f.createList(t, f.anna, "Groceries")
+	ctx := f.withToken(t, f.anna, store.PermissionWrite, groceries)
+
+	if _, err := requireAdmin(ctx); connect.CodeOf(err) != connect.CodePermissionDenied {
+		t.Errorf("requireAdmin code = %v, want permission_denied", connect.CodeOf(err))
+	}
+
+	// The same context is still a perfectly good caller for what the token is for.
+	if _, err := requireGrant(ctx); err != nil {
+		t.Errorf("requireGrant: %v, want the token to still be a caller", err)
 	}
 }

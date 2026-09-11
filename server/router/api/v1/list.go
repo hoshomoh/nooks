@@ -8,7 +8,6 @@ import (
 	"connectrpc.com/connect"
 
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
-	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
 )
 
@@ -308,45 +307,6 @@ func (s *ListService) openCount(ctx context.Context, listID int64) (int, error) 
 		}
 	}
 	return open, nil
-}
-
-// requireMember rejects a request from nobody.
-//
-// Use it only where the Member is all that is needed — their own name, their own
-// settings. Anything that reaches a List wants requireGrant instead, because a Member
-// on their own has lost whatever limits the caller arrived with.
-func requireMember(ctx context.Context) (store.Member, error) {
-	grant, err := requireGrant(ctx)
-	if err != nil {
-		return store.Member{}, err
-	}
-	return grant.Member, nil
-}
-
-// requireGrant rejects a request from nobody, and answers with what the caller may do.
-func requireGrant(ctx context.Context) (auth.Grant, error) {
-	grant, ok := auth.GrantFrom(ctx)
-	if !ok {
-		return auth.Grant{}, connect.NewError(connect.CodeUnauthenticated,
-			errors.New("not signed in"))
-	}
-	return grant, nil
-}
-
-// requireBrowser rejects a request that arrived with an Access token.
-//
-// A token must not be able to mint or revoke tokens: a leaked one would otherwise be
-// able to make itself permanent and to lock its Member out of noticing.
-func requireBrowser(ctx context.Context) (store.Member, error) {
-	grant, err := requireGrant(ctx)
-	if err != nil {
-		return store.Member{}, err
-	}
-	if grant.Token != nil {
-		return store.Member{}, connect.NewError(connect.CodePermissionDenied,
-			errors.New("access tokens cannot manage access tokens"))
-	}
-	return grant.Member, nil
 }
 
 // listToProto converts a List for the wire, from one Member's point of view.

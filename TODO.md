@@ -246,9 +246,9 @@ The single most important milestone; everything else is furniture.
 
 - [x] Account: name, email, change password
 - [x] Appearance: theme segment and the language picker
-- [ ] Instance default language, for public lists, printed sheets and anyone who has not
+- [x] Instance default language, for public lists, printed sheets and anyone who has not
       chosen one
-- [ ] Instance (admins only): Instance name, public signup toggle
+- [x] Instance (admins only): Instance name, public signup toggle
 - [ ] About: version, storage, instance age, counts, licence, **Telemetry: None**
 - [ ] Delete instance, from About — takes everything and returns the Instance to first run.
       Any Admin, behind the irreversible confirmation in DESIGN.md §9

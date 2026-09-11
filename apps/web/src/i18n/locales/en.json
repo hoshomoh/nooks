@@ -299,7 +299,8 @@
     "publicList": "Public list",
     "tokens": "Access tokens",
     "account": "Account",
-    "appearance": "Appearance"
+    "appearance": "Appearance",
+    "instance": "Instance"
   },
   "members": {
     "title": "Members",
@@ -524,5 +525,15 @@
     "languageBlurb": "Sets the words, how dates read, and how numbers are written. One choice, not three.",
     "translationsNote": "{{count}} language so far. Adding one is a JSON file in the repository — no code, and no release needed to try it.",
     "translationsNote_other": "{{count}} languages so far. Adding one is a JSON file in the repository — no code, and no release needed to try it."
+  },
+  "instance": {
+    "title": "Instance",
+    "blurb": "What this copy of nooks is called, who may join it, and the language it falls back to. Admins only.",
+    "name": "Name",
+    "nameBlurb": "Shows in the sidebar, on the public page and on printed lists.",
+    "publicSignup": "Public signup",
+    "publicSignupBlurb": "Off means anybody asking for an account waits for an admin to approve them. Off is the default, and usually the right answer.",
+    "language": "Default language",
+    "languageBlurb": "Used for the public page, printed sheets, and anyone who has not chosen one of their own."
   }
 }

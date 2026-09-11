@@ -42,6 +42,10 @@ message InstanceSettings {
   bool public_signup = 2;
 
   PublicListSettings public_list = 3;
+
+  // The language of anything nobody chose a language for: the public page, a printed
+  // sheet, and a Member who has not picked one. Empty means English.
+  string default_locale = 4;
 }
 
 message GetInstanceSettingsRequest {}
@@ -73,4 +77,8 @@ message GetInstanceResponse {
 
   // When false, every account starts as a join request an Admin approves.
   bool public_signup = 4;
+
+  // The language a Visitor reads this Instance in. Reachable without authentication
+  // because the public page needs it before anybody has signed in.
+  string default_locale = 5;
 }

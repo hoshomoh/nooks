@@ -40,10 +40,11 @@ func (s *InstanceService) GetInstance(
 	}
 
 	return connect.NewResponse(&apiv1.GetInstanceResponse{
-		Name:         settings.Name,
-		Version:      version.String(),
-		NeedsSetup:   settings.NeedsSetup(),
-		PublicSignup: settings.PublicSignup,
+		Name:          settings.Name,
+		Version:       version.String(),
+		NeedsSetup:    settings.NeedsSetup(),
+		PublicSignup:  settings.PublicSignup,
+		DefaultLocale: settings.DefaultLocale,
 	}), nil
 }
 
@@ -97,6 +98,7 @@ func (s *InstanceService) UpdateInstanceSettings(
 	}
 	settings.Name = name
 	settings.PublicSignup = wanted.GetPublicSignup()
+	settings.DefaultLocale = wanted.GetDefaultLocale()
 	settings.Public = public
 
 	if err := s.store.SaveInstanceSettings(ctx, settings); err != nil {
@@ -137,8 +139,9 @@ func (s *InstanceService) publicFromProto(
 // settingsToProto converts the Instance's configuration for the wire.
 func settingsToProto(settings store.InstanceSettings) *apiv1.InstanceSettings {
 	return &apiv1.InstanceSettings{
-		Name:         settings.Name,
-		PublicSignup: settings.PublicSignup,
+		Name:          settings.Name,
+		PublicSignup:  settings.PublicSignup,
+		DefaultLocale: settings.DefaultLocale,
 		PublicList: &apiv1.PublicListSettings{
 			ListUid:   settings.Public.ListUID,
 			ShowNames: settings.Public.ShowNames,

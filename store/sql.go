@@ -18,6 +18,7 @@ import (
 const (
 	settingInstanceName     = "instance.name"
 	settingPublicSignup     = "instance.public_signup"
+	settingDefaultLocale    = "instance.default_locale"
 	settingSetupCompletedAt = "instance.setup_completed_at"
 	settingPublicListUID    = "instance.public_list_uid"
 	settingPublicShowNames  = "instance.public_show_names"
@@ -81,8 +82,9 @@ func (s *sqlStore) Close() error {
 // error: it means first run has not set it yet.
 func settingsFromValues(values map[string]string) (InstanceSettings, error) {
 	settings := InstanceSettings{
-		Name:         values[settingInstanceName],
-		PublicSignup: values[settingPublicSignup] == "true",
+		Name:          values[settingInstanceName],
+		PublicSignup:  values[settingPublicSignup] == "true",
+		DefaultLocale: values[settingDefaultLocale],
 		Public: PublicList{
 			ListUID:   values[settingPublicListUID],
 			ShowNames: values[settingPublicShowNames] == "true",
@@ -104,6 +106,7 @@ func valuesFromSettings(settings InstanceSettings) map[string]string {
 	return map[string]string{
 		settingInstanceName:     settings.Name,
 		settingPublicSignup:     strconv.FormatBool(settings.PublicSignup),
+		settingDefaultLocale:    settings.DefaultLocale,
 		settingSetupCompletedAt: formatTime(settings.SetupCompletedAt),
 		settingPublicListUID:    settings.Public.ListUID,
 		settingPublicShowNames:  strconv.FormatBool(settings.Public.ShowNames),

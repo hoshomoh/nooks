@@ -20,6 +20,10 @@ type InstanceSettings struct {
 	// PublicSignup, when false, makes every account a Join request an Admin approves.
 	PublicSignup bool
 
+	// DefaultLocale is the language of anything nobody chose a language for: the public
+	// page, a printed sheet, and a Member who has not picked one. Empty means English.
+	DefaultLocale string
+
 	// SetupCompletedAt is when first run finished. The zero value means it has not,
 	// and the app shows first run rather than sign in.
 	SetupCompletedAt time.Time

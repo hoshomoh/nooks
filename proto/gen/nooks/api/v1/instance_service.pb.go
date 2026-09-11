@@ -100,8 +100,11 @@ type InstanceSettings struct {
 	// What the Instance calls itself, e.g. "Brunnen Street".
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// When false, every account starts as a join request an Admin approves.
-	PublicSignup  bool                `protobuf:"varint,2,opt,name=public_signup,json=publicSignup,proto3" json:"public_signup,omitempty"`
-	PublicList    *PublicListSettings `protobuf:"bytes,3,opt,name=public_list,json=publicList,proto3" json:"public_list,omitempty"`
+	PublicSignup bool                `protobuf:"varint,2,opt,name=public_signup,json=publicSignup,proto3" json:"public_signup,omitempty"`
+	PublicList   *PublicListSettings `protobuf:"bytes,3,opt,name=public_list,json=publicList,proto3" json:"public_list,omitempty"`
+	// The language of anything nobody chose a language for: the public page, a printed
+	// sheet, and a Member who has not picked one. Empty means English.
+	DefaultLocale string `protobuf:"bytes,4,opt,name=default_locale,json=defaultLocale,proto3" json:"default_locale,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -155,6 +158,13 @@ func (x *InstanceSettings) GetPublicList() *PublicListSettings {
 		return x.PublicList
 	}
 	return nil
+}
+
+func (x *InstanceSettings) GetDefaultLocale() string {
+	if x != nil {
+		return x.DefaultLocale
+	}
+	return ""
 }
 
 type GetInstanceSettingsRequest struct {
@@ -371,7 +381,10 @@ type GetInstanceResponse struct {
 	// True until the first Admin exists. The app shows first run rather than sign in.
 	NeedsSetup bool `protobuf:"varint,3,opt,name=needs_setup,json=needsSetup,proto3" json:"needs_setup,omitempty"`
 	// When false, every account starts as a join request an Admin approves.
-	PublicSignup  bool `protobuf:"varint,4,opt,name=public_signup,json=publicSignup,proto3" json:"public_signup,omitempty"`
+	PublicSignup bool `protobuf:"varint,4,opt,name=public_signup,json=publicSignup,proto3" json:"public_signup,omitempty"`
+	// The language a Visitor reads this Instance in. Reachable without authentication
+	// because the public page needs it before anybody has signed in.
+	DefaultLocale string `protobuf:"bytes,5,opt,name=default_locale,json=defaultLocale,proto3" json:"default_locale,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -434,6 +447,13 @@ func (x *GetInstanceResponse) GetPublicSignup() bool {
 	return false
 }
 
+func (x *GetInstanceResponse) GetDefaultLocale() string {
+	if x != nil {
+		return x.DefaultLocale
+	}
+	return ""
+}
+
 var File_nooks_api_v1_instance_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_instance_service_proto_rawDesc = "" +
@@ -445,12 +465,13 @@ const file_nooks_api_v1_instance_service_proto_rawDesc = "" +
 	"show_names\x18\x02 \x01(\bR\tshowNames\x12\x1b\n" +
 	"\tshow_meta\x18\x03 \x01(\bR\bshowMeta\x12\x1d\n" +
 	"\n" +
-	"allow_join\x18\x04 \x01(\bR\tallowJoin\"\x8e\x01\n" +
+	"allow_join\x18\x04 \x01(\bR\tallowJoin\"\xb5\x01\n" +
 	"\x10InstanceSettings\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12#\n" +
 	"\rpublic_signup\x18\x02 \x01(\bR\fpublicSignup\x12A\n" +
 	"\vpublic_list\x18\x03 \x01(\v2 .nooks.api.v1.PublicListSettingsR\n" +
-	"publicList\"\x1c\n" +
+	"publicList\x12%\n" +
+	"\x0edefault_locale\x18\x04 \x01(\tR\rdefaultLocale\"\x1c\n" +
 	"\x1aGetInstanceSettingsRequest\"Y\n" +
 	"\x1bGetInstanceSettingsResponse\x12:\n" +
 	"\bsettings\x18\x01 \x01(\v2\x1e.nooks.api.v1.InstanceSettingsR\bsettings\"[\n" +
@@ -458,13 +479,14 @@ const file_nooks_api_v1_instance_service_proto_rawDesc = "" +
 	"\bsettings\x18\x01 \x01(\v2\x1e.nooks.api.v1.InstanceSettingsR\bsettings\"\\\n" +
 	"\x1eUpdateInstanceSettingsResponse\x12:\n" +
 	"\bsettings\x18\x01 \x01(\v2\x1e.nooks.api.v1.InstanceSettingsR\bsettings\"\x14\n" +
-	"\x12GetInstanceRequest\"\x89\x01\n" +
+	"\x12GetInstanceRequest\"\xb0\x01\n" +
 	"\x13GetInstanceResponse\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
 	"\aversion\x18\x02 \x01(\tR\aversion\x12\x1f\n" +
 	"\vneeds_setup\x18\x03 \x01(\bR\n" +
 	"needsSetup\x12#\n" +
-	"\rpublic_signup\x18\x04 \x01(\bR\fpublicSignup2\xc6\x02\n" +
+	"\rpublic_signup\x18\x04 \x01(\bR\fpublicSignup\x12%\n" +
+	"\x0edefault_locale\x18\x05 \x01(\tR\rdefaultLocale2\xc6\x02\n" +
 	"\x0fInstanceService\x12R\n" +
 	"\vGetInstance\x12 .nooks.api.v1.GetInstanceRequest\x1a!.nooks.api.v1.GetInstanceResponse\x12j\n" +
 	"\x13GetInstanceSettings\x12(.nooks.api.v1.GetInstanceSettingsRequest\x1a).nooks.api.v1.GetInstanceSettingsResponse\x12s\n" +

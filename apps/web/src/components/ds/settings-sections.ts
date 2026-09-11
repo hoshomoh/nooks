@@ -2,6 +2,7 @@
 export type SettingsRoute =
   | "/settings/account"
   | "/settings/appearance"
+  | "/settings/instance"
   | "/settings/members"
   | "/settings/groups"
   | "/settings/tokens"
@@ -11,6 +12,8 @@ export type SettingsRoute =
 export interface SettingsSection {
   to: SettingsRoute
   labelKey: string
+  /** Hidden from a Member: the server refuses them, so offering it would be a lie. */
+  adminOnly?: boolean
 }
 
 /**
@@ -19,8 +22,8 @@ export interface SettingsSection {
  * The settings column and the command palette both read this, so a page added here is
  * reachable from both without anybody remembering to add it twice.
  *
- * Instance and About arrive with the milestones that build them. A nav entry that
- * goes nowhere is worse than one that is not there yet.
+ * About arrives with the milestone that builds it. A nav entry that goes nowhere is
+ * worse than one that is not there yet.
  */
 export const SETTINGS_SECTIONS: SettingsSection[] = [
   { to: "/settings/account", labelKey: "settings.account" },
@@ -28,5 +31,6 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   { to: "/settings/members", labelKey: "settings.members" },
   { to: "/settings/groups", labelKey: "settings.groups" },
   { to: "/settings/tokens", labelKey: "settings.tokens" },
-  { to: "/settings/public", labelKey: "settings.publicList" },
+  { to: "/settings/instance", labelKey: "settings.instance", adminOnly: true },
+  { to: "/settings/public", labelKey: "settings.publicList", adminOnly: true },
 ]

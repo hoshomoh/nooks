@@ -14,6 +14,14 @@ export type FieldProps = Omit<React.ComponentProps<typeof Input>, "id"> & {
   hint?: string
   /** What went wrong. Replaces the hint and re-colours the field. */
   error?: string
+  /**
+   * Hides the label without removing it.
+   *
+   * For a settings row, which already prints the label in its left column. The label
+   * stays in the markup because a field with no label is a field a screen reader cannot
+   * announce — it is the seeing of it that is redundant, not the having.
+   */
+  hideLabel?: boolean
 }
 
 /**
@@ -23,13 +31,16 @@ export type FieldProps = Omit<React.ComponentProps<typeof Input>, "id"> & {
  * useId rather than a caller-supplied id, so a field is always wired to its label and
  * two of them on one page cannot collide.
  */
-export function Field({ label, hint, error, className, ...props }: FieldProps) {
+export function Field({ label, hint, error, hideLabel, className, ...props }: FieldProps) {
   const id = useId()
   const describedBy = hint || error ? `${id}-description` : undefined
 
   return (
     <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id} className="text-secondary-foreground text-small font-medium">
+      <Label
+        htmlFor={id}
+        className={cn("text-secondary-foreground text-small font-medium", hideLabel && "sr-only")}
+      >
         {label}
       </Label>
 

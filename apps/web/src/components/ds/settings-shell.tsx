@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import { Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { cn } from "cn"
+import { Role } from "@nooks/api"
 
 import { ChromeBar } from "./chrome-bar"
 import { Sidebar } from "./sidebar"
@@ -29,6 +30,7 @@ export interface SettingsShellProps {
 export function SettingsShell({ active, crumb, children }: SettingsShellProps) {
   const { t } = useTranslation()
   const { instanceName, member, lists } = useSignedInData()
+  const isAdmin = member?.role === Role.ADMIN
   const palette = useCommandPalette()
 
   return (
@@ -47,7 +49,7 @@ export function SettingsShell({ active, crumb, children }: SettingsShellProps) {
         </span>
 
         <div className="flex flex-col gap-px">
-          {SETTINGS_SECTIONS.map((section) => (
+          {SETTINGS_SECTIONS.filter((section) => !section.adminOnly || isAdmin).map((section) => (
             <Link
               key={section.to}
               to={section.to}

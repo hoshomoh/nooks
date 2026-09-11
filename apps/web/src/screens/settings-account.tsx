@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import { ConnectError, Code } from "@connectrpc/connect"
 
-import { Button } from "@/components/ds/button"
+import { SaveButton } from "@/components/ds/save-button"
 import { Field } from "@/components/ds/field"
 import { SettingsShell } from "@/components/ds/settings-shell"
 import { authClient, memberClient } from "@/lib/api"
@@ -79,10 +79,11 @@ function ProfileForm() {
           className="max-w-70"
         />
 
-        <Footer
-          saved={save.isSuccess && !save.isPending && unchanged}
+        <SaveButton
+          unchanged={unchanged}
           pending={save.isPending}
-          disabled={unchanged || !name.trim() || !email.trim()}
+          succeeded={save.isSuccess}
+          disabled={!name.trim() || !email.trim()}
         />
       </form>
     </Section>
@@ -130,10 +131,11 @@ function PasswordForm() {
           className="max-w-70"
         />
 
-        <Footer
-          saved={replace.isSuccess && !replace.isPending}
+        <SaveButton
+          // Cleared on success, so an empty form is both "nothing to send" and "done".
+          unchanged={!current && !next}
           pending={replace.isPending}
-          disabled={!current || !next}
+          succeeded={replace.isSuccess}
           label={t("account.replacePassword")}
         />
       </form>
@@ -157,28 +159,6 @@ function Section({ title, blurb, children }: SectionProps) {
       </div>
       {children}
     </section>
-  )
-}
-
-interface FooterProps {
-  saved: boolean
-  pending: boolean
-  disabled: boolean
-  /** What the button says. Defaults to Save. */
-  label?: string
-}
-
-/** The submit row, left-aligned: these are forms, not dialogs. */
-function Footer({ saved, pending, disabled, label }: FooterProps) {
-  const { t } = useTranslation()
-
-  return (
-    <div className="flex items-center gap-3">
-      <Button type="submit" disabled={disabled || pending}>
-        {label ?? t("action.save")}
-      </Button>
-      {saved && <span className="text-micro text-muted-foreground">{t("account.saved")}</span>}
-    </div>
   )
 }
 

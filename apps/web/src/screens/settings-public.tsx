@@ -3,7 +3,7 @@ import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-q
 import { useTranslation } from "react-i18next"
 import type { InstanceSettings, PublicListSettings } from "@nooks/api"
 
-import { Button } from "@/components/ds/button"
+import { SaveButton } from "@/components/ds/save-button"
 import { SettingsRow, Toggle } from "@/components/ds/settings-row"
 import { SettingsShell } from "@/components/ds/settings-shell"
 import { instanceClient } from "@/lib/api"
@@ -108,19 +108,33 @@ export function SettingsPublicScreen() {
           </span>
         )}
         <span className="flex-1" />
-        <Button
-          disabled={save.isPending}
+        <SaveButton
+          unchanged={samePublicList(draft, saved?.publicList)}
+          pending={save.isPending}
+          succeeded={save.isSuccess}
           onClick={() =>
-            saved &&
-            draft &&
-            save.mutate({ ...saved, publicList: draft } as InstanceSettings)
+            saved && draft && save.mutate({ ...saved, publicList: draft } as InstanceSettings)
           }
-        >
-          {save.isSuccess && !save.isPending
-            ? t("publicSettings.saved")
-            : t("publicSettings.save")}
-        </Button>
+        />
       </div>
     </SettingsShell>
+  )
+}
+
+/**
+ * samePublicList reports whether the draft still says what was saved.
+ *
+ * Field by field rather than by identity: the answer comes back from the server as a
+ * fresh object every time, so two settings that agree are never the same value.
+ */
+function samePublicList(
+  draft: PublicListSettings | undefined,
+  saved: PublicListSettings | undefined,
+): boolean {
+  return (
+    (draft?.listUid ?? "") === (saved?.listUid ?? "") &&
+    (draft?.showNames ?? false) === (saved?.showNames ?? false) &&
+    (draft?.showMeta ?? false) === (saved?.showMeta ?? false) &&
+    (draft?.allowJoin ?? false) === (saved?.allowJoin ?? false)
   )
 }

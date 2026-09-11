@@ -5,8 +5,8 @@ import type { Group } from "@nooks/api"
 
 import { Button } from "@/components/ds/button"
 import { EmptyState } from "@/components/ds/empty-state"
+import { AddGroupDialog, type NewGroup } from "@/components/ds/add-group-dialog"
 import { PickPeople } from "@/components/ds/pick-people"
-import { PromptDialog } from "@/components/ds/prompt-dialog"
 import { SettingsShell } from "@/components/ds/settings-shell"
 import { memberClient } from "@/lib/api"
 import { formatList } from "@/lib/format"
@@ -32,7 +32,8 @@ export function SettingsGroupsScreen() {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["groups"] })
 
   const add = useMutation({
-    mutationFn: (name: string) => memberClient.createGroup({ name }),
+    mutationFn: ({ name, memberUids }: NewGroup) =>
+      memberClient.createGroup({ name, memberUids }),
     onSuccess: refresh,
   })
 
@@ -47,7 +48,6 @@ export function SettingsGroupsScreen() {
     <SettingsShell
       active="/settings/groups"
       crumb={t("settings.groups")}
-      counts={{ "/settings/members": members.length, "/settings/groups": groups.length }}
     >
       <header className="flex items-start gap-6">
         <div className="min-w-0">
@@ -71,15 +71,11 @@ export function SettingsGroupsScreen() {
         </div>
       )}
 
-      <PromptDialog
+      <AddGroupDialog
         open={adding}
         onOpenChange={setAdding}
-        title={t("groups.addTitle")}
-        blurb={t("groups.addBlurb")}
-        label={t("groups.name")}
-        initialValue=""
-        confirmLabel={t("groups.addSubmit")}
-        onConfirm={(name) => add.mutate(name)}
+        members={members}
+        onAdd={(group) => add.mutate(group)}
       />
 
       <PickPeople

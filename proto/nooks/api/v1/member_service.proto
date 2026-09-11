@@ -69,6 +69,10 @@ message ListGroupsResponse {
 
 message CreateGroupRequest {
   string name = 1;
+
+  // Who is in it from the start. A Group is made in order to share with the people in
+  // it, so naming it and filling it is one decision, not two.
+  repeated string member_uids = 2;
 }
 
 message CreateGroupResponse {

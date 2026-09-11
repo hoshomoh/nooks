@@ -51,7 +51,6 @@ export function SettingsTokensScreen() {
     <SettingsShell
       active="/settings/tokens"
       crumb={t("settings.tokens")}
-      counts={{ "/settings/tokens": tokens.length }}
     >
       <header className="flex items-start gap-6">
         <div className="min-w-0">

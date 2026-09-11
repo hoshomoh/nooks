@@ -325,3 +325,41 @@ func TestATokenCannotChangeAProfile(t *testing.T) {
 		t.Errorf("code = %v, want permission_denied", got)
 	}
 }
+
+// A Group is made in order to share with the people in it, so naming it and filling it
+// is one decision rather than two.
+func TestAGroupIsMadeWithItsPeopleInIt(t *testing.T) {
+	f := newListFixture(t)
+	svc := NewMemberService(f.store, nil, nil)
+
+	res, err := svc.CreateGroup(f.as(t, f.anna), connect.NewRequest(&apiv1.CreateGroupRequest{
+		Name: "Flatmates", MemberUids: []string{f.anna.UID, f.jonas.UID},
+	}))
+	if err != nil {
+		t.Fatalf("CreateGroup: %v", err)
+	}
+	if got := len(res.Msg.GetGroup().GetMembers()); got != 2 {
+		t.Errorf("got %d members, want the two it was made with", got)
+	}
+}
+
+// Resolved before the Group exists, so a bad identifier leaves nothing behind.
+func TestAGroupWithAnUnknownMemberIsNotMade(t *testing.T) {
+	f := newListFixture(t)
+	svc := NewMemberService(f.store, nil, nil)
+
+	_, err := svc.CreateGroup(f.as(t, f.anna), connect.NewRequest(&apiv1.CreateGroupRequest{
+		Name: "Flatmates", MemberUids: []string{"mem_nobody"},
+	}))
+	if err == nil {
+		t.Fatal("CreateGroup with an unknown member succeeded")
+	}
+
+	listed, err := svc.ListGroups(f.as(t, f.anna), connect.NewRequest(&apiv1.ListGroupsRequest{}))
+	if err != nil {
+		t.Fatalf("ListGroups: %v", err)
+	}
+	if got := len(listed.Msg.GetGroups()); got != 0 {
+		t.Errorf("got %d groups, want none left behind", got)
+	}
+}

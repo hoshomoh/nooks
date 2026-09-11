@@ -254,8 +254,11 @@ func (x *ListGroupsResponse) GetGroups() []*Group {
 }
 
 type CreateGroupRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Who is in it from the start. A Group is made in order to share with the people in
+	// it, so naming it and filling it is one decision, not two.
+	MemberUids    []string `protobuf:"bytes,2,rep,name=member_uids,json=memberUids,proto3" json:"member_uids,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -295,6 +298,13 @@ func (x *CreateGroupRequest) GetName() string {
 		return x.Name
 	}
 	return ""
+}
+
+func (x *CreateGroupRequest) GetMemberUids() []string {
+	if x != nil {
+		return x.MemberUids
+	}
+	return nil
 }
 
 type CreateGroupResponse struct {
@@ -833,9 +843,11 @@ const file_nooks_api_v1_member_service_proto_rawDesc = "" +
 	"\amembers\x18\x01 \x03(\v2\x14.nooks.api.v1.MemberR\amembers\"\x13\n" +
 	"\x11ListGroupsRequest\"A\n" +
 	"\x12ListGroupsResponse\x12+\n" +
-	"\x06groups\x18\x01 \x03(\v2\x13.nooks.api.v1.GroupR\x06groups\"(\n" +
+	"\x06groups\x18\x01 \x03(\v2\x13.nooks.api.v1.GroupR\x06groups\"I\n" +
 	"\x12CreateGroupRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\"@\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1f\n" +
+	"\vmember_uids\x18\x02 \x03(\tR\n" +
+	"memberUids\"@\n" +
 	"\x13CreateGroupResponse\x12)\n" +
 	"\x05group\x18\x01 \x01(\v2\x13.nooks.api.v1.GroupR\x05group\"V\n" +
 	"\x16SetGroupMembersRequest\x12\x1b\n" +

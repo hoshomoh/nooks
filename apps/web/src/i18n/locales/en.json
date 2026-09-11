@@ -8,7 +8,9 @@
     "cancel": "Cancel",
     "save": "Save",
     "signIn": "Sign in",
-    "search": "Search"
+    "search": "Search",
+    "saving": "Saving…",
+    "saved": "Saved"
   },
   "auth": {
     "setup": {
@@ -337,7 +339,7 @@
     "blurb": "A group is a shortcut for sharing, and nothing else. Sharing a list with one reaches everyone in it, including anybody added later.",
     "add": "Add a group",
     "addTitle": "Add a group",
-    "addBlurb": "Flatmates, family, the people who use the car. Name it after who is in it.",
+    "addBlurb": "A group is a shortcut for sharing. It carries no permissions of its own — what it reaches is whatever you share with it.",
     "name": "Name",
     "addSubmit": "Add group",
     "peopleCount": "{{count}} person",
@@ -350,7 +352,12 @@
     "editBlurb": "Taking somebody out takes away the lists they reached through this group, and nothing else.",
     "save": "Save",
     "emptyTitle": "No groups yet",
-    "emptyBody": "A group is worth making when you share the same lists with the same people more than once. Until then, sharing with them by name is less to keep up to date."
+    "emptyBody": "A group is worth making when you share the same lists with the same people more than once. Until then, sharing with them by name is less to keep up to date.",
+    "who": "Who is in it",
+    "nobodyYet": "Nobody else is here yet.",
+    "chosenCount": "{{count}} person",
+    "chosenCount_other": "{{count}} people",
+    "chosenCount_zero": "Nobody yet"
   },
   "sidebarMenu": {
     "open": "More",

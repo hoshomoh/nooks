@@ -250,8 +250,14 @@ The single most important milestone; everything else is furniture.
       chosen one
 - [ ] Instance (admins only): Instance name, public signup toggle
 - [ ] About: version, storage, instance age, counts, licence, **Telemetry: None**
+- [ ] Delete instance, from About — takes everything and returns the Instance to first run.
+      Any Admin, behind the irreversible confirmation in DESIGN.md §9
+- [ ] Sign out — there is no way out of the app today. Belongs on the sidebar's member row
 - [ ] Export everything — one JSON file plus the printed pages as PDFs
 - [ ] Import a backup — the same file the exporter writes, so moving machines is copy and restore
+
+**Found while measuring REST coverage:** `SignOut` and `MoveItem` are the only two RPCs the app
+never calls. Both are built on the server and missing their UI, not missing by design.
 
 ---
 

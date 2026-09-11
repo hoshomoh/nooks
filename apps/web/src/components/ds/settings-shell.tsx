@@ -14,8 +14,6 @@ export interface SettingsShellProps {
   active: SettingsRoute
   /** What the chrome bar says after "Settings". */
   crumb: string
-  /** Counts beside the entries, keyed by route. */
-  counts?: Partial<Record<SettingsRoute, number>>
   children: ReactNode
 }
 
@@ -28,7 +26,7 @@ export interface SettingsShellProps {
  * rather than a click. The content column is wider than a List's 660px because these
  * pages hold tables rather than sentences, per DESIGN.md §5.
  */
-export function SettingsShell({ active, crumb, counts, children }: SettingsShellProps) {
+export function SettingsShell({ active, crumb, children }: SettingsShellProps) {
   const { t } = useTranslation()
   const { instanceName, member, lists } = useSignedInData()
   const palette = useCommandPalette()
@@ -60,11 +58,6 @@ export function SettingsShell({ active, crumb, counts, children }: SettingsShell
               )}
             >
               {t(section.labelKey)}
-              {counts?.[section.to] !== undefined && (
-                <span className="ml-auto text-[11.5px] text-muted-foreground">
-                  {counts[section.to]}
-                </span>
-              )}
             </Link>
           ))}
         </div>

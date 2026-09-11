@@ -1,12 +1,12 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { cn } from "cn"
 import type { Member } from "@nooks/api"
 
 import { Button } from "./button"
 import { DIALOG_SURFACE } from "./dialog-surface"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { TickBox } from "./tick-box"
+import { MemberPicker } from "./member-picker"
+import { toggled } from "@/lib/toggle-uid"
 
 export interface PickPeopleProps {
   open: boolean
@@ -86,9 +86,6 @@ function PickPeopleForm({
   const { t } = useTranslation()
   const [chosen, setChosen] = useState<string[]>(picked)
 
-  const toggle = (uid: string) =>
-    setChosen(chosen.includes(uid) ? chosen.filter((each) => each !== uid) : [...chosen, uid])
-
   return (
     <div className="flex flex-col">
       <header className="flex flex-col gap-2 px-6.5 pt-6">
@@ -96,27 +93,12 @@ function PickPeopleForm({
         <p className="text-field text-secondary-foreground">{blurb}</p>
       </header>
 
-      <div className="flex max-h-[46vh] flex-col gap-0.5 overflow-y-auto px-6.5 pt-5 pb-1">
-        {members.map((member) => (
-          <button
-            key={member.uid}
-            type="button"
-            role="checkbox"
-            aria-checked={chosen.includes(member.uid)}
-            onClick={() => toggle(member.uid)}
-            className={cn(
-              "flex min-h-row items-center gap-3 rounded-md px-2 py-1.5 text-left transition-colors",
-              chosen.includes(member.uid) ? "bg-secondary" : "hover:bg-secondary",
-            )}
-          >
-            <span className="grid size-6 shrink-0 place-items-center rounded-full bg-chip font-mono text-[10px] text-secondary-foreground">
-              {member.name.slice(0, 2).toUpperCase()}
-            </span>
-            <span className="text-field">{member.name}</span>
-            <span className="truncate text-micro text-muted-foreground">{member.email}</span>
-            <TickBox picked={chosen.includes(member.uid)} className="ml-auto" />
-          </button>
-        ))}
+      <div className="px-6.5 pt-5 pb-1">
+        <MemberPicker
+          members={members}
+          chosen={chosen}
+          onToggle={(uid) => setChosen(toggled(chosen, uid))}
+        />
       </div>
 
       <footer className="mt-4 flex items-center gap-3 border-t border-hair px-6.5 py-3.5">

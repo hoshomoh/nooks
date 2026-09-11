@@ -356,6 +356,20 @@ with a 12.5 `--muted-foreground` explanation under it; control right-aligned. Th
 carries are an input, a segment, a toggle, a select, or a button with a note to its left. A **select**
 is 280 × 36, radius 7, 1px `--border`, the value at 14.5 with a chevron in `--control` at the right.
 
+**About** — what this copy of Nooks is, as settings rows: version, how long the Instance has been
+running, how much room it is taking, how many Members, Lists and Items it holds, and the licence.
+Facts, in the same rows every other settings page uses; there is no dashboard here and nothing is
+charted.
+
+One of those rows reads **Telemetry · None**, stated as a fact rather than as a setting with a toggle
+off. There is nothing to turn off, and a toggle would imply there was.
+
+The page ends with **Delete instance**, behind a `--hair` rule: an outlined destructive button with the
+consequence to its left. It takes every Member, List, Item, Note, Access token and setting with it and
+returns the Instance to first run — the next person to open the address sees the setup screen. Any
+Admin may do it, through the irreversible confirmation in §9. It is last on the page because it is
+the last thing anybody wants, and it is on About because About is the page about this Instance.
+
 **Empty state** — 1px **dashed** `--border`, radius 8, padding `30px 26px`, **left-aligned, never
 centred**. 17 / 500 statement of fact, then one 14 / 1.6 sentence capped at 440px saying what the thing
 is for. No illustration, no centred hero, and **no button if the page header already has one**.
@@ -370,6 +384,20 @@ scrim. Header `24px 26px 0`: 21px title then one 14 / 1.6 explaining line. Body.
 
 Say what happens: *"Ignore removes the request silently and never notifies the sender."* Not *"Are you
 sure?"*
+
+**Irreversible confirmation** — the same dialog, with two things added, and used only where nothing
+can be recovered afterwards. The body states what goes and what is kept, as a list of plain sentences
+rather than a warning. Then **two fields**: the exact name of the thing, typed out, and the Member's
+own password.
+
+Typing the name makes a Member read what they are about to lose. The password is the one that matters:
+an unattended browser is the realistic way this happens by accident, and a name can be copied off the
+screen in front of you. The confirm button is the outlined destructive, never filled — a filled red
+button is a thing to click, and this is a thing to decide.
+
+Where an export exists, offer it in the body as a link, in words: *"Export everything first — nooks
+keeps no backup."* Offering the way out beside the door is not friction, it is the only honest place
+to put it.
 
 **Menu** — 248px, radius 9 (`rounded-menu`, the one step outside the sm–2xl scale), 1px `--border`, 6px padding; items 32px at radius 6 with the shortcut
 right in 12 `--muted-foreground`; groups split by a 1px `--hair` rule inset 8px. Destructive items take

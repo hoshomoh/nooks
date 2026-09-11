@@ -2,7 +2,7 @@
 import { beforeAll, describe, expect, it, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { ActivityKind, type Activity } from "@nooks/api"
+import { ActivityKind, ActivityOutcome, type Activity } from "@nooks/api"
 
 import "@/test/dom"
 import { readyForEnglish } from "@/test/i18n"
@@ -11,7 +11,7 @@ import { ActivityPanel } from "./activity-panel"
 beforeAll(readyForEnglish)
 
 /** entry builds one thing waiting for attention. */
-function entry(kind: ActivityKind, text: string): Activity {
+function entry(kind: ActivityKind, text: string, outcome = ActivityOutcome.UNSPECIFIED): Activity {
   return {
     uid: "act_1",
     kind,
@@ -19,6 +19,7 @@ function entry(kind: ActivityKind, text: string): Activity {
     targetUid: "req_1",
     createdAt: "2026-09-10T18:44:00Z",
     unread: true,
+    outcome,
   } as Activity
 }
 
@@ -30,7 +31,6 @@ function show(activity: Activity[], onDecide = vi.fn(), onOpen = vi.fn()) {
       timeOf={() => "18:44"}
       onOpen={onOpen}
       onDecide={onDecide}
-      onClose={vi.fn()}
     />,
   )
   return { onDecide, onOpen }
@@ -66,6 +66,21 @@ describe("the activity panel", () => {
     await userEvent.click(screen.getByRole("button", { name: "Ignore" }))
 
     expect(onDecide).toHaveBeenCalledWith(joined, false)
+  })
+
+  // An Admin who clicks Approve and sees nothing change cannot tell whether it worked.
+  it("says what happened once a request has been decided", () => {
+    show([entry(ActivityKind.JOIN_REQUEST, "Til asked to join", ActivityOutcome.APPROVED)])
+
+    expect(screen.getByText("Approved")).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "Approve" })).not.toBeInTheDocument()
+  })
+
+  // Ignoring is silent to the sender, not to the Admin who did it.
+  it("says so when a request was ignored", () => {
+    show([entry(ActivityKind.JOIN_REQUEST, "Til asked to join", ActivityOutcome.IGNORED)])
+
+    expect(screen.getByText("Ignored, silently")).toBeInTheDocument()
   })
 
   // An entry with nothing to decide is a statement.

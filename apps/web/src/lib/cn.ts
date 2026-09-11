@@ -42,6 +42,8 @@ export const NOOKS_TEXT_SIZES = [
   "dialog",
   "section",
   "note-heading",
+  "note-heading-sheet",
+  "sheet-title",
   "empty",
   "body",
   "note",

@@ -6,6 +6,7 @@ import { useNavigate } from "@tanstack/react-router"
 import { AuthShell } from "@/components/ds/auth-shell"
 import { Button } from "@/components/ds/button"
 import { Field } from "@/components/ds/field"
+import { FormError } from "@/components/ds/form-error"
 import { authClient } from "@/lib/api"
 import { messageFrom } from "@/lib/errors"
 
@@ -58,11 +59,7 @@ export function ReplacePassword() {
           required
         />
 
-        {replacePassword.isError && (
-          <p className="text-destructive text-meta">
-            {messageFrom(replacePassword.error)}
-          </p>
-        )}
+        <FormError message={messageFrom(replacePassword.error)} />
 
         <Button type="submit" disabled={replacePassword.isPending} className="self-start">
           {replacePassword.isPending ? t("auth.replacePassword.submitting") : t("auth.replacePassword.submit")}

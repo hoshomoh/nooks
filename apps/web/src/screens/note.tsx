@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react"
+import type { ReactNode } from "react"
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
 import { getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
@@ -6,6 +7,7 @@ import { useTranslation } from "react-i18next"
 import { Button } from "@/components/ds/button"
 import { Checkbox } from "@/components/ds/checkbox"
 import { ChromeBar } from "@/components/ds/chrome-bar"
+import { DateField } from "@/components/ds/date-field"
 import { EditableTitle } from "@/components/ds/editable-title"
 import { NoteEditor } from "@/components/ds/note-editor"
 import { listClient } from "@/lib/api"
@@ -16,6 +18,12 @@ import { useDueLabel } from "@/lib/use-due-label"
 import { useEscape } from "@/lib/use-escape"
 
 const route = getRouteApi("/lists/$listUid/items/$itemUid")
+
+/** The fields an edit may change. Either may be left alone. */
+interface ItemFields {
+  quantity?: string
+  dueOn?: string
+}
 
 /** How long the typing has to settle before a Note is saved. */
 const AUTOSAVE_DELAY_MS = 800
@@ -51,6 +59,12 @@ export function NoteScreen() {
 
   const rename = useMutation({
     mutationFn: (label: string) => listClient.updateItem({ itemUid, label }),
+    onSuccess: refresh,
+  })
+
+  // Quantity and due date are two fields of the same edit, so they are one mutation.
+  const edit = useMutation({
+    mutationFn: (fields: ItemFields) => listClient.updateItem({ itemUid, ...fields }),
     onSuccess: refresh,
   })
 
@@ -105,15 +119,38 @@ export function NoteScreen() {
             />
           </div>
 
-          <div className="flex flex-wrap gap-4.5 pl-9.5">
-            <Detail label={t("note.list")} value={list.name} />
-            <Detail label={t("note.quantity")} value={item.quantity || t("note.add")} empty={!item.quantity} />
-            <Detail
-              label={t("note.due")}
-              value={due.label(item.dueOn) || t("note.addDate")}
-              empty={!item.dueOn}
-            />
-            <Detail label={t("note.addedBy")} value={item.addedByName} />
+          {/* The same fields as the sheet, at the same scale: an Item is read and
+              rewritten in both, and a field that is a control in one and text in the
+              other would be a rule a Member has to learn. */}
+          <div className="flex flex-wrap items-center gap-4.5 pl-9.5">
+            <Detail label={t("note.list")}>
+              <span className="text-small">{list.name}</span>
+            </Detail>
+
+            <Detail label={t("note.quantity")}>
+              <EditableTitle
+                value={item.quantity}
+                onCommit={(quantity) => edit.mutate({ quantity })}
+                readOnly={!canEdit}
+                label={t("note.quantity")}
+                as="span"
+                className="w-24 text-small"
+                placeholder={t("note.add")}
+              />
+            </Detail>
+
+            <Detail label={t("note.due")}>
+              <DateField
+                value={item.dueOn}
+                label={due.label(item.dueOn) || t("note.addDate")}
+                chosen={Boolean(item.dueOn)}
+                onChange={(dueOn) => edit.mutate({ dueOn })}
+              />
+            </Detail>
+
+            <Detail label={t("note.addedBy")}>
+              <span className="text-small">{item.addedByName}</span>
+            </Detail>
           </div>
 
           <div className="h-px bg-hair" />
@@ -139,18 +176,17 @@ export function NoteScreen() {
   )
 }
 
-type DetailProps = {
+interface DetailProps {
   label: string
-  value: string
-  empty?: boolean
+  children: ReactNode
 }
 
-/** One fact about the Item, in the row under its title. */
-function Detail({ label, value, empty }: DetailProps) {
+/** One fact about the Item, and the control that changes it. */
+function Detail({ label, children }: DetailProps) {
   return (
     <span className="flex items-center gap-2">
       <span className="text-micro text-muted-foreground">{label}</span>
-      <span className={empty ? "text-small text-muted-foreground" : "text-small"}>{value}</span>
+      {children}
     </span>
   )
 }

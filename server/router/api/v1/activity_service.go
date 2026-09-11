@@ -75,6 +75,18 @@ func activityToProto(entry store.Activity) *apiv1.Activity {
 		TargetUid: entry.TargetUID,
 		CreatedAt: entry.CreatedAt.Format(time.RFC3339),
 		Unread:    entry.Unread(),
+		Outcome:   outcomeToProto(entry.Outcome),
+	}
+}
+
+func outcomeToProto(outcome store.Outcome) apiv1.ActivityOutcome {
+	switch outcome {
+	case store.OutcomeApproved:
+		return apiv1.ActivityOutcome_ACTIVITY_OUTCOME_APPROVED
+	case store.OutcomeIgnored:
+		return apiv1.ActivityOutcome_ACTIVITY_OUTCOME_IGNORED
+	default:
+		return apiv1.ActivityOutcome_ACTIVITY_OUTCOME_UNSPECIFIED
 	}
 }
 

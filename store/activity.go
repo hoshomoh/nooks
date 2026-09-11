@@ -35,9 +35,24 @@ type Activity struct {
 	// TargetUID is what it points at: a request, a List, or nothing.
 	TargetUID string
 	// ReadAt is the zero value until the Member has seen it.
-	ReadAt    time.Time
+	ReadAt time.Time
+	// Outcome is what became of a request, once an Admin decided. Empty until one has.
+	Outcome   Outcome
 	CreatedAt time.Time
 }
+
+// Outcome is what an Admin decided about a request.
+type Outcome string
+
+const (
+	// OutcomeApproved is a request an Admin let through.
+	OutcomeApproved Outcome = "APPROVED"
+	// OutcomeIgnored is a request an Admin dismissed. The sender is never told.
+	OutcomeIgnored Outcome = "IGNORED"
+)
+
+// Decided reports whether anybody has acted on this yet.
+func (a Activity) Decided() bool { return a.Outcome != "" }
 
 // Unread reports whether the entry still wants attention.
 func (a Activity) Unread() bool { return a.ReadAt.IsZero() }
@@ -109,6 +124,23 @@ func (s *sqlStore) MarkActivityRead(ctx context.Context, memberID int64, at time
 	return nil
 }
 
+// ResolveActivity records what became of everything pointing at one request.
+//
+// Every Admin has their own row for the same request, so deciding it resolves all of
+// them: whoever got there first, the others should see what happened rather than a
+// button that now does nothing.
+func (s *sqlStore) ResolveActivity(ctx context.Context, targetUID string, outcome Outcome) error {
+	_, err := s.db.NewUpdate().
+		Model((*activityModel)(nil)).
+		Set("outcome = ?", string(outcome)).
+		Where("target_uid = ? AND outcome = ''", targetUID).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("resolve activity: %w", err)
+	}
+	return nil
+}
+
 // AdminIDs lists the Members who can act on a request. Join and Reset requests go to
 // every Admin, so the sender does not depend on one person being awake.
 func (s *sqlStore) AdminIDs(ctx context.Context) ([]int64, error) {
@@ -135,6 +167,7 @@ type activityModel struct {
 	Text      string `bun:"text,notnull"`
 	TargetUID string `bun:"target_uid,notnull"`
 	ReadAt    string `bun:"read_at,notnull"`
+	Outcome   string `bun:"outcome,notnull"`
 	CreatedAt string `bun:"created_at,notnull"`
 }
 
@@ -149,6 +182,7 @@ func (m activityModel) toActivity() (Activity, error) {
 	}
 	return Activity{
 		ID: m.ID, UID: m.UID, MemberID: m.MemberID, Kind: ActivityKind(m.Kind),
-		Text: m.Text, TargetUID: m.TargetUID, ReadAt: readAt, CreatedAt: createdAt,
+		Text: m.Text, TargetUID: m.TargetUID, ReadAt: readAt,
+		Outcome: Outcome(m.Outcome), CreatedAt: createdAt,
 	}, nil
 }

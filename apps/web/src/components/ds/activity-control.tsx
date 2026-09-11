@@ -7,6 +7,7 @@ import type { Activity } from "@nooks/api"
 import { ActivityKind } from "@nooks/api"
 
 import { ActivityPanel } from "./activity-panel"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { activityClient, requestClient } from "@/lib/api"
 import { activityQuery } from "@/lib/activity-queries"
 import { useMomentLabel } from "@/lib/use-moment-label"
@@ -58,7 +59,9 @@ export function ActivityControl() {
       }
       await requestClient.decideResetRequest({ requestUid, approve })
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["activity"] }),
+    // Deciding a request changes who is a Member, so the panel is not the only thing
+    // that has to catch up.
+    onSuccess: () => queryClient.invalidateQueries(),
   })
 
   const follow = (entry: Activity) => {
@@ -69,28 +72,40 @@ export function ActivityControl() {
   }
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={isOpen ? () => setOpen(false) : open}
-        className={cn(
-          "flex h-control-toolbar items-center gap-1.5 rounded-md px-2.5 text-micro transition-colors",
-          isOpen ? "bg-secondary text-foreground" : "text-secondary-foreground hover:bg-secondary",
-        )}
-      >
-        <span>{t("activity.action")}</span>
-        {unread > 0 && <span className="size-[5px] rounded-full bg-shared" />}
-      </button>
+    <Popover open={isOpen} onOpenChange={(next) => (next ? open() : setOpen(false))}>
+      <PopoverTrigger
+        render={
+          <button
+            type="button"
+            className={cn(
+              "flex h-control-toolbar items-center gap-1.5 rounded-md px-2.5 text-micro transition-colors",
+              isOpen
+                ? "bg-secondary text-foreground"
+                : "text-secondary-foreground hover:bg-secondary",
+            )}
+          >
+            <span>{t("activity.action")}</span>
+            {unread > 0 && <span className="size-[5px] rounded-full bg-shared" />}
+          </button>
+        }
+      />
 
-      {isOpen && (
+      {/* A popover rather than a panel positioned by hand: the browser closes it on a
+          click outside or Escape, and a portal puts it above the side sheet rather
+          than beside it in the same stacking context. */}
+      <PopoverContent
+        align="end"
+        sideOffset={6}
+        className="w-95 gap-0 rounded-2xl border border-border p-2 shadow-[0_12px_32px_rgba(0,0,0,0.14)]"
+      >
         <ActivityPanel
           activity={activity.data?.activity ?? []}
           timeOf={timeOf}
           onOpen={follow}
           onDecide={(entry, approve) => decide.mutate({ entry, approve })}
-          onClose={() => setOpen(false)}
+          deciding={decide.isPending ? decide.variables?.entry.uid : undefined}
         />
-      )}
-    </>
+      </PopoverContent>
+    </Popover>
   )
 }

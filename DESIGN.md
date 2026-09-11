@@ -393,7 +393,7 @@ converts a block as it is typed but is **never displayed back to the Member**.
 
 | Block | Full screen | Sheet | Spec |
 | --- | --- | --- | --- |
-| Heading | 18 / 600 / lh 1.4 | 13.5 | padding `18px 0 3px` |
+| Heading | 18 / 600 / lh 1.4 | 16 / 600 | padding `18px 0 3px` |
 | Paragraph | 15.5 / lh 1.6 | 14.5 | padding `5px 0` |
 | Checklist | 15.5 | 14.5 | 15px box in a 26px gutter, padding `3px 0` |
 | Quote | 15.5 `--secondary-foreground` | 14.5 | 2px `--border` left rule, 13px indent, padding `10px 0` |

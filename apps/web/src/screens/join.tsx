@@ -7,6 +7,7 @@ import { RequestStatus } from "@nooks/api"
 import { AuthShell } from "@/components/ds/auth-shell"
 import { Button } from "@/components/ds/button"
 import { Field } from "@/components/ds/field"
+import { FormError } from "@/components/ds/form-error"
 import { NotePanel } from "@/components/ds/note-panel"
 import { authClient } from "@/lib/api"
 import { messageFrom } from "@/lib/errors"
@@ -87,9 +88,7 @@ function AskToJoin({ onSent }: AskToJoinProps) {
           placeholder={t("auth.join.messagePlaceholder")}
         />
 
-        {requestJoin.isError && (
-          <p className="text-destructive text-meta">{messageFrom(requestJoin.error)}</p>
-        )}
+        <FormError message={messageFrom(requestJoin.error)} />
 
         <Button type="submit" disabled={requestJoin.isPending} className="self-start">
           {requestJoin.isPending ? t("auth.join.submitting") : t("auth.join.submit")}
@@ -186,9 +185,7 @@ function CheckJoinRequest({ requestUid, onStartOver }: CheckJoinRequestProps) {
           required
         />
 
-        {completeJoin.isError && (
-          <p className="text-destructive text-meta">{messageFrom(completeJoin.error)}</p>
-        )}
+        <FormError message={messageFrom(completeJoin.error)} />
 
         <Button type="submit" disabled={completeJoin.isPending} className="self-start">
           {completeJoin.isPending ? t("auth.join.joining") : t("auth.join.submitJoin")}

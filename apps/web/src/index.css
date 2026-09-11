@@ -60,6 +60,15 @@
   --text-field: 15px; /* field values, blurbs */
   --text-field--line-height: 1.65;
 
+  --text-sheet-title: 24px; /* the side sheet's own title */
+  --text-sheet-title--line-height: 1.25;
+  --text-sheet-title--letter-spacing: -0.02em;
+  --text-sheet-title--font-weight: 600;
+
+  --text-note-heading-sheet: 16px; /* note headings in the side sheet */
+  --text-note-heading-sheet--line-height: 1.35;
+  --text-note-heading-sheet--font-weight: 600;
+
   --text-note-sheet: 14.5px; /* note paragraphs in the side sheet */
   --text-note-sheet--line-height: 1.6;
 

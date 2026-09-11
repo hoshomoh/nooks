@@ -43,6 +43,17 @@ message Activity {
   string created_at = 5;
 
   bool unread = 6;
+
+  // What became of a request, once an Admin decided. Unspecified until one has.
+  ActivityOutcome outcome = 7;
+}
+
+// ActivityOutcome is what an Admin decided about a request.
+enum ActivityOutcome {
+  ACTIVITY_OUTCOME_UNSPECIFIED = 0;
+  ACTIVITY_OUTCOME_APPROVED = 1;
+  // The sender is never told, which is the whole point of ignoring.
+  ACTIVITY_OUTCOME_IGNORED = 2;
 }
 
 message ListActivityRequest {}

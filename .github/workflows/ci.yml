@@ -76,11 +76,12 @@ jobs:
         run: pnpm --filter @nooks/web lint
       - name: Test
         run: pnpm --filter @nooks/web test
-      - name: Build
-        run: pnpm --filter @nooks/web build
+      # One build, not two: `release` is the same Vite build with its output pointed at
+      # the binary, so building both proved the same thing twice.
+      #
       # The release output path is relative to apps/web, so a directory move can
       # silently start writing the bundle somewhere the binary does not embed.
-      - name: Release lands where go:embed reads
+      - name: Build, landing where go:embed reads
         run: |
           pnpm --filter @nooks/web release
           test -d server/router/frontend/dist/assets

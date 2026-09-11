@@ -6,6 +6,7 @@ import { useNavigate } from "@tanstack/react-router"
 import { AuthShell } from "@/components/ds/auth-shell"
 import { Button } from "@/components/ds/button"
 import { Field } from "@/components/ds/field"
+import { FormError } from "@/components/ds/form-error"
 import { authClient } from "@/lib/api"
 import { messageFrom } from "@/lib/errors"
 
@@ -73,11 +74,7 @@ export function Setup() {
           required
         />
 
-        {completeSetup.isError && (
-          <p className="text-destructive text-meta">
-            {messageFrom(completeSetup.error)}
-          </p>
-        )}
+        <FormError message={messageFrom(completeSetup.error)} />
 
         <Button type="submit" disabled={completeSetup.isPending} className="self-start">
           {completeSetup.isPending ? t("auth.setup.submitting") : t("auth.setup.submit")}

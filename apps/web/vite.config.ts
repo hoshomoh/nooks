@@ -25,6 +25,10 @@ export default defineConfig({
     // not enough on a loaded machine; this is about the machine, not the code.
     testTimeout: 20_000,
     hookTimeout: 20_000,
+    // One worker per test file, each with its own jsdom, is more memory than a small
+    // machine has — and a project that expects to be self-hosted should not need a
+    // large one to test itself. Four is enough to keep the suite quick.
+    maxWorkers: 4,
   },
   server: {
     port: 3001,

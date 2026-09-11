@@ -17,6 +17,8 @@ export interface EditableTitleProps {
   className?: string
   /** What a screen reader calls the field. */
   label: string
+  /** What an empty field reads as, e.g. "Add". Without it, empty is invisible. */
+  placeholder?: string
 }
 
 /**
@@ -37,13 +39,14 @@ export function EditableTitle({
   as = "h1",
   className,
   label,
+  placeholder,
 }: EditableTitleProps) {
   const [draft, setDraft] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   if (readOnly || !onCommit) {
     const Text = as
-    return <Text className={className}>{value}</Text>
+    return <Text className={className}>{value || placeholder}</Text>
   }
 
   const commit = () => {
@@ -58,6 +61,7 @@ export function EditableTitle({
     <input
       ref={inputRef}
       aria-label={label}
+      placeholder={placeholder}
       value={draft ?? value}
       onChange={(event) => setDraft(event.target.value)}
       onBlur={commit}
@@ -75,7 +79,7 @@ export function EditableTitle({
       // second.
       className={cn(
         "w-full rounded-md bg-transparent px-1 -mx-1 outline-none",
-        "transition-colors focus:bg-secondary",
+        "transition-colors placeholder:text-muted-foreground hover:bg-secondary focus:bg-secondary",
         className,
       )}
     />

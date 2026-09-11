@@ -1,5 +1,7 @@
-import { createRootRouteWithContext, Outlet } from "@tanstack/react-router"
+import { createRootRouteWithContext } from "@tanstack/react-router"
 import type { QueryClient } from "@tanstack/react-query"
+
+import { Root } from "@/screens/root"
 
 /**
  * The router's context. Loaders receive it, which is how a route can ensure its data is
@@ -10,5 +12,5 @@ export type RouterContext = {
 }
 
 export const rootRoute = createRootRouteWithContext<RouterContext>()({
-  component: Outlet,
+  component: Root,
 })

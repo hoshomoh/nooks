@@ -81,6 +81,57 @@ func (ActivityKind) EnumDescriptor() ([]byte, []int) {
 	return file_nooks_api_v1_activity_service_proto_rawDescGZIP(), []int{0}
 }
 
+// ActivityOutcome is what an Admin decided about a request.
+type ActivityOutcome int32
+
+const (
+	ActivityOutcome_ACTIVITY_OUTCOME_UNSPECIFIED ActivityOutcome = 0
+	ActivityOutcome_ACTIVITY_OUTCOME_APPROVED    ActivityOutcome = 1
+	// The sender is never told, which is the whole point of ignoring.
+	ActivityOutcome_ACTIVITY_OUTCOME_IGNORED ActivityOutcome = 2
+)
+
+// Enum value maps for ActivityOutcome.
+var (
+	ActivityOutcome_name = map[int32]string{
+		0: "ACTIVITY_OUTCOME_UNSPECIFIED",
+		1: "ACTIVITY_OUTCOME_APPROVED",
+		2: "ACTIVITY_OUTCOME_IGNORED",
+	}
+	ActivityOutcome_value = map[string]int32{
+		"ACTIVITY_OUTCOME_UNSPECIFIED": 0,
+		"ACTIVITY_OUTCOME_APPROVED":    1,
+		"ACTIVITY_OUTCOME_IGNORED":     2,
+	}
+)
+
+func (x ActivityOutcome) Enum() *ActivityOutcome {
+	p := new(ActivityOutcome)
+	*p = x
+	return p
+}
+
+func (x ActivityOutcome) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ActivityOutcome) Descriptor() protoreflect.EnumDescriptor {
+	return file_nooks_api_v1_activity_service_proto_enumTypes[1].Descriptor()
+}
+
+func (ActivityOutcome) Type() protoreflect.EnumType {
+	return &file_nooks_api_v1_activity_service_proto_enumTypes[1]
+}
+
+func (x ActivityOutcome) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ActivityOutcome.Descriptor instead.
+func (ActivityOutcome) EnumDescriptor() ([]byte, []int) {
+	return file_nooks_api_v1_activity_service_proto_rawDescGZIP(), []int{1}
+}
+
 // Activity is one thing waiting for attention.
 type Activity struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -92,8 +143,10 @@ type Activity struct {
 	// What it points at: a request, a List, or nothing.
 	TargetUid string `protobuf:"bytes,4,opt,name=target_uid,json=targetUid,proto3" json:"target_uid,omitempty"`
 	// When it happened, RFC 3339.
-	CreatedAt     string `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	Unread        bool   `protobuf:"varint,6,opt,name=unread,proto3" json:"unread,omitempty"`
+	CreatedAt string `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Unread    bool   `protobuf:"varint,6,opt,name=unread,proto3" json:"unread,omitempty"`
+	// What became of a request, once an Admin decided. Unspecified until one has.
+	Outcome       ActivityOutcome `protobuf:"varint,7,opt,name=outcome,proto3,enum=nooks.api.v1.ActivityOutcome" json:"outcome,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -168,6 +221,13 @@ func (x *Activity) GetUnread() bool {
 		return x.Unread
 	}
 	return false
+}
+
+func (x *Activity) GetOutcome() ActivityOutcome {
+	if x != nil {
+		return x.Outcome
+	}
+	return ActivityOutcome_ACTIVITY_OUTCOME_UNSPECIFIED
 }
 
 type ListActivityRequest struct {
@@ -335,7 +395,7 @@ var File_nooks_api_v1_activity_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_activity_service_proto_rawDesc = "" +
 	"\n" +
-	"#nooks/api/v1/activity_service.proto\x12\fnooks.api.v1\"\xb6\x01\n" +
+	"#nooks/api/v1/activity_service.proto\x12\fnooks.api.v1\"\xef\x01\n" +
 	"\bActivity\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12.\n" +
 	"\x04kind\x18\x02 \x01(\x0e2\x1a.nooks.api.v1.ActivityKindR\x04kind\x12\x12\n" +
@@ -344,7 +404,8 @@ const file_nooks_api_v1_activity_service_proto_rawDesc = "" +
 	"target_uid\x18\x04 \x01(\tR\ttargetUid\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x05 \x01(\tR\tcreatedAt\x12\x16\n" +
-	"\x06unread\x18\x06 \x01(\bR\x06unread\"\x15\n" +
+	"\x06unread\x18\x06 \x01(\bR\x06unread\x127\n" +
+	"\aoutcome\x18\a \x01(\x0e2\x1d.nooks.api.v1.ActivityOutcomeR\aoutcome\"\x15\n" +
 	"\x13ListActivityRequest\"m\n" +
 	"\x14ListActivityResponse\x122\n" +
 	"\bactivity\x18\x01 \x03(\v2\x16.nooks.api.v1.ActivityR\bactivity\x12!\n" +
@@ -356,7 +417,11 @@ const file_nooks_api_v1_activity_service_proto_rawDesc = "" +
 	"\x1aACTIVITY_KIND_JOIN_REQUEST\x10\x01\x12\x1f\n" +
 	"\x1bACTIVITY_KIND_RESET_REQUEST\x10\x02\x12\x1d\n" +
 	"\x19ACTIVITY_KIND_LIST_SHARED\x10\x03\x12\x1a\n" +
-	"\x16ACTIVITY_KIND_CONFLICT\x10\x042\xcb\x01\n" +
+	"\x16ACTIVITY_KIND_CONFLICT\x10\x04*p\n" +
+	"\x0fActivityOutcome\x12 \n" +
+	"\x1cACTIVITY_OUTCOME_UNSPECIFIED\x10\x00\x12\x1d\n" +
+	"\x19ACTIVITY_OUTCOME_APPROVED\x10\x01\x12\x1c\n" +
+	"\x18ACTIVITY_OUTCOME_IGNORED\x10\x022\xcb\x01\n" +
 	"\x0fActivityService\x12U\n" +
 	"\fListActivity\x12!.nooks.api.v1.ListActivityRequest\x1a\".nooks.api.v1.ListActivityResponse\x12a\n" +
 	"\x10MarkActivityRead\x12%.nooks.api.v1.MarkActivityReadRequest\x1a&.nooks.api.v1.MarkActivityReadResponseB\xb2\x01\n" +
@@ -374,28 +439,30 @@ func file_nooks_api_v1_activity_service_proto_rawDescGZIP() []byte {
 	return file_nooks_api_v1_activity_service_proto_rawDescData
 }
 
-var file_nooks_api_v1_activity_service_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_nooks_api_v1_activity_service_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_nooks_api_v1_activity_service_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_nooks_api_v1_activity_service_proto_goTypes = []any{
 	(ActivityKind)(0),                // 0: nooks.api.v1.ActivityKind
-	(*Activity)(nil),                 // 1: nooks.api.v1.Activity
-	(*ListActivityRequest)(nil),      // 2: nooks.api.v1.ListActivityRequest
-	(*ListActivityResponse)(nil),     // 3: nooks.api.v1.ListActivityResponse
-	(*MarkActivityReadRequest)(nil),  // 4: nooks.api.v1.MarkActivityReadRequest
-	(*MarkActivityReadResponse)(nil), // 5: nooks.api.v1.MarkActivityReadResponse
+	(ActivityOutcome)(0),             // 1: nooks.api.v1.ActivityOutcome
+	(*Activity)(nil),                 // 2: nooks.api.v1.Activity
+	(*ListActivityRequest)(nil),      // 3: nooks.api.v1.ListActivityRequest
+	(*ListActivityResponse)(nil),     // 4: nooks.api.v1.ListActivityResponse
+	(*MarkActivityReadRequest)(nil),  // 5: nooks.api.v1.MarkActivityReadRequest
+	(*MarkActivityReadResponse)(nil), // 6: nooks.api.v1.MarkActivityReadResponse
 }
 var file_nooks_api_v1_activity_service_proto_depIdxs = []int32{
 	0, // 0: nooks.api.v1.Activity.kind:type_name -> nooks.api.v1.ActivityKind
-	1, // 1: nooks.api.v1.ListActivityResponse.activity:type_name -> nooks.api.v1.Activity
-	2, // 2: nooks.api.v1.ActivityService.ListActivity:input_type -> nooks.api.v1.ListActivityRequest
-	4, // 3: nooks.api.v1.ActivityService.MarkActivityRead:input_type -> nooks.api.v1.MarkActivityReadRequest
-	3, // 4: nooks.api.v1.ActivityService.ListActivity:output_type -> nooks.api.v1.ListActivityResponse
-	5, // 5: nooks.api.v1.ActivityService.MarkActivityRead:output_type -> nooks.api.v1.MarkActivityReadResponse
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	1, // 1: nooks.api.v1.Activity.outcome:type_name -> nooks.api.v1.ActivityOutcome
+	2, // 2: nooks.api.v1.ListActivityResponse.activity:type_name -> nooks.api.v1.Activity
+	3, // 3: nooks.api.v1.ActivityService.ListActivity:input_type -> nooks.api.v1.ListActivityRequest
+	5, // 4: nooks.api.v1.ActivityService.MarkActivityRead:input_type -> nooks.api.v1.MarkActivityReadRequest
+	4, // 5: nooks.api.v1.ActivityService.ListActivity:output_type -> nooks.api.v1.ListActivityResponse
+	6, // 6: nooks.api.v1.ActivityService.MarkActivityRead:output_type -> nooks.api.v1.MarkActivityReadResponse
+	5, // [5:7] is the sub-list for method output_type
+	3, // [3:5] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_nooks_api_v1_activity_service_proto_init() }
@@ -408,7 +475,7 @@ func file_nooks_api_v1_activity_service_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_nooks_api_v1_activity_service_proto_rawDesc), len(file_nooks_api_v1_activity_service_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,

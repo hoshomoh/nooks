@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nooks/api/v1/activity_service.proto.
  */
 export const file_nooks_api_v1_activity_service: GenFile = /*@__PURE__*/
-  fileDesc("CiNub29rcy9hcGkvdjEvYWN0aXZpdHlfc2VydmljZS5wcm90bxIMbm9va3MuYXBpLnYxIocBCghBY3Rpdml0eRILCgN1aWQYASABKAkSKAoEa2luZBgCIAEoDjIaLm5vb2tzLmFwaS52MS5BY3Rpdml0eUtpbmQSDAoEdGV4dBgDIAEoCRISCgp0YXJnZXRfdWlkGAQgASgJEhIKCmNyZWF0ZWRfYXQYBSABKAkSDgoGdW5yZWFkGAYgASgIIhUKE0xpc3RBY3Rpdml0eVJlcXVlc3QiVgoUTGlzdEFjdGl2aXR5UmVzcG9uc2USKAoIYWN0aXZpdHkYASADKAsyFi5ub29rcy5hcGkudjEuQWN0aXZpdHkSFAoMdW5yZWFkX2NvdW50GAIgASgFIhkKF01hcmtBY3Rpdml0eVJlYWRSZXF1ZXN0IhoKGE1hcmtBY3Rpdml0eVJlYWRSZXNwb25zZSqpAQoMQWN0aXZpdHlLaW5kEh0KGUFDVElWSVRZX0tJTkRfVU5TUEVDSUZJRUQQABIeChpBQ1RJVklUWV9LSU5EX0pPSU5fUkVRVUVTVBABEh8KG0FDVElWSVRZX0tJTkRfUkVTRVRfUkVRVUVTVBACEh0KGUFDVElWSVRZX0tJTkRfTElTVF9TSEFSRUQQAxIaChZBQ1RJVklUWV9LSU5EX0NPTkZMSUNUEAQyywEKD0FjdGl2aXR5U2VydmljZRJVCgxMaXN0QWN0aXZpdHkSIS5ub29rcy5hcGkudjEuTGlzdEFjdGl2aXR5UmVxdWVzdBoiLm5vb2tzLmFwaS52MS5MaXN0QWN0aXZpdHlSZXNwb25zZRJhChBNYXJrQWN0aXZpdHlSZWFkEiUubm9va3MuYXBpLnYxLk1hcmtBY3Rpdml0eVJlYWRSZXF1ZXN0GiYubm9va3MuYXBpLnYxLk1hcmtBY3Rpdml0eVJlYWRSZXNwb25zZUKyAQoQY29tLm5vb2tzLmFwaS52MUIUQWN0aXZpdHlTZXJ2aWNlUHJvdG9QAVo2Z2l0aHViLmNvbS9ob3Nob21vaC9ub29rcy9wcm90by9nZW4vbm9va3MvYXBpL3YxO2FwaXYxogIDTkFYqgIMTm9va3MuQXBpLlYxygIMTm9va3NcQXBpXFYx4gIYTm9va3NcQXBpXFYxXEdQQk1ldGFkYXRh6gIOTm9va3M6OkFwaTo6VjFiBnByb3RvMw");
+  fileDesc("CiNub29rcy9hcGkvdjEvYWN0aXZpdHlfc2VydmljZS5wcm90bxIMbm9va3MuYXBpLnYxIrcBCghBY3Rpdml0eRILCgN1aWQYASABKAkSKAoEa2luZBgCIAEoDjIaLm5vb2tzLmFwaS52MS5BY3Rpdml0eUtpbmQSDAoEdGV4dBgDIAEoCRISCgp0YXJnZXRfdWlkGAQgASgJEhIKCmNyZWF0ZWRfYXQYBSABKAkSDgoGdW5yZWFkGAYgASgIEi4KB291dGNvbWUYByABKA4yHS5ub29rcy5hcGkudjEuQWN0aXZpdHlPdXRjb21lIhUKE0xpc3RBY3Rpdml0eVJlcXVlc3QiVgoUTGlzdEFjdGl2aXR5UmVzcG9uc2USKAoIYWN0aXZpdHkYASADKAsyFi5ub29rcy5hcGkudjEuQWN0aXZpdHkSFAoMdW5yZWFkX2NvdW50GAIgASgFIhkKF01hcmtBY3Rpdml0eVJlYWRSZXF1ZXN0IhoKGE1hcmtBY3Rpdml0eVJlYWRSZXNwb25zZSqpAQoMQWN0aXZpdHlLaW5kEh0KGUFDVElWSVRZX0tJTkRfVU5TUEVDSUZJRUQQABIeChpBQ1RJVklUWV9LSU5EX0pPSU5fUkVRVUVTVBABEh8KG0FDVElWSVRZX0tJTkRfUkVTRVRfUkVRVUVTVBACEh0KGUFDVElWSVRZX0tJTkRfTElTVF9TSEFSRUQQAxIaChZBQ1RJVklUWV9LSU5EX0NPTkZMSUNUEAQqcAoPQWN0aXZpdHlPdXRjb21lEiAKHEFDVElWSVRZX09VVENPTUVfVU5TUEVDSUZJRUQQABIdChlBQ1RJVklUWV9PVVRDT01FX0FQUFJPVkVEEAESHAoYQUNUSVZJVFlfT1VUQ09NRV9JR05PUkVEEAIyywEKD0FjdGl2aXR5U2VydmljZRJVCgxMaXN0QWN0aXZpdHkSIS5ub29rcy5hcGkudjEuTGlzdEFjdGl2aXR5UmVxdWVzdBoiLm5vb2tzLmFwaS52MS5MaXN0QWN0aXZpdHlSZXNwb25zZRJhChBNYXJrQWN0aXZpdHlSZWFkEiUubm9va3MuYXBpLnYxLk1hcmtBY3Rpdml0eVJlYWRSZXF1ZXN0GiYubm9va3MuYXBpLnYxLk1hcmtBY3Rpdml0eVJlYWRSZXNwb25zZUKyAQoQY29tLm5vb2tzLmFwaS52MUIUQWN0aXZpdHlTZXJ2aWNlUHJvdG9QAVo2Z2l0aHViLmNvbS9ob3Nob21vaC9ub29rcy9wcm90by9nZW4vbm9va3MvYXBpL3YxO2FwaXYxogIDTkFYqgIMTm9va3MuQXBpLlYxygIMTm9va3NcQXBpXFYx4gIYTm9va3NcQXBpXFYxXEdQQk1ldGFkYXRh6gIOTm9va3M6OkFwaTo6VjFiBnByb3RvMw");
 
 /**
  * Activity is one thing waiting for attention.
@@ -54,6 +54,13 @@ export type Activity = Message<"nooks.api.v1.Activity"> & {
    * @generated from field: bool unread = 6;
    */
   unread: boolean;
+
+  /**
+   * What became of a request, once an Admin decided. Unspecified until one has.
+   *
+   * @generated from field: nooks.api.v1.ActivityOutcome outcome = 7;
+   */
+  outcome: ActivityOutcome;
 };
 
 /**
@@ -171,6 +178,36 @@ export enum ActivityKind {
  */
 export const ActivityKindSchema: GenEnum<ActivityKind> = /*@__PURE__*/
   enumDesc(file_nooks_api_v1_activity_service, 0);
+
+/**
+ * ActivityOutcome is what an Admin decided about a request.
+ *
+ * @generated from enum nooks.api.v1.ActivityOutcome
+ */
+export enum ActivityOutcome {
+  /**
+   * @generated from enum value: ACTIVITY_OUTCOME_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: ACTIVITY_OUTCOME_APPROVED = 1;
+   */
+  APPROVED = 1,
+
+  /**
+   * The sender is never told, which is the whole point of ignoring.
+   *
+   * @generated from enum value: ACTIVITY_OUTCOME_IGNORED = 2;
+   */
+  IGNORED = 2,
+}
+
+/**
+ * Describes the enum nooks.api.v1.ActivityOutcome.
+ */
+export const ActivityOutcomeSchema: GenEnum<ActivityOutcome> = /*@__PURE__*/
+  enumDesc(file_nooks_api_v1_activity_service, 1);
 
 /**
  * ActivityService is everything waiting for one Member's attention.

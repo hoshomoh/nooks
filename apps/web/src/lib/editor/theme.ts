@@ -17,7 +17,8 @@ export type NoteScale = "sheet" | "full"
 /** buildNoteTheme renders the blocks at one of the two scales. */
 export function buildNoteTheme(scale: NoteScale): Extension {
   const body = scale === "full" ? "var(--text-note)" : "var(--text-note-sheet)"
-  const heading = scale === "full" ? "var(--text-note-heading)" : "var(--text-small)"
+  const heading =
+    scale === "full" ? "var(--text-note-heading)" : "var(--text-note-heading-sheet)"
   const code = scale === "full" ? "var(--text-small)" : "var(--text-micro)"
 
   return EditorView.theme({
@@ -51,11 +52,26 @@ export function buildNoteTheme(scale: NoteScale): Extension {
       paddingLeft: "13px",
       margin: "10px 0",
     },
+    // A code block is one surface with the fences as its edges, so a Member can see
+    // that it is there at all.
     ".cm-nooks-code": {
       fontFamily: "var(--font-mono)",
       fontSize: code,
       color: "var(--secondary-foreground)",
-      padding: "10px 0",
+      backgroundColor: "var(--chip)",
+      padding: "2px 12px",
+    },
+    ".cm-nooks-code-open": {
+      marginTop: "10px",
+      paddingTop: "10px",
+      borderTopLeftRadius: "var(--radius-xl)",
+      borderTopRightRadius: "var(--radius-xl)",
+    },
+    ".cm-nooks-code-close": {
+      marginBottom: "10px",
+      paddingBottom: "10px",
+      borderBottomLeftRadius: "var(--radius-xl)",
+      borderBottomRightRadius: "var(--radius-xl)",
     },
     ".cm-nooks-todo, .cm-nooks-todo-done": {
       paddingLeft: "26px",

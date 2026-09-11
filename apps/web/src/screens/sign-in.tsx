@@ -6,6 +6,7 @@ import { getRouteApi, Link, useNavigate } from "@tanstack/react-router"
 import { AuthShell } from "@/components/ds/auth-shell"
 import { Button } from "@/components/ds/button"
 import { Field } from "@/components/ds/field"
+import { FormError } from "@/components/ds/form-error"
 import { authClient } from "@/lib/api"
 import { messageFrom } from "@/lib/errors"
 
@@ -68,11 +69,7 @@ export function SignIn() {
           required
         />
 
-        {signIn.isError && (
-          <p className="text-destructive text-meta">
-            {messageFrom(signIn.error)}
-          </p>
-        )}
+        <FormError message={messageFrom(signIn.error)} />
 
         <Button type="submit" disabled={signIn.isPending} className="self-start">
           {signIn.isPending ? t("auth.signIn.submitting") : t("action.signIn")}

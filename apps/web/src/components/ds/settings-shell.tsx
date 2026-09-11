@@ -4,6 +4,9 @@ import { useTranslation } from "react-i18next"
 import { cn } from "cn"
 
 import { ChromeBar } from "./chrome-bar"
+import { Sidebar } from "./sidebar"
+import { useCommandPalette } from "@/lib/use-command-palette"
+import { useSignedInData } from "@/lib/use-signed-in-data"
 
 /** Where a settings page lives. Only routes that exist are listed. */
 export type SettingsRoute = "/settings/members" | "/settings/groups"
@@ -36,16 +39,29 @@ export interface SettingsShellProps {
 }
 
 /**
- * The settings layout: a nav column, then a 720px content column.
+ * The settings layout: the app's own sidebar, then a settings column, then a 720px
+ * content column.
  *
- * Wider than a List's 660px, because these pages hold tables rather than sentences —
- * DESIGN.md §5.
+ * The sidebar stays because settings is somewhere a Member goes for a minute in the
+ * middle of using the app — taking their Lists away would make going back a journey
+ * rather than a click. The content column is wider than a List's 660px because these
+ * pages hold tables rather than sentences, per DESIGN.md §5.
  */
 export function SettingsShell({ active, crumb, counts, children }: SettingsShellProps) {
   const { t } = useTranslation()
+  const { instanceName, member, lists } = useSignedInData()
+  const palette = useCommandPalette()
 
   return (
     <div className="flex min-h-dvh bg-background">
+      <Sidebar
+        instanceName={instanceName}
+        memberName={member?.name ?? ""}
+        lists={lists}
+        onSearch={palette.open}
+        onAddList={palette.openAddList}
+      />
+
       <nav className="flex w-56 flex-col gap-4 border-r border-border bg-sidebar px-2.5 pt-3 pb-4">
         <span className="px-2 text-label text-muted-foreground uppercase">
           {t("settings.title")}

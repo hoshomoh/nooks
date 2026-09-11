@@ -51,10 +51,11 @@ pnpm --filter @nooks/web lint
 step "web test"
 pnpm --filter @nooks/web test
 
-step "web build"
-pnpm --filter @nooks/web build
-
-step "release lands where go:embed reads"
+step "web build, landing where go:embed reads"
+# One build, not two: `release` is the same Vite build as `build` with the output
+# pointed at the binary, so running both proved the same thing twice and was the
+# heaviest thing in this script. A project that expects to be self-hosted should not
+# need a large machine to test itself.
 pnpm --filter @nooks/web release
 test -d server/router/frontend/dist/assets
 test ! -e apps/server

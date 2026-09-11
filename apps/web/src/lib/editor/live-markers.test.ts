@@ -55,6 +55,17 @@ describe("what a Note shows", () => {
   })
 })
 
+// A code block is the one thing a single line cannot describe on its own.
+describe("a fenced code block", () => {
+  it("shows what is inside it, without the backticks", () => {
+    expect(shown("```\ngrind: filter\n```\n", 22)).toBe("grind: filter")
+  })
+
+  it("keeps a marker inside a fence as text, because inside a fence it is text", () => {
+    expect(shown("```\n### not a heading\n```\n", 26)).toContain("### not a heading")
+  })
+})
+
 describe("what the caret reveals", () => {
   // A block's shorthand is never shown, wherever the caret is. It was typed to make a
   // heading, and the heading is what it made.

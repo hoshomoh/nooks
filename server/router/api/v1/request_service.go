@@ -104,6 +104,9 @@ func (s *RequestService) DecideJoinRequest(
 	if err != nil {
 		return nil, decideError(err)
 	}
+	if err := s.resolveActivity(ctx, req.Msg.GetRequestUid(), req.Msg.GetApprove()); err != nil {
+		return nil, err
+	}
 	return connect.NewResponse(&apiv1.DecideJoinRequestResponse{}), nil
 }
 
@@ -120,6 +123,9 @@ func (s *RequestService) DecideResetRequest(
 		decision(req.Msg.GetApprove()), s.now())
 	if err != nil {
 		return nil, decideError(err)
+	}
+	if err := s.resolveActivity(ctx, req.Msg.GetRequestUid(), req.Msg.GetApprove()); err != nil {
+		return nil, err
 	}
 	return connect.NewResponse(&apiv1.DecideResetRequestResponse{}), nil
 }
@@ -162,4 +168,24 @@ func formatRFC3339(t time.Time) string {
 		return ""
 	}
 	return t.UTC().Format(time.RFC3339)
+}
+
+// resolveActivity records what became of a request, in every Admin's panel.
+//
+// Deciding is the act; this is what makes it visible. Without it an Admin clicks
+// Approve and nothing about the entry changes — so they cannot tell whether it worked,
+// and the other Admins keep a button that now does nothing.
+func (s *RequestService) resolveActivity(
+	ctx context.Context,
+	requestUID string,
+	approved bool,
+) error {
+	outcome := store.OutcomeIgnored
+	if approved {
+		outcome = store.OutcomeApproved
+	}
+	if err := s.store.ResolveActivity(ctx, requestUID, outcome); err != nil {
+		return internalError("resolve activity", err)
+	}
+	return nil
 }

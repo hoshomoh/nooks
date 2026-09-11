@@ -1,21 +1,19 @@
+import type { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import type { Item } from "@nooks/api"
 
 import { Checkbox } from "./checkbox"
+import { DateField } from "./date-field"
 import { EditableTitle } from "./editable-title"
 import { NoteEditor } from "./note-editor"
+import type { DueDate } from "@/lib/dates"
+import { useDueLabel } from "@/lib/use-due-label"
 
-export type NoteSheetField = {
-  label: string
-  value: string
-  /** An empty field reads as a prompt rather than a value. */
-  empty?: boolean
-}
-
-export type NoteSheetProps = {
+export interface NoteSheetProps {
   item: Item
   crumbs: string[]
-  fields: NoteSheetField[]
+  /** Which List the Item is on. Moving between Lists is not a sheet-level action. */
+  listName: string
   /** Whether the Member may change anything here. */
   canEdit: boolean
   /**
@@ -26,6 +24,8 @@ export type NoteSheetProps = {
   onToggleDone: (done: boolean) => void
   /** Renames the Item. Its title is the field that renders it. */
   onRename: (label: string) => void
+  onQuantityChange: (quantity: string) => void
+  onDueChange: (dueOn: DueDate) => void
   onClose: () => void
   /** Opens the same Note at full width. */
   onOpenFull: () => void
@@ -40,38 +40,60 @@ export type NoteSheetProps = {
  * label are lifted above the row's own click target, and without a layer of its own the
  * sheet would be covered by the rows it is drawn over.
  *
- * Same order as the full-screen view — chrome bar, checkbox and title, detail row,
- * hairline, Note, footer bar — so the two read as one thing at two widths. Opening an
- * Item never replaces the List with a page: the list keeps its place behind this.
+ * Same order as full screen — chrome bar, checkbox and title, detail row, hairline,
+ * Note, footer bar — so the two read as one thing at two widths. Opening an Item never
+ * replaces the List with a page.
+ *
+ * Every field here is the control that changes it. There is no edit mode: the sheet is
+ * where an Item is read and where it is rewritten.
  */
 export function NoteSheet({
   item,
   crumbs,
-  fields,
+  listName,
   canEdit,
   onNoteChange,
   onToggleDone,
   onRename,
+  onQuantityChange,
+  onDueChange,
   onClose,
   onOpenFull,
   status,
 }: NoteSheetProps) {
   const { t } = useTranslation()
+  const due = useDueLabel()
 
   return (
     <aside className="absolute inset-y-0 right-0 z-20 flex w-sheet animate-sheet-in flex-col border-l border-border bg-background">
       <div className="flex h-chrome items-center gap-2.5 border-b border-hair pr-4 pl-5.5 text-micro text-muted-foreground">
         <span className="text-secondary-foreground">{crumbs.join(" / ")}</span>
         <span className="flex-1" />
-        <button type="button" onClick={onOpenFull} className="text-small hover:text-foreground">
-          {t("note.openFull")}
+
+        <button
+          type="button"
+          onClick={onOpenFull}
+          className="flex h-control-toolbar items-center gap-1 rounded-md bg-secondary px-2 text-micro text-secondary-foreground transition-colors hover:text-foreground"
+        >
+          <span aria-hidden className="text-[11px]">
+            ⤢
+          </span>
+          <span>{t("note.openFull")}</span>
         </button>
-        <button type="button" onClick={onClose} className="text-small hover:text-foreground">
-          {t("note.close")}
+
+        {/* A glyph, not a word: the crumb already says where this is, and a second
+            label beside "Open full" would read as a second destination. */}
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t("note.close")}
+          className="ml-1 grid size-6 place-items-center rounded-md text-[13px] transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          ✕
         </button>
       </div>
 
-      <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-7 pt-7">
+      <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-7.5 pt-7.5">
         <div className="grid grid-cols-[24px_1fr] items-start gap-3">
           <span className="mt-1">
             <Checkbox checked={item.done} onCheckedChange={onToggleDone} disabled={!canEdit} />
@@ -82,24 +104,44 @@ export function NoteSheet({
             readOnly={!canEdit}
             label={t("note.itemName")}
             as="h2"
-            className="text-page"
+            className="text-sheet-title"
           />
         </div>
 
-        <div className="flex flex-wrap gap-x-4.5 gap-y-2.5 pl-9">
-          {fields.map((field) => (
-            <span key={field.label} className="flex items-center gap-2">
-              <span className="text-micro text-muted-foreground">{field.label}</span>
-              <span className={field.empty ? "text-small text-muted-foreground" : "text-small"}>
-                {field.value}
-              </span>
-            </span>
-          ))}
+        <div className="flex flex-wrap items-center gap-x-4.5 gap-y-2.5 pl-9">
+          <Detail label={t("note.list")}>
+            <span className="text-small">{listName}</span>
+          </Detail>
+
+          <Detail label={t("note.quantity")}>
+            <EditableTitle
+              value={item.quantity}
+              onCommit={onQuantityChange}
+              readOnly={!canEdit}
+              label={t("note.quantity")}
+              as="span"
+              className="w-24 text-small"
+              placeholder={t("note.add")}
+            />
+          </Detail>
+
+          <Detail label={t("note.due")}>
+            <DateField
+              value={item.dueOn}
+              label={item.dueOn ? due.label(item.dueOn) : t("note.addDate")}
+              chosen={Boolean(item.dueOn)}
+              onChange={onDueChange}
+            />
+          </Detail>
+
+          <Detail label={t("note.addedBy")}>
+            <span className="text-small">{item.addedByName}</span>
+          </Detail>
         </div>
 
         <div className="h-px bg-hair" />
 
-        <div className="flex min-h-[240px] flex-1 pl-9">
+        <div className="flex min-h-60 flex-1 pl-9">
           {/* Keyed on the Item: opening a different one builds a fresh editor. */}
           <NoteEditor
             key={item.uid}
@@ -116,5 +158,20 @@ export function NoteSheet({
         {status && <span>{status}</span>}
       </div>
     </aside>
+  )
+}
+
+interface DetailProps {
+  label: string
+  children: ReactNode
+}
+
+/** One fact about the Item, and the control that changes it. */
+function Detail({ label, children }: DetailProps) {
+  return (
+    <span className="flex items-center gap-2">
+      <span className="text-micro text-muted-foreground">{label}</span>
+      {children}
+    </span>
   )
 }

@@ -267,7 +267,8 @@
     "seeBoth": "See both",
     "ignore": "Ignore",
     "ignored": "Ignored, silently",
-    "approved": "Approved"
+    "approved": "Approved",
+    "deciding": "Approving…"
   },
   "listMenu": {
     "open": "More",

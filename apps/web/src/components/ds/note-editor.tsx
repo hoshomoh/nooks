@@ -6,6 +6,7 @@ import { EditorView, keymap } from "@codemirror/view"
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands"
 import { markdown } from "@codemirror/lang-markdown"
 
+import { listContinuation } from "@/lib/editor/list-continuation"
 import { liveMarkers } from "@/lib/editor/live-markers"
 import { slashMenu, type SlashOption } from "@/lib/editor/slash-menu"
 import { buildNoteTheme, type NoteScale } from "@/lib/editor/theme"
@@ -92,6 +93,8 @@ export function NoteEditor({ initialValue, onChange, readOnly, scale = "sheet" }
           doc: initialDoc,
           extensions: [
             history(),
+            // Above the default keymap, so Enter in a list is decided here first.
+            listContinuation,
             keymap.of([...defaultKeymap, ...historyKeymap]),
             markdown(),
             liveMarkers,

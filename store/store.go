@@ -239,6 +239,9 @@ type Store interface {
 	// MarkActivityRead marks everything a Member has now seen.
 	MarkActivityRead(ctx context.Context, memberID int64, at time.Time) error
 
+	// ResolveActivity records what became of everything pointing at one request.
+	ResolveActivity(ctx context.Context, targetUID string, outcome Outcome) error
+
 	// AdminIDs lists the Members who can act on a request.
 	AdminIDs(ctx context.Context) ([]int64, error)
 

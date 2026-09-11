@@ -7,6 +7,7 @@ import { RequestStatus } from "@nooks/api"
 import { AuthShell } from "@/components/ds/auth-shell"
 import { Button } from "@/components/ds/button"
 import { Field } from "@/components/ds/field"
+import { FormError } from "@/components/ds/form-error"
 import { authClient } from "@/lib/api"
 import { messageFrom } from "@/lib/errors"
 import {
@@ -77,9 +78,7 @@ function AskForReset({ onSent }: AskForResetProps) {
           required
         />
 
-        {requestReset.isError && (
-          <p className="text-destructive text-meta">{messageFrom(requestReset.error)}</p>
-        )}
+        <FormError message={messageFrom(requestReset.error)} />
 
         <Button type="submit" disabled={requestReset.isPending} className="self-start">
           {requestReset.isPending ? t("auth.join.submitting") : t("auth.join.submit")}
@@ -163,9 +162,7 @@ function CheckResetRequest({ requestUid, onStartOver }: CheckResetRequestProps) 
           required
         />
 
-        {completeReset.isError && (
-          <p className="text-destructive text-meta">{messageFrom(completeReset.error)}</p>
-        )}
+        <FormError message={messageFrom(completeReset.error)} />
 
         <Button type="submit" disabled={completeReset.isPending} className="self-start">
           {completeReset.isPending ? t("auth.replacePassword.submitting") : t("auth.reset.submit")}

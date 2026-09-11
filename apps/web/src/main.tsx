@@ -5,7 +5,6 @@ import { RouterProvider } from "@tanstack/react-router"
 
 import "./i18n"
 
-import { CommandPalette } from "./components/ds/command-palette"
 import { buildRouter } from "./router"
 import { wireLiveUpdates } from "./lib/live-wiring"
 import "./index.css"
@@ -38,7 +37,6 @@ createRoot(container).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-      <CommandPalette />
     </QueryClientProvider>
   </StrictMode>,
 )

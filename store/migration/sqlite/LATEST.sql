@@ -174,6 +174,9 @@ CREATE TABLE activity (
   -- What it points at: a request uid, a list uid, or empty.
   target_uid TEXT    NOT NULL DEFAULT '',
   read_at    TEXT    NOT NULL DEFAULT '',
+  -- What became of a request once an Admin decided: APPROVED, IGNORED, or empty for
+  -- one nobody has answered yet.
+  outcome    TEXT    NOT NULL DEFAULT '',
   created_at TEXT    NOT NULL
 );
 

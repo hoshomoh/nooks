@@ -147,3 +147,63 @@ func TestAdminIDs(t *testing.T) {
 		})
 	}
 }
+
+// Every Admin has their own row for the same request, so deciding it resolves all of
+// them: whoever got there first, the others should see what happened rather than a
+// button that now does nothing.
+func TestDecidingARequestResolvesEveryAdminsEntry(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			anna := newMember(t, s)
+			jonas := addMember(t, s, "mem_jonas", "Jonas", "jonas@brunnen.lan")
+
+			for i, member := range []Member{anna, jonas} {
+				if _, err := s.CreateActivity(t.Context(), CreateActivityParams{
+					UID: "act_" + strconv.Itoa(i), MemberID: member.ID,
+					Kind: ActivityJoinRequest, Text: "Til asked to join",
+					TargetUID: "req_til", At: createdAt,
+				}); err != nil {
+					t.Fatalf("CreateActivity: %v", err)
+				}
+			}
+
+			if err := s.ResolveActivity(t.Context(), "req_til", OutcomeApproved); err != nil {
+				t.Fatalf("ResolveActivity: %v", err)
+			}
+
+			for _, member := range []Member{anna, jonas} {
+				entries, err := s.ActivityFor(t.Context(), member.ID)
+				if err != nil {
+					t.Fatalf("ActivityFor: %v", err)
+				}
+				if !entries[0].Decided() || entries[0].Outcome != OutcomeApproved {
+					t.Errorf("%s still sees an undecided request", member.Name)
+				}
+			}
+		})
+	}
+}
+
+// An entry that is not about that request is left alone.
+func TestResolvingLeavesOtherEntriesAlone(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			member := newMember(t, s)
+			entry(t, s, member.ID, "act_share", ActivityListShared, createdAt)
+
+			if err := s.ResolveActivity(t.Context(), "req_til", OutcomeIgnored); err != nil {
+				t.Fatalf("ResolveActivity: %v", err)
+			}
+
+			entries, err := s.ActivityFor(t.Context(), member.ID)
+			if err != nil {
+				t.Fatalf("ActivityFor: %v", err)
+			}
+			if entries[0].Decided() {
+				t.Error("an unrelated entry was marked decided")
+			}
+		})
+	}
+}

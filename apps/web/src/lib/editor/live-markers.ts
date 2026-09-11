@@ -51,6 +51,23 @@ const BLOCK_CLASS: Record<BlockKind, string> = {
 }
 
 /**
+ * The classes a fenced code block is drawn with.
+ *
+ * A fence line keeps its own line — the text is hidden but the line is real, and
+ * pretending otherwise breaks the caret. So the two fences are drawn as the block's top
+ * and bottom edge instead: with the same background as the lines between them, the
+ * block reads as one thing rather than as a gap with some monospace in the middle.
+ */
+const FENCE_CLASS = {
+  open: "cm-nooks-code cm-nooks-code-open",
+  close: "cm-nooks-code cm-nooks-code-close",
+  inside: "cm-nooks-code cm-nooks-code-inside",
+} as const
+
+/** FENCE is the shorthand that opens and closes a code block. */
+const FENCE = "```"
+
+/**
  * The markup nodes markdown puts around a phrase, and what the phrase becomes.
  *
  * Every one of these is punctuation the Member wrote to mean something; the meaning is
@@ -97,11 +114,36 @@ function addBlockMarks(
   to: number,
   marks: Range<Decoration>[],
 ): void {
+  // Whether the walk is currently between two fences. A code block is the one thing
+  // here that a single line cannot describe on its own.
+  let insideFence = false
+
   let position = from
   while (position <= to) {
     const line = state.doc.lineAt(position)
-    const marker = markerOf(line.text)
 
+    if (line.text.startsWith(FENCE)) {
+      marks.push(
+        Decoration.line({
+          class: insideFence ? FENCE_CLASS.close : FENCE_CLASS.open,
+        }).range(line.from),
+      )
+      // The backticks are markup; the edge they draw is what stays.
+      if (line.to > line.from) {
+        marks.push(hidden.range(line.from, line.to))
+      }
+      insideFence = !insideFence
+      position = line.to + 1
+      continue
+    }
+
+    if (insideFence) {
+      marks.push(Decoration.line({ class: FENCE_CLASS.inside }).range(line.from))
+      position = line.to + 1
+      continue
+    }
+
+    const marker = markerOf(line.text)
     marks.push(Decoration.line({ class: BLOCK_CLASS[marker.kind] }).range(line.from))
 
     if (marker.length > 0) {

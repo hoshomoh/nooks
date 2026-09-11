@@ -12,7 +12,7 @@ import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
 import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
-import { NoteSheet, type NoteSheetField } from "@/components/ds/note-sheet"
+import { NoteSheet } from "@/components/ds/note-sheet"
 import { PromptDialog } from "@/components/ds/prompt-dialog"
 import { ShareDialog, type ShareDecision } from "@/components/ds/share-dialog"
 import { Button } from "@/components/ds/button"
@@ -31,6 +31,13 @@ import { useSignedInData } from "@/lib/use-signed-in-data"
 import { Sharing, type Item } from "@nooks/api"
 
 const route = getRouteApi("/lists/$listUid")
+
+/** What the quantity-and-date edit is told. Either field may be left alone. */
+interface EditItemVariables {
+  itemUid: string
+  quantity?: string
+  dueOn?: string
+}
 
 /** How long the typing has to settle before a Note is saved. */
 const AUTOSAVE_DELAY_MS = 800
@@ -111,6 +118,13 @@ export function ListScreen() {
   const rename = useMutation({
     mutationFn: ({ itemUid, label }: RenameItemVariables) =>
       listClient.updateItem({ itemUid, label }),
+    onSuccess: refresh,
+  })
+
+  // Quantity and due date are two fields of the same edit, so they are one mutation.
+  const editItem = useMutation({
+    mutationFn: ({ itemUid, quantity, dueOn }: EditItemVariables) =>
+      listClient.updateItem({ itemUid, quantity, dueOn }),
     onSuccess: refresh,
   })
 
@@ -292,12 +306,16 @@ export function ListScreen() {
           <NoteSheet
             item={openItem}
             crumbs={[list.list?.name ?? "", t("note.crumb")]}
-            fields={noteFields(t, openItem, list.list?.name ?? "", due.label(openItem.dueOn))}
+            listName={list.list?.name ?? ""}
             canEdit={Boolean(canEdit)}
             status={saveNote.isPending ? t("note.saving") : undefined}
             onNoteChange={onNoteChange}
             onToggleDone={(done) => setDone.mutate({ itemUid: openItem.uid, done })}
             onRename={(label) => rename.mutate({ itemUid: openItem.uid, label })}
+            onQuantityChange={(quantity) =>
+              editItem.mutate({ itemUid: openItem.uid, quantity })
+            }
+            onDueChange={(dueOn) => editItem.mutate({ itemUid: openItem.uid, dueOn })}
             onClose={closeSheet}
             onOpenFull={() => {
               autosave.flush()
@@ -325,21 +343,6 @@ function doneLabel(t: Translate, done: Item[], from: Date): string {
   return todays > 0
     ? t("list.doneToday", { count: todays })
     : t("list.doneEarlier", { count: done.length })
-}
-
-/** The detail row in the sheet: what is known about the Item, and what is not yet. */
-function noteFields(
-  t: Translate,
-  item: Item,
-  listName: string,
-  dueLabel: string,
-): NoteSheetField[] {
-  return [
-    { label: t("note.list"), value: listName },
-    { label: t("note.quantity"), value: item.quantity || t("note.add"), empty: !item.quantity },
-    { label: t("note.due"), value: dueLabel || t("note.addDate"), empty: !item.dueOn },
-    { label: t("note.addedBy"), value: item.addedByName },
-  ]
 }
 
 /** Which line under the title says who can reach this List. */

@@ -84,8 +84,59 @@ export function SettingsAboutScreen() {
         </SettingsRow>
       </div>
 
+      {member?.role === Role.ADMIN && <Export driver={about.storageDriver} />}
       {member?.role === Role.ADMIN && <DeleteInstance name={about.instanceName} />}
     </SettingsShell>
+  )
+}
+
+interface ExportProps {
+  /** What is holding the data, which decides whether Nooks can copy it itself. */
+  driver: string
+}
+
+/**
+ * Taking the whole Instance away with you.
+ *
+ * On SQLite the database is one file and Nooks copies it while it runs, so the export
+ * is the database itself rather than a format of ours — nothing here describes the
+ * schema, so nothing here can fall behind it.
+ *
+ * On Postgres it says so and shows the command. That deployment already has a backup
+ * story, and anything Nooks wrote would be a worse one.
+ */
+function Export({ driver }: ExportProps) {
+  const { t } = useTranslation()
+  const copyable = driver === "sqlite"
+
+  return (
+    <section className="mt-8 flex flex-col gap-3.5 border-t border-hair pt-5">
+      <div className="flex items-center gap-6">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-chrome">{t("about.exportTitle")}</span>
+          <span className="max-w-135 text-micro leading-[1.5] text-muted-foreground">
+            {t(copyable ? "about.exportBlurb" : "about.exportElsewhere")}
+          </span>
+        </div>
+        <span className="flex-1" />
+        {copyable && (
+          // A plain link, so the browser saves it the way it saves anything else.
+          <a
+            href="/api/v1/backup"
+            download
+            className="flex h-control-compact items-center rounded-lg border border-border px-3.5 text-meta text-secondary-foreground transition-colors hover:bg-secondary"
+          >
+            {t("about.exportAction")}
+          </a>
+        )}
+      </div>
+
+      {!copyable && (
+        <code className="rounded-lg border border-border bg-sidebar px-3.5 py-2.5 font-mono text-meta break-all text-secondary-foreground">
+          {t("about.pgDump")}
+        </code>
+      )}
+    </section>
   )
 }
 

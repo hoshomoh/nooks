@@ -254,17 +254,17 @@ The single most important milestone; everything else is furniture.
       tick off items" and "Delete items and lists", the last off by default
 - [x] `buf breaking` in CI, against main — the protos are the contract every client is
       built against, and nothing was checking it
-- [ ] Export everything — **the database itself, not a format of our own**. On SQLite
+- [x] Export everything — **the database itself, not a format of our own**. On SQLite
       that is `VACUUM INTO`, which writes a consistent copy of the live database as one
       file while Nooks keeps running: the same thing the About page already calls "one
       file you can copy". A hand-written JSON exporter would be a second description of
       the schema to keep in step, and the way it fails is silently missing a table
-- [ ] Postgres exports with `pg_dump`, which Nooks does not shell out to — a Postgres
+- [x] Postgres exports with `pg_dump`, which Nooks does not shell out to — a Postgres
       deployment already has a backup story, and ours would be worse. About says so, and
       shows the command with this Instance's database name in it
-- [ ] Import a backup — copy the file back and restart. Nothing to parse, because
-      nothing was ever serialised
-- [ ] Printed pages as PDFs stay the browser's own print-to-PDF. The print sheet already
+- [x] Import a backup — copy the file back and restart. Nothing to parse, because
+      nothing was ever serialised, so there is no importer to write
+- [x] Printed pages as PDFs stay the browser's own print-to-PDF. The print sheet already
       makes real A4 with real page breaks, and the Member chooses where it saves
 
 **Found while measuring REST coverage:** `MoveItem` is the only RPC the app never calls —

@@ -99,6 +99,13 @@ type Store interface {
 	// ResetInstance empties everything and returns the Instance to first run.
 	ResetInstance(ctx context.Context) error
 
+	// BackupTo writes a consistent copy of the database to a path that does not exist
+	// yet, or answers ErrNoBackup where the driver has its own tool for it.
+	BackupTo(ctx context.Context, path string) error
+
+	// Driver names which engine is holding the data.
+	Driver() string
+
 	// SetMemberPassword replaces a password and clears the must-change flag.
 	SetMemberPassword(ctx context.Context, id int64, hash string) error
 

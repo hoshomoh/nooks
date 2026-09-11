@@ -583,7 +583,12 @@
     "licenceBlurb": "The source is yours, and so is anything you change.",
     "telemetry": "Telemetry",
     "telemetryBlurb": "There is nothing to turn off.",
-    "none": "None"
+    "none": "None",
+    "exportTitle": "Export everything",
+    "exportBlurb": "The database itself, copied while nooks keeps running. Put it back and restart to restore — there is nothing to import, because nothing was ever converted.",
+    "exportElsewhere": "This instance is on postgres, which has its own backup tool. nooks does not wrap it: pg_dump is better than anything we would write, and it is already on the machine running your database.",
+    "exportAction": "Download",
+    "pgDump": "pg_dump --format=custom --file=nooks-backup.dump \"$NOOKS_DSN\""
   },
   "danger": {
     "deleteTitle": "Delete this instance",

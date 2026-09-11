@@ -18,6 +18,7 @@ import (
 	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/server/events"
 	v1 "github.com/hoshomoh/nooks/server/router/api/v1"
+	"github.com/hoshomoh/nooks/server/router/backup"
 	"github.com/hoshomoh/nooks/server/router/frontend"
 	"github.com/hoshomoh/nooks/server/router/live"
 	"github.com/hoshomoh/nooks/store"
@@ -94,6 +95,7 @@ func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
 		v1.NewTokenService(s, nil, nil, nil).WithActivity(tokenActivity), interceptors,
 	))
 	mux.Handle("GET /api/v1/events", live.NewHandler(s, broker, resolver))
+	mux.Handle("GET /api/v1/backup", backup.NewHandler(s, resolver, nil))
 	mux.HandleFunc("GET /healthz", handleHealthz)
 
 	// In dev the Vite server serves the app and proxies here, so the binary serves only

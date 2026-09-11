@@ -33,16 +33,16 @@ export default defineConfig({
      * suite that runs beside a Go build and a Vite build and one the kernel kills —
      * three runs of ./scripts/preflight.sh in a row died here before this changed.
      *
-     * One of them, because two still got killed. The suite is slower for it and that is
-     * the right trade: a gate that fails half the time is not a gate, and this one is
-     * what stands between a broken commit and main.
+     * Two of them. One was tried when runs kept being killed, and kept being killed —
+     * the machine had 11GB available at the time, so the pressure was never this suite's
+     * to relieve.
      *
      * Isolation is kept: each file still gets a fresh module registry, which the
      * module-level stores (the theme, the locale, the pending tick) depend on. Turning
      * that off is the other way to save memory and it would make tests share state.
      */
     pool: "threads",
-    maxWorkers: 1,
+    maxWorkers: 2,
   },
   server: {
     port: 3001,

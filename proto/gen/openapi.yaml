@@ -1,0 +1,2114 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ""
+    version: 0.0.1
+paths:
+    /api/v1/access-tokens:
+        get:
+            tags:
+                - TokenService
+            description: ListAccessTokens returns the signed-in Member's own tokens.
+            operationId: TokenService_ListAccessTokens
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListAccessTokensResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - TokenService
+            description: CreateAccessToken cuts one. The secret is in the answer and nowhere else, ever.
+            operationId: TokenService_CreateAccessToken
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateAccessTokenRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateAccessTokenResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/access-tokens/{tokenUid}:
+        delete:
+            tags:
+                - TokenService
+            description: |-
+                RevokeAccessToken stops one working. A Member may revoke their own; an Admin may
+                 revoke anybody's, because a key somebody left in a door is the Instance's problem.
+            operationId: TokenService_RevokeAccessToken
+            parameters:
+                - name: tokenUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RevokeAccessTokenResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/activity:
+        get:
+            tags:
+                - ActivityService
+            description: ListActivity returns what is waiting, newest first.
+            operationId: ActivityService_ListActivity
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListActivityResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/activity:markRead:
+        post:
+            tags:
+                - ActivityService
+            description: MarkActivityRead marks everything the Member has now seen.
+            operationId: ActivityService_MarkActivityRead
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/MarkActivityReadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MarkActivityReadResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/auth/join-requests:
+        post:
+            tags:
+                - AuthService
+            description: |-
+                RequestJoin asks an Admin for an account. It is how a Visitor gets in when public
+                 signup is off, which is the default.
+            operationId: AuthService_RequestJoin
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RequestJoinRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RequestJoinResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/auth/join-requests/{requestUid}:
+        get:
+            tags:
+                - AuthService
+            description: |-
+                GetJoinRequest reports whether an Admin has decided yet. The Visitor's browser
+                 remembers the request id and comes back to the same address.
+            operationId: AuthService_GetJoinRequest
+            parameters:
+                - name: requestUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetJoinRequestResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/auth/me:
+        get:
+            tags:
+                - AuthService
+            description: GetCurrentMember returns whoever the session cookie belongs to.
+            operationId: AuthService_GetCurrentMember
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetCurrentMemberResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/auth/reset-requests:
+        post:
+            tags:
+                - AuthService
+            description: |-
+                RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
+                 the Admin checks it is really them however they like, then approves.
+            operationId: AuthService_RequestPasswordReset
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RequestPasswordResetRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RequestPasswordResetResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/auth/reset-requests/{requestUid}:
+        get:
+            tags:
+                - AuthService
+            description: GetResetRequest reports whether an Admin has approved a reset yet.
+            operationId: AuthService_GetResetRequest
+            parameters:
+                - name: requestUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetResetRequestResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/dated-items:
+        get:
+            tags:
+                - ListService
+            description: |-
+                ListDatedItems returns unticked Items with a due date, across every List the
+                 Member can reach. Today, Upcoming and the calendar are all views over this: a
+                 calendar is a lens on dates, not a second home for Lists.
+            operationId: ListService_ListDatedItems
+            parameters:
+                - name: from
+                  in: query
+                  description: |-
+                    The earliest day to include, YYYY-MM-DD. Empty means no lower bound, which is how
+                     Today gathers everything overdue as well as everything due.
+                  schema:
+                    type: string
+                - name: to
+                  in: query
+                  description: The latest day to include, YYYY-MM-DD. Required.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListDatedItemsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/groups:
+        get:
+            tags:
+                - MemberService
+            description: ListGroups returns every Group, with who is in it.
+            operationId: MemberService_ListGroups
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListGroupsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - MemberService
+            description: CreateGroup adds a Group. Admins only.
+            operationId: MemberService_CreateGroup
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateGroupRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateGroupResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/groups/{groupUid}/members:
+        put:
+            tags:
+                - MemberService
+            description: |-
+                SetGroupMembers replaces who is in a Group. Admins only.
+
+                 Removing someone takes away the Lists they reached through it, and nothing else.
+            operationId: MemberService_SetGroupMembers
+            parameters:
+                - name: groupUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SetGroupMembersRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SetGroupMembersResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/instance:
+        get:
+            tags:
+                - InstanceService
+            description: |-
+                GetInstance returns the public profile of this Instance. It is reachable without
+                 authentication because the sign-in page and the Public list both need it before
+                 anyone has signed in.
+            operationId: InstanceService_GetInstance
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetInstanceResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/instance/about:
+        get:
+            tags:
+                - InstanceService
+            description: |-
+                GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
+                 Member: it is their Instance too, and none of it is anybody else's business.
+            operationId: InstanceService_GetInstanceAbout
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetInstanceAboutResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/instance/settings:
+        get:
+            tags:
+                - InstanceService
+            description: |-
+                GetInstanceSettings returns everything an Admin may change, including which List
+                 is public. Admins only: which List is published is not a fact a Visitor gets to
+                 read from the outside.
+            operationId: InstanceService_GetInstanceSettings
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetInstanceSettingsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        put:
+            tags:
+                - InstanceService
+            description: UpdateInstanceSettings replaces them. Admins only.
+            operationId: InstanceService_UpdateInstanceSettings
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateInstanceSettingsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateInstanceSettingsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/instance:delete:
+        post:
+            tags:
+                - InstanceService
+            description: |-
+                DeleteInstance empties it and returns it to first run. Admins only, and there is
+                 no undo: Nooks keeps no backup of its own.
+            operationId: InstanceService_DeleteInstance
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DeleteInstanceRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteInstanceResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/items/{itemUid}:
+        delete:
+            tags:
+                - ListService
+            description: DeleteItem removes an Item.
+            operationId: ListService_DeleteItem
+            parameters:
+                - name: itemUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteItemResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        patch:
+            tags:
+                - ListService
+            description: |-
+                UpdateItem changes an Item's label, quantity or due date. An unset field is left
+                 alone.
+            operationId: ListService_UpdateItem
+            parameters:
+                - name: itemUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateItemRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateItemResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/items/{itemUid}/done:
+        put:
+            tags:
+                - ListService
+            description: |-
+                SetItemDone ticks or unticks an Item. A tick is a tick whoever made it, so this
+                 never conflicts.
+            operationId: ListService_SetItemDone
+            parameters:
+                - name: itemUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SetItemDoneRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SetItemDoneResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/items/{itemUid}:move:
+        post:
+            tags:
+                - ListService
+            description: |-
+                MoveItem places an Item after another one, or at the top when after_item_uid is
+                 empty.
+            operationId: ListService_MoveItem
+            parameters:
+                - name: itemUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/MoveItemRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/MoveItemResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/lists:
+        get:
+            tags:
+                - ListService
+            description: |-
+                ListLists returns every List the signed-in Member can reach, with the counts the
+                 sidebar shows.
+            operationId: ListService_ListLists
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListListsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - ListService
+            description: CreateList adds a List. It starts private.
+            operationId: ListService_CreateList
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateListRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/lists/{listUid}:
+        get:
+            tags:
+                - ListService
+            description: GetList returns one List and its Items, in their manual order.
+            operationId: ListService_GetList
+            parameters:
+                - name: listUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        delete:
+            tags:
+                - ListService
+            description: DeleteList removes a List and the Items on it. Only its owner may.
+            operationId: ListService_DeleteList
+            parameters:
+                - name: listUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        patch:
+            tags:
+                - ListService
+            description: RenameList changes a List's name. Only its owner may.
+            operationId: ListService_RenameList
+            parameters:
+                - name: listUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RenameListRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RenameListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/lists/{listUid}/items:
+        post:
+            tags:
+                - ListService
+            description: CreateItem appends an Item to a List.
+            operationId: ListService_CreateItem
+            parameters:
+                - name: listUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateItemRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateItemResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/lists/{listUid}/pinned:
+        put:
+            tags:
+                - ListService
+            description: |-
+                SetListPinned pins or unpins a List in the signed-in Member's own sidebar. It
+                 never affects anyone else's.
+            operationId: ListService_SetListPinned
+            parameters:
+                - name: listUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SetListPinnedRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SetListPinnedResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/lists/{listUid}/shares:
+        get:
+            tags:
+                - ListService
+            description: GetListShares returns who a List reaches by name, for the share dialog.
+            operationId: ListService_GetListShares
+            parameters:
+                - name: listUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetListSharesResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/lists/{listUid}/sharing:
+        put:
+            tags:
+                - ListService
+            description: SetListSharing changes who can reach a List. Only its owner may.
+            operationId: ListService_SetListSharing
+            parameters:
+                - name: listUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SetListSharingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SetListSharingResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/lists/{listUid}:duplicate:
+        post:
+            tags:
+                - ListService
+            description: |-
+                DuplicateList copies a List and the Items still open on it.
+
+                 The copy starts private and starts empty of history: it is a new List that happens
+                 to begin with the same things on it, not a second view of the first.
+            operationId: ListService_DuplicateList
+            parameters:
+                - name: listUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DuplicateListRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DuplicateListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/members:
+        get:
+            tags:
+                - MemberService
+            description: ListMembers returns everyone on the Instance, by name.
+            operationId: MemberService_ListMembers
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListMembersResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        post:
+            tags:
+                - MemberService
+            description: |-
+                AddMember creates an account with a temporary password, which is read out once.
+
+                 Nooks has no mail server, so an Admin hands the password over in person or however
+                 else they already talk. The Member must replace it before anything else.
+            operationId: MemberService_AddMember
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AddMemberRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AddMemberResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/members/me:
+        patch:
+            tags:
+                - MemberService
+            description: |-
+                UpdateOwnProfile changes the signed-in Member's own name and email.
+
+                 Their own, and only their own. An Admin who wants somebody else's name changed
+                 asks them: an account is a person, and Nooks does not let one person edit another.
+            operationId: MemberService_UpdateOwnProfile
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateOwnProfileRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateOwnProfileResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/members/{memberUid}:
+        delete:
+            tags:
+                - MemberService
+            description: RemoveMember deletes an account. What they added stays on its Lists.
+            operationId: MemberService_RemoveMember
+            parameters:
+                - name: memberUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RemoveMemberResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/members/{memberUid}/role:
+        put:
+            tags:
+                - MemberService
+            description: SetMemberRole makes somebody an Admin, or stops them being one.
+            operationId: MemberService_SetMemberRole
+            parameters:
+                - name: memberUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SetMemberRoleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SetMemberRoleResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/public-list:
+        get:
+            tags:
+                - PublicService
+            description: |-
+                GetPublicList returns the published List, or nothing when there is none.
+
+                 It is the only List reachable this way: a Visitor cannot ask for another one, and
+                 cannot discover that another one exists.
+            operationId: PublicService_GetPublicList
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetPublicListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/requests:
+        get:
+            tags:
+                - RequestService
+            description: ListPendingRequests returns everything waiting for an Admin, oldest first.
+            operationId: RequestService_ListPendingRequests
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListPendingRequestsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/requests/join/{requestUid}:decide:
+        post:
+            tags:
+                - RequestService
+            description: |-
+                DecideJoinRequest approves or ignores a request for an account. Ignoring is silent
+                 and never notifies the sender.
+            operationId: RequestService_DecideJoinRequest
+            parameters:
+                - name: requestUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DecideJoinRequestRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DecideJoinRequestResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/requests/reset/{requestUid}:decide:
+        post:
+            tags:
+                - RequestService
+            description: |-
+                DecideResetRequest approves or ignores a request to replace a password. An
+                 approval expires in an hour.
+            operationId: RequestService_DecideResetRequest
+            parameters:
+                - name: requestUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DecideResetRequestRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DecideResetRequestResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/search:
+        get:
+            tags:
+                - ListService
+            description: |-
+                Search finds Lists and Items by what a Member wrote in them. It is what ⌘K reads.
+                 Results narrow while they are still typing, and never include anything they could
+                 not already open.
+            operationId: ListService_Search
+            parameters:
+                - name: query
+                  in: query
+                  description: What the Member typed. The last word is treated as a prefix.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SearchResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        AccessToken:
+            type: object
+            properties:
+                uid:
+                    type: string
+                name:
+                    type: string
+                    description: 'What it is for, in the Member''s words: "kitchen tablet".'
+                abilities:
+                    $ref: '#/components/schemas/TokenAbilities'
+                listNames:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        The Lists it may reach, by name. A List it does not name is invisible to it.
+                         Empty when all_lists is set, because then there is no list to name.
+                allLists:
+                    type: boolean
+                    description: True when it reaches every List its Member can, including ones made later.
+                expiresAt:
+                    type: string
+                    description: RFC 3339, or empty for a token that does not expire.
+                lastUsedAt:
+                    type: string
+                    description: RFC 3339, or empty for one nothing has used yet.
+                createdAt:
+                    type: string
+                memberName:
+                    type: string
+                    description: |-
+                        Whose it is. Shown to an Admin, who can see that somebody else's token exists
+                         without being able to read or use it.
+            description: AccessToken is a key, described. Never the key itself.
+        Activity:
+            type: object
+            properties:
+                uid:
+                    type: string
+                kind:
+                    enum:
+                        - ACTIVITY_KIND_UNSPECIFIED
+                        - ACTIVITY_KIND_JOIN_REQUEST
+                        - ACTIVITY_KIND_RESET_REQUEST
+                        - ACTIVITY_KIND_LIST_SHARED
+                        - ACTIVITY_KIND_CONFLICT
+                        - ACTIVITY_KIND_TOKEN_USED
+                    type: string
+                    format: enum
+                text:
+                    type: string
+                    description: |-
+                        What it says, in words. Written when the entry is made, so the panel never has to
+                         reconstruct what happened.
+                targetUid:
+                    type: string
+                    description: 'What it points at: a request, a List, or nothing.'
+                createdAt:
+                    type: string
+                    description: When it happened, RFC 3339.
+                unread:
+                    type: boolean
+                outcome:
+                    enum:
+                        - ACTIVITY_OUTCOME_UNSPECIFIED
+                        - ACTIVITY_OUTCOME_APPROVED
+                        - ACTIVITY_OUTCOME_IGNORED
+                    type: string
+                    description: What became of a request, once an Admin decided. Unspecified until one has.
+                    format: enum
+            description: Activity is one thing waiting for attention.
+        AddMemberRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                email:
+                    type: string
+        AddMemberResponse:
+            type: object
+            properties:
+                member:
+                    $ref: '#/components/schemas/Member'
+                temporaryPassword:
+                    type: string
+                    description: |-
+                        The temporary password, in clear, shown once and never again. Nooks does not keep
+                         it: what is stored is a hash, and this is the only time it can be read.
+        CreateAccessTokenRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                abilities:
+                    $ref: '#/components/schemas/TokenAbilities'
+                listUids:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        The Lists it may reach. A token that names none reaches none, unless all_lists is
+                         set instead.
+                allLists:
+                    type: boolean
+                    description: |-
+                        Reach every List the Member can, including ones made later. Not the same as naming
+                         them all: that would stop at the Lists that exist today.
+                expiresAt:
+                    type: string
+                    description: RFC 3339, or empty for a token that does not expire.
+        CreateAccessTokenResponse:
+            type: object
+            properties:
+                token:
+                    $ref: '#/components/schemas/AccessToken'
+                secret:
+                    type: string
+                    description: The secret, in clear, shown once and never again. Nooks keeps only a hash.
+        CreateGroupRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                memberUids:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        Who is in it from the start. A Group is made in order to share with the people in
+                         it, so naming it and filling it is one decision, not two.
+        CreateGroupResponse:
+            type: object
+            properties:
+                group:
+                    $ref: '#/components/schemas/Group'
+        CreateItemRequest:
+            type: object
+            properties:
+                listUid:
+                    type: string
+                label:
+                    type: string
+                quantity:
+                    type: string
+                dueOn:
+                    type: string
+        CreateItemResponse:
+            type: object
+            properties:
+                item:
+                    $ref: '#/components/schemas/Item'
+        CreateListRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+        CreateListResponse:
+            type: object
+            properties:
+                list:
+                    $ref: '#/components/schemas/List'
+        DatedItem:
+            type: object
+            properties:
+                item:
+                    $ref: '#/components/schemas/Item'
+                listUid:
+                    type: string
+                listName:
+                    type: string
+            description: DatedItem is an Item with enough of its List to render a row away from it.
+        DecideJoinRequestRequest:
+            type: object
+            properties:
+                requestUid:
+                    type: string
+                approve:
+                    type: boolean
+                    description: 'False ignores the request: it disappears silently and the sender is never told.'
+        DecideJoinRequestResponse:
+            type: object
+            properties: {}
+        DecideResetRequestRequest:
+            type: object
+            properties:
+                requestUid:
+                    type: string
+                approve:
+                    type: boolean
+        DecideResetRequestResponse:
+            type: object
+            properties: {}
+        DeleteInstanceRequest:
+            type: object
+            properties:
+                password:
+                    type: string
+                    description: |-
+                        The Admin's own password. An unattended browser is the realistic way this happens
+                         by accident, and a name can be read off the screen in front of you.
+                instanceName:
+                    type: string
+                    description: |-
+                        The Instance's name, typed out, so that whoever is doing this has read what they
+                         are about to lose.
+        DeleteInstanceResponse:
+            type: object
+            properties: {}
+        DeleteItemResponse:
+            type: object
+            properties: {}
+        DeleteListResponse:
+            type: object
+            properties: {}
+        DuplicateListRequest:
+            type: object
+            properties:
+                listUid:
+                    type: string
+        DuplicateListResponse:
+            type: object
+            properties:
+                list:
+                    $ref: '#/components/schemas/List'
+        GetCurrentMemberResponse:
+            type: object
+            properties:
+                member:
+                    $ref: '#/components/schemas/Member'
+        GetInstanceAboutResponse:
+            type: object
+            properties:
+                version:
+                    type: string
+                    description: The build that is running, e.g. "1.0.2".
+                startedAt:
+                    type: string
+                    description: When first run finished, RFC 3339. How long the Instance has been going.
+                memberCount:
+                    type: integer
+                    format: int32
+                listCount:
+                    type: integer
+                    format: int32
+                itemCount:
+                    type: integer
+                    format: int32
+                storageBytes:
+                    type: string
+                    description: |-
+                        How much room the database is taking, or zero where the driver cannot say. Zero
+                         renders as nothing: a wrong number about somebody's disk is worse than no number.
+                licence:
+                    type: string
+                    description: The licence this build is under, e.g. "AGPL-3.0".
+                storageDriver:
+                    type: string
+                    description: What is holding the data, e.g. "sqlite". Shown beside the size.
+                instanceName:
+                    type: string
+                    description: What the Instance calls itself, so About can be read without a second request.
+        GetInstanceResponse:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: |-
+                        The mutable display label chosen at first run, e.g. "Brunnen Street". Empty
+                         until first run completes.
+                version:
+                    type: string
+                    description: The build of Nooks that is running, e.g. "1.0.2".
+                needsSetup:
+                    type: boolean
+                    description: True until the first Admin exists. The app shows first run rather than sign in.
+                publicSignup:
+                    type: boolean
+                    description: When false, every account starts as a join request an Admin approves.
+                defaultLocale:
+                    type: string
+                    description: |-
+                        The language a Visitor reads this Instance in. Reachable without authentication
+                         because the public page needs it before anybody has signed in.
+        GetInstanceSettingsResponse:
+            type: object
+            properties:
+                settings:
+                    $ref: '#/components/schemas/InstanceSettings'
+        GetJoinRequestResponse:
+            type: object
+            properties:
+                status:
+                    enum:
+                        - REQUEST_STATUS_UNSPECIFIED
+                        - REQUEST_STATUS_PENDING
+                        - REQUEST_STATUS_APPROVED
+                        - REQUEST_STATUS_IGNORED
+                    type: string
+                    format: enum
+                name:
+                    type: string
+                    description: Carried back so the Visitor does not retype them. Empty unless approved.
+                email:
+                    type: string
+        GetListResponse:
+            type: object
+            properties:
+                list:
+                    $ref: '#/components/schemas/List'
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Item'
+        GetListSharesResponse:
+            type: object
+            properties:
+                memberUids:
+                    type: array
+                    items:
+                        type: string
+                groupUids:
+                    type: array
+                    items:
+                        type: string
+        GetPublicListResponse:
+            type: object
+            properties:
+                published:
+                    type: boolean
+                    description: False when nothing is published. Everything else is then empty.
+                instanceName:
+                    type: string
+                    description: What the Instance calls itself, for the page's own heading.
+                listName:
+                    type: string
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PublicItem'
+                allowJoin:
+                    type: boolean
+                    description: Whether a Visitor may ask for an account from this page.
+                openCount:
+                    type: integer
+                    description: |-
+                        How many Items are still open. The page leads with this: a shopper wants the number
+                         of things left, not the length of the list.
+                    format: int32
+                updatedAt:
+                    type: string
+                    description: |-
+                        When the List last changed, RFC 3339. A page somebody keeps open on the way to the
+                         shop has to say how fresh it is.
+        GetResetRequestResponse:
+            type: object
+            properties:
+                status:
+                    enum:
+                        - REQUEST_STATUS_UNSPECIFIED
+                        - REQUEST_STATUS_PENDING
+                        - REQUEST_STATUS_APPROVED
+                        - REQUEST_STATUS_IGNORED
+                    type: string
+                    format: enum
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        Group:
+            type: object
+            properties:
+                uid:
+                    type: string
+                name:
+                    type: string
+                members:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Member'
+                    description: 'Who is in it, in the order they read: the dialog shows names, not counts.'
+                listNames:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        The Lists this Group reaches, by name. A Group is only ever a shortcut for
+                         sharing, so what it reaches is the whole of what it does.
+            description: Group is a named set of Members.
+        InstanceSettings:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: What the Instance calls itself, e.g. "Brunnen Street".
+                publicSignup:
+                    type: boolean
+                    description: When false, every account starts as a join request an Admin approves.
+                publicList:
+                    $ref: '#/components/schemas/PublicListSettings'
+                defaultLocale:
+                    type: string
+                    description: |-
+                        The language of anything nobody chose a language for: the public page, a printed
+                         sheet, and a Member who has not picked one. Empty means English.
+        Item:
+            type: object
+            properties:
+                uid:
+                    type: string
+                label:
+                    type: string
+                quantity:
+                    type: string
+                    description: Free text — "2", "1 kg" — never a number.
+                dueOn:
+                    type: string
+                    description: 'A date, not a time: YYYY-MM-DD, or empty for an Item with no due date.'
+                done:
+                    type: boolean
+                addedByName:
+                    type: string
+                    description: Who put it on the List, shown at the right of the row.
+                doneByName:
+                    type: string
+                    description: Who ticked it, when anyone has.
+                doneAt:
+                    type: string
+                    description: |-
+                        When it was ticked, RFC 3339, or empty. A tick that has just landed is held for a
+                         second before it settles, and this is how a reader knows it just landed.
+                doneByUid:
+                    type: string
+                    description: |-
+                        Who ticked it, as an identifier. A reader compares it with their own, because a
+                         tick of your own is not news.
+                note:
+                    type: string
+                    description: The Note attached to the Item, as markdown. Empty when there is none.
+                noteFirstLine:
+                    type: string
+                    description: |-
+                        The Note's own first line, for the row. Nooks never summarises a Member, so this
+                         is what they wrote rather than anything generated.
+                noteRemainingLines:
+                    type: integer
+                    description: How many further lines the Note has, for the "+N lines" after the first.
+                    format: int32
+                addedViaToken:
+                    type: string
+                    description: |-
+                        The Access token it came through, by name, or empty when a browser added it. The
+                         Member in added_by_name is still the one who did it: a token is somebody's access
+                         narrowed, never an identity of its own.
+            description: Item is one line on a List.
+        List:
+            type: object
+            properties:
+                uid:
+                    type: string
+                name:
+                    type: string
+                sharing:
+                    enum:
+                        - SHARING_UNSPECIFIED
+                        - SHARING_PRIVATE
+                        - SHARING_INSTANCE
+                        - SHARING_SPECIFIC
+                    type: string
+                    format: enum
+                canEdit:
+                    type: boolean
+                    description: False means whoever it is shared with may see and print it, but not tick or add.
+                isOwner:
+                    type: boolean
+                    description: Whether the signed-in Member owns it. Only an owner may rename, share or delete.
+                isPinned:
+                    type: boolean
+                    description: Whether the signed-in Member has pinned it to their own sidebar.
+                openCount:
+                    type: integer
+                    description: How many Items are not yet ticked. The number beside the name in the sidebar.
+                    format: int32
+            description: List is a named, ordered collection of Items.
+        ListAccessTokensResponse:
+            type: object
+            properties:
+                tokens:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/AccessToken'
+        ListActivityResponse:
+            type: object
+            properties:
+                activity:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Activity'
+                unreadCount:
+                    type: integer
+                    description: How many are still unread — the dot on the Activity control.
+                    format: int32
+        ListDatedItemsResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/DatedItem'
+        ListGroupsResponse:
+            type: object
+            properties:
+                groups:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Group'
+        ListListsResponse:
+            type: object
+            properties:
+                lists:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/List'
+        ListMembersResponse:
+            type: object
+            properties:
+                members:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Member'
+        ListPendingRequestsResponse:
+            type: object
+            properties:
+                joinRequests:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PendingJoinRequest'
+                resetRequests:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PendingResetRequest'
+        MarkActivityReadRequest:
+            type: object
+            properties: {}
+        MarkActivityReadResponse:
+            type: object
+            properties: {}
+        Member:
+            type: object
+            properties:
+                uid:
+                    type: string
+                    description: The public identifier used in resource names and URLs.
+                name:
+                    type: string
+                    description: How the Member appears on Items they add.
+                email:
+                    type: string
+                    description: Used to sign in. Nooks never sends mail to it.
+                role:
+                    enum:
+                        - ROLE_UNSPECIFIED
+                        - ROLE_ADMIN
+                        - ROLE_MEMBER
+                    type: string
+                    format: enum
+                mustChangePassword:
+                    type: boolean
+                    description: |-
+                        True while an Admin-set temporary password has not been replaced. The app must
+                         send the Member to replace it before anything else.
+                createdAt:
+                    type: string
+                    description: When the account was created, RFC 3339.
+                lastSignedInAt:
+                    type: string
+                    description: |-
+                        When they last signed in, RFC 3339, or empty for somebody who never has. The
+                         Members table greys the name of a Member who has not arrived yet — the account is
+                         real, the person has simply not used it.
+            description: |-
+                Member is a person with an account on this Instance, as seen over the wire. It
+                 never carries a password or a hash.
+        MoveItemRequest:
+            type: object
+            properties:
+                itemUid:
+                    type: string
+                afterItemUid:
+                    type: string
+                    description: The Item to place it after. Empty puts it at the top.
+        MoveItemResponse:
+            type: object
+            properties: {}
+        PendingJoinRequest:
+            type: object
+            properties:
+                requestUid:
+                    type: string
+                name:
+                    type: string
+                email:
+                    type: string
+                message:
+                    type: string
+                    description: |-
+                        Anything they added, e.g. "It's Til, from upstairs". May be empty, and an empty one
+                         is worth an Admin's suspicion.
+                createdAt:
+                    type: string
+                    description: When they asked, RFC 3339.
+            description: PendingJoinRequest is somebody asking for an account.
+        PendingResetRequest:
+            type: object
+            properties:
+                requestUid:
+                    type: string
+                member:
+                    allOf:
+                        - $ref: '#/components/schemas/Member'
+                    description: Who is asking. An Admin has to recognise them to check it is really them.
+                createdAt:
+                    type: string
+            description: PendingResetRequest is a Member asking to replace a forgotten password.
+        PublicItem:
+            type: object
+            properties:
+                label:
+                    type: string
+                done:
+                    type: boolean
+                uid:
+                    type: string
+                    description: |-
+                        The Item's identifier.
+
+                         Not a secret and not a capability: every call still checks who is asking. It is
+                         here so that a tick a Visitor reached for before signing in can be applied to the
+                         right Item afterwards, rather than guessed at by matching text.
+                quantity:
+                    type: string
+                    description: Empty unless the Instance shows quantities and dates.
+                dueOn:
+                    type: string
+                addedByName:
+                    type: string
+                    description: Empty unless the Instance shows contributor names.
+            description: |-
+                PublicItem is one line of the public page.
+
+                 Deliberately not an Item: a Visitor is shown what needs doing, not who is in the
+                 household. Fields the settings turn off are absent rather than blank, so there is
+                 nothing to leak by rendering them.
+        PublicListSettings:
+            type: object
+            properties:
+                listUid:
+                    type: string
+                    description: The List on the page, or empty for no public page at all.
+                showNames:
+                    type: boolean
+                    description: |-
+                        Contributor names on the rows. Off by default: a public page is about what needs
+                         buying, not about who is in the household.
+                showMeta:
+                    type: boolean
+                    description: Quantities and dates on the rows — the metadata a shopper actually needs.
+                allowJoin:
+                    type: boolean
+                    description: A quiet link at the foot of the page for a Visitor to ask for an account.
+            description: PublicListSettings is the Instance's one public page, and what a Visitor sees of it.
+        RemoveMemberResponse:
+            type: object
+            properties: {}
+        RenameListRequest:
+            type: object
+            properties:
+                listUid:
+                    type: string
+                name:
+                    type: string
+        RenameListResponse:
+            type: object
+            properties:
+                list:
+                    $ref: '#/components/schemas/List'
+        RequestJoinRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                email:
+                    type: string
+                message:
+                    type: string
+                    description: Anything the Visitor wants to add, e.g. "It's Til, from upstairs". Optional.
+        RequestJoinResponse:
+            type: object
+            properties:
+                requestUid:
+                    type: string
+                    description: The identifier the Visitor's browser remembers so it can check back.
+        RequestPasswordResetRequest:
+            type: object
+            properties:
+                emailOrName:
+                    type: string
+                    description: An email or a name — whatever the Member remembers.
+        RequestPasswordResetResponse:
+            type: object
+            properties:
+                requestUid:
+                    type: string
+        RevokeAccessTokenResponse:
+            type: object
+            properties: {}
+        SearchHit:
+            type: object
+            properties:
+                kind:
+                    enum:
+                        - SEARCH_HIT_KIND_UNSPECIFIED
+                        - SEARCH_HIT_KIND_LIST
+                        - SEARCH_HIT_KIND_ITEM
+                        - SEARCH_HIT_KIND_NOTE
+                    type: string
+                    format: enum
+                listUid:
+                    type: string
+                    description: 'What to open: the List itself, or the List the Item sits on.'
+                itemUid:
+                    type: string
+                    description: The Item, when the hit is one.
+                text:
+                    type: string
+                    description: The matched text, for showing the result.
+                listName:
+                    type: string
+                    description: The name of the List the hit belongs to, so a result reads in context.
+            description: SearchHit is one match.
+        SearchResponse:
+            type: object
+            properties:
+                hits:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SearchHit'
+        SetGroupMembersRequest:
+            type: object
+            properties:
+                groupUid:
+                    type: string
+                memberUids:
+                    type: array
+                    items:
+                        type: string
+        SetGroupMembersResponse:
+            type: object
+            properties:
+                group:
+                    $ref: '#/components/schemas/Group'
+        SetItemDoneRequest:
+            type: object
+            properties:
+                itemUid:
+                    type: string
+                done:
+                    type: boolean
+        SetItemDoneResponse:
+            type: object
+            properties:
+                item:
+                    $ref: '#/components/schemas/Item'
+        SetListPinnedRequest:
+            type: object
+            properties:
+                listUid:
+                    type: string
+                pinned:
+                    type: boolean
+        SetListPinnedResponse:
+            type: object
+            properties: {}
+        SetListSharingRequest:
+            type: object
+            properties:
+                listUid:
+                    type: string
+                sharing:
+                    enum:
+                        - SHARING_UNSPECIFIED
+                        - SHARING_PRIVATE
+                        - SHARING_INSTANCE
+                        - SHARING_SPECIFIC
+                    type: string
+                    format: enum
+                canEdit:
+                    type: boolean
+                memberUids:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        Who it reaches by name, for SHARING_SPECIFIC. Sharing is one decision, not a
+                         sequence of additions: these replace whatever was there, and both are ignored for
+                         any other kind of sharing.
+                groupUids:
+                    type: array
+                    items:
+                        type: string
+        SetListSharingResponse:
+            type: object
+            properties:
+                list:
+                    $ref: '#/components/schemas/List'
+        SetMemberRoleRequest:
+            type: object
+            properties:
+                memberUid:
+                    type: string
+                role:
+                    enum:
+                        - ROLE_UNSPECIFIED
+                        - ROLE_ADMIN
+                        - ROLE_MEMBER
+                    type: string
+                    format: enum
+        SetMemberRoleResponse:
+            type: object
+            properties:
+                member:
+                    $ref: '#/components/schemas/Member'
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        TokenAbilities:
+            type: object
+            properties:
+                read:
+                    type: boolean
+                    description: |-
+                        See lists and items: titles, quantities, dates and notes on the lists it names.
+                         Has to be on unless write is: a token that reads nothing opens nothing.
+                write:
+                    type: boolean
+                    description: Add, tick off and edit. Every change is attributed to the token in list history.
+                delete:
+                    type: boolean
+                    description: |-
+                        Delete items and lists. Off unless it was asked for — most callers never need it,
+                         and it is the one that cannot be undone.
+            description: |-
+                TokenAbilities is what a token may do — three answers, not one level.
+
+                 A level forces an order the real question does not have: a recipe importer reads and
+                 never writes, a shopping shortcut writes and should never delete.
+        UpdateInstanceSettingsRequest:
+            type: object
+            properties:
+                settings:
+                    $ref: '#/components/schemas/InstanceSettings'
+        UpdateInstanceSettingsResponse:
+            type: object
+            properties:
+                settings:
+                    $ref: '#/components/schemas/InstanceSettings'
+        UpdateItemRequest:
+            type: object
+            properties:
+                itemUid:
+                    type: string
+                label:
+                    type: string
+                    description: |-
+                        Each field is optional: an unset one is left alone, so changing a quantity does not
+                         have to restate the label.
+                quantity:
+                    type: string
+                dueOn:
+                    type: string
+                note:
+                    type: string
+                    description: The Note, as markdown. Sending an empty string removes it.
+        UpdateItemResponse:
+            type: object
+            properties:
+                item:
+                    $ref: '#/components/schemas/Item'
+        UpdateOwnProfileRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                email:
+                    type: string
+                    description: |-
+                        Used to sign in, so it has to stay unique on the Instance. Nooks never sends mail
+                         to it, and changing it takes effect on the next sign-in like any other.
+        UpdateOwnProfileResponse:
+            type: object
+            properties:
+                member:
+                    $ref: '#/components/schemas/Member'
+tags:
+    - name: ActivityService
+      description: |-
+        ActivityService is everything waiting for one Member's attention.
+
+         Nooks has no mail server, so this panel is the only place any of it surfaces. That is
+         why an entry carries its own words rather than a code the reader has to interpret.
+    - name: AuthService
+      description: |-
+        AuthService covers getting into a Nooks Instance: first run, signing in, signing
+         out, and replacing a temporary password.
+
+         Nooks sends no email, so there is no emailed reset link here. A forgotten password
+         becomes a Reset request an Admin approves in Activity.
+    - name: InstanceService
+      description: InstanceService reports what this copy of Nooks is and how it is configured.
+    - name: ListService
+      description: |-
+        ListService covers Lists and the Items on them — the whole of Nooks, really.
+         Everything else is a view over these.
+    - name: MemberService
+      description: |-
+        MemberService covers who is here and how they are grouped.
+
+         A Group carries no permissions of its own: it is a shortcut for sharing, so that
+         "the flatmates" is one thing to pick rather than three.
+    - name: PublicService
+      description: |-
+        PublicService is the one page an Instance can put in front of somebody with no
+         account.
+
+         Everything here is reachable without signing in, which is the whole point — and why
+         it is a service of its own rather than a flag on another one. A method that answers
+         anonymously should be impossible to add by accident.
+    - name: RequestService
+      description: |-
+        RequestService is the Admin's side of the two things that would be emails elsewhere:
+         somebody asking for an account, and somebody asking to replace a forgotten password.
+
+         Every method here requires an Admin. Nooks has no mail server, so these requests wait
+         in the Instance until an Admin acts on them.
+    - name: TokenService
+      description: |-
+        TokenService covers the keys a Member cuts for things that are not browsers.
+
+         A token can never do more than the Member it belongs to. That is why there is no way
+         here to make one in somebody else's name, and no way to read one back: an Admin who
+         needs a token makes their own.

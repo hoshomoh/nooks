@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package nooks.api.v1;
 
+import "google/api/annotations.proto";
 import "nooks/api/v1/auth_service.proto";
 
 // RequestService is the Admin's side of the two things that would be emails elsewhere:
@@ -11,15 +12,27 @@ import "nooks/api/v1/auth_service.proto";
 // in the Instance until an Admin acts on them.
 service RequestService {
   // ListPendingRequests returns everything waiting for an Admin, oldest first.
-  rpc ListPendingRequests(ListPendingRequestsRequest) returns (ListPendingRequestsResponse);
+  rpc ListPendingRequests(ListPendingRequestsRequest) returns (ListPendingRequestsResponse) {
+    option (google.api.http) = {get: "/api/v1/requests"};
+  }
 
   // DecideJoinRequest approves or ignores a request for an account. Ignoring is silent
   // and never notifies the sender.
-  rpc DecideJoinRequest(DecideJoinRequestRequest) returns (DecideJoinRequestResponse);
+  rpc DecideJoinRequest(DecideJoinRequestRequest) returns (DecideJoinRequestResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/requests/join/{request_uid}:decide"
+      body: "*"
+    };
+  }
 
   // DecideResetRequest approves or ignores a request to replace a password. An
   // approval expires in an hour.
-  rpc DecideResetRequest(DecideResetRequestRequest) returns (DecideResetRequestResponse);
+  rpc DecideResetRequest(DecideResetRequestRequest) returns (DecideResetRequestResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/requests/reset/{request_uid}:decide"
+      body: "*"
+    };
+  }
 }
 
 // PendingJoinRequest is somebody asking for an account.

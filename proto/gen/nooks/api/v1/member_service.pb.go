@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -831,7 +832,7 @@ var File_nooks_api_v1_member_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_member_service_proto_rawDesc = "" +
 	"\n" +
-	"!nooks/api/v1/member_service.proto\x12\fnooks.api.v1\x1a\x1fnooks/api/v1/auth_service.proto\"|\n" +
+	"!nooks/api/v1/member_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fnooks/api/v1/auth_service.proto\"|\n" +
 	"\x05Group\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12.\n" +
@@ -876,17 +877,17 @@ const file_nooks_api_v1_member_service_proto_rawDesc = "" +
 	"\x13RemoveMemberRequest\x12\x1d\n" +
 	"\n" +
 	"member_uid\x18\x01 \x01(\tR\tmemberUid\"\x16\n" +
-	"\x14RemoveMemberResponse2\xca\x05\n" +
-	"\rMemberService\x12R\n" +
-	"\vListMembers\x12 .nooks.api.v1.ListMembersRequest\x1a!.nooks.api.v1.ListMembersResponse\x12O\n" +
+	"\x14RemoveMemberResponse2\xd7\a\n" +
+	"\rMemberService\x12k\n" +
+	"\vListMembers\x12 .nooks.api.v1.ListMembersRequest\x1a!.nooks.api.v1.ListMembersResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/members\x12g\n" +
 	"\n" +
-	"ListGroups\x12\x1f.nooks.api.v1.ListGroupsRequest\x1a .nooks.api.v1.ListGroupsResponse\x12R\n" +
-	"\vCreateGroup\x12 .nooks.api.v1.CreateGroupRequest\x1a!.nooks.api.v1.CreateGroupResponse\x12^\n" +
-	"\x0fSetGroupMembers\x12$.nooks.api.v1.SetGroupMembersRequest\x1a%.nooks.api.v1.SetGroupMembersResponse\x12L\n" +
-	"\tAddMember\x12\x1e.nooks.api.v1.AddMemberRequest\x1a\x1f.nooks.api.v1.AddMemberResponse\x12X\n" +
-	"\rSetMemberRole\x12\".nooks.api.v1.SetMemberRoleRequest\x1a#.nooks.api.v1.SetMemberRoleResponse\x12U\n" +
-	"\fRemoveMember\x12!.nooks.api.v1.RemoveMemberRequest\x1a\".nooks.api.v1.RemoveMemberResponse\x12a\n" +
-	"\x10UpdateOwnProfile\x12%.nooks.api.v1.UpdateOwnProfileRequest\x1a&.nooks.api.v1.UpdateOwnProfileResponseB\xb0\x01\n" +
+	"ListGroups\x12\x1f.nooks.api.v1.ListGroupsRequest\x1a .nooks.api.v1.ListGroupsResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/api/v1/groups\x12m\n" +
+	"\vCreateGroup\x12 .nooks.api.v1.CreateGroupRequest\x1a!.nooks.api.v1.CreateGroupResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/api/v1/groups\x12\x8d\x01\n" +
+	"\x0fSetGroupMembers\x12$.nooks.api.v1.SetGroupMembersRequest\x1a%.nooks.api.v1.SetGroupMembersResponse\"-\x82\xd3\xe4\x93\x02':\x01*\x1a\"/api/v1/groups/{group_uid}/members\x12h\n" +
+	"\tAddMember\x12\x1e.nooks.api.v1.AddMemberRequest\x1a\x1f.nooks.api.v1.AddMemberResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/api/v1/members\x12\x86\x01\n" +
+	"\rSetMemberRole\x12\".nooks.api.v1.SetMemberRoleRequest\x1a#.nooks.api.v1.SetMemberRoleResponse\",\x82\xd3\xe4\x93\x02&:\x01*\x1a!/api/v1/members/{member_uid}/role\x12{\n" +
+	"\fRemoveMember\x12!.nooks.api.v1.RemoveMemberRequest\x1a\".nooks.api.v1.RemoveMemberResponse\"$\x82\xd3\xe4\x93\x02\x1e*\x1c/api/v1/members/{member_uid}\x12\x80\x01\n" +
+	"\x10UpdateOwnProfile\x12%.nooks.api.v1.UpdateOwnProfileRequest\x1a&.nooks.api.v1.UpdateOwnProfileResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*2\x12/api/v1/members/meB\xb0\x01\n" +
 	"\x10com.nooks.api.v1B\x12MemberServiceProtoP\x01Z6github.com/hoshomoh/nooks/proto/gen/nooks/api/v1;apiv1\xa2\x02\x03NAX\xaa\x02\fNooks.Api.V1\xca\x02\fNooks\\Api\\V1\xe2\x02\x18Nooks\\Api\\V1\\GPBMetadata\xea\x02\x0eNooks::Api::V1b\x06proto3"
 
 var (

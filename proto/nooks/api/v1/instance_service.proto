@@ -2,28 +2,46 @@ syntax = "proto3";
 
 package nooks.api.v1;
 
+import "google/api/annotations.proto";
+
 // InstanceService reports what this copy of Nooks is and how it is configured.
 service InstanceService {
   // GetInstance returns the public profile of this Instance. It is reachable without
   // authentication because the sign-in page and the Public list both need it before
   // anyone has signed in.
-  rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse);
+  rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse) {
+    option (google.api.http) = {get: "/api/v1/instance"};
+  }
 
   // GetInstanceSettings returns everything an Admin may change, including which List
   // is public. Admins only: which List is published is not a fact a Visitor gets to
   // read from the outside.
-  rpc GetInstanceSettings(GetInstanceSettingsRequest) returns (GetInstanceSettingsResponse);
+  rpc GetInstanceSettings(GetInstanceSettingsRequest) returns (GetInstanceSettingsResponse) {
+    option (google.api.http) = {get: "/api/v1/instance/settings"};
+  }
 
   // UpdateInstanceSettings replaces them. Admins only.
-  rpc UpdateInstanceSettings(UpdateInstanceSettingsRequest) returns (UpdateInstanceSettingsResponse);
+  rpc UpdateInstanceSettings(UpdateInstanceSettingsRequest) returns (UpdateInstanceSettingsResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/instance/settings"
+      body: "*"
+    };
+  }
 
   // GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
   // Member: it is their Instance too, and none of it is anybody else's business.
-  rpc GetInstanceAbout(GetInstanceAboutRequest) returns (GetInstanceAboutResponse);
+  rpc GetInstanceAbout(GetInstanceAboutRequest) returns (GetInstanceAboutResponse) {
+    option (google.api.http) = {get: "/api/v1/instance/about"};
+  }
 
   // DeleteInstance empties it and returns it to first run. Admins only, and there is
   // no undo: Nooks keeps no backup of its own.
-  rpc DeleteInstance(DeleteInstanceRequest) returns (DeleteInstanceResponse);
+  rpc DeleteInstance(DeleteInstanceRequest) returns (DeleteInstanceResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/instance:delete"
+      body: "*"
+    };
+  }
 }
 
 message DeleteInstanceRequest {

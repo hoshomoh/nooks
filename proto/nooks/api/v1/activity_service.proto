@@ -2,16 +2,25 @@ syntax = "proto3";
 
 package nooks.api.v1;
 
+import "google/api/annotations.proto";
+
 // ActivityService is everything waiting for one Member's attention.
 //
 // Nooks has no mail server, so this panel is the only place any of it surfaces. That is
 // why an entry carries its own words rather than a code the reader has to interpret.
 service ActivityService {
   // ListActivity returns what is waiting, newest first.
-  rpc ListActivity(ListActivityRequest) returns (ListActivityResponse);
+  rpc ListActivity(ListActivityRequest) returns (ListActivityResponse) {
+    option (google.api.http) = {get: "/api/v1/activity"};
+  }
 
   // MarkActivityRead marks everything the Member has now seen.
-  rpc MarkActivityRead(MarkActivityReadRequest) returns (MarkActivityReadResponse);
+  rpc MarkActivityRead(MarkActivityReadRequest) returns (MarkActivityReadResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/activity:markRead"
+      body: "*"
+    };
+  }
 }
 
 // ActivityKind says what an entry is about.

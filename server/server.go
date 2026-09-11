@@ -20,6 +20,7 @@ import (
 	v1 "github.com/hoshomoh/nooks/server/router/api/v1"
 	"github.com/hoshomoh/nooks/server/router/backup"
 	"github.com/hoshomoh/nooks/server/router/frontend"
+	"github.com/hoshomoh/nooks/server/router/gateway"
 	"github.com/hoshomoh/nooks/server/router/live"
 	"github.com/hoshomoh/nooks/store"
 )
@@ -81,20 +82,39 @@ func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
 		Secure: cfg.SecureCookies,
 	}).WithAnnouncer(publisher)
 
+	// Built once and served twice: the browser reaches them over Connect, a script or an
+	// alternative client over REST. One instance of each, so the two surfaces cannot
+	// drift into behaving differently.
+	services := gateway.Services{
+		Activity: v1.NewActivityService(s, nil),
+		Auth:     authService,
+		Instance: v1.NewInstanceService(s),
+		List:     v1.NewListService(s, nil, nil).WithAnnouncer(publisher),
+		Member:   v1.NewMemberService(s, nil, nil),
+		Public:   v1.NewPublicService(s),
+		Request:  v1.NewRequestService(s, nil),
+		Token:    v1.NewTokenService(s, nil, nil, nil).WithActivity(tokenActivity),
+	}
+
 	mux := http.NewServeMux()
-	mux.Handle(apiv1.NewInstanceServiceHandler(v1.NewInstanceService(s), interceptors))
-	mux.Handle(apiv1.NewAuthServiceHandler(authService, interceptors))
-	mux.Handle(apiv1.NewRequestServiceHandler(v1.NewRequestService(s, nil), interceptors))
-	mux.Handle(apiv1.NewListServiceHandler(
-		v1.NewListService(s, nil, nil).WithAnnouncer(publisher), interceptors,
-	))
-	mux.Handle(apiv1.NewMemberServiceHandler(v1.NewMemberService(s, nil, nil), interceptors))
-	mux.Handle(apiv1.NewActivityServiceHandler(v1.NewActivityService(s, nil), interceptors))
-	mux.Handle(apiv1.NewPublicServiceHandler(v1.NewPublicService(s), interceptors))
-	mux.Handle(apiv1.NewTokenServiceHandler(
-		v1.NewTokenService(s, nil, nil, nil).WithActivity(tokenActivity), interceptors,
-	))
+	mux.Handle(apiv1.NewInstanceServiceHandler(services.Instance, interceptors))
+	mux.Handle(apiv1.NewAuthServiceHandler(services.Auth, interceptors))
+	mux.Handle(apiv1.NewRequestServiceHandler(services.Request, interceptors))
+	mux.Handle(apiv1.NewListServiceHandler(services.List, interceptors))
+	mux.Handle(apiv1.NewMemberServiceHandler(services.Member, interceptors))
+	mux.Handle(apiv1.NewActivityServiceHandler(services.Activity, interceptors))
+	mux.Handle(apiv1.NewPublicServiceHandler(services.Public, interceptors))
+	mux.Handle(apiv1.NewTokenServiceHandler(services.Token, interceptors))
 	mux.Handle("GET /api/v1/events", live.NewHandler(s, broker, resolver))
+	// The REST API, generated from the same protos the app is built against. Mounted
+	// under its own prefix so the Connect routes, the event stream and the backup
+	// download keep theirs.
+	rest, err := gateway.New(services, resolver)
+	if err != nil {
+		return nil, fmt.Errorf("build the rest api: %w", err)
+	}
+	mux.Handle("/api/v1/", rest)
+
 	mux.Handle("GET /api/v1/backup", backup.NewHandler(s, resolver, nil))
 	mux.HandleFunc("GET /healthz", handleHealthz)
 

@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -505,7 +506,7 @@ var File_nooks_api_v1_token_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_token_service_proto_rawDesc = "" +
 	"\n" +
-	" nooks/api/v1/token_service.proto\x12\fnooks.api.v1\"R\n" +
+	" nooks/api/v1/token_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\"R\n" +
 	"\x0eTokenAbilities\x12\x12\n" +
 	"\x04read\x18\x01 \x01(\bR\x04read\x12\x14\n" +
 	"\x05write\x18\x02 \x01(\bR\x05write\x12\x16\n" +
@@ -540,11 +541,11 @@ const file_nooks_api_v1_token_service_proto_rawDesc = "" +
 	"\x06secret\x18\x02 \x01(\tR\x06secret\"7\n" +
 	"\x18RevokeAccessTokenRequest\x12\x1b\n" +
 	"\ttoken_uid\x18\x01 \x01(\tR\btokenUid\"\x1b\n" +
-	"\x19RevokeAccessTokenResponse2\xbd\x02\n" +
-	"\fTokenService\x12a\n" +
-	"\x10ListAccessTokens\x12%.nooks.api.v1.ListAccessTokensRequest\x1a&.nooks.api.v1.ListAccessTokensResponse\x12d\n" +
-	"\x11CreateAccessToken\x12&.nooks.api.v1.CreateAccessTokenRequest\x1a'.nooks.api.v1.CreateAccessTokenResponse\x12d\n" +
-	"\x11RevokeAccessToken\x12&.nooks.api.v1.RevokeAccessTokenRequest\x1a'.nooks.api.v1.RevokeAccessTokenResponseB\xaf\x01\n" +
+	"\x19RevokeAccessTokenResponse2\xac\x03\n" +
+	"\fTokenService\x12\x80\x01\n" +
+	"\x10ListAccessTokens\x12%.nooks.api.v1.ListAccessTokensRequest\x1a&.nooks.api.v1.ListAccessTokensResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/access-tokens\x12\x86\x01\n" +
+	"\x11CreateAccessToken\x12&.nooks.api.v1.CreateAccessTokenRequest\x1a'.nooks.api.v1.CreateAccessTokenResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/access-tokens\x12\x8f\x01\n" +
+	"\x11RevokeAccessToken\x12&.nooks.api.v1.RevokeAccessTokenRequest\x1a'.nooks.api.v1.RevokeAccessTokenResponse\")\x82\xd3\xe4\x93\x02#*!/api/v1/access-tokens/{token_uid}B\xaf\x01\n" +
 	"\x10com.nooks.api.v1B\x11TokenServiceProtoP\x01Z6github.com/hoshomoh/nooks/proto/gen/nooks/api/v1;apiv1\xa2\x02\x03NAX\xaa\x02\fNooks.Api.V1\xca\x02\fNooks\\Api\\V1\xe2\x02\x18Nooks\\Api\\V1\\GPBMetadata\xea\x02\x0eNooks::Api::V1b\x06proto3"
 
 var (

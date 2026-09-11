@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -432,7 +433,7 @@ var File_nooks_api_v1_request_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_request_service_proto_rawDesc = "" +
 	"\n" +
-	"\"nooks/api/v1/request_service.proto\x12\fnooks.api.v1\x1a\x1fnooks/api/v1/auth_service.proto\"\x98\x01\n" +
+	"\"nooks/api/v1/request_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fnooks/api/v1/auth_service.proto\"\x98\x01\n" +
 	"\x12PendingJoinRequest\x12\x1f\n" +
 	"\vrequest_uid\x18\x01 \x01(\tR\n" +
 	"requestUid\x12\x12\n" +
@@ -460,11 +461,11 @@ const file_nooks_api_v1_request_service_proto_rawDesc = "" +
 	"\vrequest_uid\x18\x01 \x01(\tR\n" +
 	"requestUid\x12\x18\n" +
 	"\aapprove\x18\x02 \x01(\bR\aapprove\"\x1c\n" +
-	"\x1aDecideResetRequestResponse2\xcb\x02\n" +
-	"\x0eRequestService\x12j\n" +
-	"\x13ListPendingRequests\x12(.nooks.api.v1.ListPendingRequestsRequest\x1a).nooks.api.v1.ListPendingRequestsResponse\x12d\n" +
-	"\x11DecideJoinRequest\x12&.nooks.api.v1.DecideJoinRequestRequest\x1a'.nooks.api.v1.DecideJoinRequestResponse\x12g\n" +
-	"\x12DecideResetRequest\x12'.nooks.api.v1.DecideResetRequestRequest\x1a(.nooks.api.v1.DecideResetRequestResponseB\xb1\x01\n" +
+	"\x1aDecideResetRequestResponse2\xd7\x03\n" +
+	"\x0eRequestService\x12\x84\x01\n" +
+	"\x13ListPendingRequests\x12(.nooks.api.v1.ListPendingRequestsRequest\x1a).nooks.api.v1.ListPendingRequestsResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v1/requests\x12\x9b\x01\n" +
+	"\x11DecideJoinRequest\x12&.nooks.api.v1.DecideJoinRequestRequest\x1a'.nooks.api.v1.DecideJoinRequestResponse\"5\x82\xd3\xe4\x93\x02/:\x01*\"*/api/v1/requests/join/{request_uid}:decide\x12\x9f\x01\n" +
+	"\x12DecideResetRequest\x12'.nooks.api.v1.DecideResetRequestRequest\x1a(.nooks.api.v1.DecideResetRequestResponse\"6\x82\xd3\xe4\x93\x020:\x01*\"+/api/v1/requests/reset/{request_uid}:decideB\xb1\x01\n" +
 	"\x10com.nooks.api.v1B\x13RequestServiceProtoP\x01Z6github.com/hoshomoh/nooks/proto/gen/nooks/api/v1;apiv1\xa2\x02\x03NAX\xaa\x02\fNooks.Api.V1\xca\x02\fNooks\\Api\\V1\xe2\x02\x18Nooks\\Api\\V1\\GPBMetadata\xea\x02\x0eNooks::Api::V1b\x06proto3"
 
 var (

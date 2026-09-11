@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -256,7 +257,7 @@ var File_nooks_api_v1_public_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_public_service_proto_rawDesc = "" +
 	"\n" +
-	"!nooks/api/v1/public_service.proto\x12\fnooks.api.v1\"\x9f\x01\n" +
+	"!nooks/api/v1/public_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\"\x9f\x01\n" +
 	"\n" +
 	"PublicItem\x12\x14\n" +
 	"\x05label\x18\x01 \x01(\tR\x05label\x12\x12\n" +
@@ -276,9 +277,9 @@ const file_nooks_api_v1_public_service_proto_rawDesc = "" +
 	"\n" +
 	"open_count\x18\x06 \x01(\x05R\topenCount\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\a \x01(\tR\tupdatedAt2i\n" +
-	"\rPublicService\x12X\n" +
-	"\rGetPublicList\x12\".nooks.api.v1.GetPublicListRequest\x1a#.nooks.api.v1.GetPublicListResponseB\xb0\x01\n" +
+	"updated_at\x18\a \x01(\tR\tupdatedAt2\x86\x01\n" +
+	"\rPublicService\x12u\n" +
+	"\rGetPublicList\x12\".nooks.api.v1.GetPublicListRequest\x1a#.nooks.api.v1.GetPublicListResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/public-listB\xb0\x01\n" +
 	"\x10com.nooks.api.v1B\x12PublicServiceProtoP\x01Z6github.com/hoshomoh/nooks/proto/gen/nooks/api/v1;apiv1\xa2\x02\x03NAX\xaa\x02\fNooks.Api.V1\xca\x02\fNooks\\Api\\V1\xe2\x02\x18Nooks\\Api\\V1\\GPBMetadata\xea\x02\x0eNooks::Api::V1b\x06proto3"
 
 var (

@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -400,7 +401,7 @@ var File_nooks_api_v1_activity_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_activity_service_proto_rawDesc = "" +
 	"\n" +
-	"#nooks/api/v1/activity_service.proto\x12\fnooks.api.v1\"\xef\x01\n" +
+	"#nooks/api/v1/activity_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\"\xef\x01\n" +
 	"\bActivity\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12.\n" +
 	"\x04kind\x18\x02 \x01(\x0e2\x1a.nooks.api.v1.ActivityKindR\x04kind\x12\x12\n" +
@@ -427,10 +428,10 @@ const file_nooks_api_v1_activity_service_proto_rawDesc = "" +
 	"\x0fActivityOutcome\x12 \n" +
 	"\x1cACTIVITY_OUTCOME_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19ACTIVITY_OUTCOME_APPROVED\x10\x01\x12\x1c\n" +
-	"\x18ACTIVITY_OUTCOME_IGNORED\x10\x022\xcb\x01\n" +
-	"\x0fActivityService\x12U\n" +
-	"\fListActivity\x12!.nooks.api.v1.ListActivityRequest\x1a\".nooks.api.v1.ListActivityResponse\x12a\n" +
-	"\x10MarkActivityRead\x12%.nooks.api.v1.MarkActivityReadRequest\x1a&.nooks.api.v1.MarkActivityReadResponseB\xb2\x01\n" +
+	"\x18ACTIVITY_OUTCOME_IGNORED\x10\x022\x8c\x02\n" +
+	"\x0fActivityService\x12o\n" +
+	"\fListActivity\x12!.nooks.api.v1.ListActivityRequest\x1a\".nooks.api.v1.ListActivityResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v1/activity\x12\x87\x01\n" +
+	"\x10MarkActivityRead\x12%.nooks.api.v1.MarkActivityReadRequest\x1a&.nooks.api.v1.MarkActivityReadResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/activity:markReadB\xb2\x01\n" +
 	"\x10com.nooks.api.v1B\x14ActivityServiceProtoP\x01Z6github.com/hoshomoh/nooks/proto/gen/nooks/api/v1;apiv1\xa2\x02\x03NAX\xaa\x02\fNooks.Api.V1\xca\x02\fNooks\\Api\\V1\xe2\x02\x18Nooks\\Api\\V1\\GPBMetadata\xea\x02\x0eNooks::Api::V1b\x06proto3"
 
 var (

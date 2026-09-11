@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -701,7 +702,7 @@ var File_nooks_api_v1_instance_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_instance_service_proto_rawDesc = "" +
 	"\n" +
-	"#nooks/api/v1/instance_service.proto\x12\fnooks.api.v1\"X\n" +
+	"#nooks/api/v1/instance_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\"X\n" +
 	"\x15DeleteInstanceRequest\x12\x1a\n" +
 	"\bpassword\x18\x01 \x01(\tR\bpassword\x12#\n" +
 	"\rinstance_name\x18\x02 \x01(\tR\finstanceName\"\x18\n" +
@@ -747,13 +748,13 @@ const file_nooks_api_v1_instance_service_proto_rawDesc = "" +
 	"\vneeds_setup\x18\x03 \x01(\bR\n" +
 	"needsSetup\x12#\n" +
 	"\rpublic_signup\x18\x04 \x01(\bR\fpublicSignup\x12%\n" +
-	"\x0edefault_locale\x18\x05 \x01(\tR\rdefaultLocale2\x86\x04\n" +
-	"\x0fInstanceService\x12R\n" +
-	"\vGetInstance\x12 .nooks.api.v1.GetInstanceRequest\x1a!.nooks.api.v1.GetInstanceResponse\x12j\n" +
-	"\x13GetInstanceSettings\x12(.nooks.api.v1.GetInstanceSettingsRequest\x1a).nooks.api.v1.GetInstanceSettingsResponse\x12s\n" +
-	"\x16UpdateInstanceSettings\x12+.nooks.api.v1.UpdateInstanceSettingsRequest\x1a,.nooks.api.v1.UpdateInstanceSettingsResponse\x12a\n" +
-	"\x10GetInstanceAbout\x12%.nooks.api.v1.GetInstanceAboutRequest\x1a&.nooks.api.v1.GetInstanceAboutResponse\x12[\n" +
-	"\x0eDeleteInstance\x12#.nooks.api.v1.DeleteInstanceRequest\x1a$.nooks.api.v1.DeleteInstanceResponseB\xb2\x01\n" +
+	"\x0edefault_locale\x18\x05 \x01(\tR\rdefaultLocale2\xb0\x05\n" +
+	"\x0fInstanceService\x12l\n" +
+	"\vGetInstance\x12 .nooks.api.v1.GetInstanceRequest\x1a!.nooks.api.v1.GetInstanceResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v1/instance\x12\x8d\x01\n" +
+	"\x13GetInstanceSettings\x12(.nooks.api.v1.GetInstanceSettingsRequest\x1a).nooks.api.v1.GetInstanceSettingsResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/instance/settings\x12\x99\x01\n" +
+	"\x16UpdateInstanceSettings\x12+.nooks.api.v1.UpdateInstanceSettingsRequest\x1a,.nooks.api.v1.UpdateInstanceSettingsResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\x1a\x19/api/v1/instance/settings\x12\x81\x01\n" +
+	"\x10GetInstanceAbout\x12%.nooks.api.v1.GetInstanceAboutRequest\x1a&.nooks.api.v1.GetInstanceAboutResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/instance/about\x12\x7f\n" +
+	"\x0eDeleteInstance\x12#.nooks.api.v1.DeleteInstanceRequest\x1a$.nooks.api.v1.DeleteInstanceResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/api/v1/instance:deleteB\xb2\x01\n" +
 	"\x10com.nooks.api.v1B\x14InstanceServiceProtoP\x01Z6github.com/hoshomoh/nooks/proto/gen/nooks/api/v1;apiv1\xa2\x02\x03NAX\xaa\x02\fNooks.Api.V1\xca\x02\fNooks\\Api\\V1\xe2\x02\x18Nooks\\Api\\V1\\GPBMetadata\xea\x02\x0eNooks::Api::V1b\x06proto3"
 
 var (

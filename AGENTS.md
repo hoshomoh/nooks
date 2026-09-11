@@ -8,7 +8,7 @@ file and update this guide.
 
 Nooks is a self-hosted household todo app. See `CONTEXT.md` for the domain glossary — use those terms.
 
-- Backend: Go, Connect RPC, Protocol Buffers. gRPC-Gateway and OpenAPI arrive with the REST API in M10.
+- Backend: Go, Connect RPC, Protocol Buffers. gRPC-Gateway serves the same services as REST at `/api/v1`, and gnostic generates `proto/gen/openapi.yaml` from the same annotations.
 - Frontend: React, TypeScript, Vite, Tailwind CSS v4, shadcn/ui, TanStack Query, TanStack Router,
   i18next, date-fns.
 - Storage: SQLite (default — one file the user can copy) and Postgres, behind one store interface,

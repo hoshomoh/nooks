@@ -236,7 +236,11 @@ The single most important milestone; everything else is furniture.
 - [x] The secret is handed over once by the API and never again
 - [x] Unpicked Lists are invisible to a token — it cannot see that they exist
 - [x] Token activity log
-- [ ] REST API at `/api/v1`
+- [x] REST API at `/api/v1` — gRPC-Gateway over the same services the browser uses, with
+      `scripts/check-annotations.sh` in CI so an RPC cannot ship UI-only
+- [ ] Sign in over REST. The five cookie RPCs and ReplacePassword have no HTTP binding
+      yet, because a cookie cannot survive the gateway adapter. Deciding it means either
+      a session token in a response body, or a second RPC that mints one
 - [ ] MCP server at `/mcp`, same token
 - [x] Changes made by a token are attributed to the token in List history
 

@@ -2,68 +2,129 @@ syntax = "proto3";
 
 package nooks.api.v1;
 
+import "google/api/annotations.proto";
+
 // ListService covers Lists and the Items on them — the whole of Nooks, really.
 // Everything else is a view over these.
 service ListService {
   // ListLists returns every List the signed-in Member can reach, with the counts the
   // sidebar shows.
-  rpc ListLists(ListListsRequest) returns (ListListsResponse);
+  rpc ListLists(ListListsRequest) returns (ListListsResponse) {
+    option (google.api.http) = {get: "/api/v1/lists"};
+  }
 
   // GetList returns one List and its Items, in their manual order.
-  rpc GetList(GetListRequest) returns (GetListResponse);
+  rpc GetList(GetListRequest) returns (GetListResponse) {
+    option (google.api.http) = {get: "/api/v1/lists/{list_uid}"};
+  }
 
   // CreateList adds a List. It starts private.
-  rpc CreateList(CreateListRequest) returns (CreateListResponse);
+  rpc CreateList(CreateListRequest) returns (CreateListResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/lists"
+      body: "*"
+    };
+  }
 
   // RenameList changes a List's name. Only its owner may.
-  rpc RenameList(RenameListRequest) returns (RenameListResponse);
+  rpc RenameList(RenameListRequest) returns (RenameListResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/lists/{list_uid}"
+      body: "*"
+    };
+  }
 
   // SetListSharing changes who can reach a List. Only its owner may.
-  rpc SetListSharing(SetListSharingRequest) returns (SetListSharingResponse);
+  rpc SetListSharing(SetListSharingRequest) returns (SetListSharingResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/lists/{list_uid}/sharing"
+      body: "*"
+    };
+  }
 
   // GetListShares returns who a List reaches by name, for the share dialog.
-  rpc GetListShares(GetListSharesRequest) returns (GetListSharesResponse);
+  rpc GetListShares(GetListSharesRequest) returns (GetListSharesResponse) {
+    option (google.api.http) = {get: "/api/v1/lists/{list_uid}/shares"};
+  }
 
   // DeleteList removes a List and the Items on it. Only its owner may.
-  rpc DeleteList(DeleteListRequest) returns (DeleteListResponse);
+  rpc DeleteList(DeleteListRequest) returns (DeleteListResponse) {
+    option (google.api.http) = {delete: "/api/v1/lists/{list_uid}"};
+  }
 
   // DuplicateList copies a List and the Items still open on it.
   //
   // The copy starts private and starts empty of history: it is a new List that happens
   // to begin with the same things on it, not a second view of the first.
-  rpc DuplicateList(DuplicateListRequest) returns (DuplicateListResponse);
+  rpc DuplicateList(DuplicateListRequest) returns (DuplicateListResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/lists/{list_uid}:duplicate"
+      body: "*"
+    };
+  }
 
   // SetListPinned pins or unpins a List in the signed-in Member's own sidebar. It
   // never affects anyone else's.
-  rpc SetListPinned(SetListPinnedRequest) returns (SetListPinnedResponse);
+  rpc SetListPinned(SetListPinnedRequest) returns (SetListPinnedResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/lists/{list_uid}/pinned"
+      body: "*"
+    };
+  }
 
   // CreateItem appends an Item to a List.
-  rpc CreateItem(CreateItemRequest) returns (CreateItemResponse);
+  rpc CreateItem(CreateItemRequest) returns (CreateItemResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/lists/{list_uid}/items"
+      body: "*"
+    };
+  }
 
   // UpdateItem changes an Item's label, quantity or due date. An unset field is left
   // alone.
-  rpc UpdateItem(UpdateItemRequest) returns (UpdateItemResponse);
+  rpc UpdateItem(UpdateItemRequest) returns (UpdateItemResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/items/{item_uid}"
+      body: "*"
+    };
+  }
 
   // SetItemDone ticks or unticks an Item. A tick is a tick whoever made it, so this
   // never conflicts.
-  rpc SetItemDone(SetItemDoneRequest) returns (SetItemDoneResponse);
+  rpc SetItemDone(SetItemDoneRequest) returns (SetItemDoneResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/items/{item_uid}/done"
+      body: "*"
+    };
+  }
 
   // MoveItem places an Item after another one, or at the top when after_item_uid is
   // empty.
-  rpc MoveItem(MoveItemRequest) returns (MoveItemResponse);
+  rpc MoveItem(MoveItemRequest) returns (MoveItemResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/items/{item_uid}:move"
+      body: "*"
+    };
+  }
 
   // DeleteItem removes an Item.
-  rpc DeleteItem(DeleteItemRequest) returns (DeleteItemResponse);
+  rpc DeleteItem(DeleteItemRequest) returns (DeleteItemResponse) {
+    option (google.api.http) = {delete: "/api/v1/items/{item_uid}"};
+  }
 
   // ListDatedItems returns unticked Items with a due date, across every List the
   // Member can reach. Today, Upcoming and the calendar are all views over this: a
   // calendar is a lens on dates, not a second home for Lists.
-  rpc ListDatedItems(ListDatedItemsRequest) returns (ListDatedItemsResponse);
+  rpc ListDatedItems(ListDatedItemsRequest) returns (ListDatedItemsResponse) {
+    option (google.api.http) = {get: "/api/v1/dated-items"};
+  }
 
   // Search finds Lists and Items by what a Member wrote in them. It is what ⌘K reads.
   // Results narrow while they are still typing, and never include anything they could
   // not already open.
-  rpc Search(SearchRequest) returns (SearchResponse);
+  rpc Search(SearchRequest) returns (SearchResponse) {
+    option (google.api.http) = {get: "/api/v1/search"};
+  }
 }
 
 // Sharing is who can reach a List.

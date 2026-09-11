@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package nooks.api.v1;
 
+import "google/api/annotations.proto";
+
 // AuthService covers getting into a Nooks Instance: first run, signing in, signing
 // out, and replacing a temporary password.
 //
@@ -19,7 +21,9 @@ service AuthService {
   rpc SignOut(SignOutRequest) returns (SignOutResponse);
 
   // GetCurrentMember returns whoever the session cookie belongs to.
-  rpc GetCurrentMember(GetCurrentMemberRequest) returns (GetCurrentMemberResponse);
+  rpc GetCurrentMember(GetCurrentMemberRequest) returns (GetCurrentMemberResponse) {
+    option (google.api.http) = {get: "/api/v1/auth/me"};
+  }
 
   // ReplacePassword sets a new password for the signed-in Member. A Member who was
   // given a temporary password must call this before they can use Nooks.
@@ -27,11 +31,18 @@ service AuthService {
 
   // RequestJoin asks an Admin for an account. It is how a Visitor gets in when public
   // signup is off, which is the default.
-  rpc RequestJoin(RequestJoinRequest) returns (RequestJoinResponse);
+  rpc RequestJoin(RequestJoinRequest) returns (RequestJoinResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/join-requests"
+      body: "*"
+    };
+  }
 
   // GetJoinRequest reports whether an Admin has decided yet. The Visitor's browser
   // remembers the request id and comes back to the same address.
-  rpc GetJoinRequest(GetJoinRequestRequest) returns (GetJoinRequestResponse);
+  rpc GetJoinRequest(GetJoinRequestRequest) returns (GetJoinRequestResponse) {
+    option (google.api.http) = {get: "/api/v1/auth/join-requests/{request_uid}"};
+  }
 
   // CompleteJoin turns an approved Join request into an account, once the Visitor
   // chooses a password.
@@ -39,10 +50,17 @@ service AuthService {
 
   // RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
   // the Admin checks it is really them however they like, then approves.
-  rpc RequestPasswordReset(RequestPasswordResetRequest) returns (RequestPasswordResetResponse);
+  rpc RequestPasswordReset(RequestPasswordResetRequest) returns (RequestPasswordResetResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/reset-requests"
+      body: "*"
+    };
+  }
 
   // GetResetRequest reports whether an Admin has approved a reset yet.
-  rpc GetResetRequest(GetResetRequestRequest) returns (GetResetRequestResponse);
+  rpc GetResetRequest(GetResetRequestRequest) returns (GetResetRequestResponse) {
+    option (google.api.http) = {get: "/api/v1/auth/reset-requests/{request_uid}"};
+  }
 
   // CompletePasswordReset sets a new password against an approved reset.
   rpc CompletePasswordReset(CompletePasswordResetRequest) returns (CompletePasswordResetResponse);

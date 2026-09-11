@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package nooks.api.v1;
 
+import "google/api/annotations.proto";
+
 // TokenService covers the keys a Member cuts for things that are not browsers.
 //
 // A token can never do more than the Member it belongs to. That is why there is no way
@@ -9,14 +11,23 @@ package nooks.api.v1;
 // needs a token makes their own.
 service TokenService {
   // ListAccessTokens returns the signed-in Member's own tokens.
-  rpc ListAccessTokens(ListAccessTokensRequest) returns (ListAccessTokensResponse);
+  rpc ListAccessTokens(ListAccessTokensRequest) returns (ListAccessTokensResponse) {
+    option (google.api.http) = {get: "/api/v1/access-tokens"};
+  }
 
   // CreateAccessToken cuts one. The secret is in the answer and nowhere else, ever.
-  rpc CreateAccessToken(CreateAccessTokenRequest) returns (CreateAccessTokenResponse);
+  rpc CreateAccessToken(CreateAccessTokenRequest) returns (CreateAccessTokenResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/access-tokens"
+      body: "*"
+    };
+  }
 
   // RevokeAccessToken stops one working. A Member may revoke their own; an Admin may
   // revoke anybody's, because a key somebody left in a door is the Instance's problem.
-  rpc RevokeAccessToken(RevokeAccessTokenRequest) returns (RevokeAccessTokenResponse);
+  rpc RevokeAccessToken(RevokeAccessTokenRequest) returns (RevokeAccessTokenResponse) {
+    option (google.api.http) = {delete: "/api/v1/access-tokens/{token_uid}"};
+  }
 }
 
 // TokenAbilities is what a token may do — three answers, not one level.

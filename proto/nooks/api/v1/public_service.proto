@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package nooks.api.v1;
 
+import "google/api/annotations.proto";
+
 // PublicService is the one page an Instance can put in front of somebody with no
 // account.
 //
@@ -13,7 +15,9 @@ service PublicService {
   //
   // It is the only List reachable this way: a Visitor cannot ask for another one, and
   // cannot discover that another one exists.
-  rpc GetPublicList(GetPublicListRequest) returns (GetPublicListResponse);
+  rpc GetPublicList(GetPublicListRequest) returns (GetPublicListResponse) {
+    option (google.api.http) = {get: "/api/v1/public-list"};
+  }
 }
 
 // PublicItem is one line of the public page.

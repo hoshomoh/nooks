@@ -3,6 +3,8 @@
 // Nooks' generated API client. Everything under gen/ comes from proto/ via
 // `pnpm generate`; this file is the surface the rest of the monorepo imports.
 
+export * from "./gen/google/api/annotations_pb"
+export * from "./gen/google/api/http_pb"
 export * from "./gen/nooks/api/v1/activity_service_pb"
 export * from "./gen/nooks/api/v1/auth_service_pb"
 export * from "./gen/nooks/api/v1/instance_service_pb"

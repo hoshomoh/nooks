@@ -1,6 +1,12 @@
 version: v2
 managed:
   enabled: true
+  # googleapis keeps its real Go package. Without this, managed mode rewrites it to a
+  # path under this module that nothing generates, and the build stops on a missing
+  # import of our own making.
+  disable:
+    - file_option: go_package
+      module: buf.build/googleapis/googleapis
   override:
     - file_option: go_package_prefix
       value: github.com/hoshomoh/nooks/proto/gen
@@ -11,6 +17,19 @@ plugins:
   - remote: buf.build/connectrpc/go
     out: gen
     opt: paths=source_relative
+  # The gateway calls a gRPC-shaped server interface, which this generates. Nooks does
+  # not serve gRPC — the stubs exist so the gateway has something to talk to in-process.
+  - remote: buf.build/grpc/go
+    out: gen
+    opt: paths=source_relative
+  - remote: buf.build/grpc-ecosystem/gateway
+    out: gen
+    opt: paths=source_relative
+  # The OpenAPI spec, which the docs site and the MCP tools both read. Generated, so it
+  # cannot describe an API that no longer exists.
+  - remote: buf.build/community/google-gnostic-openapi
+    out: gen
+    opt: enum_type=string
   - remote: buf.build/bufbuild/es
     out: ../packages/api/src/gen
     opt: target=ts

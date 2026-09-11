@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -2052,7 +2053,7 @@ var File_nooks_api_v1_list_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1fnooks/api/v1/list_service.proto\x12\fnooks.api.v1\"\xcf\x01\n" +
+	"\x1fnooks/api/v1/list_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\"\xcf\x01\n" +
 	"\x04List\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12/\n" +
@@ -2182,31 +2183,30 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\x1bSEARCH_HIT_KIND_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14SEARCH_HIT_KIND_LIST\x10\x01\x12\x18\n" +
 	"\x14SEARCH_HIT_KIND_ITEM\x10\x02\x12\x18\n" +
-	"\x14SEARCH_HIT_KIND_NOTE\x10\x032\xb5\n" +
+	"\x14SEARCH_HIT_KIND_NOTE\x10\x032\xff\x0e\n" +
+	"\vListService\x12c\n" +
+	"\tListLists\x12\x1e.nooks.api.v1.ListListsRequest\x1a\x1f.nooks.api.v1.ListListsResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/lists\x12h\n" +
+	"\aGetList\x12\x1c.nooks.api.v1.GetListRequest\x1a\x1d.nooks.api.v1.GetListResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/api/v1/lists/{list_uid}\x12i\n" +
 	"\n" +
-	"\vListService\x12L\n" +
-	"\tListLists\x12\x1e.nooks.api.v1.ListListsRequest\x1a\x1f.nooks.api.v1.ListListsResponse\x12F\n" +
-	"\aGetList\x12\x1c.nooks.api.v1.GetListRequest\x1a\x1d.nooks.api.v1.GetListResponse\x12O\n" +
+	"CreateList\x12\x1f.nooks.api.v1.CreateListRequest\x1a .nooks.api.v1.CreateListResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/v1/lists\x12t\n" +
 	"\n" +
-	"CreateList\x12\x1f.nooks.api.v1.CreateListRequest\x1a .nooks.api.v1.CreateListResponse\x12O\n" +
+	"RenameList\x12\x1f.nooks.api.v1.RenameListRequest\x1a .nooks.api.v1.RenameListResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*2\x18/api/v1/lists/{list_uid}\x12\x88\x01\n" +
+	"\x0eSetListSharing\x12#.nooks.api.v1.SetListSharingRequest\x1a$.nooks.api.v1.SetListSharingResponse\"+\x82\xd3\xe4\x93\x02%:\x01*\x1a /api/v1/lists/{list_uid}/sharing\x12\x81\x01\n" +
+	"\rGetListShares\x12\".nooks.api.v1.GetListSharesRequest\x1a#.nooks.api.v1.GetListSharesResponse\"'\x82\xd3\xe4\x93\x02!\x12\x1f/api/v1/lists/{list_uid}/shares\x12q\n" +
 	"\n" +
-	"RenameList\x12\x1f.nooks.api.v1.RenameListRequest\x1a .nooks.api.v1.RenameListResponse\x12[\n" +
-	"\x0eSetListSharing\x12#.nooks.api.v1.SetListSharingRequest\x1a$.nooks.api.v1.SetListSharingResponse\x12X\n" +
-	"\rGetListShares\x12\".nooks.api.v1.GetListSharesRequest\x1a#.nooks.api.v1.GetListSharesResponse\x12O\n" +
+	"DeleteList\x12\x1f.nooks.api.v1.DeleteListRequest\x1a .nooks.api.v1.DeleteListResponse\" \x82\xd3\xe4\x93\x02\x1a*\x18/api/v1/lists/{list_uid}\x12\x87\x01\n" +
+	"\rDuplicateList\x12\".nooks.api.v1.DuplicateListRequest\x1a#.nooks.api.v1.DuplicateListResponse\"-\x82\xd3\xe4\x93\x02':\x01*\"\"/api/v1/lists/{list_uid}:duplicate\x12\x84\x01\n" +
+	"\rSetListPinned\x12\".nooks.api.v1.SetListPinnedRequest\x1a#.nooks.api.v1.SetListPinnedResponse\"*\x82\xd3\xe4\x93\x02$:\x01*\x1a\x1f/api/v1/lists/{list_uid}/pinned\x12z\n" +
 	"\n" +
-	"DeleteList\x12\x1f.nooks.api.v1.DeleteListRequest\x1a .nooks.api.v1.DeleteListResponse\x12X\n" +
-	"\rDuplicateList\x12\".nooks.api.v1.DuplicateListRequest\x1a#.nooks.api.v1.DuplicateListResponse\x12X\n" +
-	"\rSetListPinned\x12\".nooks.api.v1.SetListPinnedRequest\x1a#.nooks.api.v1.SetListPinnedResponse\x12O\n" +
+	"CreateItem\x12\x1f.nooks.api.v1.CreateItemRequest\x1a .nooks.api.v1.CreateItemResponse\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/lists/{list_uid}/items\x12t\n" +
 	"\n" +
-	"CreateItem\x12\x1f.nooks.api.v1.CreateItemRequest\x1a .nooks.api.v1.CreateItemResponse\x12O\n" +
+	"UpdateItem\x12\x1f.nooks.api.v1.UpdateItemRequest\x1a .nooks.api.v1.UpdateItemResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*2\x18/api/v1/items/{item_uid}\x12|\n" +
+	"\vSetItemDone\x12 .nooks.api.v1.SetItemDoneRequest\x1a!.nooks.api.v1.SetItemDoneResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\x1a\x1d/api/v1/items/{item_uid}/done\x12s\n" +
+	"\bMoveItem\x12\x1d.nooks.api.v1.MoveItemRequest\x1a\x1e.nooks.api.v1.MoveItemResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/items/{item_uid}:move\x12q\n" +
 	"\n" +
-	"UpdateItem\x12\x1f.nooks.api.v1.UpdateItemRequest\x1a .nooks.api.v1.UpdateItemResponse\x12R\n" +
-	"\vSetItemDone\x12 .nooks.api.v1.SetItemDoneRequest\x1a!.nooks.api.v1.SetItemDoneResponse\x12I\n" +
-	"\bMoveItem\x12\x1d.nooks.api.v1.MoveItemRequest\x1a\x1e.nooks.api.v1.MoveItemResponse\x12O\n" +
-	"\n" +
-	"DeleteItem\x12\x1f.nooks.api.v1.DeleteItemRequest\x1a .nooks.api.v1.DeleteItemResponse\x12[\n" +
-	"\x0eListDatedItems\x12#.nooks.api.v1.ListDatedItemsRequest\x1a$.nooks.api.v1.ListDatedItemsResponse\x12C\n" +
-	"\x06Search\x12\x1b.nooks.api.v1.SearchRequest\x1a\x1c.nooks.api.v1.SearchResponseB\xae\x01\n" +
+	"DeleteItem\x12\x1f.nooks.api.v1.DeleteItemRequest\x1a .nooks.api.v1.DeleteItemResponse\" \x82\xd3\xe4\x93\x02\x1a*\x18/api/v1/items/{item_uid}\x12x\n" +
+	"\x0eListDatedItems\x12#.nooks.api.v1.ListDatedItemsRequest\x1a$.nooks.api.v1.ListDatedItemsResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/dated-items\x12[\n" +
+	"\x06Search\x12\x1b.nooks.api.v1.SearchRequest\x1a\x1c.nooks.api.v1.SearchResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/api/v1/searchB\xae\x01\n" +
 	"\x10com.nooks.api.v1B\x10ListServiceProtoP\x01Z6github.com/hoshomoh/nooks/proto/gen/nooks/api/v1;apiv1\xa2\x02\x03NAX\xaa\x02\fNooks.Api.V1\xca\x02\fNooks\\Api\\V1\xe2\x02\x18Nooks\\Api\\V1\\GPBMetadata\xea\x02\x0eNooks::Api::V1b\x06proto3"
 
 var (

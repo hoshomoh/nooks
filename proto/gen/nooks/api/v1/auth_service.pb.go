@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -1282,7 +1283,7 @@ var File_nooks_api_v1_auth_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_auth_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1fnooks/api/v1/auth_service.proto\x12\fnooks.api.v1\"\xe8\x01\n" +
+	"\x1fnooks/api/v1/auth_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\"\xe8\x01\n" +
 	"\x06Member\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
@@ -1360,18 +1361,18 @@ const file_nooks_api_v1_auth_service_proto_rawDesc = "" +
 	"\x10ROLE_UNSPECIFIED\x10\x00\x12\x0e\n" +
 	"\n" +
 	"ROLE_ADMIN\x10\x01\x12\x0f\n" +
-	"\vROLE_MEMBER\x10\x022\x80\b\n" +
+	"\vROLE_MEMBER\x10\x022\xd0\t\n" +
 	"\vAuthService\x12X\n" +
 	"\rCompleteSetup\x12\".nooks.api.v1.CompleteSetupRequest\x1a#.nooks.api.v1.CompleteSetupResponse\x12C\n" +
 	"\x06SignIn\x12\x1b.nooks.api.v1.SignInRequest\x1a\x1c.nooks.api.v1.SignInResponse\x12F\n" +
-	"\aSignOut\x12\x1c.nooks.api.v1.SignOutRequest\x1a\x1d.nooks.api.v1.SignOutResponse\x12a\n" +
-	"\x10GetCurrentMember\x12%.nooks.api.v1.GetCurrentMemberRequest\x1a&.nooks.api.v1.GetCurrentMemberResponse\x12^\n" +
-	"\x0fReplacePassword\x12$.nooks.api.v1.ReplacePasswordRequest\x1a%.nooks.api.v1.ReplacePasswordResponse\x12R\n" +
-	"\vRequestJoin\x12 .nooks.api.v1.RequestJoinRequest\x1a!.nooks.api.v1.RequestJoinResponse\x12[\n" +
-	"\x0eGetJoinRequest\x12#.nooks.api.v1.GetJoinRequestRequest\x1a$.nooks.api.v1.GetJoinRequestResponse\x12U\n" +
-	"\fCompleteJoin\x12!.nooks.api.v1.CompleteJoinRequest\x1a\".nooks.api.v1.CompleteJoinResponse\x12m\n" +
-	"\x14RequestPasswordReset\x12).nooks.api.v1.RequestPasswordResetRequest\x1a*.nooks.api.v1.RequestPasswordResetResponse\x12^\n" +
-	"\x0fGetResetRequest\x12$.nooks.api.v1.GetResetRequestRequest\x1a%.nooks.api.v1.GetResetRequestResponse\x12p\n" +
+	"\aSignOut\x12\x1c.nooks.api.v1.SignOutRequest\x1a\x1d.nooks.api.v1.SignOutResponse\x12z\n" +
+	"\x10GetCurrentMember\x12%.nooks.api.v1.GetCurrentMemberRequest\x1a&.nooks.api.v1.GetCurrentMemberResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/auth/me\x12^\n" +
+	"\x0fReplacePassword\x12$.nooks.api.v1.ReplacePasswordRequest\x1a%.nooks.api.v1.ReplacePasswordResponse\x12y\n" +
+	"\vRequestJoin\x12 .nooks.api.v1.RequestJoinRequest\x1a!.nooks.api.v1.RequestJoinResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v1/auth/join-requests\x12\x8d\x01\n" +
+	"\x0eGetJoinRequest\x12#.nooks.api.v1.GetJoinRequestRequest\x1a$.nooks.api.v1.GetJoinRequestResponse\"0\x82\xd3\xe4\x93\x02*\x12(/api/v1/auth/join-requests/{request_uid}\x12U\n" +
+	"\fCompleteJoin\x12!.nooks.api.v1.CompleteJoinRequest\x1a\".nooks.api.v1.CompleteJoinResponse\x12\x95\x01\n" +
+	"\x14RequestPasswordReset\x12).nooks.api.v1.RequestPasswordResetRequest\x1a*.nooks.api.v1.RequestPasswordResetResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/auth/reset-requests\x12\x91\x01\n" +
+	"\x0fGetResetRequest\x12$.nooks.api.v1.GetResetRequestRequest\x1a%.nooks.api.v1.GetResetRequestResponse\"1\x82\xd3\xe4\x93\x02+\x12)/api/v1/auth/reset-requests/{request_uid}\x12p\n" +
 	"\x15CompletePasswordReset\x12*.nooks.api.v1.CompletePasswordResetRequest\x1a+.nooks.api.v1.CompletePasswordResetResponseB\xae\x01\n" +
 	"\x10com.nooks.api.v1B\x10AuthServiceProtoP\x01Z6github.com/hoshomoh/nooks/proto/gen/nooks/api/v1;apiv1\xa2\x02\x03NAX\xaa\x02\fNooks.Api.V1\xca\x02\fNooks\\Api\\V1\xe2\x02\x18Nooks\\Api\\V1\\GPBMetadata\xea\x02\x0eNooks::Api::V1b\x06proto3"
 

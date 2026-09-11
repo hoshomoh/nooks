@@ -115,7 +115,10 @@
     "namedCanEdit": "Shared with specific people · they can edit",
     "namedReadOnly": "Shared with specific people · read-only",
     "isHere": "{{name}} is here",
-    "areHere": "{{names}} are here"
+    "areHere": "{{names}} are here",
+    "doneToday": "{{count}} done today",
+    "doneToday_zero": "nothing done today",
+    "doneEarlier": "{{count}} done"
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",

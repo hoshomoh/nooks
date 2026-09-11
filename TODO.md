@@ -121,7 +121,7 @@ The single most important milestone; everything else is furniture.
 - [x] Due dates stored and shown ("Today", "Fri", "Sat 5 Sep"); parsing them out of the
       typed text is still to come
 - [x] Tick and untick, with attribution
-- [ ] Completed Items: placement and the "3 done today" row
+- [x] Completed Items: collapsed at the foot of the List, behind the "3 done today" row
 - [x] Empty states: empty List, cold-start All lists
 - [ ] List menu (`···`): rename, pin, duplicate, print, sort, completed placement, export as plain
       text, delete

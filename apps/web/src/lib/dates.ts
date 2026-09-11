@@ -167,6 +167,12 @@ export function momentLabel(at: Date, options: MomentLabelOptions): string {
  */
 export const SETTLE_MS = 3000
 
+/** happenedToday reports whether a moment falls on the day being measured against. */
+export function happenedToday(at: string, from: Date): boolean {
+  const parsed = parseMoment(at)
+  return parsed !== null && differenceInCalendarDays(startOfDay(from), startOfDay(parsed)) === 0
+}
+
 /** justHappened reports whether a moment is recent enough to still be news. */
 export function justHappened(at: string, now: Date): boolean {
   const parsed = parseMoment(at)

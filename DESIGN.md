@@ -223,6 +223,11 @@ border-radius: 6px;
 - Hover fills `--secondary` and darkens the checkbox border to `--muted-foreground`.
 - Done: checkbox filled `--muted-foreground` with a white tick; label `--muted-foreground` with
   `line-through` in `#C4C4BE`.
+- Completed Items sit **collapsed at the foot of the List**, behind one 13.5
+  `--secondary-foreground` line with a `▸` in `--muted-foreground` at 10: *"3 done today"* while
+  the day is going, a plain count for anything ticked before it. What is done is not what a Member
+  came for, and a List that doubles in length as the week goes on is one nobody scrolls to the
+  bottom of — but ticking must still visibly **put an Item somewhere** rather than delete it.
 - Just ticked by someone else: fill `--done-bg`, checkbox filled `--done`, attribution
   `--done`. Holds for one second, then settles. **No toast, no sound.**
 - A Note previews as one line below the row: 13.5px `--secondary-foreground`, on a 2px `--border` left rule

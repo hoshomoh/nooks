@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next"
 import { ActivityControl } from "@/components/ds/activity-control"
 import { Presence } from "@/components/ds/presence"
 import { AddRow, type AddRowSubmission } from "@/components/ds/add-row"
+import { DoneSection } from "@/components/ds/done-section"
 import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
@@ -16,9 +17,10 @@ import { Button } from "@/components/ds/button"
 import { listClient } from "@/lib/api"
 import { listQuery } from "@/lib/list-queries"
 import { refreshLists } from "@/lib/refresh"
+import type { Translate } from "@/lib/translate"
 import { debounce } from "@/lib/debounce"
 import type { RenameItemVariables, SaveNoteVariables, SetDoneVariables } from "@/lib/item-mutations"
-import { isOverdue, justHappened, today } from "@/lib/dates"
+import { happenedToday, isOverdue, justHappened, today } from "@/lib/dates"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useLive } from "@/lib/use-live"
@@ -204,10 +206,7 @@ export function ListScreen() {
           )}
 
           {done.length > 0 && (
-            <div className="mt-8.5 flex flex-col gap-1.5 border-t border-hair pt-4.5">
-              <span className="text-meta text-secondary-foreground">
-                {t("list.doneCount", { count: done.length })}
-              </span>
+            <DoneSection label={doneLabel(t, done, from)}>
               {done.map((item) => (
                 <ListRow
                   key={item.uid}
@@ -224,7 +223,7 @@ export function ListScreen() {
                   labels={rowLabels}
                 />
               ))}
-            </div>
+            </DoneSection>
           )}
         </div>
 
@@ -253,9 +252,23 @@ export function ListScreen() {
   )
 }
 
+/**
+ * doneLabel is the line the completed Items sit behind.
+ *
+ * "3 done today" while the day is going, because that is the number a Member recognises
+ * as theirs. Anything ticked before today is counted plainly — it is history, not an
+ * account of the afternoon.
+ */
+function doneLabel(t: Translate, done: Item[], from: Date): string {
+  const todays = done.filter((item) => happenedToday(item.doneAt, from)).length
+  return todays > 0
+    ? t("list.doneToday", { count: todays })
+    : t("list.doneEarlier", { count: done.length })
+}
+
 /** The detail row in the sheet: what is known about the Item, and what is not yet. */
 function noteFields(
-  t: (key: string, options?: Record<string, unknown>) => string,
+  t: Translate,
   item: Item,
   listName: string,
   dueLabel: string,

@@ -25,11 +25,24 @@ export default defineConfig({
     // not enough on a loaded machine; this is about the machine, not the code.
     testTimeout: 20_000,
     hookTimeout: 20_000,
-    // One worker per test file, each with its own jsdom, is more memory than a small
-    // machine has — and a project that expects to be self-hosted should not need a
-    // large one to test itself. Two keeps the peak low enough to run beside a Go build
-    // and a Vite build, which is what ./scripts/preflight.sh does.
-    maxWorkers: 2,
+    /*
+     * Threads rather than forked processes, and two of them.
+     *
+     * Vitest's default pool forks a Node process per worker, each with its own heap and
+     * its own jsdom. Threads share one heap instead, which is the difference between a
+     * suite that runs beside a Go build and a Vite build and one the kernel kills —
+     * three runs of ./scripts/preflight.sh in a row died here before this changed.
+     *
+     * One of them, because two still got killed. The suite is slower for it and that is
+     * the right trade: a gate that fails half the time is not a gate, and this one is
+     * what stands between a broken commit and main.
+     *
+     * Isolation is kept: each file still gets a fresh module registry, which the
+     * module-level stores (the theme, the locale, the pending tick) depend on. Turning
+     * that off is the other way to save memory and it would make tests share state.
+     */
+    pool: "threads",
+    maxWorkers: 1,
   },
   server: {
     port: 3001,

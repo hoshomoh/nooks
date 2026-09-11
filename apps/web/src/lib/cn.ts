@@ -62,6 +62,7 @@ export const NOOKS_CONTAINERS = [
   "sheet",
   "dialog",
   "form",
+  "settings",
 ]
 
 /** Every height a control is measured in — DESIGN.md §4 and §7. */

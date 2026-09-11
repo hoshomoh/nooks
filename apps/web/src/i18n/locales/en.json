@@ -152,7 +152,8 @@
     "cannotReach": "Can't reach the server.",
     "screenTitle": "That didn't load",
     "screenBody": "The server did not answer. Nothing you have written is lost — try again.",
-    "tryAgain": "Try again"
+    "tryAgain": "Try again",
+    "emailTaken": "Somebody here already uses that email."
   },
   "views": {
     "today": "Today",
@@ -282,5 +283,45 @@
     "deleteConfirm": "Delete",
     "renameTitle": "Rename “{{name}}”",
     "renameBlurb": "What the list is called, in the sidebar and on anything printed from it."
+  },
+  "settings": {
+    "title": "Settings",
+    "members": "Members",
+    "groups": "Groups",
+    "backToLists": "Back to lists"
+  },
+  "members": {
+    "title": "Members",
+    "blurb": "{{count}} person at {{name}}. Adding someone sets a temporary password you read out once; they must replace it on first sign-in.",
+    "blurb_other": "{{count}} people at {{name}}. Adding someone sets a temporary password you read out once; they must replace it on first sign-in.",
+    "add": "Add a member",
+    "person": "Person",
+    "groupsColumn": "Groups",
+    "role": "Role",
+    "admin": "Admin",
+    "member": "Member",
+    "noGroups": "—",
+    "neverSignedIn": "temporary password not yet replaced",
+    "addedOn": "added {{date}}",
+    "makeAdmin": "Make an admin",
+    "makeMember": "Remove admin",
+    "remove": "Remove from {{name}}",
+    "removeTitle": "Remove {{name}}?",
+    "removeBlurb": "Their account goes. What they added stays on its lists, still in their name.",
+    "removeConfirm": "Remove",
+    "addTitle": "Add a member",
+    "addBlurb": "They get a temporary password you read out once. nooks sends no mail, so how it reaches them is up to you.",
+    "name": "Name",
+    "email": "Email",
+    "emailHint": "Used to sign in. nooks never sends mail to it.",
+    "addSubmit": "Add",
+    "secretTitle": "{{name}} can sign in with this",
+    "secretBlurb": "Read it out, or write it down. It cannot be shown again — nooks keeps only a hash of it. They must replace it on first sign-in.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "secretDone": "Done",
+    "requests": "Requests",
+    "requestsWaiting": "{{count}} waiting · from the public list",
+    "noMessage": "no message"
   }
 }

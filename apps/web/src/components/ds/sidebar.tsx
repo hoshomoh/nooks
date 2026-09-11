@@ -104,12 +104,16 @@ export function Sidebar({
         <span>{t("sidebar.addList")}</span>
       </button>
 
-      <div className="mt-auto flex h-8.5 items-center gap-2.5 px-2">
+      <Link
+        to="/settings/members"
+        className="mt-auto flex h-8.5 items-center gap-2.5 rounded-md px-2 transition-colors hover:bg-secondary"
+      >
         <span className="grid size-5.5 place-items-center rounded-full bg-chip text-[10px] text-secondary-foreground">
           {initialsOf(memberName)}
         </span>
         <span className="truncate text-small text-secondary-foreground">{memberName}</span>
-      </div>
+        <span className="ml-auto text-micro text-muted-foreground">{t("settings.title")}</span>
+      </Link>
     </aside>
   )
 }

@@ -100,6 +100,7 @@
   --container-sheet: 520px; /* the side sheet */
   --container-dialog: 560px;
   --container-form: 460px; /* a signed-out form, narrower than content */
+  --container-settings: 720px; /* settings pages hold tables, not sentences */
 
   --radius-sm: 4px; /* checkbox, small badge */
   --radius-md: 6px; /* row, toolbar button, menu item */

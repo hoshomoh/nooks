@@ -1,9 +1,8 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
-import { Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
 import { AppShell } from "@/components/ds/app-shell"
-import { Button } from "@/components/ds/button"
+import { ViewSwitch } from "@/components/ds/view-switch"
 import { ActivityControl } from "@/components/ds/activity-control"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { DatedAddRow } from "@/components/ds/dated-add-row"
@@ -66,11 +65,7 @@ export function UpcomingScreen() {
         crumbs={[t("views.upcoming")]}
         actions={
           <>
-            <Link to="/calendar">
-              <Button tone="quiet" scale="toolbar">
-                {t("views.calendar")}
-              </Button>
-            </Link>
+            <ViewSwitch listRoute="/upcoming" showing="list" />
             <ActivityControl />
           </>
         }

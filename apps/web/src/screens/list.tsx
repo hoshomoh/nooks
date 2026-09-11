@@ -266,6 +266,7 @@ export function ListScreen() {
               onAdd={(item) => addItem.mutate(item)}
               disabled={addItem.isPending}
               divided={open.length > 0}
+              hint={t("addRow.hint")}
             />
           )}
 

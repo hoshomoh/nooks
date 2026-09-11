@@ -9,6 +9,7 @@ import { DatedAddRow } from "@/components/ds/dated-add-row"
 import { EmptyState } from "@/components/ds/empty-state"
 import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
 import { SectionHeading } from "@/components/ds/section-heading"
+import { ViewSwitch } from "@/components/ds/view-switch"
 import { listClient } from "@/lib/api"
 import { todayQuery } from "@/lib/dated-queries"
 import type { RenameItemVariables, SetDoneVariables } from "@/lib/item-mutations"
@@ -67,7 +68,15 @@ export function TodayScreen() {
       onSearch={palette.open}
       onAddList={palette.openAddList}
     >
-      <ChromeBar crumbs={[t("views.today")]} actions={<ActivityControl />} />
+      <ChromeBar
+        crumbs={[t("views.today")]}
+        actions={
+          <>
+            <ViewSwitch listRoute="/today" showing="list" />
+            <ActivityControl />
+          </>
+        }
+      />
 
       <div className="flex justify-center px-5.5 pt-14 pb-22">
         <div className="w-full max-w-content">
@@ -170,7 +179,8 @@ export function DatedRow({ entry, dueLabel, overdue, onToggle, onRename, labels 
     <ListRow
       label={item.label}
       quantity={item.quantity}
-      addedByName={entry.listName}
+      listName={entry.listName}
+      addedByName={item.addedByName}
       dueLabel={dueLabel}
       overdue={overdue}
       onToggle={onToggle}

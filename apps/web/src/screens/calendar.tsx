@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import { AppShell } from "@/components/ds/app-shell"
 import { ActivityControl } from "@/components/ds/activity-control"
 import { ChromeBar } from "@/components/ds/chrome-bar"
-import { Button } from "@/components/ds/button"
+import { ViewSwitch } from "@/components/ds/view-switch"
 import { buildMonth, byDay, type CalendarDay } from "@/lib/calendar"
 import { datedRangeQuery } from "@/lib/dated-queries"
 import { monthHeading, monthWindow, today, toStored } from "@/lib/dates"
@@ -47,11 +47,7 @@ export function CalendarScreen() {
         crumbs={[t("views.upcoming"), t("views.calendar")]}
         actions={
           <>
-            <Link to="/upcoming">
-              <Button tone="quiet" scale="toolbar">
-                {t("views.list")}
-              </Button>
-            </Link>
+            <ViewSwitch listRoute="/upcoming" showing="calendar" />
             <ActivityControl />
           </>
         }

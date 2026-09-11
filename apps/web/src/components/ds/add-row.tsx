@@ -28,6 +28,13 @@ export interface AddRowProps {
   onAdd: (item: AddRowSubmission) => void
   disabled?: boolean
   /**
+   * One line under the row saying what it can do, e.g. how a typed date is read.
+   *
+   * Under the row rather than in the placeholder: the placeholder has to say where the
+   * Item is going, and a shortcut nobody knows about is a shortcut nobody uses.
+   */
+  hint?: string
+  /**
    * Whether a rule separates the row from what is above it.
    *
    * True after a run of Items, which is what the rule is for. False when there are
@@ -69,6 +76,7 @@ export function AddRow({
   defaultDue = "",
   onAdd,
   disabled,
+  hint,
   divided = true,
 }: AddRowProps) {
   const { t } = useTranslation()
@@ -143,72 +151,76 @@ export function AddRow({
   }
 
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
-        submit()
-      }}
-      className={cn(
-        "grid min-h-row grid-cols-[20px_1fr_auto] items-center gap-3.5 px-2 py-1.5 -mx-2",
-        divided ? "mt-1 border-t border-hair" : "mt-5",
-      )}
-    >
-      <span className="text-center text-[15px] text-muted-foreground">+</span>
+    <div className={cn("flex flex-col", divided ? "mt-1" : "mt-5")}>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault()
+          submit()
+        }}
+        className={cn(
+          "grid min-h-row grid-cols-[20px_1fr_auto] items-center gap-3.5 px-2 py-1.5 -mx-2",
+          divided && "border-t border-hair",
+        )}
+      >
+        <span className="text-center text-[15px] text-muted-foreground">+</span>
 
-      {/* The sentence and its chips are one field: the chips sit where the words were,
-          and the caret carries on after them. */}
-      <span className="flex min-w-0 flex-wrap items-center gap-2">
-        {draft.name && <span className="text-body">{draft.name}</span>}
-        {draft.chips.map((chip) => (
-          <Chip
-            key={`${chip.kind}-${chip.source}`}
-            kind={chip.kind}
-            label={chip.kind === "due" ? due.label(chip.label) : chip.label}
-            kindLabel={t(chip.kind === "due" ? "date.dueChip" : "date.quantityChip")}
-          />
-        ))}
-        <input
-          ref={inputRef}
-          aria-label={placeholder}
-          value={draft.typing}
-          onChange={(event) => setDraft(absorb(event.target.value))}
-          onKeyDown={(event) => {
-            // The row has a second input — the date control — so the browser will not
-            // submit it implicitly. Enter is the way an Item is filed, so it is handled
-            // rather than left to the form.
-            if (event.key === "Enter") {
-              event.preventDefault()
-              submit()
-            }
-            if (event.key === "Backspace" && draft.typing === "") {
-              event.preventDefault()
-              unchip()
-            }
-            if (event.key === "Escape") {
-              if (isEmpty(draft)) {
-                inputRef.current?.blur()
+        {/* The sentence and its chips are one field: the chips sit where the words were,
+            and the caret carries on after them. */}
+        <span className="flex min-w-0 flex-wrap items-center gap-2">
+          {draft.name && <span className="text-body">{draft.name}</span>}
+          {draft.chips.map((chip) => (
+            <Chip
+              key={`${chip.kind}-${chip.source}`}
+              kind={chip.kind}
+              label={chip.kind === "due" ? due.label(chip.label) : chip.label}
+              kindLabel={t(chip.kind === "due" ? "date.dueChip" : "date.quantityChip")}
+            />
+          ))}
+          <input
+            ref={inputRef}
+            aria-label={placeholder}
+            value={draft.typing}
+            onChange={(event) => setDraft(absorb(event.target.value))}
+            onKeyDown={(event) => {
+              // The row has a second input — the date control — so the browser will not
+              // submit it implicitly. Enter is the way an Item is filed, so it is handled
+              // rather than left to the form.
+              if (event.key === "Enter") {
+                event.preventDefault()
+                submit()
               }
-              setDraft(EMPTY)
-            }
-          }}
-          placeholder={hasText ? "" : placeholder}
-          disabled={disabled}
-          className="min-w-24 flex-1 bg-transparent text-body outline-none placeholder:text-muted-foreground"
-        />
-      </span>
-
-      <span className="flex items-center gap-1.5">
-        <DateField
-          value={effectiveDue}
-          label={effectiveDue ? due.label(effectiveDue) : t("date.addDate")}
-          chosen={Boolean(chosenDue)}
-          onChange={(next) => setDraft({ ...draft, picked: next || null, cleared: !next })}
-        />
-        <span className="rounded-sm border border-border px-1.5 py-px font-mono text-keycap text-muted-foreground">
-          ↵
+              if (event.key === "Backspace" && draft.typing === "") {
+                event.preventDefault()
+                unchip()
+              }
+              if (event.key === "Escape") {
+                if (isEmpty(draft)) {
+                  inputRef.current?.blur()
+                }
+                setDraft(EMPTY)
+              }
+            }}
+            placeholder={hasText ? "" : placeholder}
+            disabled={disabled}
+            className="min-w-24 flex-1 bg-transparent text-body outline-none placeholder:text-muted-foreground"
+          />
         </span>
-      </span>
-    </form>
+
+        <span className="flex items-center gap-1.5">
+          <DateField
+            value={effectiveDue}
+            label={effectiveDue ? due.label(effectiveDue) : t("date.addDate")}
+            chosen={Boolean(chosenDue)}
+            onChange={(next) => setDraft({ ...draft, picked: next || null, cleared: !next })}
+          />
+          <span className="rounded-sm border border-border px-1.5 py-px font-mono text-keycap text-muted-foreground">
+            ↵
+          </span>
+        </span>
+      </form>
+
+      {hint && <p className="px-2 pt-1.5 text-micro text-muted-foreground -mx-2">{hint}</p>}
+    </div>
   )
 }
 

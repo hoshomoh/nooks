@@ -236,7 +236,8 @@
       "l",
       "ml",
       "x"
-    ]
+    ],
+    "hint": "Type and press enter. A date in the text is read: “milk friday”."
   },
   "share": {
     "action": "Share",

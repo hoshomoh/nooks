@@ -19,6 +19,13 @@ export type ListRowProps = {
   /** Who put it on the List. Sits at the right of the row. */
   addedByName?: string
   /**
+   * Which List it is on, for a view that gathers Items from several.
+   *
+   * Beside the label rather than in the metadata column: away from its own List, where
+   * an Item lives is part of reading the Item, not a fact filed after it.
+   */
+  listName?: string
+  /**
    * What it came through, when that was not a browser: "Anna · via Kitchen tablet".
    *
    * The Member is still named. A token is somebody's access narrowed, never an identity
@@ -76,6 +83,7 @@ export function ListRow({
   quantity,
   addedByName,
   addedVia,
+  listName,
   dueLabel,
   overdue,
   done,
@@ -124,6 +132,10 @@ export function ListRow({
             <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[11.5px] text-muted-foreground">
               {quantity}
             </span>
+          )}
+
+          {listName && (
+            <span className="shrink-0 text-micro text-secondary-foreground">{listName}</span>
           )}
         </span>
 

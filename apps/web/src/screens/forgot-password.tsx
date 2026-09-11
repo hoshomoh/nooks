@@ -15,6 +15,7 @@ import {
   readPendingRequest,
   rememberPendingRequest,
 } from "@/lib/pending-request"
+import { startNewSession } from "@/lib/new-session"
 
 /**
  * A forgotten password. Nooks sends no email: an Admin checks it is really you however
@@ -108,7 +109,7 @@ function CheckResetRequest({ requestUid, onStartOver }: CheckResetRequestProps) 
     mutationFn: () => authClient.completePasswordReset({ requestUid, newPassword }),
     onSuccess: async () => {
       forgetPendingRequest("reset")
-      await queryClient.invalidateQueries()
+      startNewSession(queryClient)
       await navigate({ to: "/" })
     },
   })

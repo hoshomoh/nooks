@@ -10,6 +10,7 @@ import { FormError } from "@/components/ds/form-error"
 import { authClient } from "@/lib/api"
 import { createStarterList } from "@/lib/starter-list"
 import { messageFrom } from "@/lib/errors"
+import { startNewSession } from "@/lib/new-session"
 
 export function Setup() {
   const navigate = useNavigate()
@@ -30,7 +31,7 @@ export function Setup() {
       await createStarterList(t).catch(() => undefined)
 
       // The Instance is now named, there is a session, and there is a List.
-      await queryClient.invalidateQueries()
+      startNewSession(queryClient)
       await navigate({ to: "/" })
     },
   })

@@ -12,6 +12,7 @@ import { NotePanel } from "@/components/ds/note-panel"
 import { authClient } from "@/lib/api"
 import { applyPendingTick } from "@/lib/apply-pending-tick"
 import { messageFrom } from "@/lib/errors"
+import { startNewSession } from "@/lib/new-session"
 import {
   forgetPendingRequest,
   readPendingRequest,
@@ -123,7 +124,7 @@ function CheckJoinRequest({ requestUid, onStartOver }: CheckJoinRequestProps) {
       forgetPendingRequest("join")
       // Somebody who asked to join from the public list reached for something first.
       await applyPendingTick()
-      await queryClient.invalidateQueries()
+      startNewSession(queryClient)
       await navigate({ to: "/" })
     },
   })

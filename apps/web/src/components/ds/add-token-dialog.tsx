@@ -9,10 +9,10 @@ import { Field } from "./field"
 import { SecretOnce } from "./secret-once"
 import { TickBox } from "./tick-box"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { DateCalendar } from "./date-calendar"
-import { atEndOf, momentIn, parseDue, toStored, type DueDate } from "@/lib/dates"
+import { DateField } from "./date-field"
+import { atEndOf, momentIn, type DueDate } from "@/lib/dates"
 import { toggled } from "@/lib/toggle-uid"
-import { useLocale } from "@/lib/use-locale"
+import { useDueLabel } from "@/lib/use-due-label"
 
 /** What a Member asked for, to cut a token from. */
 export interface NewToken {
@@ -110,7 +110,7 @@ interface AddTokenFormProps {
 /** The form itself, which owns the answers so far. */
 function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
   const { t } = useTranslation()
-  const { dateLocale } = useLocale()
+  const due = useDueLabel()
   const [name, setName] = useState("")
   // Read and write on, delete off — the shape almost every caller wants, and the one
   // the design draws. Delete has to be asked for.
@@ -231,16 +231,15 @@ function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
           onChoose={setLifetime}
         />
 
-        {/* The calendar itself, not a control that opens one. Asking for a day and then
-            making a Member press a second thing to see the days is one step too many. */}
+        {/* The calendar opens over the dialog rather than growing it: a form that gets
+            taller as you answer it moves every field under the cursor. */}
         {lifetime === "pick" && (
-          <div className="rounded-xl border border-border p-1">
-            <DateCalendar
-              selected={parseDue(chosenDay) ?? undefined}
-              onSelect={(day) => setChosenDay(day ? toStored(day) : "")}
-              locale={dateLocale}
-            />
-          </div>
+          <DateField
+            value={chosenDay}
+            label={chosenDay ? due.label(chosenDay) : t("tokens.pickADay")}
+            chosen={Boolean(chosenDay)}
+            onChange={setChosenDay}
+          />
         )}
       </div>
 

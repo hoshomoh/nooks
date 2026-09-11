@@ -9,6 +9,7 @@ import { Field } from "@/components/ds/field"
 import { FormError } from "@/components/ds/form-error"
 import { authClient } from "@/lib/api"
 import { messageFrom } from "@/lib/errors"
+import { startNewSession } from "@/lib/new-session"
 
 export function ReplacePassword() {
   const navigate = useNavigate()
@@ -21,7 +22,7 @@ export function ReplacePassword() {
   const replacePassword = useMutation({
     mutationFn: () => authClient.replacePassword({ currentPassword, newPassword }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries()
+      startNewSession(queryClient)
       await navigate({ to: "/" })
     },
   })

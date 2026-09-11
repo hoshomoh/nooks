@@ -10,6 +10,7 @@ import { FormError } from "@/components/ds/form-error"
 import { authClient } from "@/lib/api"
 import { applyPendingTick } from "@/lib/apply-pending-tick"
 import { messageFrom } from "@/lib/errors"
+import { startNewSession } from "@/lib/new-session"
 
 const route = getRouteApi("/sign-in")
 
@@ -27,11 +28,7 @@ export function SignIn() {
     onSuccess: async () => {
       // Before anything is read, so the List they land on already shows it ticked.
       await applyPendingTick()
-      // Cleared rather than invalidated: the loader on "/" reads the current Member
-      // with ensureQueryData, which hands back a cached answer even once it is stale.
-      // The cached answer here is "nobody is signed in", so invalidating alone sent a
-      // Member who had just signed in straight back to this page.
-      queryClient.clear()
+      startNewSession(queryClient)
       await navigate({ to: "/" })
     },
   })

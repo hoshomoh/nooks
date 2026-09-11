@@ -127,10 +127,6 @@ func (s *AuthService) SignIn(
 		return nil, internalError("verify password", err)
 	}
 
-	if err := s.store.MarkMemberSignedIn(ctx, member.ID, s.now()); err != nil {
-		return nil, internalError("mark member signed in", err)
-	}
-
 	res := connect.NewResponse(&apiv1.SignInResponse{Member: memberToProto(member)})
 	if err := s.startSession(ctx, res.Header(), member); err != nil {
 		return nil, err
@@ -282,6 +278,13 @@ func (s *AuthService) startSession(ctx context.Context, header interface{ Add(st
 	}
 	if err := s.store.CreateSession(ctx, session); err != nil {
 		return internalError("create session", err)
+	}
+
+	// Here rather than in SignIn, because every way a session begins is somebody
+	// arriving: first run, signing in, finishing a join, replacing a password. Marking
+	// it only on sign-in left the first Admin listed forever as not yet arrived.
+	if err := s.store.MarkMemberSignedIn(ctx, member.ID, now); err != nil {
+		return internalError("mark member signed in", err)
 	}
 
 	header.Add("Set-Cookie", auth.NewCookie(token, expires, s.secure).String())

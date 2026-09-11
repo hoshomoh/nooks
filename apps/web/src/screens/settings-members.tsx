@@ -162,7 +162,10 @@ function MemberRow({ member, groups, isSignedIn, onSetRole, onRemove }: MemberRo
 
   return (
     <div className="grid min-h-14 grid-cols-[1fr_120px_110px_28px] items-center gap-4 border-b border-hair">
-      <span className="flex items-center gap-3">
+      {/* min-w-0, because a grid item will not shrink below its content without it —
+          a long email was pushing the fixed columns to the right of where their headings
+          sit. */}
+      <span className="flex min-w-0 items-center gap-3">
         <span className="grid size-7 shrink-0 place-items-center rounded-full bg-chip text-[11px] text-secondary-foreground">
           {initialsOf(member.name)}
         </span>

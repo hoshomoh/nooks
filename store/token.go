@@ -118,13 +118,24 @@ func (s *sqlStore) AccessTokenByHash(ctx context.Context, hash string) (AccessTo
 
 // AccessTokensFor lists a Member's own tokens, newest first.
 func (s *sqlStore) AccessTokensFor(ctx context.Context, memberID int64) ([]AccessToken, error) {
+	return s.accessTokens(ctx, &memberID)
+}
+
+// AllAccessTokens lists every token on the Instance, newest first.
+func (s *sqlStore) AllAccessTokens(ctx context.Context) ([]AccessToken, error) {
+	return s.accessTokens(ctx, nil)
+}
+
+// accessTokens reads tokens, for one Member or for everybody.
+func (s *sqlStore) accessTokens(ctx context.Context, memberID *int64) ([]AccessToken, error) {
 	var rows []accessTokenModel
-	err := s.db.NewSelect().
+	query := s.db.NewSelect().
 		Model(&rows).
-		Where("member_id = ?", memberID).
-		Order("created_at DESC", "id DESC").
-		Scan(ctx)
-	if err != nil {
+		Order("created_at DESC", "id DESC")
+	if memberID != nil {
+		query = query.Where("member_id = ?", *memberID)
+	}
+	if err := query.Scan(ctx); err != nil {
 		return nil, fmt.Errorf("read access tokens: %w", err)
 	}
 

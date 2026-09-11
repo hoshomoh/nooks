@@ -4,6 +4,7 @@ import {
   differenceInCalendarDays,
   endOfMonth,
   format,
+  formatISO,
   getDay,
   isBefore,
   isValid,
@@ -186,6 +187,16 @@ export function parseMoment(value: string): Date | null {
   }
   const parsed = parseISO(value)
   return isValid(parsed) ? parsed : null
+}
+
+/**
+ * momentIn is an RFC 3339 timestamp a number of days from now.
+ *
+ * For an expiry, which is a moment rather than a day: a token stops working at a time,
+ * and the server is told when in the format it reads back.
+ */
+export function momentIn(days: number, from: Date = new Date()): string {
+  return formatISO(addDays(from, days))
 }
 
 /** rangeFrom returns the stored dates bounding a window of days starting at from. */

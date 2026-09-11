@@ -230,12 +230,11 @@ The single most important milestone; everything else is furniture.
 ## M10 · Access tokens, REST, MCP
 
 - [x] Access token schema: hashed, scoped to named Lists, permissioned, expiring
-- [ ] Tokens page — a Member's own; an Admin also sees that others' exist
+- [x] Tokens page — a Member's own; an Admin also sees that others' exist
 - [x] An Admin can revoke another Member's token but **cannot read it or make one in their name**
-- [ ] Add a token dialog: name, List scope picker, permissions, expiry
-- [~] The secret is handed over once by the API and never again. Its panel arrives with
-      the tokens page
-- [ ] Unpicked Lists are invisible to a token — it cannot see that they exist
+- [x] Add a token dialog: name, List scope picker, permissions, expiry
+- [x] The secret is handed over once by the API and never again
+- [x] Unpicked Lists are invisible to a token — it cannot see that they exist
 - [ ] Token activity log
 - [ ] REST API at `/api/v1`
 - [ ] MCP server at `/mcp`, same token

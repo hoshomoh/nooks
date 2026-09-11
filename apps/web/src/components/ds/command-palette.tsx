@@ -23,6 +23,7 @@ import { listClient } from "@/lib/api"
 import { listsQuery, searchQuery } from "@/lib/list-queries"
 import { refreshLists } from "@/lib/refresh"
 import { useCommandPalette } from "@/lib/use-command-palette"
+import { SETTINGS_SECTIONS, type SettingsRoute } from "./settings-sections"
 
 /**
  * ⌘K: go anywhere, and find anything.
@@ -54,17 +55,22 @@ export function CommandPalette() {
 
 /** Where a Member can go that is not a List. */
 interface Destination {
-  to: "/today" | "/upcoming" | "/calendar" | "/" | "/settings/members" | "/settings/groups"
+  to: "/today" | "/upcoming" | "/calendar" | "/" | SettingsRoute
   labelKey: string
 }
 
+/**
+ * Every view, then every settings page.
+ *
+ * The settings half is built from the same list the settings column is, so a page added
+ * there is reachable from the palette without anybody remembering to add it twice.
+ */
 const DESTINATIONS: Destination[] = [
   { to: "/today", labelKey: "views.today" },
   { to: "/upcoming", labelKey: "views.upcoming" },
   { to: "/calendar", labelKey: "views.calendar" },
   { to: "/", labelKey: "list.allLists" },
-  { to: "/settings/members", labelKey: "settings.members" },
-  { to: "/settings/groups", labelKey: "settings.groups" },
+  ...SETTINGS_SECTIONS,
 ]
 
 function SearchPanel() {

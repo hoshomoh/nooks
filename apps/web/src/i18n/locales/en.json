@@ -290,7 +290,8 @@
     "members": "Members",
     "groups": "Groups",
     "backToLists": "Back to lists",
-    "publicList": "Public list"
+    "publicList": "Public list",
+    "tokens": "Access tokens"
   },
   "members": {
     "title": "Members",
@@ -424,5 +425,44 @@
     "address": "The page is at {{url}}",
     "save": "Save",
     "saved": "Saved"
+  },
+  "tokens": {
+    "title": "Access tokens",
+    "blurb": "Keys for the things that are not browsers — a script, a shortcut, an assistant. A token can never do more than you can, and it reaches only the lists you name.",
+    "add": "Add a token",
+    "emptyTitle": "No tokens yet",
+    "emptyBody": "A token lets something other than a browser read or change your lists. You are shown the secret once, when you make it.",
+    "tokenColumn": "Token",
+    "permission": "Permission",
+    "lastUsed": "Last used",
+    "neverUsed": "never",
+    "noLists": "no lists",
+    "expires": "expires {{date}}",
+    "neverExpires": "does not expire",
+    "read": "Read",
+    "readBlurb": "See and print. It cannot tick anything off or add to a list.",
+    "write": "Write",
+    "writeBlurb": "Tick, add and edit items on the lists it names.",
+    "scope": "Lists",
+    "scopeBlurb": "A list you do not pick is invisible to this token — it cannot see that it exists.",
+    "expiry": "Expires",
+    "lifetime": {
+      "30": "In 30 days",
+      "90": "In 90 days",
+      "365": "In a year",
+      "never": "Never"
+    },
+    "name": "Name",
+    "nameHint": "What it is for, so you recognise it later: “kitchen tablet”.",
+    "addTitle": "Add a token",
+    "addBlurb": "The secret is shown once, here, and never again. nooks keeps only a hash of it.",
+    "addSubmit": "Add",
+    "secretTitle": "“{{name}}” can reach nooks with this",
+    "secretBlurb": "Copy it now. It cannot be shown again — nooks keeps only a hash. If you lose it, revoke this token and make another.",
+    "revoke": "Revoke {{name}}",
+    "revokeTitle": "Revoke “{{name}}”?",
+    "revokeBlurb": "Whatever is using it stops working straight away. What it added stays on its lists.",
+    "revokeConfirm": "Revoke",
+    "someoneElses": "{{name}}'s token"
   }
 }

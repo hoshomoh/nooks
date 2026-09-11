@@ -211,3 +211,79 @@ func TestATokenCannotManageTokens(t *testing.T) {
 		t.Errorf("ListAccessTokens code = %v, want permission_denied", got)
 	}
 }
+
+// An Admin can see that somebody else's key exists — that is what lets them revoke it —
+// but the names of another Member's Lists are not theirs to read.
+func TestAnAdminSeesThatOthersTokensExistWithoutTheirScope(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.jonas, "Bike")
+
+	_, err := f.tokens(t).CreateAccessToken(f.as(t, f.jonas), connect.NewRequest(
+		&apiv1.CreateAccessTokenRequest{
+			Name: "Jonas' shortcut", ListUids: []string{uid},
+			Permission: apiv1.Permission_PERMISSION_READ,
+		},
+	))
+	if err != nil {
+		t.Fatalf("CreateAccessToken: %v", err)
+	}
+
+	listed, err := f.tokens(t).ListAccessTokens(f.as(t, f.anna), connect.NewRequest(
+		&apiv1.ListAccessTokensRequest{},
+	))
+	if err != nil {
+		t.Fatalf("ListAccessTokens as an Admin: %v", err)
+	}
+
+	tokens := listed.Msg.GetTokens()
+	if len(tokens) != 1 {
+		t.Fatalf("got %d tokens, want the one somebody else cut", len(tokens))
+	}
+	if got := tokens[0].GetMemberName(); got != f.jonas.Name {
+		t.Errorf("memberName = %q, want %q", got, f.jonas.Name)
+	}
+	if got := tokens[0].GetListNames(); len(got) != 0 {
+		t.Errorf("listNames = %v, want none for somebody else's token", got)
+	}
+}
+
+// A Member is told about their own tokens and nobody else's.
+func TestAMemberSeesOnlyTheirOwnTokens(t *testing.T) {
+	f := newListFixture(t)
+	mine := f.createList(t, f.jonas, "Bike")
+	theirs := f.createList(t, f.anna, "Groceries")
+
+	// One service across both cuts: its secrets are a counter, and a fresh one would
+	// hand out the same hash twice.
+	svc := f.tokens(t)
+	for _, cut := range []struct {
+		member store.Member
+		list   string
+		name   string
+	}{{f.jonas, mine, "Mine"}, {f.anna, theirs, "Theirs"}} {
+		_, err := svc.CreateAccessToken(f.as(t, cut.member), connect.NewRequest(
+			&apiv1.CreateAccessTokenRequest{
+				Name: cut.name, ListUids: []string{cut.list},
+				Permission: apiv1.Permission_PERMISSION_READ,
+			},
+		))
+		if err != nil {
+			t.Fatalf("CreateAccessToken %s: %v", cut.name, err)
+		}
+	}
+
+	listed, err := svc.ListAccessTokens(f.as(t, f.jonas), connect.NewRequest(
+		&apiv1.ListAccessTokensRequest{},
+	))
+	if err != nil {
+		t.Fatalf("ListAccessTokens: %v", err)
+	}
+
+	tokens := listed.Msg.GetTokens()
+	if len(tokens) != 1 || tokens[0].GetName() != "Mine" {
+		t.Fatalf("got %d tokens, want only the Member's own", len(tokens))
+	}
+	if got := tokens[0].GetListNames(); len(got) != 1 || got[0] != "Bike" {
+		t.Errorf("listNames = %v, want the List their own token names", got)
+	}
+}

@@ -54,9 +54,9 @@ func (s *TokenService) ListAccessTokens(
 		return nil, err
 	}
 
-	tokens, err := s.store.AccessTokensFor(ctx, member.ID)
+	tokens, err := s.visibleTokens(ctx, member)
 	if err != nil {
-		return nil, internalError("read access tokens", err)
+		return nil, err
 	}
 
 	out := make([]*apiv1.AccessToken, 0, len(tokens))
@@ -68,6 +68,30 @@ func (s *TokenService) ListAccessTokens(
 		out = append(out, described)
 	}
 	return connect.NewResponse(&apiv1.ListAccessTokensResponse{Tokens: out}), nil
+}
+
+// visibleTokens is the tokens a Member may be told about.
+//
+// Their own, and — for an Admin — everybody's, because a key somebody left in a door is
+// the Instance's problem. What an Admin is told about somebody else's is deliberately
+// thin; see describe.
+func (s *TokenService) visibleTokens(
+	ctx context.Context,
+	member store.Member,
+) ([]store.AccessToken, error) {
+	if member.IsAdmin() {
+		tokens, err := s.store.AllAccessTokens(ctx)
+		if err != nil {
+			return nil, internalError("read access tokens", err)
+		}
+		return tokens, nil
+	}
+
+	tokens, err := s.store.AccessTokensFor(ctx, member.ID)
+	if err != nil {
+		return nil, internalError("read access tokens", err)
+	}
+	return tokens, nil
 }
 
 // errNoLists refuses a token that could not reach anything.
@@ -202,12 +226,62 @@ func (s *TokenService) reachableListIDs(
 	return ids, nil
 }
 
-// describe converts a token for the wire, naming the Lists it reaches.
+// describe converts a token for the wire.
+//
+// The Lists it reaches are named only on the reader's own tokens. An Admin may see that
+// somebody else's key exists — that is what lets them revoke it — but the names of
+// another Member's Lists are not theirs to read.
 func (s *TokenService) describe(
 	ctx context.Context,
 	token store.AccessToken,
-	owner store.Member,
+	reader store.Member,
 ) (*apiv1.AccessToken, error) {
+	owner, err := s.owner(ctx, token, reader)
+	if err != nil {
+		return nil, err
+	}
+
+	described := &apiv1.AccessToken{
+		Uid:        token.UID,
+		Name:       token.Name,
+		Permission: permissionToProto(token.Permission),
+		ExpiresAt:  formatMoment(token.ExpiresAt),
+		LastUsedAt: formatMoment(token.LastUsedAt),
+		CreatedAt:  formatMoment(token.CreatedAt),
+		MemberName: owner.Name,
+	}
+	if token.MemberID != reader.ID {
+		return described, nil
+	}
+
+	described.ListNames, err = s.scopeNames(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+	return described, nil
+}
+
+// owner is whose token this is, read only when it is not the reader's own.
+func (s *TokenService) owner(
+	ctx context.Context,
+	token store.AccessToken,
+	reader store.Member,
+) (store.Member, error) {
+	if token.MemberID == reader.ID {
+		return reader, nil
+	}
+	owner, err := s.store.MemberByID(ctx, token.MemberID)
+	if err != nil {
+		return store.Member{}, internalError("read token owner", err)
+	}
+	return owner, nil
+}
+
+// scopeNames is what a token's Lists are called.
+func (s *TokenService) scopeNames(
+	ctx context.Context,
+	token store.AccessToken,
+) ([]string, error) {
 	ids, err := s.store.TokenListIDs(ctx, token.ID)
 	if err != nil {
 		return nil, internalError("read token scope", err)
@@ -225,17 +299,7 @@ func (s *TokenService) describe(
 			}
 		}
 	}
-
-	return &apiv1.AccessToken{
-		Uid:        token.UID,
-		Name:       token.Name,
-		Permission: permissionToProto(token.Permission),
-		ListNames:  names,
-		ExpiresAt:  formatMoment(token.ExpiresAt),
-		LastUsedAt: formatMoment(token.LastUsedAt),
-		CreatedAt:  formatMoment(token.CreatedAt),
-		MemberName: owner.Name,
-	}, nil
+	return names, nil
 }
 
 // parseExpiry reads an expiry, treating empty as "does not expire".

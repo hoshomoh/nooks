@@ -254,6 +254,10 @@ type Store interface {
 	// AccessTokensFor lists a Member's own tokens, newest first.
 	AccessTokensFor(ctx context.Context, memberID int64) ([]AccessToken, error)
 
+	// AllAccessTokens lists every token on the Instance, newest first. For an Admin,
+	// who may see that somebody else's key exists without being able to read or use it.
+	AllAccessTokens(ctx context.Context) ([]AccessToken, error)
+
 	// TokenListIDs is which Lists a token may reach.
 	TokenListIDs(ctx context.Context, tokenID int64) ([]int64, error)
 

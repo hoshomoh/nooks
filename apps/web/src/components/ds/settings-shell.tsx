@@ -5,29 +5,9 @@ import { cn } from "cn"
 
 import { ChromeBar } from "./chrome-bar"
 import { Sidebar } from "./sidebar"
+import { SETTINGS_SECTIONS, type SettingsRoute } from "./settings-sections"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useSignedInData } from "@/lib/use-signed-in-data"
-
-/** Where a settings page lives. Only routes that exist are listed. */
-export type SettingsRoute = "/settings/members" | "/settings/groups" | "/settings/public"
-
-/** One entry in the settings column. */
-interface SettingsSection {
-  to: SettingsRoute
-  labelKey: string
-}
-
-/**
- * The settings pages, in the order the design lists them.
- *
- * General, Access tokens, Public list and About arrive with the milestones that build
- * them. A nav entry that goes nowhere is worse than one that is not there yet.
- */
-const SECTIONS: SettingsSection[] = [
-  { to: "/settings/members", labelKey: "settings.members" },
-  { to: "/settings/groups", labelKey: "settings.groups" },
-  { to: "/settings/public", labelKey: "settings.publicList" },
-]
 
 export interface SettingsShellProps {
   /** The page being read, so its entry is marked. */
@@ -69,7 +49,7 @@ export function SettingsShell({ active, crumb, counts, children }: SettingsShell
         </span>
 
         <div className="flex flex-col gap-px">
-          {SECTIONS.map((section) => (
+          {SETTINGS_SECTIONS.map((section) => (
             <Link
               key={section.to}
               to={section.to}

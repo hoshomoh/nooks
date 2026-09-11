@@ -87,6 +87,7 @@ func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
 	mux.Handle(apiv1.NewMemberServiceHandler(v1.NewMemberService(s, nil, nil), interceptors))
 	mux.Handle(apiv1.NewActivityServiceHandler(v1.NewActivityService(s, nil), interceptors))
 	mux.Handle(apiv1.NewPublicServiceHandler(v1.NewPublicService(s), interceptors))
+	mux.Handle(apiv1.NewTokenServiceHandler(v1.NewTokenService(s, nil, nil, nil), interceptors))
 	mux.Handle("GET /api/v1/events", live.NewHandler(s, broker, resolver))
 	mux.HandleFunc("GET /healthz", handleHealthz)
 

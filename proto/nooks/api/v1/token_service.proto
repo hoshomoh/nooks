@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package nooks.api.v1;
+
+// TokenService covers the keys a Member cuts for things that are not browsers.
+//
+// A token can never do more than the Member it belongs to. That is why there is no way
+// here to make one in somebody else's name, and no way to read one back: an Admin who
+// needs a token makes their own.
+service TokenService {
+  // ListAccessTokens returns the signed-in Member's own tokens.
+  rpc ListAccessTokens(ListAccessTokensRequest) returns (ListAccessTokensResponse);
+
+  // CreateAccessToken cuts one. The secret is in the answer and nowhere else, ever.
+  rpc CreateAccessToken(CreateAccessTokenRequest) returns (CreateAccessTokenResponse);
+
+  // RevokeAccessToken stops one working. A Member may revoke their own; an Admin may
+  // revoke anybody's, because a key somebody left in a door is the Instance's problem.
+  rpc RevokeAccessToken(RevokeAccessTokenRequest) returns (RevokeAccessTokenResponse);
+}
+
+// Permission is what a token may do — two levels, not a matrix.
+enum Permission {
+  PERMISSION_UNSPECIFIED = 0;
+  // PERMISSION_READ is see and print.
+  PERMISSION_READ = 1;
+  // PERMISSION_WRITE adds ticking, adding and editing.
+  PERMISSION_WRITE = 2;
+}
+
+// AccessToken is a key, described. Never the key itself.
+message AccessToken {
+  string uid = 1;
+
+  // What it is for, in the Member's words: "kitchen tablet".
+  string name = 2;
+
+  Permission permission = 3;
+
+  // The Lists it may reach, by name. A List it does not name is invisible to it.
+  repeated string list_names = 4;
+
+  // RFC 3339, or empty for a token that does not expire.
+  string expires_at = 5;
+
+  // RFC 3339, or empty for one nothing has used yet.
+  string last_used_at = 6;
+
+  string created_at = 7;
+
+  // Whose it is. Shown to an Admin, who can see that somebody else's token exists
+  // without being able to read or use it.
+  string member_name = 8;
+}
+
+message ListAccessTokensRequest {}
+
+message ListAccessTokensResponse {
+  repeated AccessToken tokens = 1;
+}
+
+message CreateAccessTokenRequest {
+  string name = 1;
+  Permission permission = 2;
+
+  // The Lists it may reach. A token that names none reaches none.
+  repeated string list_uids = 3;
+
+  // RFC 3339, or empty for a token that does not expire.
+  string expires_at = 4;
+}
+
+message CreateAccessTokenResponse {
+  AccessToken token = 1;
+
+  // The secret, in clear, shown once and never again. Nooks keeps only a hash.
+  string secret = 2;
+}
+
+message RevokeAccessTokenRequest {
+  string token_uid = 1;
+}
+
+message RevokeAccessTokenResponse {}

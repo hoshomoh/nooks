@@ -298,7 +298,8 @@
     "backToLists": "Back to lists",
     "publicList": "Public list",
     "tokens": "Access tokens",
-    "account": "Account"
+    "account": "Account",
+    "appearance": "Appearance"
   },
   "members": {
     "title": "Members",
@@ -507,5 +508,18 @@
     "newPassword": "New password",
     "replacePassword": "Replace password",
     "saved": "Saved"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "blurb": "How nooks looks on this machine, and what language it speaks. Both are yours alone — nobody else here sees the difference.",
+    "theme": "Theme",
+    "themeBlurb": "System follows your machine, and keeps following it.",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "language": "Language",
+    "languageBlurb": "Sets the words, how dates read, and how numbers are written. One choice, not three.",
+    "translationsNote": "{{count}} language so far. Adding one is a JSON file in the repository — no code, and no release needed to try it.",
+    "translationsNote_other": "{{count}} languages so far. Adding one is a JSON file in the repository — no code, and no release needed to try it."
   }
 }

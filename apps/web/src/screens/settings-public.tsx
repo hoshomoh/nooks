@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next"
 import type { InstanceSettings, PublicListSettings } from "@nooks/api"
 
 import { SaveButton } from "@/components/ds/save-button"
+import { SelectField } from "@/components/ds/select-field"
 import { SettingsRow, Toggle } from "@/components/ds/settings-row"
 import { SettingsShell } from "@/components/ds/settings-shell"
 import { instanceClient } from "@/lib/api"
@@ -47,19 +48,15 @@ export function SettingsPublicScreen() {
 
       <div className="mt-3.5 flex flex-col">
         <SettingsRow label={t("publicSettings.whichList")} blurb={t("publicSettings.whichListBlurb")}>
-          <select
+          <SelectField
+            label={t("publicSettings.whichList")}
+            options={[
+              { value: "", label: t("publicSettings.none") },
+              ...lists.map((list) => ({ value: list.uid, label: list.name })),
+            ]}
             value={draft?.listUid ?? ""}
-            onChange={(event) => set({ listUid: event.target.value })}
-            aria-label={t("publicSettings.whichList")}
-            className="h-input w-70 rounded-lg border border-border bg-transparent px-3 text-field"
-          >
-            <option value="">{t("publicSettings.none")}</option>
-            {lists.map((list) => (
-              <option key={list.uid} value={list.uid}>
-                {list.name}
-              </option>
-            ))}
-          </select>
+            onValueChange={(listUid) => set({ listUid })}
+          />
         </SettingsRow>
 
         {/* The rest only mean anything once something is published. */}

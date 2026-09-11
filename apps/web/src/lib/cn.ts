@@ -71,6 +71,7 @@ export const NOOKS_CONTAINERS = [
 export const NOOKS_SPACING = [
   "control",
   "control-compact",
+  "control-settings",
   "control-toolbar",
   "input",
   "row",

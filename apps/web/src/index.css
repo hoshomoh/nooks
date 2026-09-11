@@ -97,6 +97,7 @@
   --spacing-control: 34px; /* default button */
   --spacing-control-compact: 32px; /* inside a table or settings row */
   --spacing-control-toolbar: 26px; /* the chrome bar only */
+  --spacing-control-settings: 36px; /* select and input in a settings row */
   --spacing-input: 38px; /* text input */
   --spacing-row: 44px; /* the list row, and the minimum hit area */
   --spacing-chrome: 44px; /* the chrome bar */

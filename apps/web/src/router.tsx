@@ -17,6 +17,7 @@ import { rootRoute } from "./routes/root"
 import { settingsGroupsRoute } from "./routes/settings-groups"
 import { settingsMembersRoute } from "./routes/settings-members"
 import { settingsAccountRoute } from "./routes/settings-account"
+import { settingsAppearanceRoute } from "./routes/settings-appearance"
 import { settingsPublicRoute } from "./routes/settings-public"
 import { settingsTokensRoute } from "./routes/settings-tokens"
 import { setupRoute } from "./routes/setup"
@@ -37,6 +38,7 @@ const routeTree = rootRoute.addChildren([
   settingsMembersRoute,
   settingsGroupsRoute,
   settingsAccountRoute,
+  settingsAppearanceRoute,
   settingsPublicRoute,
   settingsTokensRoute,
 ])

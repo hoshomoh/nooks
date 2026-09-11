@@ -260,6 +260,9 @@
     "empty": "Nothing is waiting for you.",
     "approve": "Approve",
     "open": "Open",
-    "seeBoth": "See both"
+    "seeBoth": "See both",
+    "ignore": "Ignore",
+    "ignored": "Ignored, silently",
+    "approved": "Approved"
   }
 }

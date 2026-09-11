@@ -10,6 +10,8 @@ export interface ActivityPanelProps {
   timeOf: (createdAt: string) => string
   /** Follows an entry to whatever it points at. */
   onOpen: (entry: Activity) => void
+  /** Decides a request. Ignoring is silent and never tells the sender. */
+  onDecide: (entry: Activity, approve: boolean) => void
   onClose: () => void
 }
 
@@ -21,7 +23,13 @@ export interface ActivityPanelProps {
  * code, and why the panel says so at the bottom: a Member who is waiting for an email
  * should find out here that none is coming.
  */
-export function ActivityPanel({ activity, timeOf, onOpen, onClose }: ActivityPanelProps) {
+export function ActivityPanel({
+  activity,
+  timeOf,
+  onOpen,
+  onDecide,
+  onClose,
+}: ActivityPanelProps) {
   const { t } = useTranslation()
   useEscape(onClose)
 
@@ -36,7 +44,13 @@ export function ActivityPanel({ activity, timeOf, onOpen, onClose }: ActivityPan
         <p className="px-2.5 py-3 text-meta text-muted-foreground">{t("activity.empty")}</p>
       ) : (
         activity.map((entry) => (
-          <Entry key={entry.uid} entry={entry} when={timeOf(entry.createdAt)} onOpen={onOpen} />
+          <Entry
+            key={entry.uid}
+            entry={entry}
+            when={timeOf(entry.createdAt)}
+            onOpen={onOpen}
+            onDecide={onDecide}
+          />
         ))
       )}
 
@@ -52,12 +66,12 @@ interface EntryProps {
   /** When it happened, in words. */
   when: string
   onOpen: (entry: Activity) => void
+  onDecide: (entry: Activity, approve: boolean) => void
 }
 
 /** One thing waiting for attention. */
-function Entry({ entry, when, onOpen }: EntryProps) {
+function Entry({ entry, when, onOpen, onDecide }: EntryProps) {
   const { t } = useTranslation()
-  const action = actionKeyFor(entry.kind)
 
   return (
     <div
@@ -73,14 +87,22 @@ function Entry({ entry, when, onOpen }: EntryProps) {
         <span className="text-chrome leading-[1.45]">{entry.text}</span>
         <span className="flex items-center gap-2.5">
           <span className="text-micro text-muted-foreground">{when}</span>
-          {action && (
-            <button
-              type="button"
-              onClick={() => onOpen(entry)}
-              className="text-micro text-shared hover:underline"
-            >
-              {t(action)}
-            </button>
+
+          {isRequest(entry.kind) ? (
+            <>
+              <Action label={t("activity.approve")} onClick={() => onDecide(entry, true)} />
+              {/* Ignoring is silent: the sender is never told, so there is nothing to
+                  confirm and nothing to undo. */}
+              <Action
+                label={t("activity.ignore")}
+                quiet
+                onClick={() => onDecide(entry, false)}
+              />
+            </>
+          ) : (
+            entry.kind === ActivityKind.LIST_SHARED && (
+              <Action label={t("activity.open")} onClick={() => onOpen(entry)} />
+            )
           )}
         </span>
       </div>
@@ -88,22 +110,35 @@ function Entry({ entry, when, onOpen }: EntryProps) {
   )
 }
 
+interface ActionProps {
+  label: string
+  /** A second action beside the first one, in muted text rather than the accent. */
+  quiet?: boolean
+  onClick: () => void
+}
+
 /**
- * actionKeyFor is what an entry offers to do about itself.
+ * One thing an entry offers to do about itself.
  *
  * Only what can actually be acted on gets a word: an entry with nothing to do is a
  * statement, and giving it a button would be a button that goes nowhere.
  */
-function actionKeyFor(kind: ActivityKind): string | null {
-  switch (kind) {
-    case ActivityKind.JOIN_REQUEST:
-    case ActivityKind.RESET_REQUEST:
-      return "activity.approve"
-    case ActivityKind.LIST_SHARED:
-      return "activity.open"
-    case ActivityKind.CONFLICT:
-      return "activity.seeBoth"
-    default:
-      return null
-  }
+function Action({ label, quiet, onClick }: ActionProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "text-micro hover:underline",
+        quiet ? "text-muted-foreground" : "text-shared",
+      )}
+    >
+      {label}
+    </button>
+  )
+}
+
+/** isRequest reports whether an entry is somebody waiting on an Admin's decision. */
+function isRequest(kind: ActivityKind): boolean {
+  return kind === ActivityKind.JOIN_REQUEST || kind === ActivityKind.RESET_REQUEST
 }

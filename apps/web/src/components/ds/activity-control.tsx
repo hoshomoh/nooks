@@ -7,9 +7,15 @@ import type { Activity } from "@nooks/api"
 import { ActivityKind } from "@nooks/api"
 
 import { ActivityPanel } from "./activity-panel"
-import { activityClient } from "@/lib/api"
+import { activityClient, requestClient } from "@/lib/api"
 import { activityQuery } from "@/lib/activity-queries"
 import { useMomentLabel } from "@/lib/use-moment-label"
+
+/** What the decision mutation is told. */
+interface DecideVariables {
+  entry: Activity
+  approve: boolean
+}
 
 /**
  * The Activity control in the chrome bar, and the panel behind it.
@@ -40,6 +46,21 @@ export function ActivityControl() {
     }
   }
 
+  // Approving a request and ignoring it are the same call with a different answer.
+  // Ignoring is silent: nothing is sent, and the sender is never told.
+  const decide = useMutation({
+    // Neither call answers with anything, so neither answer is kept.
+    mutationFn: async ({ entry, approve }: DecideVariables): Promise<void> => {
+      const requestUid = entry.targetUid
+      if (entry.kind === ActivityKind.JOIN_REQUEST) {
+        await requestClient.decideJoinRequest({ requestUid, approve })
+        return
+      }
+      await requestClient.decideResetRequest({ requestUid, approve })
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["activity"] }),
+  })
+
   const follow = (entry: Activity) => {
     setOpen(false)
     if (entry.kind === ActivityKind.LIST_SHARED) {
@@ -66,6 +87,7 @@ export function ActivityControl() {
           activity={activity.data?.activity ?? []}
           timeOf={timeOf}
           onOpen={follow}
+          onDecide={(entry, approve) => decide.mutate({ entry, approve })}
           onClose={() => setOpen(false)}
         />
       )}

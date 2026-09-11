@@ -19,7 +19,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M3 · Lists and Items — the core | `[~]` lists, items, search and the list view |
 | M4 · Views: Today, Upcoming, Calendar | `[~]` add row from context left |
 | M5 · Notes | `[x]` |
-| M6 · Sharing, presence, Activity | `[~]` approve and ignore actions left |
+| M6 · Sharing, presence, Activity | `[x]` |
 | M7 · Members and Groups | `[ ]` |
 | M8 · Public list | `[ ]` |
 | M9 · Print | `[ ]` |
@@ -173,7 +173,7 @@ The single most important milestone; everything else is furniture.
 - [x] Presence: "Jonas is here" on the List being read, per connection
 - [x] Activity panel: join requests, reset requests and shares. Conflicts arrive with M13,
       token use with M10
-- [ ] Approve and ignore actions. **Ignore is silent and never notifies the sender.**
+- [x] Approve and ignore actions. **Ignore is silent and never notifies the sender.**
 - [x] Unread state and the dot on the Activity control
 
 ---
@@ -267,8 +267,8 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
 - [ ] **Ticks never conflict** — last write wins, whoever made it
 - [ ] Competing text prompts, on the row it affects only: Keep mine / Keep both
 - [ ] Error on save keeps the Member's text and offers real options
-- [ ] Loading skeletons that hold the exact height of real rows
-- [ ] "Still waiting on the server" after 4s
+- [x] Loading skeletons that hold the exact height of real rows
+- [x] "Still waiting on the server" after 4s
 
 ---
 

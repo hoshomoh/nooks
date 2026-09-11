@@ -27,6 +27,12 @@ service ListService {
   // DeleteList removes a List and the Items on it. Only its owner may.
   rpc DeleteList(DeleteListRequest) returns (DeleteListResponse);
 
+  // DuplicateList copies a List and the Items still open on it.
+  //
+  // The copy starts private and starts empty of history: it is a new List that happens
+  // to begin with the same things on it, not a second view of the first.
+  rpc DuplicateList(DuplicateListRequest) returns (DuplicateListResponse);
+
   // SetListPinned pins or unpins a List in the signed-in Member's own sidebar. It
   // never affects anyone else's.
   rpc SetListPinned(SetListPinnedRequest) returns (SetListPinnedResponse);
@@ -183,6 +189,14 @@ message GetListSharesRequest {
 message GetListSharesResponse {
   repeated string member_uids = 1;
   repeated string group_uids = 2;
+}
+
+message DuplicateListRequest {
+  string list_uid = 1;
+}
+
+message DuplicateListResponse {
+  List list = 1;
 }
 
 message DeleteListRequest {

@@ -267,5 +267,20 @@
     "ignore": "Ignore",
     "ignored": "Ignored, silently",
     "approved": "Approved"
+  },
+  "listMenu": {
+    "open": "More",
+    "rename": "Rename",
+    "pin": "Pin to sidebar",
+    "unpin": "Unpin",
+    "duplicate": "Duplicate",
+    "print": "Print",
+    "export": "Export as plain text",
+    "delete": "Delete list",
+    "deleteTitle": "Delete “{{name}}”?",
+    "deleteBlurb": "The list and everything on it goes. Nobody it was shared with keeps a copy.",
+    "deleteConfirm": "Delete",
+    "renameTitle": "Rename “{{name}}”",
+    "renameBlurb": "What the list is called, in the sidebar and on anything printed from it."
   }
 }

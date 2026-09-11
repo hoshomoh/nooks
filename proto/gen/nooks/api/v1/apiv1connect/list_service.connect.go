@@ -49,6 +49,9 @@ const (
 	ListServiceGetListSharesProcedure = "/nooks.api.v1.ListService/GetListShares"
 	// ListServiceDeleteListProcedure is the fully-qualified name of the ListService's DeleteList RPC.
 	ListServiceDeleteListProcedure = "/nooks.api.v1.ListService/DeleteList"
+	// ListServiceDuplicateListProcedure is the fully-qualified name of the ListService's DuplicateList
+	// RPC.
+	ListServiceDuplicateListProcedure = "/nooks.api.v1.ListService/DuplicateList"
 	// ListServiceSetListPinnedProcedure is the fully-qualified name of the ListService's SetListPinned
 	// RPC.
 	ListServiceSetListPinnedProcedure = "/nooks.api.v1.ListService/SetListPinned"
@@ -86,6 +89,11 @@ type ListServiceClient interface {
 	GetListShares(context.Context, *connect.Request[v1.GetListSharesRequest]) (*connect.Response[v1.GetListSharesResponse], error)
 	// DeleteList removes a List and the Items on it. Only its owner may.
 	DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error)
+	// DuplicateList copies a List and the Items still open on it.
+	//
+	// The copy starts private and starts empty of history: it is a new List that happens
+	// to begin with the same things on it, not a second view of the first.
+	DuplicateList(context.Context, *connect.Request[v1.DuplicateListRequest]) (*connect.Response[v1.DuplicateListResponse], error)
 	// SetListPinned pins or unpins a List in the signed-in Member's own sidebar. It
 	// never affects anyone else's.
 	SetListPinned(context.Context, *connect.Request[v1.SetListPinnedRequest]) (*connect.Response[v1.SetListPinnedResponse], error)
@@ -165,6 +173,12 @@ func NewListServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(listServiceMethods.ByName("DeleteList")),
 			connect.WithClientOptions(opts...),
 		),
+		duplicateList: connect.NewClient[v1.DuplicateListRequest, v1.DuplicateListResponse](
+			httpClient,
+			baseURL+ListServiceDuplicateListProcedure,
+			connect.WithSchema(listServiceMethods.ByName("DuplicateList")),
+			connect.WithClientOptions(opts...),
+		),
 		setListPinned: connect.NewClient[v1.SetListPinnedRequest, v1.SetListPinnedResponse](
 			httpClient,
 			baseURL+ListServiceSetListPinnedProcedure,
@@ -225,6 +239,7 @@ type listServiceClient struct {
 	setListSharing *connect.Client[v1.SetListSharingRequest, v1.SetListSharingResponse]
 	getListShares  *connect.Client[v1.GetListSharesRequest, v1.GetListSharesResponse]
 	deleteList     *connect.Client[v1.DeleteListRequest, v1.DeleteListResponse]
+	duplicateList  *connect.Client[v1.DuplicateListRequest, v1.DuplicateListResponse]
 	setListPinned  *connect.Client[v1.SetListPinnedRequest, v1.SetListPinnedResponse]
 	createItem     *connect.Client[v1.CreateItemRequest, v1.CreateItemResponse]
 	updateItem     *connect.Client[v1.UpdateItemRequest, v1.UpdateItemResponse]
@@ -268,6 +283,11 @@ func (c *listServiceClient) GetListShares(ctx context.Context, req *connect.Requ
 // DeleteList calls nooks.api.v1.ListService.DeleteList.
 func (c *listServiceClient) DeleteList(ctx context.Context, req *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error) {
 	return c.deleteList.CallUnary(ctx, req)
+}
+
+// DuplicateList calls nooks.api.v1.ListService.DuplicateList.
+func (c *listServiceClient) DuplicateList(ctx context.Context, req *connect.Request[v1.DuplicateListRequest]) (*connect.Response[v1.DuplicateListResponse], error) {
+	return c.duplicateList.CallUnary(ctx, req)
 }
 
 // SetListPinned calls nooks.api.v1.ListService.SetListPinned.
@@ -327,6 +347,11 @@ type ListServiceHandler interface {
 	GetListShares(context.Context, *connect.Request[v1.GetListSharesRequest]) (*connect.Response[v1.GetListSharesResponse], error)
 	// DeleteList removes a List and the Items on it. Only its owner may.
 	DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error)
+	// DuplicateList copies a List and the Items still open on it.
+	//
+	// The copy starts private and starts empty of history: it is a new List that happens
+	// to begin with the same things on it, not a second view of the first.
+	DuplicateList(context.Context, *connect.Request[v1.DuplicateListRequest]) (*connect.Response[v1.DuplicateListResponse], error)
 	// SetListPinned pins or unpins a List in the signed-in Member's own sidebar. It
 	// never affects anyone else's.
 	SetListPinned(context.Context, *connect.Request[v1.SetListPinnedRequest]) (*connect.Response[v1.SetListPinnedResponse], error)
@@ -402,6 +427,12 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(listServiceMethods.ByName("DeleteList")),
 		connect.WithHandlerOptions(opts...),
 	)
+	listServiceDuplicateListHandler := connect.NewUnaryHandler(
+		ListServiceDuplicateListProcedure,
+		svc.DuplicateList,
+		connect.WithSchema(listServiceMethods.ByName("DuplicateList")),
+		connect.WithHandlerOptions(opts...),
+	)
 	listServiceSetListPinnedHandler := connect.NewUnaryHandler(
 		ListServiceSetListPinnedProcedure,
 		svc.SetListPinned,
@@ -466,6 +497,8 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 			listServiceGetListSharesHandler.ServeHTTP(w, r)
 		case ListServiceDeleteListProcedure:
 			listServiceDeleteListHandler.ServeHTTP(w, r)
+		case ListServiceDuplicateListProcedure:
+			listServiceDuplicateListHandler.ServeHTTP(w, r)
 		case ListServiceSetListPinnedProcedure:
 			listServiceSetListPinnedHandler.ServeHTTP(w, r)
 		case ListServiceCreateItemProcedure:
@@ -517,6 +550,10 @@ func (UnimplementedListServiceHandler) GetListShares(context.Context, *connect.R
 
 func (UnimplementedListServiceHandler) DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.DeleteList is not implemented"))
+}
+
+func (UnimplementedListServiceHandler) DuplicateList(context.Context, *connect.Request[v1.DuplicateListRequest]) (*connect.Response[v1.DuplicateListResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.DuplicateList is not implemented"))
 }
 
 func (UnimplementedListServiceHandler) SetListPinned(context.Context, *connect.Request[v1.SetListPinnedRequest]) (*connect.Response[v1.SetListPinnedResponse], error) {

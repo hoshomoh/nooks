@@ -749,3 +749,95 @@ func TestRenamingAnItem(t *testing.T) {
 		t.Errorf("Label = %q, want the new name", got)
 	}
 }
+
+// A duplicate is a new List that begins with the same things on it, not a second view
+// of the first.
+func TestDuplicatingAList(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+	ctx := f.as(t, f.anna)
+
+	for _, label := range []string{"Milk", "Oats"} {
+		if _, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+			ListUid: uid, Label: label,
+		})); err != nil {
+			t.Fatalf("CreateItem: %v", err)
+		}
+	}
+
+	copied, err := f.svc.DuplicateList(ctx, connect.NewRequest(&apiv1.DuplicateListRequest{
+		ListUid: uid,
+	}))
+	if err != nil {
+		t.Fatalf("DuplicateList: %v", err)
+	}
+	if got := copied.Msg.GetList().GetName(); got != "Groceries (copy)" {
+		t.Errorf("name = %q", got)
+	}
+	if got := copied.Msg.GetList().GetSharing(); got != apiv1.Sharing_SHARING_PRIVATE {
+		t.Errorf("sharing = %v, want private — a copy is yours", got)
+	}
+
+	items, err := f.svc.GetList(ctx, connect.NewRequest(&apiv1.GetListRequest{
+		ListUid: copied.Msg.GetList().GetUid(),
+	}))
+	if err != nil {
+		t.Fatalf("GetList: %v", err)
+	}
+	if len(items.Msg.GetItems()) != 2 {
+		t.Errorf("got %d items, want both of them", len(items.Msg.GetItems()))
+	}
+}
+
+// A duplicate is made to do the same thing again, not to remember the last time.
+func TestDuplicatingLeavesTheTickedItemsBehind(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+	ctx := f.as(t, f.anna)
+
+	added, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: uid, Label: "Milk",
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+	if _, err := f.svc.SetItemDone(ctx, connect.NewRequest(&apiv1.SetItemDoneRequest{
+		ItemUid: added.Msg.GetItem().GetUid(), Done: true,
+	})); err != nil {
+		t.Fatalf("SetItemDone: %v", err)
+	}
+
+	copied, err := f.svc.DuplicateList(ctx, connect.NewRequest(&apiv1.DuplicateListRequest{
+		ListUid: uid,
+	}))
+	if err != nil {
+		t.Fatalf("DuplicateList: %v", err)
+	}
+
+	items, err := f.svc.GetList(ctx, connect.NewRequest(&apiv1.GetListRequest{
+		ListUid: copied.Msg.GetList().GetUid(),
+	}))
+	if err != nil {
+		t.Fatalf("GetList: %v", err)
+	}
+	if len(items.Msg.GetItems()) != 0 {
+		t.Errorf("got %d items, want the ticked one left behind", len(items.Msg.GetItems()))
+	}
+}
+
+// Anyone who may read a List may make their own copy of it.
+func TestDuplicatingSomebodyElsesList(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+	f.share(t, f.anna, uid, false)
+
+	copied, err := f.svc.DuplicateList(f.as(t, f.jonas), connect.NewRequest(
+		&apiv1.DuplicateListRequest{ListUid: uid},
+	))
+	if err != nil {
+		t.Fatalf("DuplicateList: %v", err)
+	}
+	if !copied.Msg.GetList().GetIsOwner() {
+		t.Error("IsOwner = false, want the copy to belong to whoever made it")
+	}
+}

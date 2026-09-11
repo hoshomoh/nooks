@@ -123,7 +123,8 @@ The single most important milestone; everything else is furniture.
 - [x] Tick and untick, with attribution
 - [x] Completed Items: collapsed at the foot of the List, behind the "3 done today" row
 - [x] Empty states: empty List, cold-start All lists
-- [ ] List menu (`···`): rename, pin, duplicate, print, sort, completed placement, export as plain
+- [~] List menu (`···`): rename, pin, duplicate, print, export and delete done. Sort order
+      and completed placement need a per-List setting, and arrive with it
       text, delete
 - [x] Pinning, per Member — store done, and it never touches anyone else's sidebar
 - [~] Keyboard: `↵` and `⌘K` done, including Ctrl+K. `↑` `↓` and `space` arrive with row

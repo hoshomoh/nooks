@@ -7,11 +7,13 @@ import { ActivityControl } from "@/components/ds/activity-control"
 import { Presence } from "@/components/ds/presence"
 import { AddRow, type AddRowSubmission } from "@/components/ds/add-row"
 import { DoneSection } from "@/components/ds/done-section"
+import { ListMenu } from "@/components/ds/list-menu"
 import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
 import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
 import { NoteSheet, type NoteSheetField } from "@/components/ds/note-sheet"
+import { PromptDialog } from "@/components/ds/prompt-dialog"
 import { ShareDialog, type ShareDecision } from "@/components/ds/share-dialog"
 import { Button } from "@/components/ds/button"
 import { listClient } from "@/lib/api"
@@ -59,8 +61,9 @@ export function ListScreen() {
   const [openItemUid, setOpenItemUid] = useState<string | null>(null)
 
   // Sharing is a decision the owner makes in a dialog, so whether it is open is the
-  // screen's own state.
+  // screen's own state. Renaming is the same.
   const [sharingOpen, setSharingOpen] = useState(false)
+  const [renaming, setRenaming] = useState(false)
 
   const refresh = () => refreshLists(queryClient)
 
@@ -112,6 +115,34 @@ export function ListScreen() {
     onSuccess: refresh,
   })
 
+  const pin = useMutation({
+    mutationFn: (pinned: boolean) => listClient.setListPinned({ listUid, pinned }),
+    onSuccess: refresh,
+  })
+
+  const duplicate = useMutation({
+    mutationFn: () => listClient.duplicateList({ listUid }),
+    onSuccess: async (res) => {
+      await refresh()
+      if (res.list) {
+        void navigate({ to: "/lists/$listUid", params: { listUid: res.list.uid } })
+      }
+    },
+  })
+
+  const remove = useMutation({
+    mutationFn: () => listClient.deleteList({ listUid }),
+    onSuccess: async () => {
+      await refresh()
+      void navigate({ to: "/" })
+    },
+  })
+
+  const renameList = useMutation({
+    mutationFn: (name: string) => listClient.renameList({ listUid, name }),
+    onSuccess: refresh,
+  })
+
   const rowLabels: ListRowLabels = { name: t("note.itemName"), open: t("list.openItem") }
 
   const openItem = list.items.find((item) => item.uid === openItemUid)
@@ -138,9 +169,34 @@ export function ListScreen() {
               </Button>
             )}
             <ActivityControl />
+            {list.list && (
+              <ListMenu
+                list={list.list}
+                items={list.items}
+                actions={{
+                  onRename: () => setRenaming(true),
+                  onPin: (pinned) => pin.mutate(pinned),
+                  onDuplicate: () => duplicate.mutate(),
+                  onDelete: () => remove.mutate(),
+                }}
+              />
+            )}
           </>
         }
       />
+
+      {list.list && (
+        <PromptDialog
+          open={renaming}
+          onOpenChange={setRenaming}
+          title={t("listMenu.renameTitle", { name: list.list.name })}
+          blurb={t("listMenu.renameBlurb")}
+          label={t("palette.name")}
+          initialValue={list.list.name}
+          confirmLabel={t("action.save")}
+          onConfirm={(name) => renameList.mutate(name)}
+        />
+      )}
 
       {list.list && (
         <ShareDialog

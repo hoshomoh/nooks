@@ -49,11 +49,14 @@ func (i Item) Done() bool { return !i.DoneAt.IsZero() }
 // CreateItemParams is everything needed to add an Item. Position is worked out by the
 // store, because "put it at the end" is a fact about the List, not the caller.
 type CreateItemParams struct {
-	UID       string
-	ListID    int64
-	Label     string
-	Quantity  string
-	DueOn     string
+	UID      string
+	ListID   int64
+	Label    string
+	Quantity string
+	DueOn    string
+	// Note is the document the Item starts with. Empty for one that is simply added;
+	// a copy of an Item carries the Note it was copied from.
+	Note      string
 	AddedByID int64
 	At        time.Time
 }
@@ -75,6 +78,7 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 		Label:     params.Label,
 		Quantity:  params.Quantity,
 		DueOn:     params.DueOn,
+		Note:      params.Note,
 		Position:  position,
 		AddedByID: params.AddedByID,
 		CreatedAt: formatTime(params.At),

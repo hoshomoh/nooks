@@ -25,6 +25,13 @@ message PublicItem {
   string label = 1;
   bool done = 2;
 
+  // The Item's identifier.
+  //
+  // Not a secret and not a capability: every call still checks who is asking. It is
+  // here so that a tick a Visitor reached for before signing in can be applied to the
+  // right Item afterwards, rather than guessed at by matching text.
+  string uid = 6;
+
   // Empty unless the Instance shows quantities and dates.
   string quantity = 3;
   string due_on = 4;

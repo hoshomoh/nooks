@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nooks/api/v1/public_service.proto.
  */
 export const file_nooks_api_v1_public_service: GenFile = /*@__PURE__*/
-  fileDesc("CiFub29rcy9hcGkvdjEvcHVibGljX3NlcnZpY2UucHJvdG8SDG5vb2tzLmFwaS52MSJiCgpQdWJsaWNJdGVtEg0KBWxhYmVsGAEgASgJEgwKBGRvbmUYAiABKAgSEAoIcXVhbnRpdHkYAyABKAkSDgoGZHVlX29uGAQgASgJEhUKDWFkZGVkX2J5X25hbWUYBSABKAkiFgoUR2V0UHVibGljTGlzdFJlcXVlc3QikQEKFUdldFB1YmxpY0xpc3RSZXNwb25zZRIRCglwdWJsaXNoZWQYASABKAgSFQoNaW5zdGFuY2VfbmFtZRgCIAEoCRIRCglsaXN0X25hbWUYAyABKAkSJwoFaXRlbXMYBCADKAsyGC5ub29rcy5hcGkudjEuUHVibGljSXRlbRISCgphbGxvd19qb2luGAUgASgIMmkKDVB1YmxpY1NlcnZpY2USWAoNR2V0UHVibGljTGlzdBIiLm5vb2tzLmFwaS52MS5HZXRQdWJsaWNMaXN0UmVxdWVzdBojLm5vb2tzLmFwaS52MS5HZXRQdWJsaWNMaXN0UmVzcG9uc2VCsAEKEGNvbS5ub29rcy5hcGkudjFCElB1YmxpY1NlcnZpY2VQcm90b1ABWjZnaXRodWIuY29tL2hvc2hvbW9oL25vb2tzL3Byb3RvL2dlbi9ub29rcy9hcGkvdjE7YXBpdjGiAgNOQViqAgxOb29rcy5BcGkuVjHKAgxOb29rc1xBcGlcVjHiAhhOb29rc1xBcGlcVjFcR1BCTWV0YWRhdGHqAg5Ob29rczo6QXBpOjpWMWIGcHJvdG8z");
+  fileDesc("CiFub29rcy9hcGkvdjEvcHVibGljX3NlcnZpY2UucHJvdG8SDG5vb2tzLmFwaS52MSJvCgpQdWJsaWNJdGVtEg0KBWxhYmVsGAEgASgJEgwKBGRvbmUYAiABKAgSCwoDdWlkGAYgASgJEhAKCHF1YW50aXR5GAMgASgJEg4KBmR1ZV9vbhgEIAEoCRIVCg1hZGRlZF9ieV9uYW1lGAUgASgJIhYKFEdldFB1YmxpY0xpc3RSZXF1ZXN0IpEBChVHZXRQdWJsaWNMaXN0UmVzcG9uc2USEQoJcHVibGlzaGVkGAEgASgIEhUKDWluc3RhbmNlX25hbWUYAiABKAkSEQoJbGlzdF9uYW1lGAMgASgJEicKBWl0ZW1zGAQgAygLMhgubm9va3MuYXBpLnYxLlB1YmxpY0l0ZW0SEgoKYWxsb3dfam9pbhgFIAEoCDJpCg1QdWJsaWNTZXJ2aWNlElgKDUdldFB1YmxpY0xpc3QSIi5ub29rcy5hcGkudjEuR2V0UHVibGljTGlzdFJlcXVlc3QaIy5ub29rcy5hcGkudjEuR2V0UHVibGljTGlzdFJlc3BvbnNlQrABChBjb20ubm9va3MuYXBpLnYxQhJQdWJsaWNTZXJ2aWNlUHJvdG9QAVo2Z2l0aHViLmNvbS9ob3Nob21vaC9ub29rcy9wcm90by9nZW4vbm9va3MvYXBpL3YxO2FwaXYxogIDTkFYqgIMTm9va3MuQXBpLlYxygIMTm9va3NcQXBpXFYx4gIYTm9va3NcQXBpXFYxXEdQQk1ldGFkYXRh6gIOTm9va3M6OkFwaTo6VjFiBnByb3RvMw");
 
 /**
  * PublicItem is one line of the public page.
@@ -31,6 +31,17 @@ export type PublicItem = Message<"nooks.api.v1.PublicItem"> & {
    * @generated from field: bool done = 2;
    */
   done: boolean;
+
+  /**
+   * The Item's identifier.
+   *
+   * Not a secret and not a capability: every call still checks who is asking. It is
+   * here so that a tick a Visitor reached for before signing in can be applied to the
+   * right Item afterwards, rather than guessed at by matching text.
+   *
+   * @generated from field: string uid = 6;
+   */
+  uid: string;
 
   /**
    * Empty unless the Instance shows quantities and dates.

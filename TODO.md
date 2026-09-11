@@ -21,7 +21,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M5 · Notes | `[x]` |
 | M6 · Sharing, presence, Activity | `[x]` |
 | M7 · Members and Groups | `[x]` |
-| M8 · Public list | `[~]` settings and the remembered tick left |
+| M8 · Public list | `[x]` |
 | M9 · Print | `[ ]` |
 | M10 · Access tokens, REST, MCP | `[ ]` |
 | M11 · Settings, export, import | `[ ]` |
@@ -201,7 +201,8 @@ The single most important milestone; everything else is furniture.
 - [x] Settings: which List, show contributor names, show quantities and dates, let visitors ask
       to join. Everything off by default
 - [x] Sign-in prompt appears **under the row the Visitor touched**, not as a wall
-- [ ] The attempted tick is remembered and applied once they are in
+- [x] The attempted tick is remembered and applied once they are in, whether they sign in
+      that minute or days later
 - [~] Ask to join is offered from the page, and goes to the existing join screen. Its own
       dialog arrives with the settings that turn it on
 - [x] Empty state explains the page rather than asking for work

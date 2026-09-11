@@ -10,6 +10,7 @@ import { Field } from "@/components/ds/field"
 import { FormError } from "@/components/ds/form-error"
 import { NotePanel } from "@/components/ds/note-panel"
 import { authClient } from "@/lib/api"
+import { applyPendingTick } from "@/lib/apply-pending-tick"
 import { messageFrom } from "@/lib/errors"
 import {
   forgetPendingRequest,
@@ -120,6 +121,8 @@ function CheckJoinRequest({ requestUid, onStartOver }: CheckJoinRequestProps) {
     mutationFn: () => authClient.completeJoin({ requestUid, name, password }),
     onSuccess: async () => {
       forgetPendingRequest("join")
+      // Somebody who asked to join from the public list reached for something first.
+      await applyPendingTick()
       await queryClient.invalidateQueries()
       await navigate({ to: "/" })
     },

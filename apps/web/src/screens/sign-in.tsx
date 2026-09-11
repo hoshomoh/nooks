@@ -8,6 +8,7 @@ import { Button } from "@/components/ds/button"
 import { Field } from "@/components/ds/field"
 import { FormError } from "@/components/ds/form-error"
 import { authClient } from "@/lib/api"
+import { applyPendingTick } from "@/lib/apply-pending-tick"
 import { messageFrom } from "@/lib/errors"
 
 const route = getRouteApi("/sign-in")
@@ -24,6 +25,8 @@ export function SignIn() {
   const signIn = useMutation({
     mutationFn: () => authClient.signIn({ email, password }),
     onSuccess: async () => {
+      // Before anything is read, so the List they land on already shows it ticked.
+      await applyPendingTick()
       await queryClient.invalidateQueries()
       await navigate({ to: "/" })
     },

@@ -8,6 +8,7 @@ import type { PublicItem } from "@nooks/api"
 import { Button } from "@/components/ds/button"
 import { EmptyState } from "@/components/ds/empty-state"
 import { Mark } from "@/components/mark"
+import { pendingTickStore } from "@/lib/pending-tick-store"
 import { publicListQuery } from "@/lib/public-queries"
 import { useDueLabel } from "@/lib/use-due-label"
 
@@ -56,7 +57,12 @@ export function PublicListScreen() {
               <PublicRow
                 item={item}
                 dueLabel={due.label(item.dueOn)}
-                onReach={() => setReachedFor(index)}
+                onReach={() => {
+                  // What they meant to do, kept until they have an account to do it
+                  // with.
+                  pendingTickStore.remember(item.uid)
+                  setReachedFor(index)
+                }}
               />
               {reachedFor === index && <SignInPrompt allowJoin={page.allowJoin} />}
             </div>

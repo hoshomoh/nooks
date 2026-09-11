@@ -30,6 +30,12 @@ type PublicItem struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Label string                 `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
 	Done  bool                   `protobuf:"varint,2,opt,name=done,proto3" json:"done,omitempty"`
+	// The Item's identifier.
+	//
+	// Not a secret and not a capability: every call still checks who is asking. It is
+	// here so that a tick a Visitor reached for before signing in can be applied to the
+	// right Item afterwards, rather than guessed at by matching text.
+	Uid string `protobuf:"bytes,6,opt,name=uid,proto3" json:"uid,omitempty"`
 	// Empty unless the Instance shows quantities and dates.
 	Quantity string `protobuf:"bytes,3,opt,name=quantity,proto3" json:"quantity,omitempty"`
 	DueOn    string `protobuf:"bytes,4,opt,name=due_on,json=dueOn,proto3" json:"due_on,omitempty"`
@@ -81,6 +87,13 @@ func (x *PublicItem) GetDone() bool {
 		return x.Done
 	}
 	return false
+}
+
+func (x *PublicItem) GetUid() string {
+	if x != nil {
+		return x.Uid
+	}
+	return ""
 }
 
 func (x *PublicItem) GetQuantity() string {
@@ -223,11 +236,12 @@ var File_nooks_api_v1_public_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_public_service_proto_rawDesc = "" +
 	"\n" +
-	"!nooks/api/v1/public_service.proto\x12\fnooks.api.v1\"\x8d\x01\n" +
+	"!nooks/api/v1/public_service.proto\x12\fnooks.api.v1\"\x9f\x01\n" +
 	"\n" +
 	"PublicItem\x12\x14\n" +
 	"\x05label\x18\x01 \x01(\tR\x05label\x12\x12\n" +
-	"\x04done\x18\x02 \x01(\bR\x04done\x12\x1a\n" +
+	"\x04done\x18\x02 \x01(\bR\x04done\x12\x10\n" +
+	"\x03uid\x18\x06 \x01(\tR\x03uid\x12\x1a\n" +
 	"\bquantity\x18\x03 \x01(\tR\bquantity\x12\x15\n" +
 	"\x06due_on\x18\x04 \x01(\tR\x05dueOn\x12\"\n" +
 	"\radded_by_name\x18\x05 \x01(\tR\vaddedByName\"\x16\n" +

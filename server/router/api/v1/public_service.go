@@ -112,7 +112,7 @@ func publicItemOf(
 	public store.PublicList,
 	names map[int64]string,
 ) *apiv1.PublicItem {
-	out := &apiv1.PublicItem{Label: item.Label, Done: item.Done()}
+	out := &apiv1.PublicItem{Uid: item.UID, Label: item.Label, Done: item.Done()}
 	if public.ShowMeta {
 		out.Quantity = item.Quantity
 		out.DueOn = item.DueOn

@@ -6,7 +6,7 @@ import { cn } from "cn"
 import { ChromeBar } from "./chrome-bar"
 
 /** Where a settings page lives. Only routes that exist are listed. */
-export type SettingsRoute = "/settings/members"
+export type SettingsRoute = "/settings/members" | "/settings/groups"
 
 /** One entry in the settings column. */
 interface SettingsSection {
@@ -22,6 +22,7 @@ interface SettingsSection {
  */
 const SECTIONS: SettingsSection[] = [
   { to: "/settings/members", labelKey: "settings.members" },
+  { to: "/settings/groups", labelKey: "settings.groups" },
 ]
 
 export interface SettingsShellProps {

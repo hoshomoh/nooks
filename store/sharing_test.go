@@ -192,3 +192,57 @@ func TestGroupNotFound(t *testing.T) {
 		})
 	}
 }
+
+// A Group is only ever a shortcut for sharing, so what it reaches is the whole of what
+// it does — and the Groups page says so rather than making an Admin work it out.
+func TestTheListsAGroupReaches(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			shared, owner := newList(t, s, "Groceries", SharingSpecific)
+
+			if _, err := s.CreateList(t.Context(), CreateListParams{
+				UID: "l_bike", Name: "Bike", OwnerID: owner.ID,
+				Sharing: SharingPrivate, CanEdit: true, At: createdAt,
+			}); err != nil {
+				t.Fatalf("CreateList: %v", err)
+			}
+
+			group, err := s.CreateGroup(t.Context(), "grp_flatmates", "Flatmates", createdAt)
+			if err != nil {
+				t.Fatalf("CreateGroup: %v", err)
+			}
+			if err := s.ReplaceListShares(t.Context(), shared.ID, nil, []int64{group.ID}); err != nil {
+				t.Fatalf("ReplaceListShares: %v", err)
+			}
+
+			reached, err := s.ListsSharedWithGroup(t.Context(), group.ID)
+			if err != nil {
+				t.Fatalf("ListsSharedWithGroup: %v", err)
+			}
+			if len(reached) != 1 || reached[0].Name != "Groceries" {
+				t.Errorf("reaches %v, want only the List shared with it", reached)
+			}
+		})
+	}
+}
+
+func TestAGroupThatReachesNothing(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			group, err := s.CreateGroup(t.Context(), "grp_flatmates", "Flatmates", createdAt)
+			if err != nil {
+				t.Fatalf("CreateGroup: %v", err)
+			}
+
+			reached, err := s.ListsSharedWithGroup(t.Context(), group.ID)
+			if err != nil {
+				t.Fatalf("ListsSharedWithGroup: %v", err)
+			}
+			if len(reached) != 0 {
+				t.Errorf("reaches %v, want nothing", reached)
+			}
+		})
+	}
+}

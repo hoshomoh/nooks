@@ -196,6 +196,36 @@ func (s *sqlStore) ListShares(ctx context.Context, listID int64) ([]Share, error
 	return shares, nil
 }
 
+// ListsSharedWithGroup is every live List a Group reaches.
+//
+// A Group is only ever a shortcut for sharing, so what it reaches is the whole of what
+// it does — and the Groups page says so rather than making an Admin work it out.
+func (s *sqlStore) ListsSharedWithGroup(ctx context.Context, groupID int64) ([]List, error) {
+	var rows []listModel
+	err := s.db.NewSelect().
+		Model(&rows).
+		Where("deleted_at = ''").
+		Where("id IN (?)", s.db.NewSelect().
+			Model((*listShareModel)(nil)).
+			Column("list_id").
+			Where("group_id = ?", groupID)).
+		Order("name ASC").
+		Scan(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("read lists shared with group: %w", err)
+	}
+
+	lists := make([]List, 0, len(rows))
+	for _, row := range rows {
+		list, err := row.toList()
+		if err != nil {
+			return nil, err
+		}
+		lists = append(lists, list)
+	}
+	return lists, nil
+}
+
 // SharedListIDs is every List reaching a Member by name — directly, or through a Group
 // they are in.
 func (s *sqlStore) SharedListIDs(ctx context.Context, memberID int64) ([]int64, error) {

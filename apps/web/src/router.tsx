@@ -14,6 +14,7 @@ import { todayRoute } from "./routes/today"
 import { upcomingRoute } from "./routes/upcoming"
 import { replacePasswordRoute } from "./routes/replace-password"
 import { rootRoute } from "./routes/root"
+import { settingsGroupsRoute } from "./routes/settings-groups"
 import { settingsMembersRoute } from "./routes/settings-members"
 import { setupRoute } from "./routes/setup"
 import { signInRoute } from "./routes/sign-in"
@@ -31,6 +32,7 @@ const routeTree = rootRoute.addChildren([
   calendarRoute,
   noteRoute,
   settingsMembersRoute,
+  settingsGroupsRoute,
 ])
 
 /** buildRouter takes the query client so loaders can prime the cache before rendering. */

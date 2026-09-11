@@ -193,6 +193,9 @@ type Store interface {
 	// ReplaceGroupMembers sets exactly who is in a Group.
 	ReplaceGroupMembers(ctx context.Context, groupID int64, memberIDs []int64) error
 
+	// ListsSharedWithGroup is every live List a Group reaches.
+	ListsSharedWithGroup(ctx context.Context, groupID int64) ([]List, error)
+
 	// ReplaceListShares sets exactly who a List is shared with by name.
 	ReplaceListShares(ctx context.Context, listID int64, memberIDs, groupIDs []int64) error
 

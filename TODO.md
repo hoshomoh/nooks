@@ -20,7 +20,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M4 · Views: Today, Upcoming, Calendar | `[x]` |
 | M5 · Notes | `[x]` |
 | M6 · Sharing, presence, Activity | `[x]` |
-| M7 · Members and Groups | `[~]` groups page left |
+| M7 · Members and Groups | `[x]` |
 | M8 · Public list | `[ ]` |
 | M9 · Print | `[ ]` |
 | M10 · Access tokens, REST, MCP | `[ ]` |
@@ -186,9 +186,9 @@ The single most important milestone; everything else is furniture.
 - [x] Add a member — sets a temporary password, read out once. Four plain words, because
       a password with no mail server behind it is a spoken secret
 - [x] A Member who has never signed in greys their name and detail, not the whole row
-- [ ] Groups page: cards two-up, membership, lists shared with the Group
-- [ ] Add a group; add and remove Members
-- [ ] Removing someone from a Group takes away the lists they got through it, and nothing else
+- [x] Groups page: cards two-up, membership, lists shared with the Group
+- [x] Add a group; add and remove Members — one decision, like sharing
+- [x] Removing someone from a Group takes away the lists they got through it, and nothing else
 
 ---
 

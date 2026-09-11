@@ -27,7 +27,10 @@ type Group struct {
 	Uid   string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
 	Name  string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Who is in it, in the order they read: the dialog shows names, not counts.
-	Members       []*Member `protobuf:"bytes,3,rep,name=members,proto3" json:"members,omitempty"`
+	Members []*Member `protobuf:"bytes,3,rep,name=members,proto3" json:"members,omitempty"`
+	// The Lists this Group reaches, by name. A Group is only ever a shortcut for
+	// sharing, so what it reaches is the whole of what it does.
+	ListNames     []string `protobuf:"bytes,4,rep,name=list_names,json=listNames,proto3" json:"list_names,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -79,6 +82,13 @@ func (x *Group) GetName() string {
 func (x *Group) GetMembers() []*Member {
 	if x != nil {
 		return x.Members
+	}
+	return nil
+}
+
+func (x *Group) GetListNames() []string {
+	if x != nil {
+		return x.ListNames
 	}
 	return nil
 }
@@ -713,11 +723,13 @@ var File_nooks_api_v1_member_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_member_service_proto_rawDesc = "" +
 	"\n" +
-	"!nooks/api/v1/member_service.proto\x12\fnooks.api.v1\x1a\x1fnooks/api/v1/auth_service.proto\"]\n" +
+	"!nooks/api/v1/member_service.proto\x12\fnooks.api.v1\x1a\x1fnooks/api/v1/auth_service.proto\"|\n" +
 	"\x05Group\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12.\n" +
-	"\amembers\x18\x03 \x03(\v2\x14.nooks.api.v1.MemberR\amembers\"\x14\n" +
+	"\amembers\x18\x03 \x03(\v2\x14.nooks.api.v1.MemberR\amembers\x12\x1d\n" +
+	"\n" +
+	"list_names\x18\x04 \x03(\tR\tlistNames\"\x14\n" +
 	"\x12ListMembersRequest\"E\n" +
 	"\x13ListMembersResponse\x12.\n" +
 	"\amembers\x18\x01 \x03(\v2\x14.nooks.api.v1.MemberR\amembers\"\x13\n" +

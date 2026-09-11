@@ -175,7 +175,19 @@ func (s *MemberService) groupToProto(ctx context.Context, group store.Group) (*a
 		}
 		members = append(members, memberToProto(member))
 	}
-	return &apiv1.Group{Uid: group.UID, Name: group.Name, Members: members}, nil
+
+	lists, err := s.store.ListsSharedWithGroup(ctx, group.ID)
+	if err != nil {
+		return nil, internalError("read lists shared with group", err)
+	}
+	names := make([]string, 0, len(lists))
+	for _, list := range lists {
+		names = append(names, list.Name)
+	}
+
+	return &apiv1.Group{
+		Uid: group.UID, Name: group.Name, Members: members, ListNames: names,
+	}, nil
 }
 
 // errLastAdmin refuses to leave an Instance with nobody who can administer it.

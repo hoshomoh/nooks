@@ -43,6 +43,10 @@ message Group {
 
   // Who is in it, in the order they read: the dialog shows names, not counts.
   repeated Member members = 3;
+
+  // The Lists this Group reaches, by name. A Group is only ever a shortcut for
+  // sharing, so what it reaches is the whole of what it does.
+  repeated string list_names = 4;
 }
 
 message ListMembersRequest {}

@@ -193,6 +193,63 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/v1/auth/password:
+        post:
+            tags:
+                - AuthService
+            description: |-
+                ReplacePassword sets a new password for the signed-in Member. A Member who was
+                 given a temporary password must call this before they can use Nooks.
+            operationId: AuthService_ReplacePassword
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ReplacePasswordRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ReplacePasswordResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/auth/refresh:
+        post:
+            tags:
+                - AuthService
+            description: |-
+                RefreshAccess exchanges the refresh cookie for a new access token.
+
+                 The refresh token is read from the cookie and never appears in a request or a
+                 response body: the credential that lasts a month is not one a caller should be
+                 able to copy out of a log.
+            operationId: AuthService_RefreshAccess
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RefreshAccessRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RefreshAccessResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/v1/auth/reset-requests:
         post:
             tags:
@@ -1819,6 +1876,18 @@ components:
                     type: boolean
                     description: A quiet link at the foot of the page for a Visitor to ask for an account.
             description: PublicListSettings is the Instance's one public page, and what a Visitor sees of it.
+        RefreshAccessRequest:
+            type: object
+            properties: {}
+        RefreshAccessResponse:
+            type: object
+            properties:
+                accessToken:
+                    type: string
+                    description: A new short-lived access token. The refresh cookie is unchanged.
+                accessTokenExpiresAt:
+                    type: string
+                    description: When it stops working, RFC 3339. Ask again before then.
         RemoveMemberResponse:
             type: object
             properties: {}
@@ -1834,6 +1903,21 @@ components:
             properties:
                 list:
                     $ref: '#/components/schemas/List'
+        ReplacePasswordRequest:
+            type: object
+            properties:
+                currentPassword:
+                    type: string
+                    description: |-
+                        The password being replaced. Required even for a temporary one, so that an
+                         unattended browser cannot be used to take over the account.
+                newPassword:
+                    type: string
+        ReplacePasswordResponse:
+            type: object
+            properties:
+                member:
+                    $ref: '#/components/schemas/Member'
         RequestJoinRequest:
             type: object
             properties:

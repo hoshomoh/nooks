@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"encoding/json"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -9,6 +10,9 @@ import (
 	"testing"
 	"time"
 
+	"connectrpc.com/connect"
+
+	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/server/auth"
 	v1 "github.com/hoshomoh/nooks/server/router/api/v1"
 	"github.com/hoshomoh/nooks/store"
@@ -170,4 +174,73 @@ func TestNoTokenIsRefused(t *testing.T) {
 	if code := i.call(http.MethodGet, "/api/v1/lists", "", "").Code; code != http.StatusUnauthorized {
 		t.Errorf("code = %d, want 401", code)
 	}
+}
+
+// signIn goes through Connect the way a browser does, and answers with both credentials.
+func (i *instance) signIn(password string) (access string, refresh *http.Cookie) {
+	i.t.Helper()
+	hash, err := passwordHash(password)
+	if err != nil {
+		i.t.Fatalf("hash: %v", err)
+	}
+	if err := i.store.SetMemberPassword(i.t.Context(), i.member.ID, hash); err != nil {
+		i.t.Fatalf("SetMemberPassword: %v", err)
+	}
+
+	now := func() time.Time { return testClock }
+	svc := v1.NewAuthService(i.store, v1.AuthServiceOptions{Now: now})
+	res, err := svc.SignIn(i.t.Context(), connect.NewRequest(&apiv1.SignInRequest{
+		Email: i.member.Email, Password: password,
+	}))
+	if err != nil {
+		i.t.Fatalf("SignIn: %v", err)
+	}
+
+	for _, raw := range res.Header().Values("Set-Cookie") {
+		parsed := (&http.Response{Header: http.Header{"Set-Cookie": []string{raw}}}).Cookies()
+		if len(parsed) > 0 && parsed[0].Name == auth.CookieName {
+			refresh = parsed[0]
+		}
+	}
+	return res.Msg.GetAccessToken(), refresh
+}
+
+// The credential a caller can actually lose travels; the one that lasts a month does not.
+func TestSigningInHandsOverAShortLivedToken(t *testing.T) {
+	i := newInstance(t)
+
+	access, refresh := i.signIn("a-long-enough-password")
+
+	if access == "" {
+		t.Fatal("no access token was handed over")
+	}
+	if refresh == nil || !refresh.HttpOnly {
+		t.Fatal("the refresh token is not in an HttpOnly cookie")
+	}
+	if access == refresh.Value {
+		t.Error("the access token is the refresh token; the split buys nothing")
+	}
+
+	// It works as a bearer, which is the point of handing it over.
+	if code := i.call(http.MethodGet, "/api/v1/lists", access, "").Code; code != http.StatusOK {
+		t.Errorf("code = %d, want the access token to work", code)
+	}
+}
+
+// Otherwise the long-lived credential would be usable exactly where the short-lived one
+// was supposed to be, and the split would buy nothing.
+func TestTheRefreshTokenIsNotABearer(t *testing.T) {
+	i := newInstance(t)
+
+	_, refresh := i.signIn("a-long-enough-password")
+
+	if code := i.call(http.MethodGet, "/api/v1/lists", refresh.Value, "").Code; code != http.StatusUnauthorized {
+		t.Errorf("code = %d, want the refresh token refused as a bearer", code)
+	}
+}
+
+// passwordHash makes a hash the auth service will verify against.
+func passwordHash(plain string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(plain), bcrypt.DefaultCost)
+	return string(hash), err
 }

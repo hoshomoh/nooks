@@ -23,6 +23,7 @@ const (
 	AuthService_SignIn_FullMethodName                = "/nooks.api.v1.AuthService/SignIn"
 	AuthService_SignOut_FullMethodName               = "/nooks.api.v1.AuthService/SignOut"
 	AuthService_GetCurrentMember_FullMethodName      = "/nooks.api.v1.AuthService/GetCurrentMember"
+	AuthService_RefreshAccess_FullMethodName         = "/nooks.api.v1.AuthService/RefreshAccess"
 	AuthService_ReplacePassword_FullMethodName       = "/nooks.api.v1.AuthService/ReplacePassword"
 	AuthService_RequestJoin_FullMethodName           = "/nooks.api.v1.AuthService/RequestJoin"
 	AuthService_GetJoinRequest_FullMethodName        = "/nooks.api.v1.AuthService/GetJoinRequest"
@@ -51,6 +52,12 @@ type AuthServiceClient interface {
 	SignOut(ctx context.Context, in *SignOutRequest, opts ...grpc.CallOption) (*SignOutResponse, error)
 	// GetCurrentMember returns whoever the session cookie belongs to.
 	GetCurrentMember(ctx context.Context, in *GetCurrentMemberRequest, opts ...grpc.CallOption) (*GetCurrentMemberResponse, error)
+	// RefreshAccess exchanges the refresh cookie for a new access token.
+	//
+	// The refresh token is read from the cookie and never appears in a request or a
+	// response body: the credential that lasts a month is not one a caller should be
+	// able to copy out of a log.
+	RefreshAccess(ctx context.Context, in *RefreshAccessRequest, opts ...grpc.CallOption) (*RefreshAccessResponse, error)
 	// ReplacePassword sets a new password for the signed-in Member. A Member who was
 	// given a temporary password must call this before they can use Nooks.
 	ReplacePassword(ctx context.Context, in *ReplacePasswordRequest, opts ...grpc.CallOption) (*ReplacePasswordResponse, error)
@@ -114,6 +121,16 @@ func (c *authServiceClient) GetCurrentMember(ctx context.Context, in *GetCurrent
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetCurrentMemberResponse)
 	err := c.cc.Invoke(ctx, AuthService_GetCurrentMember_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) RefreshAccess(ctx context.Context, in *RefreshAccessRequest, opts ...grpc.CallOption) (*RefreshAccessResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RefreshAccessResponse)
+	err := c.cc.Invoke(ctx, AuthService_RefreshAccess_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -209,6 +226,12 @@ type AuthServiceServer interface {
 	SignOut(context.Context, *SignOutRequest) (*SignOutResponse, error)
 	// GetCurrentMember returns whoever the session cookie belongs to.
 	GetCurrentMember(context.Context, *GetCurrentMemberRequest) (*GetCurrentMemberResponse, error)
+	// RefreshAccess exchanges the refresh cookie for a new access token.
+	//
+	// The refresh token is read from the cookie and never appears in a request or a
+	// response body: the credential that lasts a month is not one a caller should be
+	// able to copy out of a log.
+	RefreshAccess(context.Context, *RefreshAccessRequest) (*RefreshAccessResponse, error)
 	// ReplacePassword sets a new password for the signed-in Member. A Member who was
 	// given a temporary password must call this before they can use Nooks.
 	ReplacePassword(context.Context, *ReplacePasswordRequest) (*ReplacePasswordResponse, error)
@@ -249,6 +272,9 @@ func (UnimplementedAuthServiceServer) SignOut(context.Context, *SignOutRequest) 
 }
 func (UnimplementedAuthServiceServer) GetCurrentMember(context.Context, *GetCurrentMemberRequest) (*GetCurrentMemberResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCurrentMember not implemented")
+}
+func (UnimplementedAuthServiceServer) RefreshAccess(context.Context, *RefreshAccessRequest) (*RefreshAccessResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RefreshAccess not implemented")
 }
 func (UnimplementedAuthServiceServer) ReplacePassword(context.Context, *ReplacePasswordRequest) (*ReplacePasswordResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ReplacePassword not implemented")
@@ -360,6 +386,24 @@ func _AuthService_GetCurrentMember_Handler(srv interface{}, ctx context.Context,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).GetCurrentMember(ctx, req.(*GetCurrentMemberRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_RefreshAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RefreshAccessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).RefreshAccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_RefreshAccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).RefreshAccess(ctx, req.(*RefreshAccessRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -512,6 +556,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCurrentMember",
 			Handler:    _AuthService_GetCurrentMember_Handler,
+		},
+		{
+			MethodName: "RefreshAccess",
+			Handler:    _AuthService_RefreshAccess_Handler,
 		},
 		{
 			MethodName: "ReplacePassword",

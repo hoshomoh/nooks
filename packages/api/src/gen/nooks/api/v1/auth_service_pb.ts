@@ -11,7 +11,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nooks/api/v1/auth_service.proto.
  */
 export const file_nooks_api_v1_auth_service: GenFile = /*@__PURE__*/
-  fileDesc("Ch9ub29rcy9hcGkvdjEvYXV0aF9zZXJ2aWNlLnByb3RvEgxub29rcy5hcGkudjEioQEKBk1lbWJlchILCgN1aWQYASABKAkSDAoEbmFtZRgCIAEoCRINCgVlbWFpbBgDIAEoCRIgCgRyb2xlGAQgASgOMhIubm9va3MuYXBpLnYxLlJvbGUSHAoUbXVzdF9jaGFuZ2VfcGFzc3dvcmQYBSABKAgSEgoKY3JlYXRlZF9hdBgGIAEoCRIZChFsYXN0X3NpZ25lZF9pbl9hdBgHIAEoCSJcChRDb21wbGV0ZVNldHVwUmVxdWVzdBIMCgRuYW1lGAEgASgJEg0KBWVtYWlsGAIgASgJEhAKCHBhc3N3b3JkGAMgASgJEhUKDWluc3RhbmNlX25hbWUYBCABKAkiPQoVQ29tcGxldGVTZXR1cFJlc3BvbnNlEiQKBm1lbWJlchgBIAEoCzIULm5vb2tzLmFwaS52MS5NZW1iZXIiMAoNU2lnbkluUmVxdWVzdBINCgVlbWFpbBgBIAEoCRIQCghwYXNzd29yZBgCIAEoCSI2Cg5TaWduSW5SZXNwb25zZRIkCgZtZW1iZXIYASABKAsyFC5ub29rcy5hcGkudjEuTWVtYmVyIhAKDlNpZ25PdXRSZXF1ZXN0IhEKD1NpZ25PdXRSZXNwb25zZSIZChdHZXRDdXJyZW50TWVtYmVyUmVxdWVzdCJAChhHZXRDdXJyZW50TWVtYmVyUmVzcG9uc2USJAoGbWVtYmVyGAEgASgLMhQubm9va3MuYXBpLnYxLk1lbWJlciJIChZSZXBsYWNlUGFzc3dvcmRSZXF1ZXN0EhgKEGN1cnJlbnRfcGFzc3dvcmQYASABKAkSFAoMbmV3X3Bhc3N3b3JkGAIgASgJIj8KF1JlcGxhY2VQYXNzd29yZFJlc3BvbnNlEiQKBm1lbWJlchgBIAEoCzIULm5vb2tzLmFwaS52MS5NZW1iZXIiQgoSUmVxdWVzdEpvaW5SZXF1ZXN0EgwKBG5hbWUYASABKAkSDQoFZW1haWwYAiABKAkSDwoHbWVzc2FnZRgDIAEoCSIqChNSZXF1ZXN0Sm9pblJlc3BvbnNlEhMKC3JlcXVlc3RfdWlkGAEgASgJIiwKFUdldEpvaW5SZXF1ZXN0UmVxdWVzdBITCgtyZXF1ZXN0X3VpZBgBIAEoCSJiChZHZXRKb2luUmVxdWVzdFJlc3BvbnNlEisKBnN0YXR1cxgBIAEoDjIbLm5vb2tzLmFwaS52MS5SZXF1ZXN0U3RhdHVzEgwKBG5hbWUYAiABKAkSDQoFZW1haWwYAyABKAkiSgoTQ29tcGxldGVKb2luUmVxdWVzdBITCgtyZXF1ZXN0X3VpZBgBIAEoCRIMCgRuYW1lGAIgASgJEhAKCHBhc3N3b3JkGAMgASgJIjwKFENvbXBsZXRlSm9pblJlc3BvbnNlEiQKBm1lbWJlchgBIAEoCzIULm5vb2tzLmFwaS52MS5NZW1iZXIiNAobUmVxdWVzdFBhc3N3b3JkUmVzZXRSZXF1ZXN0EhUKDWVtYWlsX29yX25hbWUYASABKAkiMwocUmVxdWVzdFBhc3N3b3JkUmVzZXRSZXNwb25zZRITCgtyZXF1ZXN0X3VpZBgBIAEoCSItChZHZXRSZXNldFJlcXVlc3RSZXF1ZXN0EhMKC3JlcXVlc3RfdWlkGAEgASgJIkYKF0dldFJlc2V0UmVxdWVzdFJlc3BvbnNlEisKBnN0YXR1cxgBIAEoDjIbLm5vb2tzLmFwaS52MS5SZXF1ZXN0U3RhdHVzIkkKHENvbXBsZXRlUGFzc3dvcmRSZXNldFJlcXVlc3QSEwoLcmVxdWVzdF91aWQYASABKAkSFAoMbmV3X3Bhc3N3b3JkGAIgASgJIkUKHUNvbXBsZXRlUGFzc3dvcmRSZXNldFJlc3BvbnNlEiQKBm1lbWJlchgBIAEoCzIULm5vb2tzLmFwaS52MS5NZW1iZXIqhAEKDVJlcXVlc3RTdGF0dXMSHgoaUkVRVUVTVF9TVEFUVVNfVU5TUEVDSUZJRUQQABIaChZSRVFVRVNUX1NUQVRVU19QRU5ESU5HEAESGwoXUkVRVUVTVF9TVEFUVVNfQVBQUk9WRUQQAhIaChZSRVFVRVNUX1NUQVRVU19JR05PUkVEEAMqPQoEUm9sZRIUChBST0xFX1VOU1BFQ0lGSUVEEAASDgoKUk9MRV9BRE1JThABEg8KC1JPTEVfTUVNQkVSEAIy0AkKC0F1dGhTZXJ2aWNlElgKDUNvbXBsZXRlU2V0dXASIi5ub29rcy5hcGkudjEuQ29tcGxldGVTZXR1cFJlcXVlc3QaIy5ub29rcy5hcGkudjEuQ29tcGxldGVTZXR1cFJlc3BvbnNlEkMKBlNpZ25JbhIbLm5vb2tzLmFwaS52MS5TaWduSW5SZXF1ZXN0Ghwubm9va3MuYXBpLnYxLlNpZ25JblJlc3BvbnNlEkYKB1NpZ25PdXQSHC5ub29rcy5hcGkudjEuU2lnbk91dFJlcXVlc3QaHS5ub29rcy5hcGkudjEuU2lnbk91dFJlc3BvbnNlEnoKEEdldEN1cnJlbnRNZW1iZXISJS5ub29rcy5hcGkudjEuR2V0Q3VycmVudE1lbWJlclJlcXVlc3QaJi5ub29rcy5hcGkudjEuR2V0Q3VycmVudE1lbWJlclJlc3BvbnNlIheC0+STAhESDy9hcGkvdjEvYXV0aC9tZRJeCg9SZXBsYWNlUGFzc3dvcmQSJC5ub29rcy5hcGkudjEuUmVwbGFjZVBhc3N3b3JkUmVxdWVzdBolLm5vb2tzLmFwaS52MS5SZXBsYWNlUGFzc3dvcmRSZXNwb25zZRJ5CgtSZXF1ZXN0Sm9pbhIgLm5vb2tzLmFwaS52MS5SZXF1ZXN0Sm9pblJlcXVlc3QaIS5ub29rcy5hcGkudjEuUmVxdWVzdEpvaW5SZXNwb25zZSIlgtPkkwIfOgEqIhovYXBpL3YxL2F1dGgvam9pbi1yZXF1ZXN0cxKNAQoOR2V0Sm9pblJlcXVlc3QSIy5ub29rcy5hcGkudjEuR2V0Sm9pblJlcXVlc3RSZXF1ZXN0GiQubm9va3MuYXBpLnYxLkdldEpvaW5SZXF1ZXN0UmVzcG9uc2UiMILT5JMCKhIoL2FwaS92MS9hdXRoL2pvaW4tcmVxdWVzdHMve3JlcXVlc3RfdWlkfRJVCgxDb21wbGV0ZUpvaW4SIS5ub29rcy5hcGkudjEuQ29tcGxldGVKb2luUmVxdWVzdBoiLm5vb2tzLmFwaS52MS5Db21wbGV0ZUpvaW5SZXNwb25zZRKVAQoUUmVxdWVzdFBhc3N3b3JkUmVzZXQSKS5ub29rcy5hcGkudjEuUmVxdWVzdFBhc3N3b3JkUmVzZXRSZXF1ZXN0Gioubm9va3MuYXBpLnYxLlJlcXVlc3RQYXNzd29yZFJlc2V0UmVzcG9uc2UiJoLT5JMCIDoBKiIbL2FwaS92MS9hdXRoL3Jlc2V0LXJlcXVlc3RzEpEBCg9HZXRSZXNldFJlcXVlc3QSJC5ub29rcy5hcGkudjEuR2V0UmVzZXRSZXF1ZXN0UmVxdWVzdBolLm5vb2tzLmFwaS52MS5HZXRSZXNldFJlcXVlc3RSZXNwb25zZSIxgtPkkwIrEikvYXBpL3YxL2F1dGgvcmVzZXQtcmVxdWVzdHMve3JlcXVlc3RfdWlkfRJwChVDb21wbGV0ZVBhc3N3b3JkUmVzZXQSKi5ub29rcy5hcGkudjEuQ29tcGxldGVQYXNzd29yZFJlc2V0UmVxdWVzdBorLm5vb2tzLmFwaS52MS5Db21wbGV0ZVBhc3N3b3JkUmVzZXRSZXNwb25zZUKuAQoQY29tLm5vb2tzLmFwaS52MUIQQXV0aFNlcnZpY2VQcm90b1ABWjZnaXRodWIuY29tL2hvc2hvbW9oL25vb2tzL3Byb3RvL2dlbi9ub29rcy9hcGkvdjE7YXBpdjGiAgNOQViqAgxOb29rcy5BcGkuVjHKAgxOb29rc1xBcGlcVjHiAhhOb29rc1xBcGlcVjFcR1BCTWV0YWRhdGHqAg5Ob29rczo6QXBpOjpWMWIGcHJvdG8z", [file_google_api_annotations]);
+  fileDesc("Ch9ub29rcy9hcGkvdjEvYXV0aF9zZXJ2aWNlLnByb3RvEgxub29rcy5hcGkudjEioQEKBk1lbWJlchILCgN1aWQYASABKAkSDAoEbmFtZRgCIAEoCRINCgVlbWFpbBgDIAEoCRIgCgRyb2xlGAQgASgOMhIubm9va3MuYXBpLnYxLlJvbGUSHAoUbXVzdF9jaGFuZ2VfcGFzc3dvcmQYBSABKAgSEgoKY3JlYXRlZF9hdBgGIAEoCRIZChFsYXN0X3NpZ25lZF9pbl9hdBgHIAEoCSJcChRDb21wbGV0ZVNldHVwUmVxdWVzdBIMCgRuYW1lGAEgASgJEg0KBWVtYWlsGAIgASgJEhAKCHBhc3N3b3JkGAMgASgJEhUKDWluc3RhbmNlX25hbWUYBCABKAkidAoVQ29tcGxldGVTZXR1cFJlc3BvbnNlEiQKBm1lbWJlchgBIAEoCzIULm5vb2tzLmFwaS52MS5NZW1iZXISFAoMYWNjZXNzX3Rva2VuGAIgASgJEh8KF2FjY2Vzc190b2tlbl9leHBpcmVzX2F0GAMgASgJIjAKDVNpZ25JblJlcXVlc3QSDQoFZW1haWwYASABKAkSEAoIcGFzc3dvcmQYAiABKAkiFgoUUmVmcmVzaEFjY2Vzc1JlcXVlc3QiTgoVUmVmcmVzaEFjY2Vzc1Jlc3BvbnNlEhQKDGFjY2Vzc190b2tlbhgBIAEoCRIfChdhY2Nlc3NfdG9rZW5fZXhwaXJlc19hdBgCIAEoCSJtCg5TaWduSW5SZXNwb25zZRIkCgZtZW1iZXIYASABKAsyFC5ub29rcy5hcGkudjEuTWVtYmVyEhQKDGFjY2Vzc190b2tlbhgCIAEoCRIfChdhY2Nlc3NfdG9rZW5fZXhwaXJlc19hdBgDIAEoCSIQCg5TaWduT3V0UmVxdWVzdCIRCg9TaWduT3V0UmVzcG9uc2UiGQoXR2V0Q3VycmVudE1lbWJlclJlcXVlc3QiQAoYR2V0Q3VycmVudE1lbWJlclJlc3BvbnNlEiQKBm1lbWJlchgBIAEoCzIULm5vb2tzLmFwaS52MS5NZW1iZXIiSAoWUmVwbGFjZVBhc3N3b3JkUmVxdWVzdBIYChBjdXJyZW50X3Bhc3N3b3JkGAEgASgJEhQKDG5ld19wYXNzd29yZBgCIAEoCSI/ChdSZXBsYWNlUGFzc3dvcmRSZXNwb25zZRIkCgZtZW1iZXIYASABKAsyFC5ub29rcy5hcGkudjEuTWVtYmVyIkIKElJlcXVlc3RKb2luUmVxdWVzdBIMCgRuYW1lGAEgASgJEg0KBWVtYWlsGAIgASgJEg8KB21lc3NhZ2UYAyABKAkiKgoTUmVxdWVzdEpvaW5SZXNwb25zZRITCgtyZXF1ZXN0X3VpZBgBIAEoCSIsChVHZXRKb2luUmVxdWVzdFJlcXVlc3QSEwoLcmVxdWVzdF91aWQYASABKAkiYgoWR2V0Sm9pblJlcXVlc3RSZXNwb25zZRIrCgZzdGF0dXMYASABKA4yGy5ub29rcy5hcGkudjEuUmVxdWVzdFN0YXR1cxIMCgRuYW1lGAIgASgJEg0KBWVtYWlsGAMgASgJIkoKE0NvbXBsZXRlSm9pblJlcXVlc3QSEwoLcmVxdWVzdF91aWQYASABKAkSDAoEbmFtZRgCIAEoCRIQCghwYXNzd29yZBgDIAEoCSJzChRDb21wbGV0ZUpvaW5SZXNwb25zZRIkCgZtZW1iZXIYASABKAsyFC5ub29rcy5hcGkudjEuTWVtYmVyEhQKDGFjY2Vzc190b2tlbhgCIAEoCRIfChdhY2Nlc3NfdG9rZW5fZXhwaXJlc19hdBgDIAEoCSI0ChtSZXF1ZXN0UGFzc3dvcmRSZXNldFJlcXVlc3QSFQoNZW1haWxfb3JfbmFtZRgBIAEoCSIzChxSZXF1ZXN0UGFzc3dvcmRSZXNldFJlc3BvbnNlEhMKC3JlcXVlc3RfdWlkGAEgASgJIi0KFkdldFJlc2V0UmVxdWVzdFJlcXVlc3QSEwoLcmVxdWVzdF91aWQYASABKAkiRgoXR2V0UmVzZXRSZXF1ZXN0UmVzcG9uc2USKwoGc3RhdHVzGAEgASgOMhsubm9va3MuYXBpLnYxLlJlcXVlc3RTdGF0dXMiSQocQ29tcGxldGVQYXNzd29yZFJlc2V0UmVxdWVzdBITCgtyZXF1ZXN0X3VpZBgBIAEoCRIUCgxuZXdfcGFzc3dvcmQYAiABKAkifAodQ29tcGxldGVQYXNzd29yZFJlc2V0UmVzcG9uc2USJAoGbWVtYmVyGAEgASgLMhQubm9va3MuYXBpLnYxLk1lbWJlchIUCgxhY2Nlc3NfdG9rZW4YAiABKAkSHwoXYWNjZXNzX3Rva2VuX2V4cGlyZXNfYXQYAyABKAkqhAEKDVJlcXVlc3RTdGF0dXMSHgoaUkVRVUVTVF9TVEFUVVNfVU5TUEVDSUZJRUQQABIaChZSRVFVRVNUX1NUQVRVU19QRU5ESU5HEAESGwoXUkVRVUVTVF9TVEFUVVNfQVBQUk9WRUQQAhIaChZSRVFVRVNUX1NUQVRVU19JR05PUkVEEAMqPQoEUm9sZRIUChBST0xFX1VOU1BFQ0lGSUVEEAASDgoKUk9MRV9BRE1JThABEg8KC1JPTEVfTUVNQkVSEAIy7goKC0F1dGhTZXJ2aWNlElgKDUNvbXBsZXRlU2V0dXASIi5ub29rcy5hcGkudjEuQ29tcGxldGVTZXR1cFJlcXVlc3QaIy5ub29rcy5hcGkudjEuQ29tcGxldGVTZXR1cFJlc3BvbnNlEkMKBlNpZ25JbhIbLm5vb2tzLmFwaS52MS5TaWduSW5SZXF1ZXN0Ghwubm9va3MuYXBpLnYxLlNpZ25JblJlc3BvbnNlEkYKB1NpZ25PdXQSHC5ub29rcy5hcGkudjEuU2lnbk91dFJlcXVlc3QaHS5ub29rcy5hcGkudjEuU2lnbk91dFJlc3BvbnNlEnoKEEdldEN1cnJlbnRNZW1iZXISJS5ub29rcy5hcGkudjEuR2V0Q3VycmVudE1lbWJlclJlcXVlc3QaJi5ub29rcy5hcGkudjEuR2V0Q3VycmVudE1lbWJlclJlc3BvbnNlIheC0+STAhESDy9hcGkvdjEvYXV0aC9tZRJ5Cg1SZWZyZXNoQWNjZXNzEiIubm9va3MuYXBpLnYxLlJlZnJlc2hBY2Nlc3NSZXF1ZXN0GiMubm9va3MuYXBpLnYxLlJlZnJlc2hBY2Nlc3NSZXNwb25zZSIfgtPkkwIZOgEqIhQvYXBpL3YxL2F1dGgvcmVmcmVzaBKAAQoPUmVwbGFjZVBhc3N3b3JkEiQubm9va3MuYXBpLnYxLlJlcGxhY2VQYXNzd29yZFJlcXVlc3QaJS5ub29rcy5hcGkudjEuUmVwbGFjZVBhc3N3b3JkUmVzcG9uc2UiIILT5JMCGjoBKiIVL2FwaS92MS9hdXRoL3Bhc3N3b3JkEnkKC1JlcXVlc3RKb2luEiAubm9va3MuYXBpLnYxLlJlcXVlc3RKb2luUmVxdWVzdBohLm5vb2tzLmFwaS52MS5SZXF1ZXN0Sm9pblJlc3BvbnNlIiWC0+STAh86ASoiGi9hcGkvdjEvYXV0aC9qb2luLXJlcXVlc3RzEo0BCg5HZXRKb2luUmVxdWVzdBIjLm5vb2tzLmFwaS52MS5HZXRKb2luUmVxdWVzdFJlcXVlc3QaJC5ub29rcy5hcGkudjEuR2V0Sm9pblJlcXVlc3RSZXNwb25zZSIwgtPkkwIqEigvYXBpL3YxL2F1dGgvam9pbi1yZXF1ZXN0cy97cmVxdWVzdF91aWR9ElUKDENvbXBsZXRlSm9pbhIhLm5vb2tzLmFwaS52MS5Db21wbGV0ZUpvaW5SZXF1ZXN0GiIubm9va3MuYXBpLnYxLkNvbXBsZXRlSm9pblJlc3BvbnNlEpUBChRSZXF1ZXN0UGFzc3dvcmRSZXNldBIpLm5vb2tzLmFwaS52MS5SZXF1ZXN0UGFzc3dvcmRSZXNldFJlcXVlc3QaKi5ub29rcy5hcGkudjEuUmVxdWVzdFBhc3N3b3JkUmVzZXRSZXNwb25zZSImgtPkkwIgOgEqIhsvYXBpL3YxL2F1dGgvcmVzZXQtcmVxdWVzdHMSkQEKD0dldFJlc2V0UmVxdWVzdBIkLm5vb2tzLmFwaS52MS5HZXRSZXNldFJlcXVlc3RSZXF1ZXN0GiUubm9va3MuYXBpLnYxLkdldFJlc2V0UmVxdWVzdFJlc3BvbnNlIjGC0+STAisSKS9hcGkvdjEvYXV0aC9yZXNldC1yZXF1ZXN0cy97cmVxdWVzdF91aWR9EnAKFUNvbXBsZXRlUGFzc3dvcmRSZXNldBIqLm5vb2tzLmFwaS52MS5Db21wbGV0ZVBhc3N3b3JkUmVzZXRSZXF1ZXN0Gisubm9va3MuYXBpLnYxLkNvbXBsZXRlUGFzc3dvcmRSZXNldFJlc3BvbnNlQq4BChBjb20ubm9va3MuYXBpLnYxQhBBdXRoU2VydmljZVByb3RvUAFaNmdpdGh1Yi5jb20vaG9zaG9tb2gvbm9va3MvcHJvdG8vZ2VuL25vb2tzL2FwaS92MTthcGl2MaICA05BWKoCDE5vb2tzLkFwaS5WMcoCDE5vb2tzXEFwaVxWMeICGE5vb2tzXEFwaVxWMVxHUEJNZXRhZGF0YeoCDk5vb2tzOjpBcGk6OlYxYgZwcm90bzM", [file_google_api_annotations]);
 
 /**
  * Member is a person with an account on this Instance, as seen over the wire. It
@@ -121,6 +121,21 @@ export type CompleteSetupResponse = Message<"nooks.api.v1.CompleteSetupResponse"
    * @generated from field: nooks.api.v1.Member member = 1;
    */
   member?: Member | undefined;
+
+  /**
+   * A short-lived access token, for a caller that is not a browser. A browser ignores
+   * it and uses the refresh cookie that came with it.
+   *
+   * @generated from field: string access_token = 2;
+   */
+  accessToken: string;
+
+  /**
+   * When the access token stops working, RFC 3339.
+   *
+   * @generated from field: string access_token_expires_at = 3;
+   */
+  accessTokenExpiresAt: string;
 };
 
 /**
@@ -153,6 +168,45 @@ export const SignInRequestSchema: GenMessage<SignInRequest> = /*@__PURE__*/
   messageDesc(file_nooks_api_v1_auth_service, 3);
 
 /**
+ * @generated from message nooks.api.v1.RefreshAccessRequest
+ */
+export type RefreshAccessRequest = Message<"nooks.api.v1.RefreshAccessRequest"> & {
+};
+
+/**
+ * Describes the message nooks.api.v1.RefreshAccessRequest.
+ * Use `create(RefreshAccessRequestSchema)` to create a new message.
+ */
+export const RefreshAccessRequestSchema: GenMessage<RefreshAccessRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_auth_service, 4);
+
+/**
+ * @generated from message nooks.api.v1.RefreshAccessResponse
+ */
+export type RefreshAccessResponse = Message<"nooks.api.v1.RefreshAccessResponse"> & {
+  /**
+   * A new short-lived access token. The refresh cookie is unchanged.
+   *
+   * @generated from field: string access_token = 1;
+   */
+  accessToken: string;
+
+  /**
+   * When it stops working, RFC 3339. Ask again before then.
+   *
+   * @generated from field: string access_token_expires_at = 2;
+   */
+  accessTokenExpiresAt: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.RefreshAccessResponse.
+ * Use `create(RefreshAccessResponseSchema)` to create a new message.
+ */
+export const RefreshAccessResponseSchema: GenMessage<RefreshAccessResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_auth_service, 5);
+
+/**
  * @generated from message nooks.api.v1.SignInResponse
  */
 export type SignInResponse = Message<"nooks.api.v1.SignInResponse"> & {
@@ -160,6 +214,21 @@ export type SignInResponse = Message<"nooks.api.v1.SignInResponse"> & {
    * @generated from field: nooks.api.v1.Member member = 1;
    */
   member?: Member | undefined;
+
+  /**
+   * A short-lived access token, for a caller that is not a browser. A browser ignores
+   * it and uses the refresh cookie that came with it.
+   *
+   * @generated from field: string access_token = 2;
+   */
+  accessToken: string;
+
+  /**
+   * When the access token stops working, RFC 3339.
+   *
+   * @generated from field: string access_token_expires_at = 3;
+   */
+  accessTokenExpiresAt: string;
 };
 
 /**
@@ -167,7 +236,7 @@ export type SignInResponse = Message<"nooks.api.v1.SignInResponse"> & {
  * Use `create(SignInResponseSchema)` to create a new message.
  */
 export const SignInResponseSchema: GenMessage<SignInResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 4);
+  messageDesc(file_nooks_api_v1_auth_service, 6);
 
 /**
  * @generated from message nooks.api.v1.SignOutRequest
@@ -180,7 +249,7 @@ export type SignOutRequest = Message<"nooks.api.v1.SignOutRequest"> & {
  * Use `create(SignOutRequestSchema)` to create a new message.
  */
 export const SignOutRequestSchema: GenMessage<SignOutRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 5);
+  messageDesc(file_nooks_api_v1_auth_service, 7);
 
 /**
  * @generated from message nooks.api.v1.SignOutResponse
@@ -193,7 +262,7 @@ export type SignOutResponse = Message<"nooks.api.v1.SignOutResponse"> & {
  * Use `create(SignOutResponseSchema)` to create a new message.
  */
 export const SignOutResponseSchema: GenMessage<SignOutResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 6);
+  messageDesc(file_nooks_api_v1_auth_service, 8);
 
 /**
  * @generated from message nooks.api.v1.GetCurrentMemberRequest
@@ -206,7 +275,7 @@ export type GetCurrentMemberRequest = Message<"nooks.api.v1.GetCurrentMemberRequ
  * Use `create(GetCurrentMemberRequestSchema)` to create a new message.
  */
 export const GetCurrentMemberRequestSchema: GenMessage<GetCurrentMemberRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 7);
+  messageDesc(file_nooks_api_v1_auth_service, 9);
 
 /**
  * @generated from message nooks.api.v1.GetCurrentMemberResponse
@@ -223,7 +292,7 @@ export type GetCurrentMemberResponse = Message<"nooks.api.v1.GetCurrentMemberRes
  * Use `create(GetCurrentMemberResponseSchema)` to create a new message.
  */
 export const GetCurrentMemberResponseSchema: GenMessage<GetCurrentMemberResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 8);
+  messageDesc(file_nooks_api_v1_auth_service, 10);
 
 /**
  * @generated from message nooks.api.v1.ReplacePasswordRequest
@@ -248,7 +317,7 @@ export type ReplacePasswordRequest = Message<"nooks.api.v1.ReplacePasswordReques
  * Use `create(ReplacePasswordRequestSchema)` to create a new message.
  */
 export const ReplacePasswordRequestSchema: GenMessage<ReplacePasswordRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 9);
+  messageDesc(file_nooks_api_v1_auth_service, 11);
 
 /**
  * @generated from message nooks.api.v1.ReplacePasswordResponse
@@ -265,7 +334,7 @@ export type ReplacePasswordResponse = Message<"nooks.api.v1.ReplacePasswordRespo
  * Use `create(ReplacePasswordResponseSchema)` to create a new message.
  */
 export const ReplacePasswordResponseSchema: GenMessage<ReplacePasswordResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 10);
+  messageDesc(file_nooks_api_v1_auth_service, 12);
 
 /**
  * @generated from message nooks.api.v1.RequestJoinRequest
@@ -294,7 +363,7 @@ export type RequestJoinRequest = Message<"nooks.api.v1.RequestJoinRequest"> & {
  * Use `create(RequestJoinRequestSchema)` to create a new message.
  */
 export const RequestJoinRequestSchema: GenMessage<RequestJoinRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 11);
+  messageDesc(file_nooks_api_v1_auth_service, 13);
 
 /**
  * @generated from message nooks.api.v1.RequestJoinResponse
@@ -313,7 +382,7 @@ export type RequestJoinResponse = Message<"nooks.api.v1.RequestJoinResponse"> & 
  * Use `create(RequestJoinResponseSchema)` to create a new message.
  */
 export const RequestJoinResponseSchema: GenMessage<RequestJoinResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 12);
+  messageDesc(file_nooks_api_v1_auth_service, 14);
 
 /**
  * @generated from message nooks.api.v1.GetJoinRequestRequest
@@ -330,7 +399,7 @@ export type GetJoinRequestRequest = Message<"nooks.api.v1.GetJoinRequestRequest"
  * Use `create(GetJoinRequestRequestSchema)` to create a new message.
  */
 export const GetJoinRequestRequestSchema: GenMessage<GetJoinRequestRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 13);
+  messageDesc(file_nooks_api_v1_auth_service, 15);
 
 /**
  * @generated from message nooks.api.v1.GetJoinRequestResponse
@@ -359,7 +428,7 @@ export type GetJoinRequestResponse = Message<"nooks.api.v1.GetJoinRequestRespons
  * Use `create(GetJoinRequestResponseSchema)` to create a new message.
  */
 export const GetJoinRequestResponseSchema: GenMessage<GetJoinRequestResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 14);
+  messageDesc(file_nooks_api_v1_auth_service, 16);
 
 /**
  * @generated from message nooks.api.v1.CompleteJoinRequest
@@ -386,7 +455,7 @@ export type CompleteJoinRequest = Message<"nooks.api.v1.CompleteJoinRequest"> & 
  * Use `create(CompleteJoinRequestSchema)` to create a new message.
  */
 export const CompleteJoinRequestSchema: GenMessage<CompleteJoinRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 15);
+  messageDesc(file_nooks_api_v1_auth_service, 17);
 
 /**
  * @generated from message nooks.api.v1.CompleteJoinResponse
@@ -396,6 +465,21 @@ export type CompleteJoinResponse = Message<"nooks.api.v1.CompleteJoinResponse"> 
    * @generated from field: nooks.api.v1.Member member = 1;
    */
   member?: Member | undefined;
+
+  /**
+   * A short-lived access token, for a caller that is not a browser. A browser ignores
+   * it and uses the refresh cookie that came with it.
+   *
+   * @generated from field: string access_token = 2;
+   */
+  accessToken: string;
+
+  /**
+   * When the access token stops working, RFC 3339.
+   *
+   * @generated from field: string access_token_expires_at = 3;
+   */
+  accessTokenExpiresAt: string;
 };
 
 /**
@@ -403,7 +487,7 @@ export type CompleteJoinResponse = Message<"nooks.api.v1.CompleteJoinResponse"> 
  * Use `create(CompleteJoinResponseSchema)` to create a new message.
  */
 export const CompleteJoinResponseSchema: GenMessage<CompleteJoinResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 16);
+  messageDesc(file_nooks_api_v1_auth_service, 18);
 
 /**
  * @generated from message nooks.api.v1.RequestPasswordResetRequest
@@ -422,7 +506,7 @@ export type RequestPasswordResetRequest = Message<"nooks.api.v1.RequestPasswordR
  * Use `create(RequestPasswordResetRequestSchema)` to create a new message.
  */
 export const RequestPasswordResetRequestSchema: GenMessage<RequestPasswordResetRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 17);
+  messageDesc(file_nooks_api_v1_auth_service, 19);
 
 /**
  * @generated from message nooks.api.v1.RequestPasswordResetResponse
@@ -439,7 +523,7 @@ export type RequestPasswordResetResponse = Message<"nooks.api.v1.RequestPassword
  * Use `create(RequestPasswordResetResponseSchema)` to create a new message.
  */
 export const RequestPasswordResetResponseSchema: GenMessage<RequestPasswordResetResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 18);
+  messageDesc(file_nooks_api_v1_auth_service, 20);
 
 /**
  * @generated from message nooks.api.v1.GetResetRequestRequest
@@ -456,7 +540,7 @@ export type GetResetRequestRequest = Message<"nooks.api.v1.GetResetRequestReques
  * Use `create(GetResetRequestRequestSchema)` to create a new message.
  */
 export const GetResetRequestRequestSchema: GenMessage<GetResetRequestRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 19);
+  messageDesc(file_nooks_api_v1_auth_service, 21);
 
 /**
  * @generated from message nooks.api.v1.GetResetRequestResponse
@@ -473,7 +557,7 @@ export type GetResetRequestResponse = Message<"nooks.api.v1.GetResetRequestRespo
  * Use `create(GetResetRequestResponseSchema)` to create a new message.
  */
 export const GetResetRequestResponseSchema: GenMessage<GetResetRequestResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 20);
+  messageDesc(file_nooks_api_v1_auth_service, 22);
 
 /**
  * @generated from message nooks.api.v1.CompletePasswordResetRequest
@@ -495,7 +579,7 @@ export type CompletePasswordResetRequest = Message<"nooks.api.v1.CompletePasswor
  * Use `create(CompletePasswordResetRequestSchema)` to create a new message.
  */
 export const CompletePasswordResetRequestSchema: GenMessage<CompletePasswordResetRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 21);
+  messageDesc(file_nooks_api_v1_auth_service, 23);
 
 /**
  * @generated from message nooks.api.v1.CompletePasswordResetResponse
@@ -505,6 +589,21 @@ export type CompletePasswordResetResponse = Message<"nooks.api.v1.CompletePasswo
    * @generated from field: nooks.api.v1.Member member = 1;
    */
   member?: Member | undefined;
+
+  /**
+   * A short-lived access token, for a caller that is not a browser. A browser ignores
+   * it and uses the refresh cookie that came with it.
+   *
+   * @generated from field: string access_token = 2;
+   */
+  accessToken: string;
+
+  /**
+   * When the access token stops working, RFC 3339.
+   *
+   * @generated from field: string access_token_expires_at = 3;
+   */
+  accessTokenExpiresAt: string;
 };
 
 /**
@@ -512,7 +611,7 @@ export type CompletePasswordResetResponse = Message<"nooks.api.v1.CompletePasswo
  * Use `create(CompletePasswordResetResponseSchema)` to create a new message.
  */
 export const CompletePasswordResetResponseSchema: GenMessage<CompletePasswordResetResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_auth_service, 22);
+  messageDesc(file_nooks_api_v1_auth_service, 24);
 
 /**
  * RequestStatus is where a request has got to.
@@ -630,6 +729,20 @@ export const AuthService: GenService<{
     methodKind: "unary";
     input: typeof GetCurrentMemberRequestSchema;
     output: typeof GetCurrentMemberResponseSchema;
+  },
+  /**
+   * RefreshAccess exchanges the refresh cookie for a new access token.
+   *
+   * The refresh token is read from the cookie and never appears in a request or a
+   * response body: the credential that lasts a month is not one a caller should be
+   * able to copy out of a log.
+   *
+   * @generated from rpc nooks.api.v1.AuthService.RefreshAccess
+   */
+  refreshAccess: {
+    methodKind: "unary";
+    input: typeof RefreshAccessRequestSchema;
+    output: typeof RefreshAccessResponseSchema;
   },
   /**
    * ReplacePassword sets a new password for the signed-in Member. A Member who was

@@ -43,6 +43,9 @@ const (
 	// AuthServiceGetCurrentMemberProcedure is the fully-qualified name of the AuthService's
 	// GetCurrentMember RPC.
 	AuthServiceGetCurrentMemberProcedure = "/nooks.api.v1.AuthService/GetCurrentMember"
+	// AuthServiceRefreshAccessProcedure is the fully-qualified name of the AuthService's RefreshAccess
+	// RPC.
+	AuthServiceRefreshAccessProcedure = "/nooks.api.v1.AuthService/RefreshAccess"
 	// AuthServiceReplacePasswordProcedure is the fully-qualified name of the AuthService's
 	// ReplacePassword RPC.
 	AuthServiceReplacePasswordProcedure = "/nooks.api.v1.AuthService/ReplacePassword"
@@ -76,6 +79,12 @@ type AuthServiceClient interface {
 	SignOut(context.Context, *connect.Request[v1.SignOutRequest]) (*connect.Response[v1.SignOutResponse], error)
 	// GetCurrentMember returns whoever the session cookie belongs to.
 	GetCurrentMember(context.Context, *connect.Request[v1.GetCurrentMemberRequest]) (*connect.Response[v1.GetCurrentMemberResponse], error)
+	// RefreshAccess exchanges the refresh cookie for a new access token.
+	//
+	// The refresh token is read from the cookie and never appears in a request or a
+	// response body: the credential that lasts a month is not one a caller should be
+	// able to copy out of a log.
+	RefreshAccess(context.Context, *connect.Request[v1.RefreshAccessRequest]) (*connect.Response[v1.RefreshAccessResponse], error)
 	// ReplacePassword sets a new password for the signed-in Member. A Member who was
 	// given a temporary password must call this before they can use Nooks.
 	ReplacePassword(context.Context, *connect.Request[v1.ReplacePasswordRequest]) (*connect.Response[v1.ReplacePasswordResponse], error)
@@ -132,6 +141,12 @@ func NewAuthServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(authServiceMethods.ByName("GetCurrentMember")),
 			connect.WithClientOptions(opts...),
 		),
+		refreshAccess: connect.NewClient[v1.RefreshAccessRequest, v1.RefreshAccessResponse](
+			httpClient,
+			baseURL+AuthServiceRefreshAccessProcedure,
+			connect.WithSchema(authServiceMethods.ByName("RefreshAccess")),
+			connect.WithClientOptions(opts...),
+		),
 		replacePassword: connect.NewClient[v1.ReplacePasswordRequest, v1.ReplacePasswordResponse](
 			httpClient,
 			baseURL+AuthServiceReplacePasswordProcedure,
@@ -183,6 +198,7 @@ type authServiceClient struct {
 	signIn                *connect.Client[v1.SignInRequest, v1.SignInResponse]
 	signOut               *connect.Client[v1.SignOutRequest, v1.SignOutResponse]
 	getCurrentMember      *connect.Client[v1.GetCurrentMemberRequest, v1.GetCurrentMemberResponse]
+	refreshAccess         *connect.Client[v1.RefreshAccessRequest, v1.RefreshAccessResponse]
 	replacePassword       *connect.Client[v1.ReplacePasswordRequest, v1.ReplacePasswordResponse]
 	requestJoin           *connect.Client[v1.RequestJoinRequest, v1.RequestJoinResponse]
 	getJoinRequest        *connect.Client[v1.GetJoinRequestRequest, v1.GetJoinRequestResponse]
@@ -210,6 +226,11 @@ func (c *authServiceClient) SignOut(ctx context.Context, req *connect.Request[v1
 // GetCurrentMember calls nooks.api.v1.AuthService.GetCurrentMember.
 func (c *authServiceClient) GetCurrentMember(ctx context.Context, req *connect.Request[v1.GetCurrentMemberRequest]) (*connect.Response[v1.GetCurrentMemberResponse], error) {
 	return c.getCurrentMember.CallUnary(ctx, req)
+}
+
+// RefreshAccess calls nooks.api.v1.AuthService.RefreshAccess.
+func (c *authServiceClient) RefreshAccess(ctx context.Context, req *connect.Request[v1.RefreshAccessRequest]) (*connect.Response[v1.RefreshAccessResponse], error) {
+	return c.refreshAccess.CallUnary(ctx, req)
 }
 
 // ReplacePassword calls nooks.api.v1.AuthService.ReplacePassword.
@@ -258,6 +279,12 @@ type AuthServiceHandler interface {
 	SignOut(context.Context, *connect.Request[v1.SignOutRequest]) (*connect.Response[v1.SignOutResponse], error)
 	// GetCurrentMember returns whoever the session cookie belongs to.
 	GetCurrentMember(context.Context, *connect.Request[v1.GetCurrentMemberRequest]) (*connect.Response[v1.GetCurrentMemberResponse], error)
+	// RefreshAccess exchanges the refresh cookie for a new access token.
+	//
+	// The refresh token is read from the cookie and never appears in a request or a
+	// response body: the credential that lasts a month is not one a caller should be
+	// able to copy out of a log.
+	RefreshAccess(context.Context, *connect.Request[v1.RefreshAccessRequest]) (*connect.Response[v1.RefreshAccessResponse], error)
 	// ReplacePassword sets a new password for the signed-in Member. A Member who was
 	// given a temporary password must call this before they can use Nooks.
 	ReplacePassword(context.Context, *connect.Request[v1.ReplacePasswordRequest]) (*connect.Response[v1.ReplacePasswordResponse], error)
@@ -308,6 +335,12 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 		AuthServiceGetCurrentMemberProcedure,
 		svc.GetCurrentMember,
 		connect.WithSchema(authServiceMethods.ByName("GetCurrentMember")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceRefreshAccessHandler := connect.NewUnaryHandler(
+		AuthServiceRefreshAccessProcedure,
+		svc.RefreshAccess,
+		connect.WithSchema(authServiceMethods.ByName("RefreshAccess")),
 		connect.WithHandlerOptions(opts...),
 	)
 	authServiceReplacePasswordHandler := connect.NewUnaryHandler(
@@ -362,6 +395,8 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 			authServiceSignOutHandler.ServeHTTP(w, r)
 		case AuthServiceGetCurrentMemberProcedure:
 			authServiceGetCurrentMemberHandler.ServeHTTP(w, r)
+		case AuthServiceRefreshAccessProcedure:
+			authServiceRefreshAccessHandler.ServeHTTP(w, r)
 		case AuthServiceReplacePasswordProcedure:
 			authServiceReplacePasswordHandler.ServeHTTP(w, r)
 		case AuthServiceRequestJoinProcedure:
@@ -399,6 +434,10 @@ func (UnimplementedAuthServiceHandler) SignOut(context.Context, *connect.Request
 
 func (UnimplementedAuthServiceHandler) GetCurrentMember(context.Context, *connect.Request[v1.GetCurrentMemberRequest]) (*connect.Response[v1.GetCurrentMemberResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.AuthService.GetCurrentMember is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) RefreshAccess(context.Context, *connect.Request[v1.RefreshAccessRequest]) (*connect.Response[v1.RefreshAccessResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.AuthService.RefreshAccess is not implemented"))
 }
 
 func (UnimplementedAuthServiceHandler) ReplacePassword(context.Context, *connect.Request[v1.ReplacePasswordRequest]) (*connect.Response[v1.ReplacePasswordResponse], error) {

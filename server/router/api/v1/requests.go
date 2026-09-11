@@ -119,9 +119,12 @@ func (s *AuthService) CompleteJoin(
 	}
 
 	res := connect.NewResponse(&apiv1.CompleteJoinResponse{Member: memberToProto(member)})
-	if err := s.startSession(ctx, res.Header(), member); err != nil {
+	access, err := s.startSession(ctx, res.Header(), member)
+	if err != nil {
 		return nil, err
 	}
+	res.Msg.AccessToken = access.Token
+	res.Msg.AccessTokenExpiresAt = formatMoment(access.ExpiresAt)
 	return res, nil
 }
 
@@ -213,9 +216,12 @@ func (s *AuthService) CompletePasswordReset(
 	}
 
 	res := connect.NewResponse(&apiv1.CompletePasswordResetResponse{Member: memberToProto(member)})
-	if err := s.startSession(ctx, res.Header(), member); err != nil {
+	access, err := s.startSession(ctx, res.Header(), member)
+	if err != nil {
 		return nil, err
 	}
+	res.Msg.AccessToken = access.Token
+	res.Msg.AccessTokenExpiresAt = formatMoment(access.ExpiresAt)
 	return res, nil
 }
 

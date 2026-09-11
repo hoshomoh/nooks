@@ -30,10 +30,17 @@ CREATE TABLE session (
   token_hash TEXT    NOT NULL PRIMARY KEY,
   member_id  INTEGER NOT NULL REFERENCES member (id) ON DELETE CASCADE,
   created_at TEXT    NOT NULL,
-  expires_at TEXT    NOT NULL
+  expires_at TEXT    NOT NULL,
+  kind        TEXT   NOT NULL DEFAULT 'REFRESH',
+  -- Which refresh token minted it, so signing out takes its access tokens too.
+  parent_hash TEXT   NOT NULL DEFAULT ''
 );
 
+  -- REFRESH lives a month in an HttpOnly cookie; ACCESS lives an hour and is the only
+  -- one ever handed to a caller in a response body.
+  -- (columns added by 0013; stated here because this is where they live)
 CREATE INDEX idx_session_member_id ON session (member_id);
+CREATE INDEX idx_session_parent_hash ON session (parent_hash);
 -- A Visitor asking for an account, and a Member asking to replace a forgotten
 -- password. Nooks sends no email, so both wait here until an Admin acts on them.
 CREATE TABLE join_request (

@@ -101,9 +101,12 @@ func (s *AuthService) CompleteSetup(
 	}
 
 	res := connect.NewResponse(&apiv1.CompleteSetupResponse{Member: memberToProto(member)})
-	if err := s.startSession(ctx, res.Header(), member); err != nil {
+	access, err := s.startSession(ctx, res.Header(), member)
+	if err != nil {
 		return nil, err
 	}
+	res.Msg.AccessToken = access.Token
+	res.Msg.AccessTokenExpiresAt = formatMoment(access.ExpiresAt)
 	return res, nil
 }
 
@@ -128,9 +131,12 @@ func (s *AuthService) SignIn(
 	}
 
 	res := connect.NewResponse(&apiv1.SignInResponse{Member: memberToProto(member)})
-	if err := s.startSession(ctx, res.Header(), member); err != nil {
+	access, err := s.startSession(ctx, res.Header(), member)
+	if err != nil {
 		return nil, err
 	}
+	res.Msg.AccessToken = access.Token
+	res.Msg.AccessTokenExpiresAt = formatMoment(access.ExpiresAt)
 	return res, nil
 }
 
@@ -142,9 +148,12 @@ func (s *AuthService) SignOut(
 	res := connect.NewResponse(&apiv1.SignOutResponse{})
 	res.Header().Add("Set-Cookie", auth.ExpiredCookie(s.secure).String())
 
+	// The whole tree, not just the cookie: an access token that outlived the session it
+	// came from is a credential nobody knows they still have.
+	//
 	// Signing out twice is not a failure, so a missing or unknown cookie is fine.
 	if token := cookieValue(req.Header().Get("Cookie"), auth.CookieName); token != "" {
-		if err := s.store.DeleteSession(ctx, auth.HashToken(token)); err != nil {
+		if err := s.store.DeleteSessionTree(ctx, auth.HashToken(token)); err != nil {
 			return nil, internalError("delete session", err)
 		}
 	}
@@ -262,10 +271,10 @@ func (s *AuthService) createMember(ctx context.Context, in createMemberInput) (s
 }
 
 // startSession mints a session and puts its cookie on the response.
-func (s *AuthService) startSession(ctx context.Context, header interface{ Add(string, string) }, member store.Member) error {
+func (s *AuthService) startSession(ctx context.Context, header interface{ Add(string, string) }, member store.Member) (issuedAccess, error) {
 	token, hash, err := s.newAuth()
 	if err != nil {
-		return internalError("make session token", err)
+		return issuedAccess{}, internalError("make session token", err)
 	}
 
 	now := s.now()
@@ -275,20 +284,65 @@ func (s *AuthService) startSession(ctx context.Context, header interface{ Add(st
 		MemberID:  member.ID,
 		CreatedAt: now,
 		ExpiresAt: expires,
+		Kind:      store.SessionRefresh,
 	}
 	if err := s.store.CreateSession(ctx, session); err != nil {
-		return internalError("create session", err)
+		return issuedAccess{}, internalError("create session", err)
+	}
+
+	// Minted alongside, so a caller that cannot use cookies has something to hold from
+	// the moment it signs in. A browser ignores it.
+	access, err := s.mintAccess(ctx, member, hash)
+	if err != nil {
+		return issuedAccess{}, err
 	}
 
 	// Here rather than in SignIn, because every way a session begins is somebody
 	// arriving: first run, signing in, finishing a join, replacing a password. Marking
 	// it only on sign-in left the first Admin listed forever as not yet arrived.
 	if err := s.store.MarkMemberSignedIn(ctx, member.ID, now); err != nil {
-		return internalError("mark member signed in", err)
+		return issuedAccess{}, internalError("mark member signed in", err)
 	}
 
 	header.Add("Set-Cookie", auth.NewCookie(token, expires, s.secure).String())
-	return nil
+	return access, nil
+}
+
+// issuedAccess is the short-lived credential handed to a caller, and when it runs out.
+type issuedAccess struct {
+	Token     string
+	ExpiresAt time.Time
+}
+
+/*
+mintAccess makes a short-lived token belonging to a refresh token.
+
+Recorded with its parent so that signing out takes it too: a credential that outlives
+the session it came from is a credential nobody knows they still have.
+*/
+func (s *AuthService) mintAccess(
+	ctx context.Context,
+	member store.Member,
+	refreshHash string,
+) (issuedAccess, error) {
+	token, hash, err := s.newAuth()
+	if err != nil {
+		return issuedAccess{}, internalError("make access token", err)
+	}
+
+	now := s.now()
+	expires := now.Add(auth.AccessLifetime)
+	if err := s.store.CreateSession(ctx, store.Session{
+		TokenHash:  hash,
+		MemberID:   member.ID,
+		CreatedAt:  now,
+		ExpiresAt:  expires,
+		Kind:       store.SessionAccess,
+		ParentHash: refreshHash,
+	}); err != nil {
+		return issuedAccess{}, internalError("create access token", err)
+	}
+	return issuedAccess{Token: token, ExpiresAt: expires}, nil
 }
 
 // errWrongCredentials is deliberately the same for an unknown email and a wrong
@@ -378,3 +432,49 @@ func roleToProto(role store.Role) apiv1.Role {
 		return apiv1.Role_ROLE_UNSPECIFIED
 	}
 }
+
+/*
+RefreshAccess exchanges the refresh cookie for a new access token.
+
+The refresh token is read from the cookie and never appears in a request or a response
+body. That is the whole point of splitting them: the credential that lasts a month is
+not one a caller can copy out of a log, and the one that does travel is worth an hour.
+*/
+func (s *AuthService) RefreshAccess(
+	ctx context.Context,
+	req *connect.Request[apiv1.RefreshAccessRequest],
+) (*connect.Response[apiv1.RefreshAccessResponse], error) {
+	presented := cookieValue(req.Header().Get("Cookie"), auth.CookieName)
+	if presented == "" {
+		return nil, errNotSignedIn
+	}
+
+	refreshHash := auth.HashToken(presented)
+	session, err := s.store.SessionByTokenHash(ctx, refreshHash)
+	if err != nil || session.Kind != store.SessionRefresh {
+		return nil, errNotSignedIn
+	}
+	if session.Expired(s.now()) {
+		_ = s.store.DeleteSessionTree(ctx, refreshHash)
+		return nil, errNotSignedIn
+	}
+
+	member, err := s.store.MemberByID(ctx, session.MemberID)
+	if err != nil {
+		return nil, internalError("read member", err)
+	}
+
+	access, err := s.mintAccess(ctx, member, refreshHash)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&apiv1.RefreshAccessResponse{
+		AccessToken:          access.Token,
+		AccessTokenExpiresAt: formatMoment(access.ExpiresAt),
+	}), nil
+}
+
+// errNotSignedIn is the one answer to every way of arriving without a usable session.
+// Saying which way it failed would tell somebody probing which half they got right.
+var errNotSignedIn = connect.NewError(connect.CodeUnauthenticated,
+	errors.New("not signed in"))

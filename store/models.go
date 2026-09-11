@@ -44,10 +44,12 @@ type memberModel struct {
 type sessionModel struct {
 	bun.BaseModel `bun:"table:session,alias:session"`
 
-	TokenHash string `bun:"token_hash,pk"`
-	MemberID  int64  `bun:"member_id,notnull"`
-	CreatedAt string `bun:"created_at,notnull"`
-	ExpiresAt string `bun:"expires_at,notnull"`
+	TokenHash  string `bun:"token_hash,pk"`
+	MemberID   int64  `bun:"member_id,notnull"`
+	CreatedAt  string `bun:"created_at,notnull"`
+	ExpiresAt  string `bun:"expires_at,notnull"`
+	Kind       string `bun:"kind,notnull"`
+	ParentHash string `bun:"parent_hash,notnull"`
 }
 
 // toMember converts a stored row to the domain type.
@@ -84,20 +86,28 @@ func (s sessionModel) toSession() (Session, error) {
 		return Session{}, err
 	}
 	return Session{
-		TokenHash: s.TokenHash,
-		MemberID:  s.MemberID,
-		CreatedAt: createdAt,
-		ExpiresAt: expiresAt,
+		TokenHash:  s.TokenHash,
+		MemberID:   s.MemberID,
+		CreatedAt:  createdAt,
+		ExpiresAt:  expiresAt,
+		Kind:       SessionKind(s.Kind),
+		ParentHash: s.ParentHash,
 	}, nil
 }
 
 // newSessionModel converts a domain Session for storage.
 func newSessionModel(s Session) *sessionModel {
+	kind := s.Kind
+	if kind == "" {
+		kind = SessionRefresh
+	}
 	return &sessionModel{
-		TokenHash: s.TokenHash,
-		MemberID:  s.MemberID,
-		CreatedAt: formatTime(s.CreatedAt),
-		ExpiresAt: formatTime(s.ExpiresAt),
+		TokenHash:  s.TokenHash,
+		MemberID:   s.MemberID,
+		CreatedAt:  formatTime(s.CreatedAt),
+		ExpiresAt:  formatTime(s.ExpiresAt),
+		Kind:       string(kind),
+		ParentHash: s.ParentHash,
 	}
 }
 

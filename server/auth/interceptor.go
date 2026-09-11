@@ -86,6 +86,13 @@ func (r *Resolver) Grant(ctx context.Context, header http.Header) (Grant, bool) 
 	if presented == "" {
 		return Grant{}, false
 	}
+
+	// A bearer is tried as an access token first: a caller holding one signed in with a
+	// password and has whatever its Member has, where an Access token is deliberately
+	// narrower. Both are bearers, and only the lookup tells them apart.
+	if member, ok := r.accessMember(ctx, presented); ok {
+		return Grant{Member: member}, true
+	}
 	return r.tokenGrant(ctx, presented)
 }
 
@@ -123,6 +130,30 @@ func (r *Resolver) tokenGrant(ctx context.Context, presented string) (Grant, boo
 	return NewTokenGrant(member, token, listIDs), true
 }
 
+/*
+accessMember resolves a short-lived access token to the Member who signed in for it.
+
+Only ACCESS: a refresh token is a cookie's business and must not work as a bearer, or
+the split would buy nothing — the long-lived credential would be usable exactly where
+the short-lived one was supposed to be.
+*/
+func (r *Resolver) accessMember(ctx context.Context, token string) (store.Member, bool) {
+	session, err := r.store.SessionByTokenHash(ctx, HashToken(token))
+	if err != nil || session.Kind != store.SessionAccess {
+		return store.Member{}, false
+	}
+	if session.Expired(r.now()) {
+		_ = r.store.DeleteSession(ctx, session.TokenHash)
+		return store.Member{}, false
+	}
+
+	member, err := r.store.MemberByID(ctx, session.MemberID)
+	if err != nil {
+		return store.Member{}, false
+	}
+	return member, true
+}
+
 // Member resolves a session token to a Member, reporting whether it is usable.
 //
 // An expired session is deleted as it is found: the request that trips over it is the
@@ -131,6 +162,11 @@ func (r *Resolver) tokenGrant(ctx context.Context, presented string) (Grant, boo
 func (r *Resolver) Member(ctx context.Context, token string) (store.Member, bool) {
 	session, err := r.store.SessionByTokenHash(ctx, HashToken(token))
 	if err != nil {
+		return store.Member{}, false
+	}
+	// A cookie carries the refresh token and nothing else. An access token presented as
+	// one would be a short-lived credential quietly given a cookie's reach.
+	if session.Kind == store.SessionAccess {
 		return store.Member{}, false
 	}
 	if session.Expired(r.now()) {

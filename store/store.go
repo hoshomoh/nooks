@@ -122,6 +122,10 @@ type Store interface {
 	// DeleteSession signs one browser out, and is not an error if it was already gone.
 	DeleteSession(ctx context.Context, tokenHash string) error
 
+	// DeleteSessionTree signs a browser out, taking the access tokens that refresh
+	// token minted with it.
+	DeleteSessionTree(ctx context.Context, refreshHash string) error
+
 	// DeleteExpiredSessions clears out Sessions past their expiry.
 	DeleteExpiredSessions(ctx context.Context, now time.Time) (int64, error)
 

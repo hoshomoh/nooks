@@ -33,7 +33,11 @@ CREATE TABLE session (
   expires_at TEXT   NOT NULL
 );
 
+  -- REFRESH lives a month in an HttpOnly cookie; ACCESS lives an hour and is the only
+  -- one ever handed to a caller in a response body.
+  -- (columns added by 0013; stated here because this is where they live)
 CREATE INDEX idx_session_member_id ON session (member_id);
+CREATE INDEX idx_session_parent_hash ON session (parent_hash);
 -- A Visitor asking for an account, and a Member asking to replace a forgotten
 -- password. Nooks sends no email, so both wait here until an Admin acts on them.
 CREATE TABLE join_request (

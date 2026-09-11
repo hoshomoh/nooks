@@ -13,6 +13,15 @@ const CookieName = "nooks_session"
 // device should not be asked every week.
 const SessionLifetime = 30 * 24 * time.Hour
 
+/*
+AccessLifetime is how long the token handed over in a response body lasts.
+
+An hour, because that is the credential a caller can actually lose: it travels in
+bodies, gets pasted into terminals, and is held in memory by clients Nooks did not
+write. The refresh token that mints it lives a month and never leaves the cookie.
+*/
+const AccessLifetime = time.Hour
+
 // NewCookie builds the cookie carrying a session token.
 //
 // secure is passed in rather than sniffed, because whether the Instance is behind TLS

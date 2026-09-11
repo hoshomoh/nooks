@@ -238,9 +238,9 @@ The single most important milestone; everything else is furniture.
 - [x] Token activity log
 - [x] REST API at `/api/v1` — gRPC-Gateway over the same services the browser uses, with
       `scripts/check-annotations.sh` in CI so an RPC cannot ship UI-only
-- [ ] Sign in over REST. The five cookie RPCs and ReplacePassword have no HTTP binding
-      yet, because a cookie cannot survive the gateway adapter. Deciding it means either
-      a session token in a response body, or a second RPC that mints one
+- [x] Sign in over REST — split-token: a month-long refresh token that only ever moves
+      in an HttpOnly cookie, and an hour-long access token handed over in the body for
+      callers that are not browsers. `RefreshAccess` exchanges one for the other
 - [ ] MCP server at `/mcp`, same token
 - [x] Changes made by a token are attributed to the token in List history
 

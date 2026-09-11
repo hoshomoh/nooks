@@ -13,22 +13,17 @@ cd "$(dirname "$0")/.."
 # EXEMPT lists RPCs that deliberately have no HTTP binding, each with the reason.
 # Keep it short: an entry here is a hole in the rule above.
 EXEMPT=(
-  # These five set or clear a session cookie on the Connect response, and the gateway
-  # adapter hands back only the message — so a cookie could never survive the trip.
-  #
-  # That is not a workaround, it is the shape of the thing: a cookie is a browser
-  # mechanism. A REST client authenticates with Authorization: Bearer and gets its token
-  # from the tokens page. What is still open is whether a REST client should be able to
-  # sign in with a password and be handed a session of its own; until that is decided
-  # these have no HTTP binding rather than a broken one.
+  # These four hand over a session, which means a Set-Cookie the gateway adapter cannot
+  # carry — it returns the message and nothing else. A REST client reaches the same
+  # ground a different way: it signs in over Connect once, or it is handed an Access
+  # token, and then it holds the short-lived access token these return in their body.
   "SignIn"
-  "SignOut"
   "CompleteSetup"
   "CompleteJoin"
   "CompletePasswordReset"
-  # Replacing a password needs a session rather than an Access token, so a REST client
-  # cannot reach it until the question above is answered.
-  "ReplacePassword"
+  # Signing out clears a cookie, which is a browser's business. A REST client stops
+  # using its access token, and the token expires within the hour either way.
+  "SignOut"
 )
 
 missing=()

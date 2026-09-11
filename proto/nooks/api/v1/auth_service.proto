@@ -25,9 +25,26 @@ service AuthService {
     option (google.api.http) = {get: "/api/v1/auth/me"};
   }
 
+  // RefreshAccess exchanges the refresh cookie for a new access token.
+  //
+  // The refresh token is read from the cookie and never appears in a request or a
+  // response body: the credential that lasts a month is not one a caller should be
+  // able to copy out of a log.
+  rpc RefreshAccess(RefreshAccessRequest) returns (RefreshAccessResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/refresh"
+      body: "*"
+    };
+  }
+
   // ReplacePassword sets a new password for the signed-in Member. A Member who was
   // given a temporary password must call this before they can use Nooks.
-  rpc ReplacePassword(ReplacePasswordRequest) returns (ReplacePasswordResponse);
+  rpc ReplacePassword(ReplacePasswordRequest) returns (ReplacePasswordResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/password"
+      body: "*"
+    };
+  }
 
   // RequestJoin asks an Admin for an account. It is how a Visitor gets in when public
   // signup is off, which is the default.
@@ -123,6 +140,13 @@ message CompleteSetupRequest {
 
 message CompleteSetupResponse {
   Member member = 1;
+
+  // A short-lived access token, for a caller that is not a browser. A browser ignores
+  // it and uses the refresh cookie that came with it.
+  string access_token = 2;
+
+  // When the access token stops working, RFC 3339.
+  string access_token_expires_at = 3;
 }
 
 message SignInRequest {
@@ -130,8 +154,25 @@ message SignInRequest {
   string password = 2;
 }
 
+message RefreshAccessRequest {}
+
+message RefreshAccessResponse {
+  // A new short-lived access token. The refresh cookie is unchanged.
+  string access_token = 1;
+
+  // When it stops working, RFC 3339. Ask again before then.
+  string access_token_expires_at = 2;
+}
+
 message SignInResponse {
   Member member = 1;
+
+  // A short-lived access token, for a caller that is not a browser. A browser ignores
+  // it and uses the refresh cookie that came with it.
+  string access_token = 2;
+
+  // When the access token stops working, RFC 3339.
+  string access_token_expires_at = 3;
 }
 
 message SignOutRequest {}
@@ -189,6 +230,13 @@ message CompleteJoinRequest {
 
 message CompleteJoinResponse {
   Member member = 1;
+
+  // A short-lived access token, for a caller that is not a browser. A browser ignores
+  // it and uses the refresh cookie that came with it.
+  string access_token = 2;
+
+  // When the access token stops working, RFC 3339.
+  string access_token_expires_at = 3;
 }
 
 message RequestPasswordResetRequest {
@@ -215,4 +263,11 @@ message CompletePasswordResetRequest {
 
 message CompletePasswordResetResponse {
   Member member = 1;
+
+  // A short-lived access token, for a caller that is not a browser. A browser ignores
+  // it and uses the refresh cookie that came with it.
+  string access_token = 2;
+
+  // When the access token stops working, RFC 3339.
+  string access_token_expires_at = 3;
 }

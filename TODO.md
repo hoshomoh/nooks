@@ -22,7 +22,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M6 · Sharing, presence, Activity | `[x]` |
 | M7 · Members and Groups | `[x]` |
 | M8 · Public list | `[x]` |
-| M9 · Print | `[ ]` |
+| M9 · Print | `[x]` |
 | M10 · Access tokens, REST, MCP | `[ ]` |
 | M11 · Settings, export, import | `[ ]` |
 | M12 · Website: marketing, docs, API docs | `[ ]` |
@@ -212,14 +212,17 @@ The single most important milestone; everything else is furniture.
 
 ## M9 · Print
 
-- [ ] `@page` A4, `18mm 18mm 14mm`, print stylesheet
-- [ ] Header: eyebrow, title, date, counts, and the 0.7pt ink rule
-- [ ] Rows with real 6mm checkboxes; quantity and attribution
-- [ ] Three blank dashed rows at the end
-- [ ] Two-up for long lists, type down one step, never below 13pt
-- [ ] Footer with page numbers
-- [ ] `⌘P` prints the List you are looking at
-- [ ] Resolve the 40pt/27pt conflict *(open question 2)*
+- [x] `@page` A4, `18mm 18mm 14mm`, print stylesheet
+- [x] Header: eyebrow, title, date, item count and the 0.7pt ink rule. The count of people
+      waits for the server to say — the browser does not know who can reach a List
+- [x] Rows with real 6mm checkboxes; quantity and attribution
+- [x] Three blank dashed rows at the end
+- [x] Two-up for long lists, type down one step, never below 13pt
+- [~] Footer with the sheet's own line. Page numbers are the browser's: CSS Paged Media
+      counters are not implemented in any browser, and every print dialog offers them
+- [x] `⌘P` prints the List you are looking at — the stylesheet answers the browser's own
+      shortcut, so there is nothing to intercept
+- [x] Resolved: the canvas settled on 27/16/13, which is what the sheet uses
 
 ---
 

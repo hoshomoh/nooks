@@ -382,8 +382,11 @@
 
 @media print {
   /* Everything that is the app rather than the List. A person standing in a shop has
-     no use for a sidebar. */
-  body > #root {
+     no use for a sidebar.
+
+     Only where there is a sheet to print instead. On a screen that has none — settings,
+     the calendar — ⌘P should print what is on it rather than a blank page. */
+  body:has(.nooks-print-sheet) > #root {
     display: none;
   }
 
@@ -473,6 +476,29 @@
 
   .nooks-print-who {
     font-size: 9.5pt;
+  }
+
+  /* A long List goes two-up, per DESIGN.md §15: one step down in type, smaller boxes,
+     and a rule between the columns. Never below 13pt — a sheet nobody can read in a
+     shop has failed at the only thing it is for. */
+  .nooks-print-items[data-two-up] {
+    column-count: 2;
+    column-gap: 12mm;
+    column-rule: 0.4pt solid #e2e2dc;
+  }
+
+  .nooks-print-items[data-two-up] .nooks-print-label {
+    font-size: 13pt;
+  }
+
+  .nooks-print-items[data-two-up] .nooks-print-box {
+    width: 5.5mm;
+    height: 5.5mm;
+  }
+
+  .nooks-print-items[data-two-up] .nooks-print-item {
+    grid-template-columns: 9mm 1fr auto;
+    padding: 3.4mm 0;
   }
 
   .nooks-print-blank .nooks-print-box {

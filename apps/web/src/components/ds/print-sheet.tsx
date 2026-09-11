@@ -14,6 +14,15 @@ export interface PrintSheetProps {
 const BLANK_ROWS = 3
 
 /**
+ * ROWS_PER_COLUMN is how many rows fit down one A4 column at full size.
+ *
+ * A4 is 297mm; the margins and header take about 50mm, and a row is 16pt of text in
+ * 4.4mm of padding — a shade over 11mm. Past this the sheet goes two-up rather than
+ * spilling onto a second page a Member has to carry as well.
+ */
+const ROWS_PER_COLUMN = 18
+
+/**
  * The printed List, per DESIGN.md §15.
  *
  * A deliverable, not a screenshot. It is rendered into the page and hidden on screen,
@@ -43,7 +52,10 @@ export function PrintSheet({ instanceName, listName, printedOn, items }: PrintSh
         </div>
       </header>
 
-      <ul className="nooks-print-items">
+      <ul
+        className="nooks-print-items"
+        data-two-up={items.length + BLANK_ROWS > ROWS_PER_COLUMN ? "" : undefined}
+      >
         {items.map((item) => (
           <li key={item.uid} className="nooks-print-item">
             <span className="nooks-print-box" data-done={item.done ? "" : undefined} />

@@ -550,7 +550,13 @@ The Print sheet is a deliverable, not a screenshot. A4, 210 × 297mm, margins `1
 - **Three blank dashed rows** at the end, for whatever gets remembered in the shop.
 - Long lists go two-up: `column-count: 2`, 12mm gap, a 0.4pt column rule, type down one step to 13pt
   and 5.5mm boxes. **Never below 13pt.**
-- Footer: a sentence left, and `Nooks · A4 210 × 297 mm · n/N` right in mono 8.5pt.
+- Footer: a sentence left, and `nooks · A4 210 × 297 mm` right in mono 8.5pt.
+- **Page numbers are the browser's.** CSS Paged Media counters — `@page { @bottom-right { content:
+  counter(page) } }` — are implemented by no browser, and every print dialog already offers headers
+  and footers with the page number in them. Drawing our own would mean counting pages we cannot
+  measure.
+- The app itself is `display: none` on paper, but **only where there is a sheet to print instead**.
+  On a screen that has none, `⌘P` should print what is on it rather than a blank page.
 
 
 

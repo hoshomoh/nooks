@@ -27,8 +27,9 @@ export default defineConfig({
     hookTimeout: 20_000,
     // One worker per test file, each with its own jsdom, is more memory than a small
     // machine has — and a project that expects to be self-hosted should not need a
-    // large one to test itself. Four is enough to keep the suite quick.
-    maxWorkers: 4,
+    // large one to test itself. Two keeps the peak low enough to run beside a Go build
+    // and a Vite build, which is what ./scripts/preflight.sh does.
+    maxWorkers: 2,
   },
   server: {
     port: 3001,

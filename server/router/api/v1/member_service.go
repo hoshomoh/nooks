@@ -340,3 +340,46 @@ func (s *MemberService) isLastAdmin(ctx context.Context, member store.Member) (b
 	}
 	return len(admins) <= 1, nil
 }
+
+/*
+UpdateOwnProfile changes the signed-in Member's own name and email.
+
+Their own, and only their own. An Admin who wants somebody else's name changed asks
+them: an account is a person, and Nooks does not let one person edit another.
+
+A browser, never a token: a key that reaches somebody's Lists must not be a way to
+change the address their account signs in with.
+*/
+func (s *MemberService) UpdateOwnProfile(
+	ctx context.Context,
+	req *connect.Request[apiv1.UpdateOwnProfileRequest],
+) (*connect.Response[apiv1.UpdateOwnProfileResponse], error) {
+	member, err := requireBrowser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	name := strings.TrimSpace(req.Msg.GetName())
+	if err := requireText(name, "a name"); err != nil {
+		return nil, err
+	}
+	email := strings.TrimSpace(req.Msg.GetEmail())
+	if err := requireText(email, "an email"); err != nil {
+		return nil, err
+	}
+
+	if err := s.store.SetMemberProfile(ctx, member.ID, name, email); err != nil {
+		if errors.Is(err, store.ErrEmailTaken) {
+			return nil, errEmailTaken
+		}
+		return nil, internalError("update profile", err)
+	}
+
+	updated, err := s.store.MemberByID(ctx, member.ID)
+	if err != nil {
+		return nil, internalError("read member", err)
+	}
+	return connect.NewResponse(&apiv1.UpdateOwnProfileResponse{
+		Member: memberToProto(updated),
+	}), nil
+}

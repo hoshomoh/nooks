@@ -83,7 +83,8 @@
       "approvedBlurb": "Nobody else sees what you choose — not the admin, not the server logs. The approval expires in an hour if you don't use it.",
       "newPassword": "New password",
       "submit": "Save and sign in"
-    }
+    },
+    "passwordRule": "Twelve characters or more. No other rules."
   },
   "sidebar": {
     "pinned": "Pinned",
@@ -156,7 +157,8 @@
     "screenTitle": "That didn't load",
     "screenBody": "The server did not answer. Nothing you have written is lost — try again.",
     "tryAgain": "Try again",
-    "emailTaken": "Somebody here already uses that email."
+    "emailTaken": "Somebody here already uses that email.",
+    "somethingWentWrong": "Something went wrong. Try again."
   },
   "views": {
     "today": "Today",
@@ -293,7 +295,8 @@
     "groups": "Groups",
     "backToLists": "Back to lists",
     "publicList": "Public list",
-    "tokens": "Access tokens"
+    "tokens": "Access tokens",
+    "account": "Account"
   },
   "members": {
     "title": "Members",
@@ -466,5 +469,21 @@
     "revokeBlurb": "Whatever is using it stops working straight away. What it added stays on its lists.",
     "revokeConfirm": "Revoke",
     "someoneElses": "{{name}}'s token"
+  },
+  "account": {
+    "title": "Account",
+    "blurb": "Who you are here, and the password you get in with. Only you can change these — an admin who wants your name changed has to ask you.",
+    "profile": "Name and email",
+    "profileBlurb": "Your name is what the lists you touch say beside your items.",
+    "name": "Name",
+    "email": "Email",
+    "emailHint": "Used to sign in. nooks never sends mail to it.",
+    "emailTaken": "Somebody here already uses that email.",
+    "password": "Password",
+    "passwordBlurb": "Changing it does not sign you out anywhere else; your access tokens keep working.",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "replacePassword": "Replace password",
+    "saved": "Saved"
   }
 }

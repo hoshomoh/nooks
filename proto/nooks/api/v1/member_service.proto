@@ -34,6 +34,12 @@ service MemberService {
 
   // RemoveMember deletes an account. What they added stays on its Lists.
   rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse);
+
+  // UpdateOwnProfile changes the signed-in Member's own name and email.
+  //
+  // Their own, and only their own. An Admin who wants somebody else's name changed
+  // asks them: an account is a person, and Nooks does not let one person edit another.
+  rpc UpdateOwnProfile(UpdateOwnProfileRequest) returns (UpdateOwnProfileResponse);
 }
 
 // Group is a named set of Members.
@@ -81,6 +87,18 @@ message SetGroupMembersResponse {
 message AddMemberRequest {
   string name = 1;
   string email = 2;
+}
+
+message UpdateOwnProfileRequest {
+  string name = 1;
+
+  // Used to sign in, so it has to stay unique on the Instance. Nooks never sends mail
+  // to it, and changing it takes effect on the next sign-in like any other.
+  string email = 2;
+}
+
+message UpdateOwnProfileResponse {
+  Member member = 1;
 }
 
 message AddMemberResponse {

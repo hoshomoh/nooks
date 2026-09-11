@@ -53,6 +53,9 @@ const (
 	// MemberServiceRemoveMemberProcedure is the fully-qualified name of the MemberService's
 	// RemoveMember RPC.
 	MemberServiceRemoveMemberProcedure = "/nooks.api.v1.MemberService/RemoveMember"
+	// MemberServiceUpdateOwnProfileProcedure is the fully-qualified name of the MemberService's
+	// UpdateOwnProfile RPC.
+	MemberServiceUpdateOwnProfileProcedure = "/nooks.api.v1.MemberService/UpdateOwnProfile"
 )
 
 // MemberServiceClient is a client for the nooks.api.v1.MemberService service.
@@ -76,6 +79,11 @@ type MemberServiceClient interface {
 	SetMemberRole(context.Context, *connect.Request[v1.SetMemberRoleRequest]) (*connect.Response[v1.SetMemberRoleResponse], error)
 	// RemoveMember deletes an account. What they added stays on its Lists.
 	RemoveMember(context.Context, *connect.Request[v1.RemoveMemberRequest]) (*connect.Response[v1.RemoveMemberResponse], error)
+	// UpdateOwnProfile changes the signed-in Member's own name and email.
+	//
+	// Their own, and only their own. An Admin who wants somebody else's name changed
+	// asks them: an account is a person, and Nooks does not let one person edit another.
+	UpdateOwnProfile(context.Context, *connect.Request[v1.UpdateOwnProfileRequest]) (*connect.Response[v1.UpdateOwnProfileResponse], error)
 }
 
 // NewMemberServiceClient constructs a client for the nooks.api.v1.MemberService service. By
@@ -131,18 +139,25 @@ func NewMemberServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(memberServiceMethods.ByName("RemoveMember")),
 			connect.WithClientOptions(opts...),
 		),
+		updateOwnProfile: connect.NewClient[v1.UpdateOwnProfileRequest, v1.UpdateOwnProfileResponse](
+			httpClient,
+			baseURL+MemberServiceUpdateOwnProfileProcedure,
+			connect.WithSchema(memberServiceMethods.ByName("UpdateOwnProfile")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // memberServiceClient implements MemberServiceClient.
 type memberServiceClient struct {
-	listMembers     *connect.Client[v1.ListMembersRequest, v1.ListMembersResponse]
-	listGroups      *connect.Client[v1.ListGroupsRequest, v1.ListGroupsResponse]
-	createGroup     *connect.Client[v1.CreateGroupRequest, v1.CreateGroupResponse]
-	setGroupMembers *connect.Client[v1.SetGroupMembersRequest, v1.SetGroupMembersResponse]
-	addMember       *connect.Client[v1.AddMemberRequest, v1.AddMemberResponse]
-	setMemberRole   *connect.Client[v1.SetMemberRoleRequest, v1.SetMemberRoleResponse]
-	removeMember    *connect.Client[v1.RemoveMemberRequest, v1.RemoveMemberResponse]
+	listMembers      *connect.Client[v1.ListMembersRequest, v1.ListMembersResponse]
+	listGroups       *connect.Client[v1.ListGroupsRequest, v1.ListGroupsResponse]
+	createGroup      *connect.Client[v1.CreateGroupRequest, v1.CreateGroupResponse]
+	setGroupMembers  *connect.Client[v1.SetGroupMembersRequest, v1.SetGroupMembersResponse]
+	addMember        *connect.Client[v1.AddMemberRequest, v1.AddMemberResponse]
+	setMemberRole    *connect.Client[v1.SetMemberRoleRequest, v1.SetMemberRoleResponse]
+	removeMember     *connect.Client[v1.RemoveMemberRequest, v1.RemoveMemberResponse]
+	updateOwnProfile *connect.Client[v1.UpdateOwnProfileRequest, v1.UpdateOwnProfileResponse]
 }
 
 // ListMembers calls nooks.api.v1.MemberService.ListMembers.
@@ -180,6 +195,11 @@ func (c *memberServiceClient) RemoveMember(ctx context.Context, req *connect.Req
 	return c.removeMember.CallUnary(ctx, req)
 }
 
+// UpdateOwnProfile calls nooks.api.v1.MemberService.UpdateOwnProfile.
+func (c *memberServiceClient) UpdateOwnProfile(ctx context.Context, req *connect.Request[v1.UpdateOwnProfileRequest]) (*connect.Response[v1.UpdateOwnProfileResponse], error) {
+	return c.updateOwnProfile.CallUnary(ctx, req)
+}
+
 // MemberServiceHandler is an implementation of the nooks.api.v1.MemberService service.
 type MemberServiceHandler interface {
 	// ListMembers returns everyone on the Instance, by name.
@@ -201,6 +221,11 @@ type MemberServiceHandler interface {
 	SetMemberRole(context.Context, *connect.Request[v1.SetMemberRoleRequest]) (*connect.Response[v1.SetMemberRoleResponse], error)
 	// RemoveMember deletes an account. What they added stays on its Lists.
 	RemoveMember(context.Context, *connect.Request[v1.RemoveMemberRequest]) (*connect.Response[v1.RemoveMemberResponse], error)
+	// UpdateOwnProfile changes the signed-in Member's own name and email.
+	//
+	// Their own, and only their own. An Admin who wants somebody else's name changed
+	// asks them: an account is a person, and Nooks does not let one person edit another.
+	UpdateOwnProfile(context.Context, *connect.Request[v1.UpdateOwnProfileRequest]) (*connect.Response[v1.UpdateOwnProfileResponse], error)
 }
 
 // NewMemberServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -252,6 +277,12 @@ func NewMemberServiceHandler(svc MemberServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(memberServiceMethods.ByName("RemoveMember")),
 		connect.WithHandlerOptions(opts...),
 	)
+	memberServiceUpdateOwnProfileHandler := connect.NewUnaryHandler(
+		MemberServiceUpdateOwnProfileProcedure,
+		svc.UpdateOwnProfile,
+		connect.WithSchema(memberServiceMethods.ByName("UpdateOwnProfile")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/nooks.api.v1.MemberService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case MemberServiceListMembersProcedure:
@@ -268,6 +299,8 @@ func NewMemberServiceHandler(svc MemberServiceHandler, opts ...connect.HandlerOp
 			memberServiceSetMemberRoleHandler.ServeHTTP(w, r)
 		case MemberServiceRemoveMemberProcedure:
 			memberServiceRemoveMemberHandler.ServeHTTP(w, r)
+		case MemberServiceUpdateOwnProfileProcedure:
+			memberServiceUpdateOwnProfileHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -303,4 +336,8 @@ func (UnimplementedMemberServiceHandler) SetMemberRole(context.Context, *connect
 
 func (UnimplementedMemberServiceHandler) RemoveMember(context.Context, *connect.Request[v1.RemoveMemberRequest]) (*connect.Response[v1.RemoveMemberResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.MemberService.RemoveMember is not implemented"))
+}
+
+func (UnimplementedMemberServiceHandler) UpdateOwnProfile(context.Context, *connect.Request[v1.UpdateOwnProfileRequest]) (*connect.Response[v1.UpdateOwnProfileResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.MemberService.UpdateOwnProfile is not implemented"))
 }

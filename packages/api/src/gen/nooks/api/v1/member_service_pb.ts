@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nooks/api/v1/member_service.proto.
  */
 export const file_nooks_api_v1_member_service: GenFile = /*@__PURE__*/
-  fileDesc("CiFub29rcy9hcGkvdjEvbWVtYmVyX3NlcnZpY2UucHJvdG8SDG5vb2tzLmFwaS52MSJdCgVHcm91cBILCgN1aWQYASABKAkSDAoEbmFtZRgCIAEoCRIlCgdtZW1iZXJzGAMgAygLMhQubm9va3MuYXBpLnYxLk1lbWJlchISCgpsaXN0X25hbWVzGAQgAygJIhQKEkxpc3RNZW1iZXJzUmVxdWVzdCI8ChNMaXN0TWVtYmVyc1Jlc3BvbnNlEiUKB21lbWJlcnMYASADKAsyFC5ub29rcy5hcGkudjEuTWVtYmVyIhMKEUxpc3RHcm91cHNSZXF1ZXN0IjkKEkxpc3RHcm91cHNSZXNwb25zZRIjCgZncm91cHMYASADKAsyEy5ub29rcy5hcGkudjEuR3JvdXAiIgoSQ3JlYXRlR3JvdXBSZXF1ZXN0EgwKBG5hbWUYASABKAkiOQoTQ3JlYXRlR3JvdXBSZXNwb25zZRIiCgVncm91cBgBIAEoCzITLm5vb2tzLmFwaS52MS5Hcm91cCJAChZTZXRHcm91cE1lbWJlcnNSZXF1ZXN0EhEKCWdyb3VwX3VpZBgBIAEoCRITCgttZW1iZXJfdWlkcxgCIAMoCSI9ChdTZXRHcm91cE1lbWJlcnNSZXNwb25zZRIiCgVncm91cBgBIAEoCzITLm5vb2tzLmFwaS52MS5Hcm91cCIvChBBZGRNZW1iZXJSZXF1ZXN0EgwKBG5hbWUYASABKAkSDQoFZW1haWwYAiABKAkiVQoRQWRkTWVtYmVyUmVzcG9uc2USJAoGbWVtYmVyGAEgASgLMhQubm9va3MuYXBpLnYxLk1lbWJlchIaChJ0ZW1wb3JhcnlfcGFzc3dvcmQYAiABKAkiTAoUU2V0TWVtYmVyUm9sZVJlcXVlc3QSEgoKbWVtYmVyX3VpZBgBIAEoCRIgCgRyb2xlGAIgASgOMhIubm9va3MuYXBpLnYxLlJvbGUiPQoVU2V0TWVtYmVyUm9sZVJlc3BvbnNlEiQKBm1lbWJlchgBIAEoCzIULm5vb2tzLmFwaS52MS5NZW1iZXIiKQoTUmVtb3ZlTWVtYmVyUmVxdWVzdBISCgptZW1iZXJfdWlkGAEgASgJIhYKFFJlbW92ZU1lbWJlclJlc3BvbnNlMucECg1NZW1iZXJTZXJ2aWNlElIKC0xpc3RNZW1iZXJzEiAubm9va3MuYXBpLnYxLkxpc3RNZW1iZXJzUmVxdWVzdBohLm5vb2tzLmFwaS52MS5MaXN0TWVtYmVyc1Jlc3BvbnNlEk8KCkxpc3RHcm91cHMSHy5ub29rcy5hcGkudjEuTGlzdEdyb3Vwc1JlcXVlc3QaIC5ub29rcy5hcGkudjEuTGlzdEdyb3Vwc1Jlc3BvbnNlElIKC0NyZWF0ZUdyb3VwEiAubm9va3MuYXBpLnYxLkNyZWF0ZUdyb3VwUmVxdWVzdBohLm5vb2tzLmFwaS52MS5DcmVhdGVHcm91cFJlc3BvbnNlEl4KD1NldEdyb3VwTWVtYmVycxIkLm5vb2tzLmFwaS52MS5TZXRHcm91cE1lbWJlcnNSZXF1ZXN0GiUubm9va3MuYXBpLnYxLlNldEdyb3VwTWVtYmVyc1Jlc3BvbnNlEkwKCUFkZE1lbWJlchIeLm5vb2tzLmFwaS52MS5BZGRNZW1iZXJSZXF1ZXN0Gh8ubm9va3MuYXBpLnYxLkFkZE1lbWJlclJlc3BvbnNlElgKDVNldE1lbWJlclJvbGUSIi5ub29rcy5hcGkudjEuU2V0TWVtYmVyUm9sZVJlcXVlc3QaIy5ub29rcy5hcGkudjEuU2V0TWVtYmVyUm9sZVJlc3BvbnNlElUKDFJlbW92ZU1lbWJlchIhLm5vb2tzLmFwaS52MS5SZW1vdmVNZW1iZXJSZXF1ZXN0GiIubm9va3MuYXBpLnYxLlJlbW92ZU1lbWJlclJlc3BvbnNlQrABChBjb20ubm9va3MuYXBpLnYxQhJNZW1iZXJTZXJ2aWNlUHJvdG9QAVo2Z2l0aHViLmNvbS9ob3Nob21vaC9ub29rcy9wcm90by9nZW4vbm9va3MvYXBpL3YxO2FwaXYxogIDTkFYqgIMTm9va3MuQXBpLlYxygIMTm9va3NcQXBpXFYx4gIYTm9va3NcQXBpXFYxXEdQQk1ldGFkYXRh6gIOTm9va3M6OkFwaTo6VjFiBnByb3RvMw", [file_nooks_api_v1_auth_service]);
+  fileDesc("CiFub29rcy9hcGkvdjEvbWVtYmVyX3NlcnZpY2UucHJvdG8SDG5vb2tzLmFwaS52MSJdCgVHcm91cBILCgN1aWQYASABKAkSDAoEbmFtZRgCIAEoCRIlCgdtZW1iZXJzGAMgAygLMhQubm9va3MuYXBpLnYxLk1lbWJlchISCgpsaXN0X25hbWVzGAQgAygJIhQKEkxpc3RNZW1iZXJzUmVxdWVzdCI8ChNMaXN0TWVtYmVyc1Jlc3BvbnNlEiUKB21lbWJlcnMYASADKAsyFC5ub29rcy5hcGkudjEuTWVtYmVyIhMKEUxpc3RHcm91cHNSZXF1ZXN0IjkKEkxpc3RHcm91cHNSZXNwb25zZRIjCgZncm91cHMYASADKAsyEy5ub29rcy5hcGkudjEuR3JvdXAiIgoSQ3JlYXRlR3JvdXBSZXF1ZXN0EgwKBG5hbWUYASABKAkiOQoTQ3JlYXRlR3JvdXBSZXNwb25zZRIiCgVncm91cBgBIAEoCzITLm5vb2tzLmFwaS52MS5Hcm91cCJAChZTZXRHcm91cE1lbWJlcnNSZXF1ZXN0EhEKCWdyb3VwX3VpZBgBIAEoCRITCgttZW1iZXJfdWlkcxgCIAMoCSI9ChdTZXRHcm91cE1lbWJlcnNSZXNwb25zZRIiCgVncm91cBgBIAEoCzITLm5vb2tzLmFwaS52MS5Hcm91cCIvChBBZGRNZW1iZXJSZXF1ZXN0EgwKBG5hbWUYASABKAkSDQoFZW1haWwYAiABKAkiNgoXVXBkYXRlT3duUHJvZmlsZVJlcXVlc3QSDAoEbmFtZRgBIAEoCRINCgVlbWFpbBgCIAEoCSJAChhVcGRhdGVPd25Qcm9maWxlUmVzcG9uc2USJAoGbWVtYmVyGAEgASgLMhQubm9va3MuYXBpLnYxLk1lbWJlciJVChFBZGRNZW1iZXJSZXNwb25zZRIkCgZtZW1iZXIYASABKAsyFC5ub29rcy5hcGkudjEuTWVtYmVyEhoKEnRlbXBvcmFyeV9wYXNzd29yZBgCIAEoCSJMChRTZXRNZW1iZXJSb2xlUmVxdWVzdBISCgptZW1iZXJfdWlkGAEgASgJEiAKBHJvbGUYAiABKA4yEi5ub29rcy5hcGkudjEuUm9sZSI9ChVTZXRNZW1iZXJSb2xlUmVzcG9uc2USJAoGbWVtYmVyGAEgASgLMhQubm9va3MuYXBpLnYxLk1lbWJlciIpChNSZW1vdmVNZW1iZXJSZXF1ZXN0EhIKCm1lbWJlcl91aWQYASABKAkiFgoUUmVtb3ZlTWVtYmVyUmVzcG9uc2UyygUKDU1lbWJlclNlcnZpY2USUgoLTGlzdE1lbWJlcnMSIC5ub29rcy5hcGkudjEuTGlzdE1lbWJlcnNSZXF1ZXN0GiEubm9va3MuYXBpLnYxLkxpc3RNZW1iZXJzUmVzcG9uc2USTwoKTGlzdEdyb3VwcxIfLm5vb2tzLmFwaS52MS5MaXN0R3JvdXBzUmVxdWVzdBogLm5vb2tzLmFwaS52MS5MaXN0R3JvdXBzUmVzcG9uc2USUgoLQ3JlYXRlR3JvdXASIC5ub29rcy5hcGkudjEuQ3JlYXRlR3JvdXBSZXF1ZXN0GiEubm9va3MuYXBpLnYxLkNyZWF0ZUdyb3VwUmVzcG9uc2USXgoPU2V0R3JvdXBNZW1iZXJzEiQubm9va3MuYXBpLnYxLlNldEdyb3VwTWVtYmVyc1JlcXVlc3QaJS5ub29rcy5hcGkudjEuU2V0R3JvdXBNZW1iZXJzUmVzcG9uc2USTAoJQWRkTWVtYmVyEh4ubm9va3MuYXBpLnYxLkFkZE1lbWJlclJlcXVlc3QaHy5ub29rcy5hcGkudjEuQWRkTWVtYmVyUmVzcG9uc2USWAoNU2V0TWVtYmVyUm9sZRIiLm5vb2tzLmFwaS52MS5TZXRNZW1iZXJSb2xlUmVxdWVzdBojLm5vb2tzLmFwaS52MS5TZXRNZW1iZXJSb2xlUmVzcG9uc2USVQoMUmVtb3ZlTWVtYmVyEiEubm9va3MuYXBpLnYxLlJlbW92ZU1lbWJlclJlcXVlc3QaIi5ub29rcy5hcGkudjEuUmVtb3ZlTWVtYmVyUmVzcG9uc2USYQoQVXBkYXRlT3duUHJvZmlsZRIlLm5vb2tzLmFwaS52MS5VcGRhdGVPd25Qcm9maWxlUmVxdWVzdBomLm5vb2tzLmFwaS52MS5VcGRhdGVPd25Qcm9maWxlUmVzcG9uc2VCsAEKEGNvbS5ub29rcy5hcGkudjFCEk1lbWJlclNlcnZpY2VQcm90b1ABWjZnaXRodWIuY29tL2hvc2hvbW9oL25vb2tzL3Byb3RvL2dlbi9ub29rcy9hcGkvdjE7YXBpdjGiAgNOQViqAgxOb29rcy5BcGkuVjHKAgxOb29rc1xBcGlcVjHiAhhOb29rc1xBcGlcVjFcR1BCTWV0YWRhdGHqAg5Ob29rczo6QXBpOjpWMWIGcHJvdG8z", [file_nooks_api_v1_auth_service]);
 
 /**
  * Group is a named set of Members.
@@ -209,6 +209,48 @@ export const AddMemberRequestSchema: GenMessage<AddMemberRequest> = /*@__PURE__*
   messageDesc(file_nooks_api_v1_member_service, 9);
 
 /**
+ * @generated from message nooks.api.v1.UpdateOwnProfileRequest
+ */
+export type UpdateOwnProfileRequest = Message<"nooks.api.v1.UpdateOwnProfileRequest"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * Used to sign in, so it has to stay unique on the Instance. Nooks never sends mail
+   * to it, and changing it takes effect on the next sign-in like any other.
+   *
+   * @generated from field: string email = 2;
+   */
+  email: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.UpdateOwnProfileRequest.
+ * Use `create(UpdateOwnProfileRequestSchema)` to create a new message.
+ */
+export const UpdateOwnProfileRequestSchema: GenMessage<UpdateOwnProfileRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_member_service, 10);
+
+/**
+ * @generated from message nooks.api.v1.UpdateOwnProfileResponse
+ */
+export type UpdateOwnProfileResponse = Message<"nooks.api.v1.UpdateOwnProfileResponse"> & {
+  /**
+   * @generated from field: nooks.api.v1.Member member = 1;
+   */
+  member?: Member | undefined;
+};
+
+/**
+ * Describes the message nooks.api.v1.UpdateOwnProfileResponse.
+ * Use `create(UpdateOwnProfileResponseSchema)` to create a new message.
+ */
+export const UpdateOwnProfileResponseSchema: GenMessage<UpdateOwnProfileResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_member_service, 11);
+
+/**
  * @generated from message nooks.api.v1.AddMemberResponse
  */
 export type AddMemberResponse = Message<"nooks.api.v1.AddMemberResponse"> & {
@@ -231,7 +273,7 @@ export type AddMemberResponse = Message<"nooks.api.v1.AddMemberResponse"> & {
  * Use `create(AddMemberResponseSchema)` to create a new message.
  */
 export const AddMemberResponseSchema: GenMessage<AddMemberResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_member_service, 10);
+  messageDesc(file_nooks_api_v1_member_service, 12);
 
 /**
  * @generated from message nooks.api.v1.SetMemberRoleRequest
@@ -253,7 +295,7 @@ export type SetMemberRoleRequest = Message<"nooks.api.v1.SetMemberRoleRequest"> 
  * Use `create(SetMemberRoleRequestSchema)` to create a new message.
  */
 export const SetMemberRoleRequestSchema: GenMessage<SetMemberRoleRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_member_service, 11);
+  messageDesc(file_nooks_api_v1_member_service, 13);
 
 /**
  * @generated from message nooks.api.v1.SetMemberRoleResponse
@@ -270,7 +312,7 @@ export type SetMemberRoleResponse = Message<"nooks.api.v1.SetMemberRoleResponse"
  * Use `create(SetMemberRoleResponseSchema)` to create a new message.
  */
 export const SetMemberRoleResponseSchema: GenMessage<SetMemberRoleResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_member_service, 12);
+  messageDesc(file_nooks_api_v1_member_service, 14);
 
 /**
  * @generated from message nooks.api.v1.RemoveMemberRequest
@@ -287,7 +329,7 @@ export type RemoveMemberRequest = Message<"nooks.api.v1.RemoveMemberRequest"> & 
  * Use `create(RemoveMemberRequestSchema)` to create a new message.
  */
 export const RemoveMemberRequestSchema: GenMessage<RemoveMemberRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_member_service, 13);
+  messageDesc(file_nooks_api_v1_member_service, 15);
 
 /**
  * @generated from message nooks.api.v1.RemoveMemberResponse
@@ -300,7 +342,7 @@ export type RemoveMemberResponse = Message<"nooks.api.v1.RemoveMemberResponse"> 
  * Use `create(RemoveMemberResponseSchema)` to create a new message.
  */
 export const RemoveMemberResponseSchema: GenMessage<RemoveMemberResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_member_service, 14);
+  messageDesc(file_nooks_api_v1_member_service, 16);
 
 /**
  * MemberService covers who is here and how they are grouped.
@@ -385,6 +427,19 @@ export const MemberService: GenService<{
     methodKind: "unary";
     input: typeof RemoveMemberRequestSchema;
     output: typeof RemoveMemberResponseSchema;
+  },
+  /**
+   * UpdateOwnProfile changes the signed-in Member's own name and email.
+   *
+   * Their own, and only their own. An Admin who wants somebody else's name changed
+   * asks them: an account is a person, and Nooks does not let one person edit another.
+   *
+   * @generated from rpc nooks.api.v1.MemberService.UpdateOwnProfile
+   */
+  updateOwnProfile: {
+    methodKind: "unary";
+    input: typeof UpdateOwnProfileRequestSchema;
+    output: typeof UpdateOwnProfileResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_nooks_api_v1_member_service, 0);

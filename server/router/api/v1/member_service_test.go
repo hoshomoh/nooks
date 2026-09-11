@@ -272,3 +272,56 @@ func TestAMemberWhoHasNeverSignedIn(t *testing.T) {
 		}
 	}
 }
+
+// An account is a person. Nooks does not let one person edit another, which is why
+// there is no "member_uid" on this request at all.
+func TestAMemberChangesTheirOwnNameAndEmail(t *testing.T) {
+	f := newListFixture(t)
+	svc := NewMemberService(f.store, nil, nil)
+
+	res, err := svc.UpdateOwnProfile(f.as(t, f.jonas), connect.NewRequest(
+		&apiv1.UpdateOwnProfileRequest{Name: "Jonas B", Email: "Jonas.B@brunnen.lan"},
+	))
+	if err != nil {
+		t.Fatalf("UpdateOwnProfile: %v", err)
+	}
+	if got := res.Msg.GetMember().GetName(); got != "Jonas B" {
+		t.Errorf("name = %q, want the new one", got)
+	}
+
+	// Normalised on the way in, so what they retyped still signs them in.
+	found, err := f.store.MemberByEmail(t.Context(), "jonas.b@brunnen.lan")
+	if err != nil {
+		t.Fatalf("MemberByEmail after the change: %v", err)
+	}
+	if found.ID != f.jonas.ID {
+		t.Errorf("the email now finds member %d, want %d", found.ID, f.jonas.ID)
+	}
+}
+
+func TestAMemberCannotTakeAnEmailSomebodyElseUses(t *testing.T) {
+	f := newListFixture(t)
+	svc := NewMemberService(f.store, nil, nil)
+
+	_, err := svc.UpdateOwnProfile(f.as(t, f.jonas), connect.NewRequest(
+		&apiv1.UpdateOwnProfileRequest{Name: "Jonas", Email: f.anna.Email},
+	))
+	if got := connect.CodeOf(err); got != connect.CodeAlreadyExists {
+		t.Errorf("code = %v, want already_exists", got)
+	}
+}
+
+// A key that reaches somebody's Lists must not be a way to change the address their
+// account signs in with.
+func TestATokenCannotChangeAProfile(t *testing.T) {
+	f := newListFixture(t)
+	groceries := f.createList(t, f.anna, "Groceries")
+	ctx := f.withToken(t, f.anna, store.PermissionWrite, groceries)
+
+	_, err := NewMemberService(f.store, nil, nil).UpdateOwnProfile(ctx, connect.NewRequest(
+		&apiv1.UpdateOwnProfileRequest{Name: "Anna", Email: "somewhere@else.lan"},
+	))
+	if got := connect.CodeOf(err); got != connect.CodePermissionDenied {
+		t.Errorf("code = %v, want permission_denied", got)
+	}
+}

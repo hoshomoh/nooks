@@ -114,6 +114,26 @@ func (s *sqlStore) SetMemberRole(ctx context.Context, id int64, role Role) error
 	return requireOneRow(result, "member")
 }
 
+// SetMemberProfile changes a Member's own name and email.
+//
+// The email is normalised the same way it is on the way in, so that a Member who
+// retypes theirs with different capitals still signs in with what they had.
+func (s *sqlStore) SetMemberProfile(ctx context.Context, id int64, name, email string) error {
+	result, err := s.db.NewUpdate().
+		Model((*memberModel)(nil)).
+		Set("name = ?", name).
+		Set("email = ?", normaliseEmail(email)).
+		Where("id = ?", id).
+		Exec(ctx)
+	if err != nil {
+		if isUniqueViolationOn(err, "email") {
+			return ErrEmailTaken
+		}
+		return fmt.Errorf("set member profile: %w", err)
+	}
+	return requireOneRow(result, "member")
+}
+
 // DeleteMember removes an account.
 //
 // What they added stays where it is: an Item on a shared List belongs to the List, and

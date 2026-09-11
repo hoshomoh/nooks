@@ -244,7 +244,7 @@ The single most important milestone; everything else is furniture.
 
 ## M11 · Settings, export, import
 
-- [ ] Account: name, email, change password
+- [x] Account: name, email, change password
 - [ ] Appearance: theme segment and the language picker
 - [ ] Instance default language, for public lists, printed sheets and anyone who has not
       chosen one

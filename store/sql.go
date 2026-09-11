@@ -19,6 +19,10 @@ const (
 	settingInstanceName     = "instance.name"
 	settingPublicSignup     = "instance.public_signup"
 	settingSetupCompletedAt = "instance.setup_completed_at"
+	settingPublicListUID    = "instance.public_list_uid"
+	settingPublicShowNames  = "instance.public_show_names"
+	settingPublicShowMeta   = "instance.public_show_meta"
+	settingPublicAllowJoin  = "instance.public_allow_join"
 )
 
 // sqlStore implements Store over Bun.
@@ -48,8 +52,9 @@ func (s *sqlStore) InstanceSettings(ctx context.Context) (InstanceSettings, erro
 
 // SaveInstanceSettings writes the Instance's own configuration in full.
 func (s *sqlStore) SaveInstanceSettings(ctx context.Context, settings InstanceSettings) error {
-	rows := make([]settingModel, 0, 3)
-	for key, value := range valuesFromSettings(settings) {
+	values := valuesFromSettings(settings)
+	rows := make([]settingModel, 0, len(values))
+	for key, value := range values {
 		rows = append(rows, settingModel{Key: key, Value: value})
 	}
 
@@ -78,6 +83,12 @@ func settingsFromValues(values map[string]string) (InstanceSettings, error) {
 	settings := InstanceSettings{
 		Name:         values[settingInstanceName],
 		PublicSignup: values[settingPublicSignup] == "true",
+		Public: PublicList{
+			ListUID:   values[settingPublicListUID],
+			ShowNames: values[settingPublicShowNames] == "true",
+			ShowMeta:  values[settingPublicShowMeta] == "true",
+			AllowJoin: values[settingPublicAllowJoin] == "true",
+		},
 	}
 
 	completedAt, err := parseTime(values[settingSetupCompletedAt])
@@ -94,6 +105,10 @@ func valuesFromSettings(settings InstanceSettings) map[string]string {
 		settingInstanceName:     settings.Name,
 		settingPublicSignup:     strconv.FormatBool(settings.PublicSignup),
 		settingSetupCompletedAt: formatTime(settings.SetupCompletedAt),
+		settingPublicListUID:    settings.Public.ListUID,
+		settingPublicShowNames:  strconv.FormatBool(settings.Public.ShowNames),
+		settingPublicShowMeta:   strconv.FormatBool(settings.Public.ShowMeta),
+		settingPublicAllowJoin:  strconv.FormatBool(settings.Public.AllowJoin),
 	}
 }
 

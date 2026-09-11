@@ -208,3 +208,67 @@ func TestOpenRejectsMissingTarget(t *testing.T) {
 		t.Error("OpenPostgres with an empty dsn succeeded, want an error")
 	}
 }
+
+// Instance configuration is key/value rows, so a setting that was never written reads
+// as its zero value rather than failing.
+func TestPublicListSettingsRoundTrip(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+
+			before, err := s.InstanceSettings(t.Context())
+			if err != nil {
+				t.Fatalf("InstanceSettings: %v", err)
+			}
+			if before.Public.IsPublished() {
+				t.Error("a fresh Instance has a public list, and should not")
+			}
+
+			before.Public = PublicList{
+				ListUID: "list_groceries", ShowNames: false, ShowMeta: true, AllowJoin: true,
+			}
+			if err := s.SaveInstanceSettings(t.Context(), before); err != nil {
+				t.Fatalf("SaveInstanceSettings: %v", err)
+			}
+
+			after, err := s.InstanceSettings(t.Context())
+			if err != nil {
+				t.Fatalf("InstanceSettings: %v", err)
+			}
+			if after.Public != before.Public {
+				t.Errorf("public = %+v, want %+v", after.Public, before.Public)
+			}
+		})
+	}
+}
+
+// Taking the page down is setting it to nothing, not a second kind of state.
+func TestUnpublishingThePublicList(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+
+			settings, err := s.InstanceSettings(t.Context())
+			if err != nil {
+				t.Fatalf("InstanceSettings: %v", err)
+			}
+			settings.Public = PublicList{ListUID: "list_groceries", ShowMeta: true}
+			if err := s.SaveInstanceSettings(t.Context(), settings); err != nil {
+				t.Fatalf("SaveInstanceSettings: %v", err)
+			}
+
+			settings.Public = PublicList{}
+			if err := s.SaveInstanceSettings(t.Context(), settings); err != nil {
+				t.Fatalf("SaveInstanceSettings: %v", err)
+			}
+
+			after, err := s.InstanceSettings(t.Context())
+			if err != nil {
+				t.Fatalf("InstanceSettings: %v", err)
+			}
+			if after.Public.IsPublished() {
+				t.Errorf("public = %+v, want nothing published", after.Public)
+			}
+		})
+	}
+}

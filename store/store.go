@@ -23,7 +23,31 @@ type InstanceSettings struct {
 	// SetupCompletedAt is when first run finished. The zero value means it has not,
 	// and the app shows first run rather than sign in.
 	SetupCompletedAt time.Time
+
+	// Public is the one List anybody can read without an account, and what a Visitor
+	// sees of it.
+	Public PublicList
 }
+
+// PublicList is the Instance's one public page.
+//
+// At most one, because the page has a single address and a Visitor arriving at it must
+// land somewhere definite. More than one would make "the public list" a question.
+type PublicList struct {
+	// ListUID is the List on the page, or empty when there is none.
+	ListUID string
+	// ShowNames puts contributor names on the rows. Off by default: a public page is
+	// about what needs buying, not about who is in the household.
+	ShowNames bool
+	// ShowMeta puts quantities and dates on the rows — the metadata a shopper needs.
+	ShowMeta bool
+	// AllowJoin adds a quiet link at the foot of the page for a Visitor to ask for an
+	// account.
+	AllowJoin bool
+}
+
+// IsPublished reports whether the Instance has a public page at all.
+func (p PublicList) IsPublished() bool { return p.ListUID != "" }
 
 // NeedsSetup reports whether first run still has to happen.
 func (s InstanceSettings) NeedsSetup() bool {

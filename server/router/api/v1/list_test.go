@@ -76,6 +76,18 @@ func (f listFixture) createList(t *testing.T, member store.Member, name string) 
 	return res.Msg.GetList().GetUid()
 }
 
+// addItem puts one Item on a List.
+func (f listFixture) addItem(t *testing.T, member store.Member, listUID, label string) string {
+	t.Helper()
+	res, err := f.svc.CreateItem(f.as(t, member), connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: listUID, Label: label,
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem %s: %v", label, err)
+	}
+	return res.Msg.GetItem().GetUid()
+}
+
 // share makes a List reachable by the whole Instance.
 func (f listFixture) share(t *testing.T, member store.Member, uid string, canEdit bool) {
 	t.Helper()

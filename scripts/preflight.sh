@@ -27,13 +27,18 @@ fi
 # A linked worktree's .git is a file, not a directory, so test for either — getting
 # this wrong meant the script tried to create a worktree that was already there, failed,
 # and only looked like it had run.
+# Resolved here, in the repository being pushed. Inside the worktree "HEAD" means the
+# worktree's own HEAD, so checking out HEAD there is a no-op that silently verifies
+# whatever it happened to be on last time.
+target=$(git rev-parse HEAD)
+
 if [ -e "$worktree/.git" ]; then
-  git -C "$worktree" checkout -q --detach HEAD
+  git -C "$worktree" checkout -q --detach "$target"
 else
-  git worktree add --detach "$worktree" HEAD
+  git worktree add --detach "$worktree" "$target"
 fi
 
-echo "preflight: checking $(git rev-parse --short HEAD) in a clean checkout"
+echo "preflight: checking $(git rev-parse --short "$target") in a clean checkout"
 (cd "$worktree" && ./scripts/ci.sh)
 
-printf '\n\033[1;32m✓ %s is what it says it is\033[0m\n' "$(git rev-parse --short HEAD)"
+printf '\n\033[1;32m✓ %s is what it says it is\033[0m\n' "$(git rev-parse --short "$target")"

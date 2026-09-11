@@ -10,7 +10,48 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nooks/api/v1/instance_service.proto.
  */
 export const file_nooks_api_v1_instance_service: GenFile = /*@__PURE__*/
-  fileDesc("CiNub29rcy9hcGkvdjEvaW5zdGFuY2Vfc2VydmljZS5wcm90bxIMbm9va3MuYXBpLnYxIhkKF0dldEluc3RhbmNlQWJvdXRSZXF1ZXN0ItQBChhHZXRJbnN0YW5jZUFib3V0UmVzcG9uc2USDwoHdmVyc2lvbhgBIAEoCRISCgpzdGFydGVkX2F0GAIgASgJEhQKDG1lbWJlcl9jb3VudBgDIAEoBRISCgpsaXN0X2NvdW50GAQgASgFEhIKCml0ZW1fY291bnQYBSABKAUSFQoNc3RvcmFnZV9ieXRlcxgGIAEoAxIPCgdsaWNlbmNlGAcgASgJEhYKDnN0b3JhZ2VfZHJpdmVyGAggASgJEhUKDWluc3RhbmNlX25hbWUYCSABKAkiYQoSUHVibGljTGlzdFNldHRpbmdzEhAKCGxpc3RfdWlkGAEgASgJEhIKCnNob3dfbmFtZXMYAiABKAgSEQoJc2hvd19tZXRhGAMgASgIEhIKCmFsbG93X2pvaW4YBCABKAgihgEKEEluc3RhbmNlU2V0dGluZ3MSDAoEbmFtZRgBIAEoCRIVCg1wdWJsaWNfc2lnbnVwGAIgASgIEjUKC3B1YmxpY19saXN0GAMgASgLMiAubm9va3MuYXBpLnYxLlB1YmxpY0xpc3RTZXR0aW5ncxIWCg5kZWZhdWx0X2xvY2FsZRgEIAEoCSIcChpHZXRJbnN0YW5jZVNldHRpbmdzUmVxdWVzdCJPChtHZXRJbnN0YW5jZVNldHRpbmdzUmVzcG9uc2USMAoIc2V0dGluZ3MYASABKAsyHi5ub29rcy5hcGkudjEuSW5zdGFuY2VTZXR0aW5ncyJRCh1VcGRhdGVJbnN0YW5jZVNldHRpbmdzUmVxdWVzdBIwCghzZXR0aW5ncxgBIAEoCzIeLm5vb2tzLmFwaS52MS5JbnN0YW5jZVNldHRpbmdzIlIKHlVwZGF0ZUluc3RhbmNlU2V0dGluZ3NSZXNwb25zZRIwCghzZXR0aW5ncxgBIAEoCzIeLm5vb2tzLmFwaS52MS5JbnN0YW5jZVNldHRpbmdzIhQKEkdldEluc3RhbmNlUmVxdWVzdCJ4ChNHZXRJbnN0YW5jZVJlc3BvbnNlEgwKBG5hbWUYASABKAkSDwoHdmVyc2lvbhgCIAEoCRITCgtuZWVkc19zZXR1cBgDIAEoCBIVCg1wdWJsaWNfc2lnbnVwGAQgASgIEhYKDmRlZmF1bHRfbG9jYWxlGAUgASgJMqkDCg9JbnN0YW5jZVNlcnZpY2USUgoLR2V0SW5zdGFuY2USIC5ub29rcy5hcGkudjEuR2V0SW5zdGFuY2VSZXF1ZXN0GiEubm9va3MuYXBpLnYxLkdldEluc3RhbmNlUmVzcG9uc2USagoTR2V0SW5zdGFuY2VTZXR0aW5ncxIoLm5vb2tzLmFwaS52MS5HZXRJbnN0YW5jZVNldHRpbmdzUmVxdWVzdBopLm5vb2tzLmFwaS52MS5HZXRJbnN0YW5jZVNldHRpbmdzUmVzcG9uc2UScwoWVXBkYXRlSW5zdGFuY2VTZXR0aW5ncxIrLm5vb2tzLmFwaS52MS5VcGRhdGVJbnN0YW5jZVNldHRpbmdzUmVxdWVzdBosLm5vb2tzLmFwaS52MS5VcGRhdGVJbnN0YW5jZVNldHRpbmdzUmVzcG9uc2USYQoQR2V0SW5zdGFuY2VBYm91dBIlLm5vb2tzLmFwaS52MS5HZXRJbnN0YW5jZUFib3V0UmVxdWVzdBomLm5vb2tzLmFwaS52MS5HZXRJbnN0YW5jZUFib3V0UmVzcG9uc2VCsgEKEGNvbS5ub29rcy5hcGkudjFCFEluc3RhbmNlU2VydmljZVByb3RvUAFaNmdpdGh1Yi5jb20vaG9zaG9tb2gvbm9va3MvcHJvdG8vZ2VuL25vb2tzL2FwaS92MTthcGl2MaICA05BWKoCDE5vb2tzLkFwaS5WMcoCDE5vb2tzXEFwaVxWMeICGE5vb2tzXEFwaVxWMVxHUEJNZXRhZGF0YeoCDk5vb2tzOjpBcGk6OlYxYgZwcm90bzM");
+  fileDesc("CiNub29rcy9hcGkvdjEvaW5zdGFuY2Vfc2VydmljZS5wcm90bxIMbm9va3MuYXBpLnYxIkAKFURlbGV0ZUluc3RhbmNlUmVxdWVzdBIQCghwYXNzd29yZBgBIAEoCRIVCg1pbnN0YW5jZV9uYW1lGAIgASgJIhgKFkRlbGV0ZUluc3RhbmNlUmVzcG9uc2UiGQoXR2V0SW5zdGFuY2VBYm91dFJlcXVlc3Qi1AEKGEdldEluc3RhbmNlQWJvdXRSZXNwb25zZRIPCgd2ZXJzaW9uGAEgASgJEhIKCnN0YXJ0ZWRfYXQYAiABKAkSFAoMbWVtYmVyX2NvdW50GAMgASgFEhIKCmxpc3RfY291bnQYBCABKAUSEgoKaXRlbV9jb3VudBgFIAEoBRIVCg1zdG9yYWdlX2J5dGVzGAYgASgDEg8KB2xpY2VuY2UYByABKAkSFgoOc3RvcmFnZV9kcml2ZXIYCCABKAkSFQoNaW5zdGFuY2VfbmFtZRgJIAEoCSJhChJQdWJsaWNMaXN0U2V0dGluZ3MSEAoIbGlzdF91aWQYASABKAkSEgoKc2hvd19uYW1lcxgCIAEoCBIRCglzaG93X21ldGEYAyABKAgSEgoKYWxsb3dfam9pbhgEIAEoCCKGAQoQSW5zdGFuY2VTZXR0aW5ncxIMCgRuYW1lGAEgASgJEhUKDXB1YmxpY19zaWdudXAYAiABKAgSNQoLcHVibGljX2xpc3QYAyABKAsyIC5ub29rcy5hcGkudjEuUHVibGljTGlzdFNldHRpbmdzEhYKDmRlZmF1bHRfbG9jYWxlGAQgASgJIhwKGkdldEluc3RhbmNlU2V0dGluZ3NSZXF1ZXN0Ik8KG0dldEluc3RhbmNlU2V0dGluZ3NSZXNwb25zZRIwCghzZXR0aW5ncxgBIAEoCzIeLm5vb2tzLmFwaS52MS5JbnN0YW5jZVNldHRpbmdzIlEKHVVwZGF0ZUluc3RhbmNlU2V0dGluZ3NSZXF1ZXN0EjAKCHNldHRpbmdzGAEgASgLMh4ubm9va3MuYXBpLnYxLkluc3RhbmNlU2V0dGluZ3MiUgoeVXBkYXRlSW5zdGFuY2VTZXR0aW5nc1Jlc3BvbnNlEjAKCHNldHRpbmdzGAEgASgLMh4ubm9va3MuYXBpLnYxLkluc3RhbmNlU2V0dGluZ3MiFAoSR2V0SW5zdGFuY2VSZXF1ZXN0IngKE0dldEluc3RhbmNlUmVzcG9uc2USDAoEbmFtZRgBIAEoCRIPCgd2ZXJzaW9uGAIgASgJEhMKC25lZWRzX3NldHVwGAMgASgIEhUKDXB1YmxpY19zaWdudXAYBCABKAgSFgoOZGVmYXVsdF9sb2NhbGUYBSABKAkyhgQKD0luc3RhbmNlU2VydmljZRJSCgtHZXRJbnN0YW5jZRIgLm5vb2tzLmFwaS52MS5HZXRJbnN0YW5jZVJlcXVlc3QaIS5ub29rcy5hcGkudjEuR2V0SW5zdGFuY2VSZXNwb25zZRJqChNHZXRJbnN0YW5jZVNldHRpbmdzEigubm9va3MuYXBpLnYxLkdldEluc3RhbmNlU2V0dGluZ3NSZXF1ZXN0Gikubm9va3MuYXBpLnYxLkdldEluc3RhbmNlU2V0dGluZ3NSZXNwb25zZRJzChZVcGRhdGVJbnN0YW5jZVNldHRpbmdzEisubm9va3MuYXBpLnYxLlVwZGF0ZUluc3RhbmNlU2V0dGluZ3NSZXF1ZXN0Giwubm9va3MuYXBpLnYxLlVwZGF0ZUluc3RhbmNlU2V0dGluZ3NSZXNwb25zZRJhChBHZXRJbnN0YW5jZUFib3V0EiUubm9va3MuYXBpLnYxLkdldEluc3RhbmNlQWJvdXRSZXF1ZXN0GiYubm9va3MuYXBpLnYxLkdldEluc3RhbmNlQWJvdXRSZXNwb25zZRJbCg5EZWxldGVJbnN0YW5jZRIjLm5vb2tzLmFwaS52MS5EZWxldGVJbnN0YW5jZVJlcXVlc3QaJC5ub29rcy5hcGkudjEuRGVsZXRlSW5zdGFuY2VSZXNwb25zZUKyAQoQY29tLm5vb2tzLmFwaS52MUIUSW5zdGFuY2VTZXJ2aWNlUHJvdG9QAVo2Z2l0aHViLmNvbS9ob3Nob21vaC9ub29rcy9wcm90by9nZW4vbm9va3MvYXBpL3YxO2FwaXYxogIDTkFYqgIMTm9va3MuQXBpLlYxygIMTm9va3NcQXBpXFYx4gIYTm9va3NcQXBpXFYxXEdQQk1ldGFkYXRh6gIOTm9va3M6OkFwaTo6VjFiBnByb3RvMw");
+
+/**
+ * @generated from message nooks.api.v1.DeleteInstanceRequest
+ */
+export type DeleteInstanceRequest = Message<"nooks.api.v1.DeleteInstanceRequest"> & {
+  /**
+   * The Admin's own password. An unattended browser is the realistic way this happens
+   * by accident, and a name can be read off the screen in front of you.
+   *
+   * @generated from field: string password = 1;
+   */
+  password: string;
+
+  /**
+   * The Instance's name, typed out, so that whoever is doing this has read what they
+   * are about to lose.
+   *
+   * @generated from field: string instance_name = 2;
+   */
+  instanceName: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.DeleteInstanceRequest.
+ * Use `create(DeleteInstanceRequestSchema)` to create a new message.
+ */
+export const DeleteInstanceRequestSchema: GenMessage<DeleteInstanceRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_instance_service, 0);
+
+/**
+ * @generated from message nooks.api.v1.DeleteInstanceResponse
+ */
+export type DeleteInstanceResponse = Message<"nooks.api.v1.DeleteInstanceResponse"> & {
+};
+
+/**
+ * Describes the message nooks.api.v1.DeleteInstanceResponse.
+ * Use `create(DeleteInstanceResponseSchema)` to create a new message.
+ */
+export const DeleteInstanceResponseSchema: GenMessage<DeleteInstanceResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_instance_service, 1);
 
 /**
  * @generated from message nooks.api.v1.GetInstanceAboutRequest
@@ -23,7 +64,7 @@ export type GetInstanceAboutRequest = Message<"nooks.api.v1.GetInstanceAboutRequ
  * Use `create(GetInstanceAboutRequestSchema)` to create a new message.
  */
 export const GetInstanceAboutRequestSchema: GenMessage<GetInstanceAboutRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 0);
+  messageDesc(file_nooks_api_v1_instance_service, 2);
 
 /**
  * @generated from message nooks.api.v1.GetInstanceAboutResponse
@@ -93,7 +134,7 @@ export type GetInstanceAboutResponse = Message<"nooks.api.v1.GetInstanceAboutRes
  * Use `create(GetInstanceAboutResponseSchema)` to create a new message.
  */
 export const GetInstanceAboutResponseSchema: GenMessage<GetInstanceAboutResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 1);
+  messageDesc(file_nooks_api_v1_instance_service, 3);
 
 /**
  * PublicListSettings is the Instance's one public page, and what a Visitor sees of it.
@@ -136,7 +177,7 @@ export type PublicListSettings = Message<"nooks.api.v1.PublicListSettings"> & {
  * Use `create(PublicListSettingsSchema)` to create a new message.
  */
 export const PublicListSettingsSchema: GenMessage<PublicListSettings> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 2);
+  messageDesc(file_nooks_api_v1_instance_service, 4);
 
 /**
  * @generated from message nooks.api.v1.InstanceSettings
@@ -175,7 +216,7 @@ export type InstanceSettings = Message<"nooks.api.v1.InstanceSettings"> & {
  * Use `create(InstanceSettingsSchema)` to create a new message.
  */
 export const InstanceSettingsSchema: GenMessage<InstanceSettings> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 3);
+  messageDesc(file_nooks_api_v1_instance_service, 5);
 
 /**
  * @generated from message nooks.api.v1.GetInstanceSettingsRequest
@@ -188,7 +229,7 @@ export type GetInstanceSettingsRequest = Message<"nooks.api.v1.GetInstanceSettin
  * Use `create(GetInstanceSettingsRequestSchema)` to create a new message.
  */
 export const GetInstanceSettingsRequestSchema: GenMessage<GetInstanceSettingsRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 4);
+  messageDesc(file_nooks_api_v1_instance_service, 6);
 
 /**
  * @generated from message nooks.api.v1.GetInstanceSettingsResponse
@@ -205,7 +246,7 @@ export type GetInstanceSettingsResponse = Message<"nooks.api.v1.GetInstanceSetti
  * Use `create(GetInstanceSettingsResponseSchema)` to create a new message.
  */
 export const GetInstanceSettingsResponseSchema: GenMessage<GetInstanceSettingsResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 5);
+  messageDesc(file_nooks_api_v1_instance_service, 7);
 
 /**
  * @generated from message nooks.api.v1.UpdateInstanceSettingsRequest
@@ -222,7 +263,7 @@ export type UpdateInstanceSettingsRequest = Message<"nooks.api.v1.UpdateInstance
  * Use `create(UpdateInstanceSettingsRequestSchema)` to create a new message.
  */
 export const UpdateInstanceSettingsRequestSchema: GenMessage<UpdateInstanceSettingsRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 6);
+  messageDesc(file_nooks_api_v1_instance_service, 8);
 
 /**
  * @generated from message nooks.api.v1.UpdateInstanceSettingsResponse
@@ -239,7 +280,7 @@ export type UpdateInstanceSettingsResponse = Message<"nooks.api.v1.UpdateInstanc
  * Use `create(UpdateInstanceSettingsResponseSchema)` to create a new message.
  */
 export const UpdateInstanceSettingsResponseSchema: GenMessage<UpdateInstanceSettingsResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 7);
+  messageDesc(file_nooks_api_v1_instance_service, 9);
 
 /**
  * @generated from message nooks.api.v1.GetInstanceRequest
@@ -252,7 +293,7 @@ export type GetInstanceRequest = Message<"nooks.api.v1.GetInstanceRequest"> & {
  * Use `create(GetInstanceRequestSchema)` to create a new message.
  */
 export const GetInstanceRequestSchema: GenMessage<GetInstanceRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 8);
+  messageDesc(file_nooks_api_v1_instance_service, 10);
 
 /**
  * @generated from message nooks.api.v1.GetInstanceResponse
@@ -301,7 +342,7 @@ export type GetInstanceResponse = Message<"nooks.api.v1.GetInstanceResponse"> & 
  * Use `create(GetInstanceResponseSchema)` to create a new message.
  */
 export const GetInstanceResponseSchema: GenMessage<GetInstanceResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 9);
+  messageDesc(file_nooks_api_v1_instance_service, 11);
 
 /**
  * InstanceService reports what this copy of Nooks is and how it is configured.
@@ -353,6 +394,17 @@ export const InstanceService: GenService<{
     methodKind: "unary";
     input: typeof GetInstanceAboutRequestSchema;
     output: typeof GetInstanceAboutResponseSchema;
+  },
+  /**
+   * DeleteInstance empties it and returns it to first run. Admins only, and there is
+   * no undo: Nooks keeps no backup of its own.
+   *
+   * @generated from rpc nooks.api.v1.InstanceService.DeleteInstance
+   */
+  deleteInstance: {
+    methodKind: "unary";
+    input: typeof DeleteInstanceRequestSchema;
+    output: typeof DeleteInstanceResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_nooks_api_v1_instance_service, 0);

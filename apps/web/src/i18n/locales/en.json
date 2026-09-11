@@ -576,5 +576,17 @@
     "telemetry": "Telemetry",
     "telemetryBlurb": "There is nothing to turn off.",
     "none": "None"
+  },
+  "danger": {
+    "deleteTitle": "Delete this instance",
+    "deleteBlurb": "Takes every list, item, note, member and token with it, and returns nooks to first run.",
+    "deleteAction": "Delete instance",
+    "confirmTitle": "Delete {{name}}?",
+    "confirmGoes": "Every list, item and note goes, along with every account, group and access token. The next person to open this address sees the setup screen.",
+    "confirmKept": "Export everything first — nooks keeps no backup of its own, and there is no undo.",
+    "typeName": "Type {{name}} to confirm",
+    "yourPassword": "Your password",
+    "passwordHint": "So an unattended browser cannot do this for you.",
+    "noUndo": "There is no undo."
   }
 }

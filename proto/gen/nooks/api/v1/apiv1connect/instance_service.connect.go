@@ -45,6 +45,9 @@ const (
 	// InstanceServiceGetInstanceAboutProcedure is the fully-qualified name of the InstanceService's
 	// GetInstanceAbout RPC.
 	InstanceServiceGetInstanceAboutProcedure = "/nooks.api.v1.InstanceService/GetInstanceAbout"
+	// InstanceServiceDeleteInstanceProcedure is the fully-qualified name of the InstanceService's
+	// DeleteInstance RPC.
+	InstanceServiceDeleteInstanceProcedure = "/nooks.api.v1.InstanceService/DeleteInstance"
 )
 
 // InstanceServiceClient is a client for the nooks.api.v1.InstanceService service.
@@ -62,6 +65,9 @@ type InstanceServiceClient interface {
 	// GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
 	// Member: it is their Instance too, and none of it is anybody else's business.
 	GetInstanceAbout(context.Context, *connect.Request[v1.GetInstanceAboutRequest]) (*connect.Response[v1.GetInstanceAboutResponse], error)
+	// DeleteInstance empties it and returns it to first run. Admins only, and there is
+	// no undo: Nooks keeps no backup of its own.
+	DeleteInstance(context.Context, *connect.Request[v1.DeleteInstanceRequest]) (*connect.Response[v1.DeleteInstanceResponse], error)
 }
 
 // NewInstanceServiceClient constructs a client for the nooks.api.v1.InstanceService service. By
@@ -99,6 +105,12 @@ func NewInstanceServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(instanceServiceMethods.ByName("GetInstanceAbout")),
 			connect.WithClientOptions(opts...),
 		),
+		deleteInstance: connect.NewClient[v1.DeleteInstanceRequest, v1.DeleteInstanceResponse](
+			httpClient,
+			baseURL+InstanceServiceDeleteInstanceProcedure,
+			connect.WithSchema(instanceServiceMethods.ByName("DeleteInstance")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -108,6 +120,7 @@ type instanceServiceClient struct {
 	getInstanceSettings    *connect.Client[v1.GetInstanceSettingsRequest, v1.GetInstanceSettingsResponse]
 	updateInstanceSettings *connect.Client[v1.UpdateInstanceSettingsRequest, v1.UpdateInstanceSettingsResponse]
 	getInstanceAbout       *connect.Client[v1.GetInstanceAboutRequest, v1.GetInstanceAboutResponse]
+	deleteInstance         *connect.Client[v1.DeleteInstanceRequest, v1.DeleteInstanceResponse]
 }
 
 // GetInstance calls nooks.api.v1.InstanceService.GetInstance.
@@ -130,6 +143,11 @@ func (c *instanceServiceClient) GetInstanceAbout(ctx context.Context, req *conne
 	return c.getInstanceAbout.CallUnary(ctx, req)
 }
 
+// DeleteInstance calls nooks.api.v1.InstanceService.DeleteInstance.
+func (c *instanceServiceClient) DeleteInstance(ctx context.Context, req *connect.Request[v1.DeleteInstanceRequest]) (*connect.Response[v1.DeleteInstanceResponse], error) {
+	return c.deleteInstance.CallUnary(ctx, req)
+}
+
 // InstanceServiceHandler is an implementation of the nooks.api.v1.InstanceService service.
 type InstanceServiceHandler interface {
 	// GetInstance returns the public profile of this Instance. It is reachable without
@@ -145,6 +163,9 @@ type InstanceServiceHandler interface {
 	// GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
 	// Member: it is their Instance too, and none of it is anybody else's business.
 	GetInstanceAbout(context.Context, *connect.Request[v1.GetInstanceAboutRequest]) (*connect.Response[v1.GetInstanceAboutResponse], error)
+	// DeleteInstance empties it and returns it to first run. Admins only, and there is
+	// no undo: Nooks keeps no backup of its own.
+	DeleteInstance(context.Context, *connect.Request[v1.DeleteInstanceRequest]) (*connect.Response[v1.DeleteInstanceResponse], error)
 }
 
 // NewInstanceServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -178,6 +199,12 @@ func NewInstanceServiceHandler(svc InstanceServiceHandler, opts ...connect.Handl
 		connect.WithSchema(instanceServiceMethods.ByName("GetInstanceAbout")),
 		connect.WithHandlerOptions(opts...),
 	)
+	instanceServiceDeleteInstanceHandler := connect.NewUnaryHandler(
+		InstanceServiceDeleteInstanceProcedure,
+		svc.DeleteInstance,
+		connect.WithSchema(instanceServiceMethods.ByName("DeleteInstance")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/nooks.api.v1.InstanceService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case InstanceServiceGetInstanceProcedure:
@@ -188,6 +215,8 @@ func NewInstanceServiceHandler(svc InstanceServiceHandler, opts ...connect.Handl
 			instanceServiceUpdateInstanceSettingsHandler.ServeHTTP(w, r)
 		case InstanceServiceGetInstanceAboutProcedure:
 			instanceServiceGetInstanceAboutHandler.ServeHTTP(w, r)
+		case InstanceServiceDeleteInstanceProcedure:
+			instanceServiceDeleteInstanceHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -211,4 +240,8 @@ func (UnimplementedInstanceServiceHandler) UpdateInstanceSettings(context.Contex
 
 func (UnimplementedInstanceServiceHandler) GetInstanceAbout(context.Context, *connect.Request[v1.GetInstanceAboutRequest]) (*connect.Response[v1.GetInstanceAboutResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.InstanceService.GetInstanceAbout is not implemented"))
+}
+
+func (UnimplementedInstanceServiceHandler) DeleteInstance(context.Context, *connect.Request[v1.DeleteInstanceRequest]) (*connect.Response[v1.DeleteInstanceResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.InstanceService.DeleteInstance is not implemented"))
 }

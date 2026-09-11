@@ -9,10 +9,10 @@ import { Field } from "./field"
 import { SecretOnce } from "./secret-once"
 import { TickBox } from "./tick-box"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { DateField } from "./date-field"
-import { atEndOf, momentIn, type DueDate } from "@/lib/dates"
+import { DateCalendar } from "./date-calendar"
+import { atEndOf, momentIn, parseDue, toStored, type DueDate } from "@/lib/dates"
 import { toggled } from "@/lib/toggle-uid"
-import { useDueLabel } from "@/lib/use-due-label"
+import { useLocale } from "@/lib/use-locale"
 
 /** What a Member asked for, to cut a token from. */
 export interface NewToken {
@@ -102,7 +102,7 @@ interface AddTokenFormProps {
 /** The form itself, which owns the answers so far. */
 function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
   const { t } = useTranslation()
-  const due = useDueLabel()
+  const { dateLocale } = useLocale()
   const [name, setName] = useState("")
   const [permission, setPermission] = useState<Permission>(Permission.WRITE)
   const [scope, setScope] = useState<Scope>("all")
@@ -196,13 +196,16 @@ function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
           onChoose={setLifetime}
         />
 
+        {/* The calendar itself, not a control that opens one. Asking for a day and then
+            making a Member press a second thing to see the days is one step too many. */}
         {lifetime === "pick" && (
-          <DateField
-            value={chosenDay}
-            label={chosenDay ? due.label(chosenDay) : t("tokens.pickADay")}
-            chosen={Boolean(chosenDay)}
-            onChange={setChosenDay}
-          />
+          <div className="rounded-xl border border-border p-1">
+            <DateCalendar
+              selected={parseDue(chosenDay) ?? undefined}
+              onSelect={(day) => setChosenDay(day ? toStored(day) : "")}
+              locale={dateLocale}
+            />
+          </div>
         )}
       </div>
 

@@ -1,11 +1,22 @@
-import { useSuspenseQuery } from "@tanstack/react-query"
+import { useState } from "react"
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
+import { Role } from "@nooks/api"
 import { useTranslation } from "react-i18next"
 import type { ReactNode } from "react"
 
+import { Button } from "@/components/ds/button"
+import {
+  IrreversibleDialog,
+  type IrreversibleConfirmation,
+} from "@/components/ds/irreversible-dialog"
 import { SettingsRow } from "@/components/ds/settings-row"
 import { SettingsShell } from "@/components/ds/settings-shell"
 import { aboutQuery } from "@/lib/about-queries"
+import { instanceClient } from "@/lib/api"
 import { readableBytes } from "@/lib/bytes"
+import { messageFrom } from "@/lib/errors"
+import { useSignedInData } from "@/lib/use-signed-in-data"
 import { useMomentLabel } from "@/lib/use-moment-label"
 import { useSettingsCounts } from "@/lib/use-settings-counts"
 
@@ -21,6 +32,7 @@ export function SettingsAboutScreen() {
   const counts = useSettingsCounts()
   const moment = useMomentLabel()
   const about = useSuspenseQuery(aboutQuery).data
+  const { member } = useSignedInData()
 
   const size = readableBytes(Number(about.storageBytes))
 
@@ -71,7 +83,81 @@ export function SettingsAboutScreen() {
           <Value>{t("about.none")}</Value>
         </SettingsRow>
       </div>
+
+      {member?.role === Role.ADMIN && <DeleteInstance name={about.instanceName} />}
     </SettingsShell>
+  )
+}
+
+interface DeleteInstanceProps {
+  /** What the Instance is called, which is what has to be typed back. */
+  name: string
+}
+
+/**
+ * The last thing on the page, because it is the last thing anybody wants.
+ *
+ * It takes every Member, List, Item, Note, Access token and setting with it and returns
+ * the Instance to first run. Any Admin may do it: on a household Instance the people
+ * with the keys are the people who share the shopping, and a rule that only the founder
+ * could wipe it would strand a household whose founder has left.
+ */
+function DeleteInstance({ name }: DeleteInstanceProps) {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const [asking, setAsking] = useState(false)
+
+  const remove = useMutation({
+    mutationFn: (confirmation: IrreversibleConfirmation) =>
+      instanceClient.deleteInstance({
+        password: confirmation.password,
+        instanceName: confirmation.typedName,
+      }),
+    onSuccess: async () => {
+      queryClient.clear()
+      await navigate({ to: "/" })
+    },
+  })
+
+  return (
+    <section className="mt-8 flex flex-col gap-3.5 border-t border-hair pt-5">
+      <div className="flex items-center gap-6">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-chrome">{t("danger.deleteTitle")}</span>
+          <span className="max-w-135 text-micro leading-[1.5] text-muted-foreground">
+            {t("danger.deleteBlurb")}
+          </span>
+        </div>
+        <span className="flex-1" />
+        <Button tone="destructive" scale="compact" onClick={() => setAsking(true)}>
+          {t("danger.deleteAction")}
+        </Button>
+      </div>
+
+      <IrreversibleDialog
+        open={asking}
+        onOpenChange={(open) => {
+          setAsking(open)
+          if (!open) {
+            remove.reset()
+          }
+        }}
+        title={t("danger.confirmTitle", { name })}
+        blurb={
+          <>
+            <span>{t("danger.confirmGoes")}</span>
+            <span>{t("danger.confirmKept")}</span>
+          </>
+        }
+        name={name}
+        nameLabel={t("danger.typeName", { name })}
+        confirmLabel={t("danger.deleteAction")}
+        onConfirm={(confirmation) => remove.mutate(confirmation)}
+        error={remove.error ? messageFrom(remove.error) : undefined}
+        pending={remove.isPending}
+      />
+    </section>
   )
 }
 

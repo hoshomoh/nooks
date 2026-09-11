@@ -8,6 +8,7 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/hoshomoh/nooks/internal/password"
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/store"
 )
@@ -204,5 +205,120 @@ func TestUnpublishing(t *testing.T) {
 	}
 	if page.Msg.GetPublished() {
 		t.Error("still published after being taken down")
+	}
+}
+
+// The fixture's Members are made with a placeholder hash, so anything that verifies a
+// password has to set a real one first.
+const (
+	annaPassword  = "anna-knows-this-one"
+	jonasPassword = "jonas-knows-this-one"
+)
+
+/*
+withPassword gives a Member a password that can actually be verified, and answers with
+the Member as they now are.
+
+The updated copy matters: a context carries the Member as they were when it was built,
+and the fixture builds them with a placeholder hash. In production the resolver reads
+them fresh on every request, so only a test can hold one this stale.
+*/
+func (f listFixture) withPassword(t *testing.T, member store.Member, plain string) store.Member {
+	t.Helper()
+	hash, err := password.Hash(plain)
+	if err != nil {
+		t.Fatalf("hash password: %v", err)
+	}
+	if err := f.store.SetMemberPassword(t.Context(), member.ID, hash); err != nil {
+		t.Fatalf("SetMemberPassword: %v", err)
+	}
+	updated, err := f.store.MemberByID(t.Context(), member.ID)
+	if err != nil {
+		t.Fatalf("MemberByID: %v", err)
+	}
+	return updated
+}
+
+// namedInstance names the Instance and answers with a service over the fixture's store.
+func (f *listFixture) namedInstance(t *testing.T, name string) *InstanceService {
+	t.Helper()
+	f.anna = f.withPassword(t, f.anna, annaPassword)
+	f.jonas = f.withPassword(t, f.jonas, jonasPassword)
+	settings, err := f.store.InstanceSettings(t.Context())
+	if err != nil {
+		t.Fatalf("InstanceSettings: %v", err)
+	}
+	settings.Name = name
+	settings.SetupCompletedAt = testClock
+	if err := f.store.SaveInstanceSettings(t.Context(), settings); err != nil {
+		t.Fatalf("SaveInstanceSettings: %v", err)
+	}
+	return NewInstanceService(f.store)
+}
+
+// Typing the name makes an Admin read what they are about to lose.
+func TestDeletingAnInstanceNeedsItsNameTypedOut(t *testing.T) {
+	f := newListFixture(t)
+	svc := (&f).namedInstance(t, "Brunnen Street")
+
+	_, err := svc.DeleteInstance(f.as(t, f.anna), connect.NewRequest(
+		&apiv1.DeleteInstanceRequest{Password: annaPassword, InstanceName: "Something Else"},
+	))
+	if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
+		t.Errorf("code = %v, want invalid_argument for the wrong name", got)
+	}
+
+	stats, err := f.store.Stats(t.Context())
+	if err != nil {
+		t.Fatalf("Stats: %v", err)
+	}
+	if stats.Members == 0 {
+		t.Error("the instance was emptied despite the wrong name")
+	}
+}
+
+// An unattended browser is how this realistically happens by accident.
+func TestDeletingAnInstanceNeedsTheAdminsPassword(t *testing.T) {
+	f := newListFixture(t)
+	svc := (&f).namedInstance(t, "Brunnen Street")
+
+	_, err := svc.DeleteInstance(f.as(t, f.anna), connect.NewRequest(
+		&apiv1.DeleteInstanceRequest{Password: "not-the-password", InstanceName: "Brunnen Street"},
+	))
+	if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
+		t.Errorf("code = %v, want invalid_argument for the wrong password", got)
+	}
+}
+
+// A Member cannot wipe the Instance they are a member of.
+func TestOnlyAnAdminDeletesAnInstance(t *testing.T) {
+	f := newListFixture(t)
+	svc := (&f).namedInstance(t, "Brunnen Street")
+
+	_, err := svc.DeleteInstance(f.as(t, f.jonas), connect.NewRequest(
+		&apiv1.DeleteInstanceRequest{Password: jonasPassword, InstanceName: "Brunnen Street"},
+	))
+	if got := connect.CodeOf(err); got != connect.CodePermissionDenied {
+		t.Errorf("code = %v, want permission_denied", got)
+	}
+}
+
+func TestDeletingAnInstanceReturnsItToFirstRun(t *testing.T) {
+	f := newListFixture(t)
+	f.createList(t, f.anna, "Groceries")
+	svc := (&f).namedInstance(t, "Brunnen Street")
+
+	if _, err := svc.DeleteInstance(f.as(t, f.anna), connect.NewRequest(
+		&apiv1.DeleteInstanceRequest{Password: annaPassword, InstanceName: "Brunnen Street"},
+	)); err != nil {
+		t.Fatalf("DeleteInstance: %v", err)
+	}
+
+	instance, err := svc.GetInstance(t.Context(), connect.NewRequest(&apiv1.GetInstanceRequest{}))
+	if err != nil {
+		t.Fatalf("GetInstance: %v", err)
+	}
+	if !instance.Msg.GetNeedsSetup() {
+		t.Error("the instance does not read as needing setup")
 	}
 }

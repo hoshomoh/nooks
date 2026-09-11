@@ -96,6 +96,9 @@ type Store interface {
 	// Stats counts what the Instance holds, for the About page.
 	Stats(ctx context.Context) (InstanceStats, error)
 
+	// ResetInstance empties everything and returns the Instance to first run.
+	ResetInstance(ctx context.Context) error
+
 	// SetMemberPassword replaces a password and clears the must-change flag.
 	SetMemberPassword(ctx context.Context, id int64, hash string) error
 

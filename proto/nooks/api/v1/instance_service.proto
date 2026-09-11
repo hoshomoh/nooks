@@ -20,7 +20,23 @@ service InstanceService {
   // GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
   // Member: it is their Instance too, and none of it is anybody else's business.
   rpc GetInstanceAbout(GetInstanceAboutRequest) returns (GetInstanceAboutResponse);
+
+  // DeleteInstance empties it and returns it to first run. Admins only, and there is
+  // no undo: Nooks keeps no backup of its own.
+  rpc DeleteInstance(DeleteInstanceRequest) returns (DeleteInstanceResponse);
 }
+
+message DeleteInstanceRequest {
+  // The Admin's own password. An unattended browser is the realistic way this happens
+  // by accident, and a name can be read off the screen in front of you.
+  string password = 1;
+
+  // The Instance's name, typed out, so that whoever is doing this has read what they
+  // are about to lose.
+  string instance_name = 2;
+}
+
+message DeleteInstanceResponse {}
 
 message GetInstanceAboutRequest {}
 

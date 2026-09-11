@@ -12,6 +12,8 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/hoshomoh/nooks/internal/password"
+
 	"github.com/hoshomoh/nooks/internal/version"
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/store"
@@ -189,4 +191,51 @@ func (s *InstanceService) GetInstanceAbout(
 		StorageDriver: stats.Driver,
 		InstanceName:  settings.Name,
 	}), nil
+}
+
+// errWrongInstanceName refuses a deletion where the typed name does not match.
+var errWrongInstanceName = connect.NewError(connect.CodeInvalidArgument,
+	errors.New("that is not the name of this instance"))
+
+/*
+DeleteInstance empties the Instance and returns it to first run.
+
+Two confirmations, and they do different jobs. Typing the name makes an Admin read what
+they are about to lose. The password is the one that matters: an unattended browser is
+how this realistically happens by accident, and a name can be copied off the screen in
+front of you.
+
+Any Admin may do it. On a household Instance the people with the keys are the people
+who share the shopping, and a rule that only the founder could wipe it would strand a
+household whose founder has left.
+*/
+func (s *InstanceService) DeleteInstance(
+	ctx context.Context,
+	req *connect.Request[apiv1.DeleteInstanceRequest],
+) (*connect.Response[apiv1.DeleteInstanceResponse], error) {
+	admin, err := requireAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	settings, err := s.store.InstanceSettings(ctx)
+	if err != nil {
+		return nil, internalError("read instance settings", err)
+	}
+	if !strings.EqualFold(strings.TrimSpace(req.Msg.GetInstanceName()), settings.Name) {
+		return nil, errWrongInstanceName
+	}
+
+	if err := password.Verify(admin.PasswordHash, req.Msg.GetPassword()); err != nil {
+		if errors.Is(err, password.ErrWrong) {
+			return nil, connect.NewError(connect.CodeInvalidArgument,
+				errors.New("that is not your password"))
+		}
+		return nil, internalError("verify password", err)
+	}
+
+	if err := s.store.ResetInstance(ctx); err != nil {
+		return nil, internalError("delete instance", err)
+	}
+	return connect.NewResponse(&apiv1.DeleteInstanceResponse{}), nil
 }

@@ -11,6 +11,9 @@
 # and, on a machine doing anything else, enough to get the run killed.
 set -euo pipefail
 
+# So a caller who pipes this to `tail` still sees a failure.
+set -o pipefail
+
 cd "$(dirname "$0")/.."
 root=$(pwd)
 worktree="$root/.preflight"
@@ -21,10 +24,13 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-if [ ! -d "$worktree/.git" ]; then
-  git worktree add -q --detach "$worktree" HEAD
-else
+# A linked worktree's .git is a file, not a directory, so test for either — getting
+# this wrong meant the script tried to create a worktree that was already there, failed,
+# and only looked like it had run.
+if [ -e "$worktree/.git" ]; then
   git -C "$worktree" checkout -q --detach HEAD
+else
+  git worktree add --detach "$worktree" HEAD
 fi
 
 echo "preflight: checking $(git rev-parse --short HEAD) in a clean checkout"

@@ -2,7 +2,7 @@
 import { beforeAll, describe, expect, it, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { Permission, Sharing, type List } from "@nooks/api"
+import { Sharing, type List } from "@nooks/api"
 
 import "@/test/dom"
 import { readyForEnglish } from "@/test/i18n"
@@ -72,26 +72,48 @@ describe("cutting an access token", () => {
     await userEvent.type(screen.getByRole("textbox", { name: "Name" }), "Kitchen tablet")
     await userEvent.click(screen.getByRole("radio", { name: /Only the lists I pick/ }))
     await userEvent.click(screen.getByRole("checkbox", { name: "Groceries" }))
-    await userEvent.click(screen.getByRole("radio", { name: /Read only/ }))
+    // Turning add off leaves a token that only reads.
+    await userEvent.click(screen.getByRole("checkbox", { name: /Add and tick off items/ }))
     await userEvent.click(screen.getByRole("button", { name: "Add" }))
 
     expect(onAdd).toHaveBeenCalledWith(
       expect.objectContaining({
         name: "Kitchen tablet",
-        permission: Permission.READ,
+        abilities: { read: true, write: false, delete: false },
         listUids: ["list_groceries"],
         allLists: false,
       }),
     )
   })
 
-  // A control that explains only the answer already chosen asks a Member to pick first
-  // and understand afterwards.
-  it("says what each permission means before one is chosen", () => {
+  // Deleting is the one that cannot be undone, and almost no caller needs it.
+  it("offers deleting separately, and off", async () => {
+    const onAdd = vi.fn()
+    show(onAdd)
+
+    expect(screen.getByRole("checkbox", { name: /Delete items and lists/ })).not.toBeChecked()
+    expect(screen.getByRole("checkbox", { name: /Read items/ })).toBeChecked()
+    expect(screen.getByRole("checkbox", { name: /Add and tick off items/ })).toBeChecked()
+
+    await userEvent.type(screen.getByRole("textbox", { name: "Name" }), "Importer")
+    await userEvent.click(screen.getByRole("button", { name: "Add" }))
+
+    expect(onAdd.mock.calls[0][0].abilities).toEqual({
+      read: true,
+      write: true,
+      delete: false,
+    })
+  })
+
+  // A token that can do nothing wherever it reaches is a key that opens nothing.
+  it("will not cut a token that may do nothing", async () => {
     show()
 
-    expect(screen.getByText(/cannot tick anything off/)).toBeInTheDocument()
-    expect(screen.getByText(/plus ticking off, adding/)).toBeInTheDocument()
+    await userEvent.type(screen.getByRole("textbox", { name: "Name" }), "Useless")
+    await userEvent.click(screen.getByRole("checkbox", { name: /Read items/ }))
+    await userEvent.click(screen.getByRole("checkbox", { name: /Add and tick off items/ }))
+
+    expect(screen.getByRole("button", { name: "Add" })).toBeDisabled()
   })
 
   // A token that does not expire is a deliberate answer, not the absence of one.

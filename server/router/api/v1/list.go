@@ -229,6 +229,9 @@ func (s *ListService) DeleteList(
 	ctx context.Context,
 	req *connect.Request[apiv1.DeleteListRequest],
 ) (*connect.Response[apiv1.DeleteListResponse], error) {
+	if err := requireDeletion(ctx); err != nil {
+		return nil, err
+	}
 	_, list, err := s.ownedList(ctx, req.Msg.GetListUid())
 	if err != nil {
 		return nil, err

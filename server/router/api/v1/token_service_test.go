@@ -31,11 +31,11 @@ func (f listFixture) tokens(t *testing.T) *TokenService {
 }
 
 // cut makes a token over one List.
-func (f listFixture) cut(t *testing.T, listUID string, permission apiv1.Permission) *apiv1.CreateAccessTokenResponse {
+func (f listFixture) cut(t *testing.T, listUID string, abilities *apiv1.TokenAbilities) *apiv1.CreateAccessTokenResponse {
 	t.Helper()
 	res, err := f.tokens(t).CreateAccessToken(f.as(t, f.anna), connect.NewRequest(
 		&apiv1.CreateAccessTokenRequest{
-			Name: "Kitchen tablet", Permission: permission, ListUids: []string{listUID},
+			Name: "Kitchen tablet", Abilities: abilities, ListUids: []string{listUID},
 		},
 	))
 	if err != nil {
@@ -49,7 +49,7 @@ func TestCuttingATokenHandsTheSecretOverOnce(t *testing.T) {
 	f := newListFixture(t)
 	uid := f.createList(t, f.anna, "Groceries")
 
-	made := f.cut(t, uid, apiv1.Permission_PERMISSION_WRITE)
+	made := f.cut(t, uid, &apiv1.TokenAbilities{Read: true, Write: true, Delete: true})
 	if made.GetSecret() == "" {
 		t.Fatal("no secret was handed over")
 	}
@@ -84,7 +84,7 @@ func TestATokenHasToReachSomething(t *testing.T) {
 
 	_, err := f.tokens(t).CreateAccessToken(f.as(t, f.anna), connect.NewRequest(
 		&apiv1.CreateAccessTokenRequest{
-			Name: "Kitchen tablet", Permission: apiv1.Permission_PERMISSION_READ,
+			Name: "Kitchen tablet", Abilities: &apiv1.TokenAbilities{Read: true},
 		},
 	))
 	if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
@@ -100,7 +100,7 @@ func TestATokenCannotReachPastItsMember(t *testing.T) {
 
 	_, err := f.tokens(t).CreateAccessToken(f.as(t, f.anna), connect.NewRequest(
 		&apiv1.CreateAccessTokenRequest{
-			Name: "Kitchen tablet", Permission: apiv1.Permission_PERMISSION_READ,
+			Name: "Kitchen tablet", Abilities: &apiv1.TokenAbilities{Read: true},
 			ListUids: []string{private},
 		},
 	))
@@ -113,7 +113,7 @@ func TestATokenCannotReachPastItsMember(t *testing.T) {
 func TestAMembersTokensAreTheirOwn(t *testing.T) {
 	f := newListFixture(t)
 	uid := f.createList(t, f.anna, "Groceries")
-	f.cut(t, uid, apiv1.Permission_PERMISSION_READ)
+	f.cut(t, uid, &apiv1.TokenAbilities{Read: true})
 
 	listed, err := f.tokens(t).ListAccessTokens(f.as(t, f.jonas), connect.NewRequest(
 		&apiv1.ListAccessTokensRequest{},
@@ -129,7 +129,7 @@ func TestAMembersTokensAreTheirOwn(t *testing.T) {
 func TestRevokingYourOwnToken(t *testing.T) {
 	f := newListFixture(t)
 	uid := f.createList(t, f.anna, "Groceries")
-	made := f.cut(t, uid, apiv1.Permission_PERMISSION_READ)
+	made := f.cut(t, uid, &apiv1.TokenAbilities{Read: true})
 
 	if _, err := f.tokens(t).RevokeAccessToken(f.as(t, f.anna), connect.NewRequest(
 		&apiv1.RevokeAccessTokenRequest{TokenUid: made.GetToken().GetUid()},
@@ -155,7 +155,7 @@ func TestAnAdminRevokesAnybodysToken(t *testing.T) {
 
 	made, err := f.tokens(t).CreateAccessToken(f.as(t, f.jonas), connect.NewRequest(
 		&apiv1.CreateAccessTokenRequest{
-			Name: "Shortcut", Permission: apiv1.Permission_PERMISSION_READ,
+			Name: "Shortcut", Abilities: &apiv1.TokenAbilities{Read: true},
 			ListUids: []string{uid},
 		},
 	))
@@ -176,7 +176,7 @@ func TestAnAdminRevokesAnybodysToken(t *testing.T) {
 func TestRevokingSomebodyElsesTokenReadsAsMissing(t *testing.T) {
 	f := newListFixture(t)
 	uid := f.createList(t, f.anna, "Groceries")
-	made := f.cut(t, uid, apiv1.Permission_PERMISSION_READ)
+	made := f.cut(t, uid, &apiv1.TokenAbilities{Read: true})
 
 	_, err := f.tokens(t).RevokeAccessToken(f.as(t, f.jonas), connect.NewRequest(
 		&apiv1.RevokeAccessTokenRequest{TokenUid: made.GetToken().GetUid()},
@@ -196,7 +196,7 @@ func TestATokenCannotManageTokens(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ListByUID: %v", err)
 	}
-	presented := store.AccessToken{ID: 1, MemberID: f.anna.ID, Permission: store.PermissionWrite}
+	presented := store.AccessToken{ID: 1, MemberID: f.anna.ID, Abilities: store.TokenAbilities{Read: true, Write: true, Delete: true}}
 	ctx := auth.WithGrant(t.Context(),
 		auth.NewTokenGrant(f.anna, presented, []int64{list.ID}))
 
@@ -222,7 +222,7 @@ func TestAnAdminSeesThatOthersTokensExistWithoutTheirScope(t *testing.T) {
 	_, err := f.tokens(t).CreateAccessToken(f.as(t, f.jonas), connect.NewRequest(
 		&apiv1.CreateAccessTokenRequest{
 			Name: "Jonas' shortcut", ListUids: []string{uid},
-			Permission: apiv1.Permission_PERMISSION_READ,
+			Abilities: &apiv1.TokenAbilities{Read: true},
 		},
 	))
 	if err != nil {
@@ -265,7 +265,7 @@ func TestAMemberSeesOnlyTheirOwnTokens(t *testing.T) {
 		_, err := svc.CreateAccessToken(f.as(t, cut.member), connect.NewRequest(
 			&apiv1.CreateAccessTokenRequest{
 				Name: cut.name, ListUids: []string{cut.list},
-				Permission: apiv1.Permission_PERMISSION_READ,
+				Abilities: &apiv1.TokenAbilities{Read: true},
 			},
 		))
 		if err != nil {
@@ -299,7 +299,7 @@ func TestRevokingSomebodyElsesTokenTellsThem(t *testing.T) {
 	made, err := svc.CreateAccessToken(f.as(t, f.jonas), connect.NewRequest(
 		&apiv1.CreateAccessTokenRequest{
 			Name: "Shortcut", ListUids: []string{uid},
-			Permission: apiv1.Permission_PERMISSION_READ,
+			Abilities: &apiv1.TokenAbilities{Read: true},
 		},
 	))
 	if err != nil {
@@ -335,7 +335,7 @@ func TestRevokingYourOwnTokenTellsNobody(t *testing.T) {
 	made, err := svc.CreateAccessToken(f.as(t, f.jonas), connect.NewRequest(
 		&apiv1.CreateAccessTokenRequest{
 			Name: "Shortcut", ListUids: []string{uid},
-			Permission: apiv1.Permission_PERMISSION_READ,
+			Abilities: &apiv1.TokenAbilities{Read: true},
 		},
 	))
 	if err != nil {
@@ -368,7 +368,7 @@ func TestATokenForAllListsReachesOnesMadeLater(t *testing.T) {
 	made, err := svc.CreateAccessToken(f.as(t, f.anna), connect.NewRequest(
 		&apiv1.CreateAccessTokenRequest{
 			Name: "My client", AllLists: true,
-			Permission: apiv1.Permission_PERMISSION_WRITE,
+			Abilities: &apiv1.TokenAbilities{Read: true, Write: true, Delete: true},
 		},
 	))
 	if err != nil {

@@ -106,7 +106,7 @@ func (f listFixture) search(t *testing.T, member store.Member, query string) []*
 func (f listFixture) withToken(
 	t *testing.T,
 	member store.Member,
-	permission store.Permission,
+	abilities store.TokenAbilities,
 	listUIDs ...string,
 ) context.Context {
 	t.Helper()
@@ -120,7 +120,7 @@ func (f listFixture) withToken(
 		ids = append(ids, list.ID)
 	}
 
-	token := store.AccessToken{ID: 1, MemberID: member.ID, Permission: permission}
+	token := store.AccessToken{ID: 1, MemberID: member.ID, Abilities: abilities}
 	return auth.WithGrant(t.Context(), auth.NewTokenGrant(member, token, ids))
 }
 
@@ -131,7 +131,7 @@ func TestATokenReachesOnlyTheListsItNames(t *testing.T) {
 	groceries := f.createList(t, f.anna, "Groceries")
 	bike := f.createList(t, f.anna, "Bike")
 
-	ctx := f.withToken(t, f.anna, store.PermissionWrite, groceries)
+	ctx := f.withToken(t, f.anna, store.TokenAbilities{Read: true, Write: true, Delete: true}, groceries)
 
 	if _, err := f.svc.GetList(ctx, connect.NewRequest(&apiv1.GetListRequest{
 		ListUid: groceries,
@@ -151,7 +151,7 @@ func TestATokenSeesOnlyItsOwnListsEverywhere(t *testing.T) {
 	groceries := f.createList(t, f.anna, "Groceries")
 	f.createList(t, f.anna, "Bike")
 
-	ctx := f.withToken(t, f.anna, store.PermissionRead, groceries)
+	ctx := f.withToken(t, f.anna, store.TokenAbilities{Read: true}, groceries)
 
 	lists, err := f.svc.ListLists(ctx, connect.NewRequest(&apiv1.ListListsRequest{}))
 	if err != nil {
@@ -175,7 +175,7 @@ func TestATokenSeesOnlyItsOwnListsEverywhere(t *testing.T) {
 func TestAReadTokenCannotWriteToItsOwnersList(t *testing.T) {
 	f := newListFixture(t)
 	groceries := f.createList(t, f.anna, "Groceries")
-	ctx := f.withToken(t, f.anna, store.PermissionRead, groceries)
+	ctx := f.withToken(t, f.anna, store.TokenAbilities{Read: true}, groceries)
 
 	if _, err := f.svc.GetList(ctx, connect.NewRequest(&apiv1.GetListRequest{
 		ListUid: groceries,
@@ -203,7 +203,7 @@ func TestAnItemAddedByATokenNamesBoth(t *testing.T) {
 	}
 	token, err := f.store.CreateAccessToken(t.Context(), store.CreateAccessTokenParams{
 		UID: "tok_1", MemberID: f.anna.ID, Name: "Kitchen tablet", TokenHash: "hash-1",
-		Permission: store.PermissionWrite, ListIDs: []int64{list.ID}, At: testClock,
+		Abilities: store.TokenAbilities{Read: true, Write: true, Delete: true}, ListIDs: []int64{list.ID}, At: testClock,
 	})
 	if err != nil {
 		t.Fatalf("CreateAccessToken: %v", err)
@@ -238,7 +238,7 @@ func TestRevokingATokenLeavesWhatItAdded(t *testing.T) {
 	}
 	token, err := f.store.CreateAccessToken(t.Context(), store.CreateAccessTokenParams{
 		UID: "tok_1", MemberID: f.anna.ID, Name: "Kitchen tablet", TokenHash: "hash-1",
-		Permission: store.PermissionWrite, ListIDs: []int64{list.ID}, At: testClock,
+		Abilities: store.TokenAbilities{Read: true, Write: true, Delete: true}, ListIDs: []int64{list.ID}, At: testClock,
 	})
 	if err != nil {
 		t.Fatalf("CreateAccessToken: %v", err)
@@ -280,7 +280,7 @@ func TestRevokingATokenLeavesWhatItAdded(t *testing.T) {
 func TestATokenCannotChangeTheAccountItBelongsTo(t *testing.T) {
 	f := newListFixture(t)
 	groceries := f.createList(t, f.anna, "Groceries")
-	ctx := f.withToken(t, f.anna, store.PermissionWrite, groceries)
+	ctx := f.withToken(t, f.anna, store.TokenAbilities{Read: true, Write: true, Delete: true}, groceries)
 
 	auths := NewAuthService(f.store, AuthServiceOptions{Now: func() time.Time { return testClock }})
 	_, err := auths.ReplacePassword(ctx, connect.NewRequest(&apiv1.ReplacePasswordRequest{
@@ -295,7 +295,7 @@ func TestATokenCannotChangeTheAccountItBelongsTo(t *testing.T) {
 func TestATokenCannotActAsAnAdmin(t *testing.T) {
 	f := newListFixture(t)
 	groceries := f.createList(t, f.anna, "Groceries")
-	ctx := f.withToken(t, f.anna, store.PermissionWrite, groceries)
+	ctx := f.withToken(t, f.anna, store.TokenAbilities{Read: true, Write: true, Delete: true}, groceries)
 
 	if _, err := requireAdmin(ctx); connect.CodeOf(err) != connect.CodePermissionDenied {
 		t.Errorf("requireAdmin code = %v, want permission_denied", connect.CodeOf(err))
@@ -304,5 +304,61 @@ func TestATokenCannotActAsAnAdmin(t *testing.T) {
 	// The same context is still a perfectly good caller for what the token is for.
 	if _, err := requireGrant(ctx); err != nil {
 		t.Errorf("requireGrant: %v, want the token to still be a caller", err)
+	}
+}
+
+// Deleting is its own ability, not part of writing. A shortcut that adds shopping
+// should not be able to empty a List because somebody sent it the wrong request.
+func TestATokenThatMayWriteCannotAlwaysDelete(t *testing.T) {
+	f := newListFixture(t)
+	groceries := f.createList(t, f.anna, "Groceries")
+	itemUID := f.addItem(t, f.anna, groceries, "Milk")
+
+	list, err := f.store.ListByUID(t.Context(), groceries)
+	if err != nil {
+		t.Fatalf("ListByUID: %v", err)
+	}
+	token, err := f.store.CreateAccessToken(t.Context(), store.CreateAccessTokenParams{
+		UID: "tok_1", MemberID: f.anna.ID, Name: "Shopping shortcut", TokenHash: "hash-1",
+		Abilities: store.TokenAbilities{Read: true, Write: true},
+		ListIDs:   []int64{list.ID}, At: testClock,
+	})
+	if err != nil {
+		t.Fatalf("CreateAccessToken: %v", err)
+	}
+	ctx := auth.WithGrant(t.Context(), auth.NewTokenGrant(f.anna, token, []int64{list.ID}))
+
+	// It may add, which is what it is for.
+	if _, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: groceries, Label: "Oats",
+	})); err != nil {
+		t.Fatalf("CreateItem with a write token: %v", err)
+	}
+
+	_, err = f.svc.DeleteItem(ctx, connect.NewRequest(&apiv1.DeleteItemRequest{
+		ItemUid: itemUID,
+	}))
+	if got := connect.CodeOf(err); got != connect.CodePermissionDenied {
+		t.Errorf("DeleteItem code = %v, want permission_denied", got)
+	}
+
+	_, err = f.svc.DeleteList(ctx, connect.NewRequest(&apiv1.DeleteListRequest{
+		ListUid: groceries,
+	}))
+	if got := connect.CodeOf(err); got != connect.CodePermissionDenied {
+		t.Errorf("DeleteList code = %v, want permission_denied", got)
+	}
+}
+
+// A browser is never narrowed, so nothing it does is gated on an ability.
+func TestABrowserMayStillDelete(t *testing.T) {
+	f := newListFixture(t)
+	groceries := f.createList(t, f.anna, "Groceries")
+	itemUID := f.addItem(t, f.anna, groceries, "Milk")
+
+	if _, err := f.svc.DeleteItem(f.as(t, f.anna), connect.NewRequest(
+		&apiv1.DeleteItemRequest{ItemUid: itemUID},
+	)); err != nil {
+		t.Errorf("DeleteItem as a browser: %v", err)
 	}
 }

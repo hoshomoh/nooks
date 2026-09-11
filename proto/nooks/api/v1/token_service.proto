@@ -19,13 +19,21 @@ service TokenService {
   rpc RevokeAccessToken(RevokeAccessTokenRequest) returns (RevokeAccessTokenResponse);
 }
 
-// Permission is what a token may do — two levels, not a matrix.
-enum Permission {
-  PERMISSION_UNSPECIFIED = 0;
-  // PERMISSION_READ is see and print.
-  PERMISSION_READ = 1;
-  // PERMISSION_WRITE adds ticking, adding and editing.
-  PERMISSION_WRITE = 2;
+// TokenAbilities is what a token may do — three answers, not one level.
+//
+// A level forces an order the real question does not have: a recipe importer reads and
+// never writes, a shopping shortcut writes and should never delete.
+message TokenAbilities {
+  // See lists and items: titles, quantities, dates and notes on the lists it names.
+  // Has to be on unless write is: a token that reads nothing opens nothing.
+  bool read = 1;
+
+  // Add, tick off and edit. Every change is attributed to the token in list history.
+  bool write = 2;
+
+  // Delete items and lists. Off unless it was asked for — most callers never need it,
+  // and it is the one that cannot be undone.
+  bool delete = 3;
 }
 
 // AccessToken is a key, described. Never the key itself.
@@ -35,7 +43,7 @@ message AccessToken {
   // What it is for, in the Member's words: "kitchen tablet".
   string name = 2;
 
-  Permission permission = 3;
+  TokenAbilities abilities = 3;
 
   // The Lists it may reach, by name. A List it does not name is invisible to it.
   // Empty when all_lists is set, because then there is no list to name.
@@ -65,7 +73,7 @@ message ListAccessTokensResponse {
 
 message CreateAccessTokenRequest {
   string name = 1;
-  Permission permission = 2;
+  TokenAbilities abilities = 2;
 
   // The Lists it may reach. A token that names none reaches none, unless all_lists is
   // set instead.

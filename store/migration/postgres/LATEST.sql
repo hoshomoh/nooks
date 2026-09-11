@@ -204,8 +204,11 @@ CREATE TABLE access_token (
   -- What it is for, in the Member's words: "kitchen tablet", "shopping shortcut".
   name       TEXT    NOT NULL,
   token_hash TEXT    NOT NULL UNIQUE,
-  -- READ or WRITE. Read means see and print; write adds ticking and adding.
-  permission TEXT    NOT NULL,
+  -- What it may do. Three abilities rather than one level, because the real question
+  -- is what a caller is for. Deleting is off unless it was asked for.
+  can_read   BOOLEAN NOT NULL DEFAULT TRUE,
+  can_write  BOOLEAN NOT NULL DEFAULT FALSE,
+  can_delete BOOLEAN NOT NULL DEFAULT FALSE,
   -- RFC 3339, or empty for a token that does not expire.
   expires_at TEXT    NOT NULL DEFAULT '',
   -- When it was last used, so a Member can tell which tokens are doing nothing.

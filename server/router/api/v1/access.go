@@ -53,7 +53,7 @@ func accessTo(list store.List, grant auth.Grant, shares namedShares) Access {
 	}
 
 	have := memberAccessTo(list, grant.Member, shares)
-	if grant.ReadOnly() && have > AccessRead {
+	if !grant.MayWrite() && have > AccessRead {
 		return AccessRead
 	}
 	return have
@@ -279,6 +279,25 @@ func requireGrant(ctx context.Context) (auth.Grant, error) {
 			errors.New("not signed in"))
 	}
 	return grant, nil
+}
+
+// errCannotDelete refuses a deletion by a token that was not cut for it.
+var errCannotDelete = connect.NewError(connect.CodePermissionDenied,
+	errors.New("this access token cannot delete things"))
+
+// requireDeletion checks the caller may delete, which accessTo does not answer.
+//
+// Reaching a List and being allowed to empty it are different questions, and the token
+// model keeps them apart on purpose.
+func requireDeletion(ctx context.Context) error {
+	grant, err := requireGrant(ctx)
+	if err != nil {
+		return err
+	}
+	if !grant.MayDelete() {
+		return errCannotDelete
+	}
+	return nil
 }
 
 // errNotABrowser refuses an account-level change made with a token.

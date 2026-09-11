@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
-import { Permission, type AccessToken } from "@nooks/api"
+import type { AccessToken, TokenAbilities } from "@nooks/api"
 
 import { AddTokenDialog, type NewToken, type TokenSecret } from "@/components/ds/add-token-dialog"
 import { Button } from "@/components/ds/button"
@@ -162,7 +162,7 @@ function TokenRow({ token, ownName, moment, onRevoke }: TokenRowProps) {
       </div>
 
       <span className="text-meta text-secondary-foreground">
-        {t(token.permission === Permission.READ ? "tokens.read" : "tokens.write")}
+        {summarise(token.abilities, t)}
       </span>
 
       <span className="text-meta text-secondary-foreground">
@@ -191,4 +191,21 @@ function describeScope(token: AccessToken, t: Translate, moment: FormatMoment): 
     return `${lists} · ${t("tokens.neverExpires")}`
   }
   return `${lists} · ${t("tokens.expires", { date: moment(token.expiresAt) })}`
+}
+
+/**
+ * summarise says what a token may do, short enough for a table column.
+ *
+ * The column has room for a phrase, not three rows of checkboxes. "Read and add" is
+ * what somebody scanning the page is checking against their memory of why they cut it;
+ * the dialog is where the exact set lives.
+ */
+function summarise(abilities: TokenAbilities | undefined, t: Translate): string {
+  const can = [
+    abilities?.read && t("tokens.read"),
+    abilities?.write && t("tokens.write"),
+    abilities?.delete && t("tokens.delete"),
+  ].filter(Boolean) as string[]
+
+  return can.length > 0 ? can.join(" · ") : t("tokens.noAbilities")
 }

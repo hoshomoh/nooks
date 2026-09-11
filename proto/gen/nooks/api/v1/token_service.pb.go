@@ -21,56 +21,73 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Permission is what a token may do — two levels, not a matrix.
-type Permission int32
+// TokenAbilities is what a token may do — three answers, not one level.
+//
+// A level forces an order the real question does not have: a recipe importer reads and
+// never writes, a shopping shortcut writes and should never delete.
+type TokenAbilities struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// See lists and items: titles, quantities, dates and notes on the lists it names.
+	// Has to be on unless write is: a token that reads nothing opens nothing.
+	Read bool `protobuf:"varint,1,opt,name=read,proto3" json:"read,omitempty"`
+	// Add, tick off and edit. Every change is attributed to the token in list history.
+	Write bool `protobuf:"varint,2,opt,name=write,proto3" json:"write,omitempty"`
+	// Delete items and lists. Off unless it was asked for — most callers never need it,
+	// and it is the one that cannot be undone.
+	Delete        bool `protobuf:"varint,3,opt,name=delete,proto3" json:"delete,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
 
-const (
-	Permission_PERMISSION_UNSPECIFIED Permission = 0
-	// PERMISSION_READ is see and print.
-	Permission_PERMISSION_READ Permission = 1
-	// PERMISSION_WRITE adds ticking, adding and editing.
-	Permission_PERMISSION_WRITE Permission = 2
-)
+func (x *TokenAbilities) Reset() {
+	*x = TokenAbilities{}
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
 
-// Enum value maps for Permission.
-var (
-	Permission_name = map[int32]string{
-		0: "PERMISSION_UNSPECIFIED",
-		1: "PERMISSION_READ",
-		2: "PERMISSION_WRITE",
+func (x *TokenAbilities) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TokenAbilities) ProtoMessage() {}
+
+func (x *TokenAbilities) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
 	}
-	Permission_value = map[string]int32{
-		"PERMISSION_UNSPECIFIED": 0,
-		"PERMISSION_READ":        1,
-		"PERMISSION_WRITE":       2,
-	}
-)
-
-func (x Permission) Enum() *Permission {
-	p := new(Permission)
-	*p = x
-	return p
+	return mi.MessageOf(x)
 }
 
-func (x Permission) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (Permission) Descriptor() protoreflect.EnumDescriptor {
-	return file_nooks_api_v1_token_service_proto_enumTypes[0].Descriptor()
-}
-
-func (Permission) Type() protoreflect.EnumType {
-	return &file_nooks_api_v1_token_service_proto_enumTypes[0]
-}
-
-func (x Permission) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use Permission.Descriptor instead.
-func (Permission) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use TokenAbilities.ProtoReflect.Descriptor instead.
+func (*TokenAbilities) Descriptor() ([]byte, []int) {
 	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *TokenAbilities) GetRead() bool {
+	if x != nil {
+		return x.Read
+	}
+	return false
+}
+
+func (x *TokenAbilities) GetWrite() bool {
+	if x != nil {
+		return x.Write
+	}
+	return false
+}
+
+func (x *TokenAbilities) GetDelete() bool {
+	if x != nil {
+		return x.Delete
+	}
+	return false
 }
 
 // AccessToken is a key, described. Never the key itself.
@@ -78,8 +95,8 @@ type AccessToken struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Uid   string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
 	// What it is for, in the Member's words: "kitchen tablet".
-	Name       string     `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Permission Permission `protobuf:"varint,3,opt,name=permission,proto3,enum=nooks.api.v1.Permission" json:"permission,omitempty"`
+	Name      string          `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Abilities *TokenAbilities `protobuf:"bytes,3,opt,name=abilities,proto3" json:"abilities,omitempty"`
 	// The Lists it may reach, by name. A List it does not name is invisible to it.
 	// Empty when all_lists is set, because then there is no list to name.
 	ListNames []string `protobuf:"bytes,4,rep,name=list_names,json=listNames,proto3" json:"list_names,omitempty"`
@@ -99,7 +116,7 @@ type AccessToken struct {
 
 func (x *AccessToken) Reset() {
 	*x = AccessToken{}
-	mi := &file_nooks_api_v1_token_service_proto_msgTypes[0]
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -111,7 +128,7 @@ func (x *AccessToken) String() string {
 func (*AccessToken) ProtoMessage() {}
 
 func (x *AccessToken) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_token_service_proto_msgTypes[0]
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -124,7 +141,7 @@ func (x *AccessToken) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AccessToken.ProtoReflect.Descriptor instead.
 func (*AccessToken) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{0}
+	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *AccessToken) GetUid() string {
@@ -141,11 +158,11 @@ func (x *AccessToken) GetName() string {
 	return ""
 }
 
-func (x *AccessToken) GetPermission() Permission {
+func (x *AccessToken) GetAbilities() *TokenAbilities {
 	if x != nil {
-		return x.Permission
+		return x.Abilities
 	}
-	return Permission_PERMISSION_UNSPECIFIED
+	return nil
 }
 
 func (x *AccessToken) GetListNames() []string {
@@ -198,7 +215,7 @@ type ListAccessTokensRequest struct {
 
 func (x *ListAccessTokensRequest) Reset() {
 	*x = ListAccessTokensRequest{}
-	mi := &file_nooks_api_v1_token_service_proto_msgTypes[1]
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -210,7 +227,7 @@ func (x *ListAccessTokensRequest) String() string {
 func (*ListAccessTokensRequest) ProtoMessage() {}
 
 func (x *ListAccessTokensRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_token_service_proto_msgTypes[1]
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -223,7 +240,7 @@ func (x *ListAccessTokensRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAccessTokensRequest.ProtoReflect.Descriptor instead.
 func (*ListAccessTokensRequest) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{1}
+	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{2}
 }
 
 type ListAccessTokensResponse struct {
@@ -235,7 +252,7 @@ type ListAccessTokensResponse struct {
 
 func (x *ListAccessTokensResponse) Reset() {
 	*x = ListAccessTokensResponse{}
-	mi := &file_nooks_api_v1_token_service_proto_msgTypes[2]
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -247,7 +264,7 @@ func (x *ListAccessTokensResponse) String() string {
 func (*ListAccessTokensResponse) ProtoMessage() {}
 
 func (x *ListAccessTokensResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_token_service_proto_msgTypes[2]
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -260,7 +277,7 @@ func (x *ListAccessTokensResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAccessTokensResponse.ProtoReflect.Descriptor instead.
 func (*ListAccessTokensResponse) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{2}
+	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListAccessTokensResponse) GetTokens() []*AccessToken {
@@ -271,9 +288,9 @@ func (x *ListAccessTokensResponse) GetTokens() []*AccessToken {
 }
 
 type CreateAccessTokenRequest struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
-	Name       string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Permission Permission             `protobuf:"varint,2,opt,name=permission,proto3,enum=nooks.api.v1.Permission" json:"permission,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Name      string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Abilities *TokenAbilities        `protobuf:"bytes,2,opt,name=abilities,proto3" json:"abilities,omitempty"`
 	// The Lists it may reach. A token that names none reaches none, unless all_lists is
 	// set instead.
 	ListUids []string `protobuf:"bytes,3,rep,name=list_uids,json=listUids,proto3" json:"list_uids,omitempty"`
@@ -288,7 +305,7 @@ type CreateAccessTokenRequest struct {
 
 func (x *CreateAccessTokenRequest) Reset() {
 	*x = CreateAccessTokenRequest{}
-	mi := &file_nooks_api_v1_token_service_proto_msgTypes[3]
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -300,7 +317,7 @@ func (x *CreateAccessTokenRequest) String() string {
 func (*CreateAccessTokenRequest) ProtoMessage() {}
 
 func (x *CreateAccessTokenRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_token_service_proto_msgTypes[3]
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -313,7 +330,7 @@ func (x *CreateAccessTokenRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAccessTokenRequest.ProtoReflect.Descriptor instead.
 func (*CreateAccessTokenRequest) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{3}
+	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CreateAccessTokenRequest) GetName() string {
@@ -323,11 +340,11 @@ func (x *CreateAccessTokenRequest) GetName() string {
 	return ""
 }
 
-func (x *CreateAccessTokenRequest) GetPermission() Permission {
+func (x *CreateAccessTokenRequest) GetAbilities() *TokenAbilities {
 	if x != nil {
-		return x.Permission
+		return x.Abilities
 	}
-	return Permission_PERMISSION_UNSPECIFIED
+	return nil
 }
 
 func (x *CreateAccessTokenRequest) GetListUids() []string {
@@ -362,7 +379,7 @@ type CreateAccessTokenResponse struct {
 
 func (x *CreateAccessTokenResponse) Reset() {
 	*x = CreateAccessTokenResponse{}
-	mi := &file_nooks_api_v1_token_service_proto_msgTypes[4]
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -374,7 +391,7 @@ func (x *CreateAccessTokenResponse) String() string {
 func (*CreateAccessTokenResponse) ProtoMessage() {}
 
 func (x *CreateAccessTokenResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_token_service_proto_msgTypes[4]
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -387,7 +404,7 @@ func (x *CreateAccessTokenResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAccessTokenResponse.ProtoReflect.Descriptor instead.
 func (*CreateAccessTokenResponse) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{4}
+	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CreateAccessTokenResponse) GetToken() *AccessToken {
@@ -413,7 +430,7 @@ type RevokeAccessTokenRequest struct {
 
 func (x *RevokeAccessTokenRequest) Reset() {
 	*x = RevokeAccessTokenRequest{}
-	mi := &file_nooks_api_v1_token_service_proto_msgTypes[5]
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -425,7 +442,7 @@ func (x *RevokeAccessTokenRequest) String() string {
 func (*RevokeAccessTokenRequest) ProtoMessage() {}
 
 func (x *RevokeAccessTokenRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_token_service_proto_msgTypes[5]
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -438,7 +455,7 @@ func (x *RevokeAccessTokenRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokeAccessTokenRequest.ProtoReflect.Descriptor instead.
 func (*RevokeAccessTokenRequest) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{5}
+	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *RevokeAccessTokenRequest) GetTokenUid() string {
@@ -456,7 +473,7 @@ type RevokeAccessTokenResponse struct {
 
 func (x *RevokeAccessTokenResponse) Reset() {
 	*x = RevokeAccessTokenResponse{}
-	mi := &file_nooks_api_v1_token_service_proto_msgTypes[6]
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -468,7 +485,7 @@ func (x *RevokeAccessTokenResponse) String() string {
 func (*RevokeAccessTokenResponse) ProtoMessage() {}
 
 func (x *RevokeAccessTokenResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_token_service_proto_msgTypes[6]
+	mi := &file_nooks_api_v1_token_service_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -481,20 +498,22 @@ func (x *RevokeAccessTokenResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokeAccessTokenResponse.ProtoReflect.Descriptor instead.
 func (*RevokeAccessTokenResponse) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{6}
+	return file_nooks_api_v1_token_service_proto_rawDescGZIP(), []int{7}
 }
 
 var File_nooks_api_v1_token_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_token_service_proto_rawDesc = "" +
 	"\n" +
-	" nooks/api/v1/token_service.proto\x12\fnooks.api.v1\"\xaa\x02\n" +
+	" nooks/api/v1/token_service.proto\x12\fnooks.api.v1\"R\n" +
+	"\x0eTokenAbilities\x12\x12\n" +
+	"\x04read\x18\x01 \x01(\bR\x04read\x12\x14\n" +
+	"\x05write\x18\x02 \x01(\bR\x05write\x12\x16\n" +
+	"\x06delete\x18\x03 \x01(\bR\x06delete\"\xac\x02\n" +
 	"\vAccessToken\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x128\n" +
-	"\n" +
-	"permission\x18\x03 \x01(\x0e2\x18.nooks.api.v1.PermissionR\n" +
-	"permission\x12\x1d\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12:\n" +
+	"\tabilities\x18\x03 \x01(\v2\x1c.nooks.api.v1.TokenAbilitiesR\tabilities\x12\x1d\n" +
 	"\n" +
 	"list_names\x18\x04 \x03(\tR\tlistNames\x12\x1b\n" +
 	"\tall_lists\x18\t \x01(\bR\ballLists\x12\x1d\n" +
@@ -508,12 +527,10 @@ const file_nooks_api_v1_token_service_proto_rawDesc = "" +
 	"memberName\"\x19\n" +
 	"\x17ListAccessTokensRequest\"M\n" +
 	"\x18ListAccessTokensResponse\x121\n" +
-	"\x06tokens\x18\x01 \x03(\v2\x19.nooks.api.v1.AccessTokenR\x06tokens\"\xc1\x01\n" +
+	"\x06tokens\x18\x01 \x03(\v2\x19.nooks.api.v1.AccessTokenR\x06tokens\"\xc3\x01\n" +
 	"\x18CreateAccessTokenRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x128\n" +
-	"\n" +
-	"permission\x18\x02 \x01(\x0e2\x18.nooks.api.v1.PermissionR\n" +
-	"permission\x12\x1b\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12:\n" +
+	"\tabilities\x18\x02 \x01(\v2\x1c.nooks.api.v1.TokenAbilitiesR\tabilities\x12\x1b\n" +
 	"\tlist_uids\x18\x03 \x03(\tR\blistUids\x12\x1b\n" +
 	"\tall_lists\x18\x05 \x01(\bR\ballLists\x12\x1d\n" +
 	"\n" +
@@ -523,12 +540,7 @@ const file_nooks_api_v1_token_service_proto_rawDesc = "" +
 	"\x06secret\x18\x02 \x01(\tR\x06secret\"7\n" +
 	"\x18RevokeAccessTokenRequest\x12\x1b\n" +
 	"\ttoken_uid\x18\x01 \x01(\tR\btokenUid\"\x1b\n" +
-	"\x19RevokeAccessTokenResponse*S\n" +
-	"\n" +
-	"Permission\x12\x1a\n" +
-	"\x16PERMISSION_UNSPECIFIED\x10\x00\x12\x13\n" +
-	"\x0fPERMISSION_READ\x10\x01\x12\x14\n" +
-	"\x10PERMISSION_WRITE\x10\x022\xbd\x02\n" +
+	"\x19RevokeAccessTokenResponse2\xbd\x02\n" +
 	"\fTokenService\x12a\n" +
 	"\x10ListAccessTokens\x12%.nooks.api.v1.ListAccessTokensRequest\x1a&.nooks.api.v1.ListAccessTokensResponse\x12d\n" +
 	"\x11CreateAccessToken\x12&.nooks.api.v1.CreateAccessTokenRequest\x1a'.nooks.api.v1.CreateAccessTokenResponse\x12d\n" +
@@ -547,10 +559,9 @@ func file_nooks_api_v1_token_service_proto_rawDescGZIP() []byte {
 	return file_nooks_api_v1_token_service_proto_rawDescData
 }
 
-var file_nooks_api_v1_token_service_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_nooks_api_v1_token_service_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_nooks_api_v1_token_service_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_nooks_api_v1_token_service_proto_goTypes = []any{
-	(Permission)(0),                   // 0: nooks.api.v1.Permission
+	(*TokenAbilities)(nil),            // 0: nooks.api.v1.TokenAbilities
 	(*AccessToken)(nil),               // 1: nooks.api.v1.AccessToken
 	(*ListAccessTokensRequest)(nil),   // 2: nooks.api.v1.ListAccessTokensRequest
 	(*ListAccessTokensResponse)(nil),  // 3: nooks.api.v1.ListAccessTokensResponse
@@ -560,9 +571,9 @@ var file_nooks_api_v1_token_service_proto_goTypes = []any{
 	(*RevokeAccessTokenResponse)(nil), // 7: nooks.api.v1.RevokeAccessTokenResponse
 }
 var file_nooks_api_v1_token_service_proto_depIdxs = []int32{
-	0, // 0: nooks.api.v1.AccessToken.permission:type_name -> nooks.api.v1.Permission
+	0, // 0: nooks.api.v1.AccessToken.abilities:type_name -> nooks.api.v1.TokenAbilities
 	1, // 1: nooks.api.v1.ListAccessTokensResponse.tokens:type_name -> nooks.api.v1.AccessToken
-	0, // 2: nooks.api.v1.CreateAccessTokenRequest.permission:type_name -> nooks.api.v1.Permission
+	0, // 2: nooks.api.v1.CreateAccessTokenRequest.abilities:type_name -> nooks.api.v1.TokenAbilities
 	1, // 3: nooks.api.v1.CreateAccessTokenResponse.token:type_name -> nooks.api.v1.AccessToken
 	2, // 4: nooks.api.v1.TokenService.ListAccessTokens:input_type -> nooks.api.v1.ListAccessTokensRequest
 	4, // 5: nooks.api.v1.TokenService.CreateAccessToken:input_type -> nooks.api.v1.CreateAccessTokenRequest
@@ -587,14 +598,13 @@ func file_nooks_api_v1_token_service_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_nooks_api_v1_token_service_proto_rawDesc), len(file_nooks_api_v1_token_service_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   7,
+			NumEnums:      0,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_nooks_api_v1_token_service_proto_goTypes,
 		DependencyIndexes: file_nooks_api_v1_token_service_proto_depIdxs,
-		EnumInfos:         file_nooks_api_v1_token_service_proto_enumTypes,
 		MessageInfos:      file_nooks_api_v1_token_service_proto_msgTypes,
 	}.Build()
 	File_nooks_api_v1_token_service_proto = out.File

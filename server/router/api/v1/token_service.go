@@ -119,6 +119,10 @@ func (s *TokenService) tellOwnerOfRevocation(
 	return s.activity.TokenRevokedByAdmin(ctx, owner, token, by)
 }
 
+// errNoAbilities refuses a token that could do nothing wherever it reached.
+var errNoAbilities = connect.NewError(connect.CodeInvalidArgument,
+	errors.New("say what the token may do"))
+
 // errNoLists refuses a token that could not reach anything.
 var errNoLists = connect.NewError(connect.CodeInvalidArgument,
 	errors.New("say which lists the token may reach"))
@@ -137,10 +141,9 @@ func (s *TokenService) CreateAccessToken(
 	if err := requireText(name, "a name"); err != nil {
 		return nil, err
 	}
-	permission := permissionFromProto(req.Msg.GetPermission())
-	if permission == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument,
-			errors.New("say what the token may do"))
+	abilities := abilitiesFrom(req.Msg.GetAbilities())
+	if !abilities.Usable() {
+		return nil, errNoAbilities
 	}
 
 	listIDs, err := s.scopeOf(ctx, member, req.Msg)
@@ -164,8 +167,8 @@ func (s *TokenService) CreateAccessToken(
 
 	token, err := s.store.CreateAccessToken(ctx, store.CreateAccessTokenParams{
 		UID: uid, MemberID: member.ID, Name: name, TokenHash: hash,
-		AllLists:   req.Msg.GetAllLists(),
-		Permission: permission, ExpiresAt: expiresAt, ListIDs: listIDs, At: s.now(),
+		AllLists:  req.Msg.GetAllLists(),
+		Abilities: abilities, ExpiresAt: expiresAt, ListIDs: listIDs, At: s.now(),
 	})
 	if err != nil {
 		return nil, internalError("create access token", err)
@@ -293,7 +296,7 @@ func (s *TokenService) describe(
 	described := &apiv1.AccessToken{
 		Uid:        token.UID,
 		Name:       token.Name,
-		Permission: permissionToProto(token.Permission),
+		Abilities:  abilitiesToProto(token.Abilities),
 		ExpiresAt:  formatMoment(token.ExpiresAt),
 		LastUsedAt: formatMoment(token.LastUsedAt),
 		CreatedAt:  formatMoment(token.CreatedAt),
@@ -376,24 +379,26 @@ func formatMoment(at time.Time) string {
 	return at.Format(time.RFC3339)
 }
 
-func permissionFromProto(permission apiv1.Permission) store.Permission {
-	switch permission {
-	case apiv1.Permission_PERMISSION_READ:
-		return store.PermissionRead
-	case apiv1.Permission_PERMISSION_WRITE:
-		return store.PermissionWrite
-	default:
-		return ""
+/*
+abilitiesFrom reads what a token is being cut for.
+
+Nothing is assumed on. A request that asks for nothing is refused rather than quietly
+given read, because a token nobody chose the shape of is a token nobody can reason
+about later.
+*/
+func abilitiesFrom(wanted *apiv1.TokenAbilities) store.TokenAbilities {
+	return store.TokenAbilities{
+		Read:   wanted.GetRead(),
+		Write:  wanted.GetWrite(),
+		Delete: wanted.GetDelete(),
 	}
 }
 
-func permissionToProto(permission store.Permission) apiv1.Permission {
-	switch permission {
-	case store.PermissionRead:
-		return apiv1.Permission_PERMISSION_READ
-	case store.PermissionWrite:
-		return apiv1.Permission_PERMISSION_WRITE
-	default:
-		return apiv1.Permission_PERMISSION_UNSPECIFIED
+// abilitiesToProto describes what a token may do.
+func abilitiesToProto(abilities store.TokenAbilities) *apiv1.TokenAbilities {
+	return &apiv1.TokenAbilities{
+		Read:   abilities.Read,
+		Write:  abilities.Write,
+		Delete: abilities.Delete,
 	}
 }

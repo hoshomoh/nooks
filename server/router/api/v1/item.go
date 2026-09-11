@@ -168,6 +168,10 @@ func (s *ListService) DeleteItem(
 	if err != nil {
 		return nil, err
 	}
+	// Reaching a List and being allowed to empty it are different questions.
+	if err := requireDeletion(ctx); err != nil {
+		return nil, err
+	}
 	item, list, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), grant, AccessWrite)
 	if err != nil {
 		return nil, err

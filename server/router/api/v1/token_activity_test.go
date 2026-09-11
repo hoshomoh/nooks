@@ -35,7 +35,7 @@ func TestTheFirstUseOfATokenIsRecordedOnce(t *testing.T) {
 	made, err := svc.CreateAccessToken(f.as(t, f.jonas), connect.NewRequest(
 		&apiv1.CreateAccessTokenRequest{
 			Name: "Kitchen tablet", ListUids: []string{uid},
-			Permission: apiv1.Permission_PERMISSION_READ,
+			Abilities: &apiv1.TokenAbilities{Read: true},
 		},
 	))
 	if err != nil {

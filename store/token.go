@@ -14,26 +14,38 @@ import (
 //
 // Two levels, not a matrix. A token is a key somebody cuts for a script; anything finer
 // would be a permission system a household has to administer.
-type Permission string
+/*
+TokenAbilities is what a token may do, as three separate answers.
 
-const (
-	// PermissionRead is see and print.
-	PermissionRead Permission = "READ"
-	// PermissionWrite adds ticking, adding and editing.
-	PermissionWrite Permission = "WRITE"
-)
+Not a level, because a level forces an order that the real question does not have: a
+recipe importer reads and never writes, a shopping shortcut writes and should never
+delete. Asking three times is asking what the caller is actually for.
+
+Read is the one that has to be on. A token that cannot read anything is a key that
+opens nothing, and handing somebody a secret that answers nothing is worse than
+refusing to make it.
+*/
+type TokenAbilities struct {
+	Read   bool
+	Write  bool
+	Delete bool
+}
+
+// Usable reports whether the abilities add up to a token worth cutting.
+func (a TokenAbilities) Usable() bool { return a.Read || a.Write }
 
 // AccessToken is how anything that is not a browser reaches an Instance.
 //
 // It belongs to a Member and can never do more than they can: it is their access,
-// narrowed to some of their Lists and to one of two things they may do there.
+// narrowed to some of their Lists and to some of what they may do there.
 type AccessToken struct {
 	ID       int64
 	UID      string
 	MemberID int64
 	// Name is what it is for, in the Member's words: "kitchen tablet".
-	Name       string
-	Permission Permission
+	Name string
+	// Abilities is what it may do. Three, not a level.
+	Abilities TokenAbilities
 	// ExpiresAt is the zero value for a token that does not expire.
 	ExpiresAt time.Time
 	// LastUsedAt is the zero value until something has used it.
@@ -55,9 +67,9 @@ type CreateAccessTokenParams struct {
 	MemberID int64
 	Name     string
 	// TokenHash is all that is kept. The token itself is shown once and never again.
-	TokenHash  string
-	Permission Permission
-	ExpiresAt  time.Time
+	TokenHash string
+	Abilities TokenAbilities
+	ExpiresAt time.Time
 	// ListIDs are the Lists it may reach. A List not named here is invisible to it.
 	// Ignored when AllLists is set.
 	ListIDs  []int64
@@ -81,14 +93,16 @@ func (s *sqlStore) CreateAccessToken(
 	defer func() { _ = tx.Rollback() }()
 
 	row := &accessTokenModel{
-		UID:        params.UID,
-		MemberID:   params.MemberID,
-		Name:       params.Name,
-		TokenHash:  params.TokenHash,
-		Permission: string(params.Permission),
-		ExpiresAt:  formatTime(params.ExpiresAt),
-		AllLists:   params.AllLists,
-		CreatedAt:  formatTime(params.At),
+		UID:       params.UID,
+		MemberID:  params.MemberID,
+		Name:      params.Name,
+		TokenHash: params.TokenHash,
+		CanRead:   params.Abilities.Read,
+		CanWrite:  params.Abilities.Write,
+		CanDelete: params.Abilities.Delete,
+		ExpiresAt: formatTime(params.ExpiresAt),
+		AllLists:  params.AllLists,
+		CreatedAt: formatTime(params.At),
 	}
 	if _, err := tx.NewInsert().Model(row).Returning("*").Exec(ctx); err != nil {
 		return AccessToken{}, fmt.Errorf("create access token: %w", err)
@@ -235,7 +249,9 @@ type accessTokenModel struct {
 	MemberID   int64  `bun:"member_id,notnull"`
 	Name       string `bun:"name,notnull"`
 	TokenHash  string `bun:"token_hash,notnull"`
-	Permission string `bun:"permission,notnull"`
+	CanRead    bool   `bun:"can_read,notnull"`
+	CanWrite   bool   `bun:"can_write,notnull"`
+	CanDelete  bool   `bun:"can_delete,notnull"`
 	ExpiresAt  string `bun:"expires_at,notnull"`
 	LastUsedAt string `bun:"last_used_at,notnull"`
 	AllLists   bool   `bun:"all_lists,notnull"`
@@ -257,7 +273,8 @@ func (m accessTokenModel) toToken() (AccessToken, error) {
 	}
 	return AccessToken{
 		ID: m.ID, UID: m.UID, MemberID: m.MemberID, Name: m.Name,
-		Permission: Permission(m.Permission), ExpiresAt: expiresAt,
+		Abilities:  TokenAbilities{Read: m.CanRead, Write: m.CanWrite, Delete: m.CanDelete},
+		ExpiresAt:  expiresAt,
 		LastUsedAt: lastUsedAt, AllLists: m.AllLists, CreatedAt: createdAt,
 	}, nil
 }

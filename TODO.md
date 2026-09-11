@@ -250,10 +250,8 @@ The single most important milestone; everything else is furniture.
       Any Admin, behind the irreversible confirmation in DESIGN.md §9
 - [x] Sign out — the design gives the sidebar's member row one label and it says
       Settings, so one-click sign-out needs a member menu the design does not have yet
-- [ ] Token permissions are three abilities, not two levels — the design has "Read items",
-      "Add and tick off items" and "Delete items and lists", the last off by default.
-      Built as READ/WRITE by mistake; needs a migration, `Grant.MayDelete`, and a check
-      at DeleteItem and DeleteList beyond what `accessTo` decides
+- [x] Token permissions are three abilities, not two levels — "Read items", "Add and
+      tick off items" and "Delete items and lists", the last off by default
 - [ ] Export everything — one JSON file plus the printed pages as PDFs
 - [ ] Import a backup — the same file the exporter writes, so moving machines is copy and restore
 

@@ -7,11 +7,11 @@ import (
 )
 
 // cutToken makes a token for a Member, scoped to some Lists.
-func cutToken(t *testing.T, s Store, member Member, listIDs []int64, permission Permission) AccessToken {
+func cutToken(t *testing.T, s Store, member Member, listIDs []int64, abilities TokenAbilities) AccessToken {
 	t.Helper()
 	token, err := s.CreateAccessToken(t.Context(), CreateAccessTokenParams{
 		UID: "tok_kitchen", MemberID: member.ID, Name: "Kitchen tablet",
-		TokenHash: "hash-of-the-token", Permission: permission,
+		TokenHash: "hash-of-the-token", Abilities: abilities,
 		ListIDs: listIDs, At: createdAt,
 	})
 	if err != nil {
@@ -26,13 +26,13 @@ func TestCuttingAToken(t *testing.T) {
 			s := d.open(t)
 			list, owner := newList(t, s, "Groceries", SharingPrivate)
 
-			token := cutToken(t, s, owner, []int64{list.ID}, PermissionWrite)
+			token := cutToken(t, s, owner, []int64{list.ID}, TokenAbilities{Read: true, Write: true, Delete: true})
 
 			if token.ID == 0 {
 				t.Error("ID = 0, want the database to have assigned one")
 			}
-			if token.Permission != PermissionWrite {
-				t.Errorf("permission = %q", token.Permission)
+			if !token.Abilities.Write || !token.Abilities.Delete {
+				t.Errorf("abilities = %+v, want the ones it was cut with", token.Abilities)
 			}
 			if !token.LastUsedAt.IsZero() {
 				t.Error("a token that has never been used has a last-used time")
@@ -48,7 +48,7 @@ func TestFindingATokenByItsHash(t *testing.T) {
 		t.Run(d.name, func(t *testing.T) {
 			s := d.open(t)
 			_, owner := newList(t, s, "Groceries", SharingPrivate)
-			cutToken(t, s, owner, nil, PermissionRead)
+			cutToken(t, s, owner, nil, TokenAbilities{Read: true})
 
 			found, err := s.AccessTokenByHash(t.Context(), "hash-of-the-token")
 			if err != nil {
@@ -85,7 +85,7 @@ func TestWhichListsATokenReaches(t *testing.T) {
 				t.Fatalf("CreateList: %v", err)
 			}
 
-			token := cutToken(t, s, owner, []int64{reachable.ID}, PermissionRead)
+			token := cutToken(t, s, owner, []int64{reachable.ID}, TokenAbilities{Read: true})
 
 			ids, err := s.TokenListIDs(t.Context(), token.ID)
 			if err != nil {
@@ -119,7 +119,7 @@ func TestRecordingThatATokenWasUsed(t *testing.T) {
 		t.Run(d.name, func(t *testing.T) {
 			s := d.open(t)
 			_, owner := newList(t, s, "Groceries", SharingPrivate)
-			token := cutToken(t, s, owner, nil, PermissionRead)
+			token := cutToken(t, s, owner, nil, TokenAbilities{Read: true})
 
 			used := createdAt.Add(time.Hour)
 			if err := s.MarkTokenUsed(t.Context(), token.ID, used); err != nil {
@@ -142,7 +142,7 @@ func TestRevokingAToken(t *testing.T) {
 		t.Run(d.name, func(t *testing.T) {
 			s := d.open(t)
 			_, owner := newList(t, s, "Groceries", SharingPrivate)
-			token := cutToken(t, s, owner, nil, PermissionRead)
+			token := cutToken(t, s, owner, nil, TokenAbilities{Read: true})
 
 			if err := s.DeleteAccessToken(t.Context(), token.ID); err != nil {
 				t.Fatalf("DeleteAccessToken: %v", err)
@@ -163,7 +163,7 @@ func TestAMembersOwnTokens(t *testing.T) {
 			s := d.open(t)
 			_, anna := newList(t, s, "Groceries", SharingPrivate)
 			jonas := addMember(t, s, "mem_jonas", "Jonas", "jonas@brunnen.lan")
-			cutToken(t, s, anna, nil, PermissionRead)
+			cutToken(t, s, anna, nil, TokenAbilities{Read: true})
 
 			mine, err := s.AccessTokensFor(t.Context(), jonas.ID)
 			if err != nil {

@@ -2,15 +2,55 @@
 // @generated from file nooks/api/v1/token_service.proto (package nooks.api.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file nooks/api/v1/token_service.proto.
  */
 export const file_nooks_api_v1_token_service: GenFile = /*@__PURE__*/
-  fileDesc("CiBub29rcy9hcGkvdjEvdG9rZW5fc2VydmljZS5wcm90bxIMbm9va3MuYXBpLnYxItABCgtBY2Nlc3NUb2tlbhILCgN1aWQYASABKAkSDAoEbmFtZRgCIAEoCRIsCgpwZXJtaXNzaW9uGAMgASgOMhgubm9va3MuYXBpLnYxLlBlcm1pc3Npb24SEgoKbGlzdF9uYW1lcxgEIAMoCRIRCglhbGxfbGlzdHMYCSABKAgSEgoKZXhwaXJlc19hdBgFIAEoCRIUCgxsYXN0X3VzZWRfYXQYBiABKAkSEgoKY3JlYXRlZF9hdBgHIAEoCRITCgttZW1iZXJfbmFtZRgIIAEoCSIZChdMaXN0QWNjZXNzVG9rZW5zUmVxdWVzdCJFChhMaXN0QWNjZXNzVG9rZW5zUmVzcG9uc2USKQoGdG9rZW5zGAEgAygLMhkubm9va3MuYXBpLnYxLkFjY2Vzc1Rva2VuIpABChhDcmVhdGVBY2Nlc3NUb2tlblJlcXVlc3QSDAoEbmFtZRgBIAEoCRIsCgpwZXJtaXNzaW9uGAIgASgOMhgubm9va3MuYXBpLnYxLlBlcm1pc3Npb24SEQoJbGlzdF91aWRzGAMgAygJEhEKCWFsbF9saXN0cxgFIAEoCBISCgpleHBpcmVzX2F0GAQgASgJIlUKGUNyZWF0ZUFjY2Vzc1Rva2VuUmVzcG9uc2USKAoFdG9rZW4YASABKAsyGS5ub29rcy5hcGkudjEuQWNjZXNzVG9rZW4SDgoGc2VjcmV0GAIgASgJIi0KGFJldm9rZUFjY2Vzc1Rva2VuUmVxdWVzdBIRCgl0b2tlbl91aWQYASABKAkiGwoZUmV2b2tlQWNjZXNzVG9rZW5SZXNwb25zZSpTCgpQZXJtaXNzaW9uEhoKFlBFUk1JU1NJT05fVU5TUEVDSUZJRUQQABITCg9QRVJNSVNTSU9OX1JFQUQQARIUChBQRVJNSVNTSU9OX1dSSVRFEAIyvQIKDFRva2VuU2VydmljZRJhChBMaXN0QWNjZXNzVG9rZW5zEiUubm9va3MuYXBpLnYxLkxpc3RBY2Nlc3NUb2tlbnNSZXF1ZXN0GiYubm9va3MuYXBpLnYxLkxpc3RBY2Nlc3NUb2tlbnNSZXNwb25zZRJkChFDcmVhdGVBY2Nlc3NUb2tlbhImLm5vb2tzLmFwaS52MS5DcmVhdGVBY2Nlc3NUb2tlblJlcXVlc3QaJy5ub29rcy5hcGkudjEuQ3JlYXRlQWNjZXNzVG9rZW5SZXNwb25zZRJkChFSZXZva2VBY2Nlc3NUb2tlbhImLm5vb2tzLmFwaS52MS5SZXZva2VBY2Nlc3NUb2tlblJlcXVlc3QaJy5ub29rcy5hcGkudjEuUmV2b2tlQWNjZXNzVG9rZW5SZXNwb25zZUKvAQoQY29tLm5vb2tzLmFwaS52MUIRVG9rZW5TZXJ2aWNlUHJvdG9QAVo2Z2l0aHViLmNvbS9ob3Nob21vaC9ub29rcy9wcm90by9nZW4vbm9va3MvYXBpL3YxO2FwaXYxogIDTkFYqgIMTm9va3MuQXBpLlYxygIMTm9va3NcQXBpXFYx4gIYTm9va3NcQXBpXFYxXEdQQk1ldGFkYXRh6gIOTm9va3M6OkFwaTo6VjFiBnByb3RvMw");
+  fileDesc("CiBub29rcy9hcGkvdjEvdG9rZW5fc2VydmljZS5wcm90bxIMbm9va3MuYXBpLnYxIj0KDlRva2VuQWJpbGl0aWVzEgwKBHJlYWQYASABKAgSDQoFd3JpdGUYAiABKAgSDgoGZGVsZXRlGAMgASgIItMBCgtBY2Nlc3NUb2tlbhILCgN1aWQYASABKAkSDAoEbmFtZRgCIAEoCRIvCglhYmlsaXRpZXMYAyABKAsyHC5ub29rcy5hcGkudjEuVG9rZW5BYmlsaXRpZXMSEgoKbGlzdF9uYW1lcxgEIAMoCRIRCglhbGxfbGlzdHMYCSABKAgSEgoKZXhwaXJlc19hdBgFIAEoCRIUCgxsYXN0X3VzZWRfYXQYBiABKAkSEgoKY3JlYXRlZF9hdBgHIAEoCRITCgttZW1iZXJfbmFtZRgIIAEoCSIZChdMaXN0QWNjZXNzVG9rZW5zUmVxdWVzdCJFChhMaXN0QWNjZXNzVG9rZW5zUmVzcG9uc2USKQoGdG9rZW5zGAEgAygLMhkubm9va3MuYXBpLnYxLkFjY2Vzc1Rva2VuIpMBChhDcmVhdGVBY2Nlc3NUb2tlblJlcXVlc3QSDAoEbmFtZRgBIAEoCRIvCglhYmlsaXRpZXMYAiABKAsyHC5ub29rcy5hcGkudjEuVG9rZW5BYmlsaXRpZXMSEQoJbGlzdF91aWRzGAMgAygJEhEKCWFsbF9saXN0cxgFIAEoCBISCgpleHBpcmVzX2F0GAQgASgJIlUKGUNyZWF0ZUFjY2Vzc1Rva2VuUmVzcG9uc2USKAoFdG9rZW4YASABKAsyGS5ub29rcy5hcGkudjEuQWNjZXNzVG9rZW4SDgoGc2VjcmV0GAIgASgJIi0KGFJldm9rZUFjY2Vzc1Rva2VuUmVxdWVzdBIRCgl0b2tlbl91aWQYASABKAkiGwoZUmV2b2tlQWNjZXNzVG9rZW5SZXNwb25zZTK9AgoMVG9rZW5TZXJ2aWNlEmEKEExpc3RBY2Nlc3NUb2tlbnMSJS5ub29rcy5hcGkudjEuTGlzdEFjY2Vzc1Rva2Vuc1JlcXVlc3QaJi5ub29rcy5hcGkudjEuTGlzdEFjY2Vzc1Rva2Vuc1Jlc3BvbnNlEmQKEUNyZWF0ZUFjY2Vzc1Rva2VuEiYubm9va3MuYXBpLnYxLkNyZWF0ZUFjY2Vzc1Rva2VuUmVxdWVzdBonLm5vb2tzLmFwaS52MS5DcmVhdGVBY2Nlc3NUb2tlblJlc3BvbnNlEmQKEVJldm9rZUFjY2Vzc1Rva2VuEiYubm9va3MuYXBpLnYxLlJldm9rZUFjY2Vzc1Rva2VuUmVxdWVzdBonLm5vb2tzLmFwaS52MS5SZXZva2VBY2Nlc3NUb2tlblJlc3BvbnNlQq8BChBjb20ubm9va3MuYXBpLnYxQhFUb2tlblNlcnZpY2VQcm90b1ABWjZnaXRodWIuY29tL2hvc2hvbW9oL25vb2tzL3Byb3RvL2dlbi9ub29rcy9hcGkvdjE7YXBpdjGiAgNOQViqAgxOb29rcy5BcGkuVjHKAgxOb29rc1xBcGlcVjHiAhhOb29rc1xBcGlcVjFcR1BCTWV0YWRhdGHqAg5Ob29rczo6QXBpOjpWMWIGcHJvdG8z");
+
+/**
+ * TokenAbilities is what a token may do — three answers, not one level.
+ *
+ * A level forces an order the real question does not have: a recipe importer reads and
+ * never writes, a shopping shortcut writes and should never delete.
+ *
+ * @generated from message nooks.api.v1.TokenAbilities
+ */
+export type TokenAbilities = Message<"nooks.api.v1.TokenAbilities"> & {
+  /**
+   * See lists and items: titles, quantities, dates and notes on the lists it names.
+   * Has to be on unless write is: a token that reads nothing opens nothing.
+   *
+   * @generated from field: bool read = 1;
+   */
+  read: boolean;
+
+  /**
+   * Add, tick off and edit. Every change is attributed to the token in list history.
+   *
+   * @generated from field: bool write = 2;
+   */
+  write: boolean;
+
+  /**
+   * Delete items and lists. Off unless it was asked for — most callers never need it,
+   * and it is the one that cannot be undone.
+   *
+   * @generated from field: bool delete = 3;
+   */
+  delete: boolean;
+};
+
+/**
+ * Describes the message nooks.api.v1.TokenAbilities.
+ * Use `create(TokenAbilitiesSchema)` to create a new message.
+ */
+export const TokenAbilitiesSchema: GenMessage<TokenAbilities> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_token_service, 0);
 
 /**
  * AccessToken is a key, described. Never the key itself.
@@ -31,9 +71,9 @@ export type AccessToken = Message<"nooks.api.v1.AccessToken"> & {
   name: string;
 
   /**
-   * @generated from field: nooks.api.v1.Permission permission = 3;
+   * @generated from field: nooks.api.v1.TokenAbilities abilities = 3;
    */
-  permission: Permission;
+  abilities?: TokenAbilities | undefined;
 
   /**
    * The Lists it may reach, by name. A List it does not name is invisible to it.
@@ -83,7 +123,7 @@ export type AccessToken = Message<"nooks.api.v1.AccessToken"> & {
  * Use `create(AccessTokenSchema)` to create a new message.
  */
 export const AccessTokenSchema: GenMessage<AccessToken> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_token_service, 0);
+  messageDesc(file_nooks_api_v1_token_service, 1);
 
 /**
  * @generated from message nooks.api.v1.ListAccessTokensRequest
@@ -96,7 +136,7 @@ export type ListAccessTokensRequest = Message<"nooks.api.v1.ListAccessTokensRequ
  * Use `create(ListAccessTokensRequestSchema)` to create a new message.
  */
 export const ListAccessTokensRequestSchema: GenMessage<ListAccessTokensRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_token_service, 1);
+  messageDesc(file_nooks_api_v1_token_service, 2);
 
 /**
  * @generated from message nooks.api.v1.ListAccessTokensResponse
@@ -113,7 +153,7 @@ export type ListAccessTokensResponse = Message<"nooks.api.v1.ListAccessTokensRes
  * Use `create(ListAccessTokensResponseSchema)` to create a new message.
  */
 export const ListAccessTokensResponseSchema: GenMessage<ListAccessTokensResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_token_service, 2);
+  messageDesc(file_nooks_api_v1_token_service, 3);
 
 /**
  * @generated from message nooks.api.v1.CreateAccessTokenRequest
@@ -125,9 +165,9 @@ export type CreateAccessTokenRequest = Message<"nooks.api.v1.CreateAccessTokenRe
   name: string;
 
   /**
-   * @generated from field: nooks.api.v1.Permission permission = 2;
+   * @generated from field: nooks.api.v1.TokenAbilities abilities = 2;
    */
-  permission: Permission;
+  abilities?: TokenAbilities | undefined;
 
   /**
    * The Lists it may reach. A token that names none reaches none, unless all_lists is
@@ -158,7 +198,7 @@ export type CreateAccessTokenRequest = Message<"nooks.api.v1.CreateAccessTokenRe
  * Use `create(CreateAccessTokenRequestSchema)` to create a new message.
  */
 export const CreateAccessTokenRequestSchema: GenMessage<CreateAccessTokenRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_token_service, 3);
+  messageDesc(file_nooks_api_v1_token_service, 4);
 
 /**
  * @generated from message nooks.api.v1.CreateAccessTokenResponse
@@ -182,7 +222,7 @@ export type CreateAccessTokenResponse = Message<"nooks.api.v1.CreateAccessTokenR
  * Use `create(CreateAccessTokenResponseSchema)` to create a new message.
  */
 export const CreateAccessTokenResponseSchema: GenMessage<CreateAccessTokenResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_token_service, 4);
+  messageDesc(file_nooks_api_v1_token_service, 5);
 
 /**
  * @generated from message nooks.api.v1.RevokeAccessTokenRequest
@@ -199,7 +239,7 @@ export type RevokeAccessTokenRequest = Message<"nooks.api.v1.RevokeAccessTokenRe
  * Use `create(RevokeAccessTokenRequestSchema)` to create a new message.
  */
 export const RevokeAccessTokenRequestSchema: GenMessage<RevokeAccessTokenRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_token_service, 5);
+  messageDesc(file_nooks_api_v1_token_service, 6);
 
 /**
  * @generated from message nooks.api.v1.RevokeAccessTokenResponse
@@ -212,39 +252,7 @@ export type RevokeAccessTokenResponse = Message<"nooks.api.v1.RevokeAccessTokenR
  * Use `create(RevokeAccessTokenResponseSchema)` to create a new message.
  */
 export const RevokeAccessTokenResponseSchema: GenMessage<RevokeAccessTokenResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_token_service, 6);
-
-/**
- * Permission is what a token may do — two levels, not a matrix.
- *
- * @generated from enum nooks.api.v1.Permission
- */
-export enum Permission {
-  /**
-   * @generated from enum value: PERMISSION_UNSPECIFIED = 0;
-   */
-  UNSPECIFIED = 0,
-
-  /**
-   * PERMISSION_READ is see and print.
-   *
-   * @generated from enum value: PERMISSION_READ = 1;
-   */
-  READ = 1,
-
-  /**
-   * PERMISSION_WRITE adds ticking, adding and editing.
-   *
-   * @generated from enum value: PERMISSION_WRITE = 2;
-   */
-  WRITE = 2,
-}
-
-/**
- * Describes the enum nooks.api.v1.Permission.
- */
-export const PermissionSchema: GenEnum<Permission> = /*@__PURE__*/
-  enumDesc(file_nooks_api_v1_token_service, 0);
+  messageDesc(file_nooks_api_v1_token_service, 7);
 
 /**
  * TokenService covers the keys a Member cuts for things that are not browsers.

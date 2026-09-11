@@ -62,9 +62,27 @@ func (g Grant) TokenID() int64 {
 	return g.Token.ID
 }
 
-// ReadOnly reports whether the caller may only look.
-func (g Grant) ReadOnly() bool {
-	return g.Token != nil && g.Token.Permission == store.PermissionRead
+// MayWrite reports whether the caller may add, tick and edit.
+//
+// A browser may do whatever its Member may. A token may only what it was cut for.
+func (g Grant) MayWrite() bool {
+	return g.Token == nil || g.Token.Abilities.Write
+}
+
+/*
+MayDelete reports whether the caller may delete Items and Lists.
+
+Its own question rather than part of writing, because deleting is the one that cannot
+be undone and almost no caller needs it. A shortcut that adds shopping should not be
+able to empty a List because somebody sent it the wrong request.
+
+It is checked beside accessTo rather than inside it: accessTo answers how far into a
+List a caller may reach, and this answers what they may do once there. Folding them
+together would mean a level called "write but not delete", which is the shape the token
+model deliberately does not have.
+*/
+func (g Grant) MayDelete() bool {
+	return g.Token == nil || g.Token.Abilities.Delete
 }
 
 // WithGrant returns a context carrying what the caller may do.

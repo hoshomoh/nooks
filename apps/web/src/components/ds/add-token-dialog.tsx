@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { cn } from "cn"
-import { Permission, type List } from "@nooks/api"
+import type { List, TokenAbilities } from "@nooks/api"
 
 import { Button } from "./button"
 import { DIALOG_SURFACE } from "./dialog-surface"
@@ -17,7 +17,7 @@ import { useLocale } from "@/lib/use-locale"
 /** What a Member asked for, to cut a token from. */
 export interface NewToken {
   name: string
-  permission: Permission
+  abilities: TokenAbilities
   /** The Lists it may reach. Empty when allLists is set. */
   listUids: string[]
   /** Reach every List, including ones made later. */
@@ -93,6 +93,14 @@ const LIFETIMES: Lifetime[] = ["30", "90", "365", "never", "pick"]
 /** What a token is pointed at. */
 type Scope = "all" | "some"
 
+/** The three things a token may be allowed to do, in the order the design lists them. */
+type Ability = "read" | "write" | "delete"
+
+const ABILITIES: Ability[] = ["read", "write", "delete"]
+
+/** What has been ticked so far. The wire type, without its generated marker. */
+type Abilities = Record<Ability, boolean>
+
 interface AddTokenFormProps {
   lists: List[]
   onCancel: () => void
@@ -104,7 +112,9 @@ function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
   const { t } = useTranslation()
   const { dateLocale } = useLocale()
   const [name, setName] = useState("")
-  const [permission, setPermission] = useState<Permission>(Permission.WRITE)
+  // Read and write on, delete off — the shape almost every caller wants, and the one
+  // the design draws. Delete has to be asked for.
+  const [abilities, setAbilities] = useState<Abilities>({ read: true, write: true, delete: false })
   const [scope, setScope] = useState<Scope>("all")
   const [picked, setPicked] = useState<string[]>([])
   const [lifetime, setLifetime] = useState<Lifetime>("90")
@@ -112,8 +122,10 @@ function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
 
   // A token that names no List reaches none, so there is nothing to cut yet.
   const scopeReady = scope === "all" || picked.length > 0
+  // A token that can do nothing wherever it reaches is a key that opens nothing.
+  const abilitiesReady = abilities.read || abilities.write
   const expiryReady = lifetime !== "pick" || chosenDay !== ""
-  const ready = name.trim().length > 0 && scopeReady && expiryReady
+  const ready = name.trim().length > 0 && scopeReady && abilitiesReady && expiryReady
 
   return (
     <form
@@ -124,7 +136,7 @@ function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
         }
         onAdd({
           name: name.trim(),
-          permission,
+          abilities: abilities as TokenAbilities,
           listUids: scope === "all" ? [] : picked,
           allLists: scope === "all",
           expiresAt: expiryOf(lifetime, chosenDay),
@@ -145,15 +157,38 @@ function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
           autoFocus
         />
 
-        <ExplainedChoice
-          label={t("tokens.permission")}
-          options={[
-            { value: Permission.READ, title: t("tokens.read"), blurb: t("tokens.readBlurb") },
-            { value: Permission.WRITE, title: t("tokens.write"), blurb: t("tokens.writeBlurb") },
-          ]}
-          chosen={permission}
-          onChoose={setPermission}
-        />
+        <fieldset className="flex flex-col gap-2.5">
+          <legend className="pb-2 text-small font-medium text-secondary-foreground">
+            {t("tokens.permission")}
+          </legend>
+          <div className="flex flex-col gap-1.5">
+            {ABILITIES.map((ability) => (
+              <button
+                key={ability}
+                type="button"
+                role="checkbox"
+                aria-checked={abilities[ability]}
+                onClick={() =>
+                  setAbilities({ ...abilities, [ability]: !abilities[ability] })
+                }
+                className={cn(
+                  "flex items-start gap-3 rounded-xl border px-3.5 py-3 text-left transition-colors",
+                  abilities[ability]
+                    ? "border-[length:1.5px] border-shared bg-shared-bg"
+                    : "border-border hover:bg-secondary",
+                )}
+              >
+                <TickBox picked={abilities[ability]} className="mt-0.5" />
+                <span className="flex flex-col gap-1">
+                  <span className="text-field font-medium">{t(`tokens.${ability}Label`)}</span>
+                  <span className="text-meta leading-[1.5] text-secondary-foreground">
+                    {t(`tokens.${ability}Blurb`)}
+                  </span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </fieldset>
 
         <ExplainedChoice
           label={t("tokens.scope")}

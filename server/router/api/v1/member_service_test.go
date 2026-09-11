@@ -316,7 +316,7 @@ func TestAMemberCannotTakeAnEmailSomebodyElseUses(t *testing.T) {
 func TestATokenCannotChangeAProfile(t *testing.T) {
 	f := newListFixture(t)
 	groceries := f.createList(t, f.anna, "Groceries")
-	ctx := f.withToken(t, f.anna, store.PermissionWrite, groceries)
+	ctx := f.withToken(t, f.anna, store.TokenAbilities{Read: true, Write: true, Delete: true}, groceries)
 
 	_, err := NewMemberService(f.store, nil, nil).UpdateOwnProfile(ctx, connect.NewRequest(
 		&apiv1.UpdateOwnProfileRequest{Name: "Anna", Email: "somewhere@else.lan"},

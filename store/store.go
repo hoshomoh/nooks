@@ -242,6 +242,27 @@ type Store interface {
 	// ResolveActivity records what became of everything pointing at one request.
 	ResolveActivity(ctx context.Context, targetUID string, outcome Outcome) error
 
+	// CreateAccessToken cuts a token and records which Lists it may reach.
+	CreateAccessToken(ctx context.Context, params CreateAccessTokenParams) (AccessToken, error)
+
+	// AccessTokenByHash finds a token by what was presented.
+	AccessTokenByHash(ctx context.Context, hash string) (AccessToken, error)
+
+	// AccessTokenByUID finds a token by its public identifier.
+	AccessTokenByUID(ctx context.Context, uid string) (AccessToken, error)
+
+	// AccessTokensFor lists a Member's own tokens, newest first.
+	AccessTokensFor(ctx context.Context, memberID int64) ([]AccessToken, error)
+
+	// TokenListIDs is which Lists a token may reach.
+	TokenListIDs(ctx context.Context, tokenID int64) ([]int64, error)
+
+	// MarkTokenUsed records that something reached the Instance with this token.
+	MarkTokenUsed(ctx context.Context, id int64, at time.Time) error
+
+	// DeleteAccessToken revokes a token.
+	DeleteAccessToken(ctx context.Context, id int64) error
+
 	// AdminIDs lists the Members who can act on a request.
 	AdminIDs(ctx context.Context) ([]int64, error)
 

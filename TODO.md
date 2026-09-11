@@ -23,7 +23,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M7 · Members and Groups | `[x]` |
 | M8 · Public list | `[x]` |
 | M9 · Print | `[x]` |
-| M10 · Access tokens, REST, MCP | `[ ]` |
+| M10 · Access tokens, REST, MCP | `[~]` schema done |
 | M11 · Settings, export, import | `[ ]` |
 | M12 · Website: marketing, docs, API docs | `[ ]` |
 | M13 · Offline and conflicts | `[ ]` |
@@ -228,7 +228,7 @@ The single most important milestone; everything else is furniture.
 
 ## M10 · Access tokens, REST, MCP
 
-- [ ] Access token schema: hashed, scoped to named Lists, permissioned, expiring
+- [x] Access token schema: hashed, scoped to named Lists, permissioned, expiring
 - [ ] Tokens page — a Member's own; an Admin also sees that others' exist
 - [ ] An Admin can revoke another Member's token but **cannot read it or make one in their name**
 - [ ] Add a token dialog: name, List scope picker, permissions, expiry

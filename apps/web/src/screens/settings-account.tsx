@@ -1,8 +1,10 @@
 import { useState, type ReactNode } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { ConnectError, Code } from "@connectrpc/connect"
 
+import { Button } from "@/components/ds/button"
 import { SaveButton } from "@/components/ds/save-button"
 import { Field } from "@/components/ds/field"
 import { SettingsShell } from "@/components/ds/settings-shell"
@@ -31,6 +33,7 @@ export function SettingsAccountScreen() {
 
       <ProfileForm />
       <PasswordForm />
+      <SignOut />
     </SettingsShell>
   )
 }
@@ -180,4 +183,37 @@ function passwordErrorOf(t: Translate, error: Error | null): string | undefined 
   return ConnectError.from(error).code === Code.InvalidArgument
     ? ConnectError.from(error).rawMessage
     : t("error.somethingWentWrong")
+}
+
+/**
+ * Leaving.
+ *
+ * On this page because this page is the account, and because the design gives the
+ * sidebar's member row one label and it says Settings. Two clicks away is further than
+ * signing out should be; if it wants to be one, the sidebar needs a menu the design
+ * does not have yet.
+ */
+function SignOut() {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+
+  const signOut = useMutation({
+    mutationFn: () => authClient.signOut({}),
+    onSuccess: async () => {
+      // Everything in the cache belongs to the Member who is leaving.
+      queryClient.clear()
+      await navigate({ to: "/sign-in" })
+    },
+  })
+
+  return (
+    <Section title={t("account.signOut")} blurb={t("account.signOutBlurb")}>
+      <div>
+        <Button tone="secondary" disabled={signOut.isPending} onClick={() => signOut.mutate()}>
+          {t("account.signOutAction")}
+        </Button>
+      </div>
+    </Section>
+  )
 }

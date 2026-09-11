@@ -507,7 +507,10 @@
     "currentPassword": "Current password",
     "newPassword": "New password",
     "replacePassword": "Replace password",
-    "saved": "Saved"
+    "saved": "Saved",
+    "signOut": "Signing out",
+    "signOutBlurb": "Ends this session in this browser. Your access tokens keep working — revoke them on the tokens page if you want them stopped too.",
+    "signOutAction": "Sign out"
   },
   "appearance": {
     "title": "Appearance",

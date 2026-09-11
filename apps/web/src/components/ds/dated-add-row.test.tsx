@@ -26,13 +26,22 @@ function list(uid: string, name: string): List {
 }
 
 /** show renders the row for a view whose Items are due on a given day. */
-function show(lists: List[], defaultDue: string) {
+function show(lists: List[], defaultDue: string, divided?: boolean) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={queryClient}>
-      <DatedAddRow lists={lists} defaultDue={defaultDue} />
+      <DatedAddRow lists={lists} defaultDue={defaultDue} divided={divided} />
     </QueryClientProvider>,
   )
+}
+
+/** rowOf is the form the row renders into. */
+function rowOf(name: RegExp): HTMLElement {
+  const form = screen.getByRole("textbox", { name }).closest("form")
+  if (!form) {
+    throw new Error("the add row rendered without a form")
+  }
+  return form
 }
 
 describe("adding from a view that gathers every List", () => {
@@ -48,6 +57,20 @@ describe("adding from a view that gathers every List", () => {
     show([list("list_groceries", "Groceries"), list("list_bike", "Bike")], toStored(today()))
 
     expect(screen.getByRole("textbox", { name: /Add to Bike/ })).toBeInTheDocument()
+  })
+
+  // A rule under an empty state is a line between a box and nothing: the two end up
+  // almost touching. Today and Upcoming show one whenever nothing is due.
+  it("draws no rule when there are no Items above it", () => {
+    show([list("list_groceries", "Groceries")], toStored(today()), false)
+
+    expect(rowOf(/Add to Groceries/)).not.toHaveClass("border-t")
+  })
+
+  it("draws a rule under a run of Items", () => {
+    show([list("list_groceries", "Groceries")], toStored(today()), true)
+
+    expect(rowOf(/Add to Groceries/)).toHaveClass("border-t")
   })
 
   // A List that was deleted or unshared cannot be where the next Item goes.

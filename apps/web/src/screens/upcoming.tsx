@@ -113,7 +113,11 @@ export function UpcomingScreen() {
           )}
 
           {/* Upcoming is what is not today, so a new Item here is due tomorrow. */}
-          <DatedAddRow lists={lists} defaultDue={toStored(shift(today(), 1))} />
+          <DatedAddRow
+            lists={lists}
+            defaultDue={toStored(shift(today(), 1))}
+            divided={days.length > 0}
+          />
         </div>
       </div>
     </AppShell>

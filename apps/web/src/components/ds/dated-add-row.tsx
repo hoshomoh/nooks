@@ -14,6 +14,8 @@ export interface DatedAddRowProps {
   lists: List[]
   /** The date this view gives a new Item: today on Today, tomorrow on Upcoming. */
   defaultDue: DueDate
+  /** Whether a rule separates the row from what is above it. See AddRow. */
+  divided?: boolean
 }
 
 /**
@@ -26,7 +28,7 @@ export interface DatedAddRowProps {
  * Nothing renders when the Member has no Lists at all: there would be nowhere to put
  * what they typed, and a row that swallows an Item is worse than no row.
  */
-export function DatedAddRow({ lists, defaultDue }: DatedAddRowProps) {
+export function DatedAddRow({ lists, defaultDue, divided }: DatedAddRowProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const due = useDueLabel()
@@ -49,6 +51,7 @@ export function DatedAddRow({ lists, defaultDue }: DatedAddRowProps) {
         date: due.label(defaultDue).toLocaleLowerCase(),
       })}
       defaultDue={defaultDue}
+      divided={divided}
       disabled={addItem.isPending}
       onAdd={(item) => {
         remember(target.uid)

@@ -139,7 +139,7 @@ export function TodayScreen() {
             </div>
           )}
 
-          <DatedAddRow lists={lists} defaultDue={toStored(from)} />
+          <DatedAddRow lists={lists} defaultDue={toStored(from)} divided={dated.items.length > 0} />
         </div>
       </div>
     </AppShell>

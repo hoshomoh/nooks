@@ -8,6 +8,8 @@ import (
 	"connectrpc.com/connect"
 
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
+	"github.com/hoshomoh/nooks/server/auth"
+	"github.com/hoshomoh/nooks/store"
 )
 
 // tokens builds the service over the fixture's store, with predictable secrets.
@@ -180,5 +182,32 @@ func TestRevokingSomebodyElsesTokenReadsAsMissing(t *testing.T) {
 	))
 	if got := connect.CodeOf(err); got != connect.CodeNotFound {
 		t.Errorf("code = %v, want not_found", got)
+	}
+}
+
+// A token must not be able to mint or revoke tokens: a leaked one would otherwise be
+// able to make itself permanent and to lock its Member out of noticing.
+func TestATokenCannotManageTokens(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+
+	list, err := f.store.ListByUID(t.Context(), uid)
+	if err != nil {
+		t.Fatalf("ListByUID: %v", err)
+	}
+	presented := store.AccessToken{ID: 1, MemberID: f.anna.ID, Permission: store.PermissionWrite}
+	ctx := auth.WithGrant(t.Context(),
+		auth.NewTokenGrant(f.anna, presented, []int64{list.ID}))
+
+	_, err = f.tokens(t).CreateAccessToken(ctx, connect.NewRequest(&apiv1.CreateAccessTokenRequest{
+		Name: "Another", ListUids: []string{uid},
+	}))
+	if got := connect.CodeOf(err); got != connect.CodePermissionDenied {
+		t.Errorf("CreateAccessToken code = %v, want permission_denied", got)
+	}
+
+	_, err = f.tokens(t).ListAccessTokens(ctx, connect.NewRequest(&apiv1.ListAccessTokensRequest{}))
+	if got := connect.CodeOf(err); got != connect.CodePermissionDenied {
+		t.Errorf("ListAccessTokens code = %v, want permission_denied", got)
 	}
 }

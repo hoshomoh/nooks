@@ -6,6 +6,7 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
 )
 
@@ -35,11 +36,31 @@ const (
 // of its arguments, and what lets one read answer a whole page of Lists.
 type namedShares map[int64]bool
 
-// accessTo works out what a Member may do with a List.
+// accessTo works out what a caller may do with a List.
 //
 // It is a pure function of its arguments, so every rule below can be read in one place
-// and tested without a database.
-func accessTo(list store.List, member store.Member, shares namedShares) Access {
+// and tested without a database. It is also the *only* place access is decided: a
+// browser, a script holding an Access token and an MCP client all arrive here, which is
+// what stops a second route growing a second set of rules.
+//
+// The Member's own access is worked out first, then narrowed by whatever the Grant
+// limits. A token is never its own identity — it is somebody else's access with edges.
+func accessTo(list store.List, grant auth.Grant, shares namedShares) Access {
+	// A List a token does not name is invisible, not forbidden: a token must not be a
+	// way to learn which Lists its Member has.
+	if !grant.Reaches(list.ID) {
+		return AccessNone
+	}
+
+	have := memberAccessTo(list, grant.Member, shares)
+	if grant.ReadOnly() && have > AccessRead {
+		return AccessRead
+	}
+	return have
+}
+
+// memberAccessTo is what the Member themselves may do, before any narrowing.
+func memberAccessTo(list store.List, member store.Member, shares namedShares) Access {
 	if list.OwnerID == member.ID {
 		return AccessOwn
 	}
@@ -66,9 +87,12 @@ func reaches(list store.List, shares namedShares) bool {
 	}
 }
 
-// namedSharesFor reads the Member's named shares once.
-func (s *ListService) namedSharesFor(ctx context.Context, member store.Member) (namedShares, error) {
-	ids, err := s.store.SharedListIDs(ctx, member.ID)
+// sharesFor reads the Member's named shares once.
+//
+// A free function rather than a method: every way into Nooks has to work out reach the
+// same way, and a helper that hangs off one service is a helper the next one copies.
+func sharesFor(ctx context.Context, st store.Store, member store.Member) (namedShares, error) {
+	ids, err := st.SharedListIDs(ctx, member.ID)
 	if err != nil {
 		return nil, internalError("read shared lists", err)
 	}
@@ -77,6 +101,35 @@ func (s *ListService) namedSharesFor(ctx context.Context, member store.Member) (
 		shares[id] = true
 	}
 	return shares, nil
+}
+
+// listReach is every List the caller may at least read, in the order the store gives
+// them — which is the order a Member sees, and so has to be the same on every read.
+//
+// This is the one answer to "what can this caller see?", for the browser, the REST API
+// and the MCP tools alike.
+func listReach(ctx context.Context, st store.Store, grant auth.Grant) ([]store.List, error) {
+	lists, err := st.ListsForMember(ctx, grant.Member.ID)
+	if err != nil {
+		return nil, internalError("read lists", err)
+	}
+	shares, err := sharesFor(ctx, st, grant.Member)
+	if err != nil {
+		return nil, err
+	}
+
+	reach := make([]store.List, 0, len(lists))
+	for _, list := range lists {
+		if accessTo(list, grant, shares) >= AccessRead {
+			reach = append(reach, list)
+		}
+	}
+	return reach, nil
+}
+
+// namedSharesFor is sharesFor with the service's own store.
+func (s *ListService) namedSharesFor(ctx context.Context, member store.Member) (namedShares, error) {
+	return sharesFor(ctx, s.store, member)
 }
 
 // sharesReaching is namedSharesFor for a single List, and reads nothing unless the List
@@ -108,7 +161,7 @@ var errNotOwner = connect.NewError(connect.CodePermissionDenied,
 func (s *ListService) listWithAccess(
 	ctx context.Context,
 	uid string,
-	member store.Member,
+	grant auth.Grant,
 	need Access,
 ) (store.List, error) {
 	list, err := s.store.ListByUID(ctx, uid)
@@ -119,12 +172,12 @@ func (s *ListService) listWithAccess(
 		return store.List{}, internalError("read list", err)
 	}
 
-	shares, err := s.sharesReaching(ctx, list, member)
+	shares, err := s.sharesReaching(ctx, list, grant.Member)
 	if err != nil {
 		return store.List{}, err
 	}
 
-	switch have := accessTo(list, member, shares); {
+	switch have := accessTo(list, grant, shares); {
 	case have >= need:
 		return list, nil
 	case have == AccessNone:
@@ -141,7 +194,7 @@ func (s *ListService) listWithAccess(
 func (s *ListService) itemWithAccess(
 	ctx context.Context,
 	uid string,
-	member store.Member,
+	grant auth.Grant,
 	need Access,
 ) (store.Item, store.List, error) {
 	item, err := s.store.ItemByUID(ctx, uid)
@@ -152,7 +205,7 @@ func (s *ListService) itemWithAccess(
 		return store.Item{}, store.List{}, internalError("read item", err)
 	}
 
-	list, err := s.listByIDWithAccess(ctx, item.ListID, member, need)
+	list, err := s.listByIDWithAccess(ctx, item.ListID, grant, need)
 	if err != nil {
 		return store.Item{}, store.List{}, err
 	}
@@ -166,14 +219,14 @@ var errItemNotFound = connect.NewError(connect.CodeNotFound, errors.New("no such
 func (s *ListService) listByIDWithAccess(
 	ctx context.Context,
 	id int64,
-	member store.Member,
+	grant auth.Grant,
 	need Access,
 ) (store.List, error) {
-	lists, err := s.store.ListsForMember(ctx, member.ID)
+	lists, err := s.store.ListsForMember(ctx, grant.Member.ID)
 	if err != nil {
 		return store.List{}, internalError("read lists", err)
 	}
-	shares, err := s.namedSharesFor(ctx, member)
+	shares, err := s.namedSharesFor(ctx, grant.Member)
 	if err != nil {
 		return store.List{}, err
 	}
@@ -181,7 +234,7 @@ func (s *ListService) listByIDWithAccess(
 		if list.ID != id {
 			continue
 		}
-		if accessTo(list, member, shares) >= need {
+		if accessTo(list, grant, shares) >= need {
 			return list, nil
 		}
 		if need == AccessOwn {

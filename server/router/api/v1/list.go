@@ -67,27 +67,29 @@ func (s *ListService) ListLists(
 	ctx context.Context,
 	_ *connect.Request[apiv1.ListListsRequest],
 ) (*connect.Response[apiv1.ListListsResponse], error) {
-	member, err := requireMember(ctx)
+	grant, err := requireGrant(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	lists, err := s.store.ListsForMember(ctx, member.ID)
+	// Through the shared reach rather than the store directly, so a token sees only the
+	// Lists it names: the sidebar is a way of learning what exists, too.
+	reachable, err := s.reachableListsInOrder(ctx, grant)
 	if err != nil {
-		return nil, internalError("read lists", err)
+		return nil, err
 	}
-	pinned, err := s.pinnedSet(ctx, member.ID)
+	pinned, err := s.pinnedSet(ctx, grant.Member.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	out := make([]*apiv1.List, 0, len(lists))
-	for _, list := range lists {
+	out := make([]*apiv1.List, 0, len(reachable))
+	for _, list := range reachable {
 		open, err := s.openCount(ctx, list.ID)
 		if err != nil {
 			return nil, err
 		}
-		out = append(out, listToProto(list, member, pinned[list.ID], open))
+		out = append(out, listToProto(list, grant.Member, pinned[list.ID], open))
 	}
 	return connect.NewResponse(&apiv1.ListListsResponse{Lists: out}), nil
 }
@@ -97,11 +99,11 @@ func (s *ListService) GetList(
 	ctx context.Context,
 	req *connect.Request[apiv1.GetListRequest],
 ) (*connect.Response[apiv1.GetListResponse], error) {
-	member, err := requireMember(ctx)
+	grant, err := requireGrant(ctx)
 	if err != nil {
 		return nil, err
 	}
-	list, err := s.listWithAccess(ctx, req.Msg.GetListUid(), member, AccessRead)
+	list, err := s.listWithAccess(ctx, req.Msg.GetListUid(), grant, AccessRead)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +116,7 @@ func (s *ListService) GetList(
 	if err != nil {
 		return nil, err
 	}
-	pinned, err := s.pinnedSet(ctx, member.ID)
+	pinned, err := s.pinnedSet(ctx, grant.Member.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +130,7 @@ func (s *ListService) GetList(
 		out = append(out, itemToProto(item, labels))
 	}
 	return connect.NewResponse(&apiv1.GetListResponse{
-		List:  listToProto(list, member, pinned[list.ID], open),
+		List:  listToProto(list, grant.Member, pinned[list.ID], open),
 		Items: out,
 	}), nil
 }
@@ -246,19 +248,19 @@ func (s *ListService) SetListPinned(
 	ctx context.Context,
 	req *connect.Request[apiv1.SetListPinnedRequest],
 ) (*connect.Response[apiv1.SetListPinnedResponse], error) {
-	member, err := requireMember(ctx)
+	grant, err := requireGrant(ctx)
 	if err != nil {
 		return nil, err
 	}
-	list, err := s.listWithAccess(ctx, req.Msg.GetListUid(), member, AccessRead)
+	list, err := s.listWithAccess(ctx, req.Msg.GetListUid(), grant, AccessRead)
 	if err != nil {
 		return nil, err
 	}
 
 	if req.Msg.GetPinned() {
-		err = s.store.PinList(ctx, member.ID, list.ID)
+		err = s.store.PinList(ctx, grant.Member.ID, list.ID)
 	} else {
-		err = s.store.UnpinList(ctx, member.ID, list.ID)
+		err = s.store.UnpinList(ctx, grant.Member.ID, list.ID)
 	}
 	if err != nil {
 		return nil, internalError("pin list", err)
@@ -268,15 +270,15 @@ func (s *ListService) SetListPinned(
 
 // ownedList fetches a List the signed-in Member owns.
 func (s *ListService) ownedList(ctx context.Context, uid string) (store.Member, store.List, error) {
-	member, err := requireMember(ctx)
+	grant, err := requireGrant(ctx)
 	if err != nil {
 		return store.Member{}, store.List{}, err
 	}
-	list, err := s.listWithAccess(ctx, uid, member, AccessOwn)
+	list, err := s.listWithAccess(ctx, uid, grant, AccessOwn)
 	if err != nil {
 		return store.Member{}, store.List{}, err
 	}
-	return member, list, nil
+	return grant.Member, list, nil
 }
 
 // pinnedSet is the Member's pins, as a set for cheap lookup.
@@ -308,14 +310,43 @@ func (s *ListService) openCount(ctx context.Context, listID int64) (int, error) 
 	return open, nil
 }
 
-// requireMember rejects a request with no session.
+// requireMember rejects a request from nobody.
+//
+// Use it only where the Member is all that is needed — their own name, their own
+// settings. Anything that reaches a List wants requireGrant instead, because a Member
+// on their own has lost whatever limits the caller arrived with.
 func requireMember(ctx context.Context) (store.Member, error) {
-	member, ok := auth.MemberFrom(ctx)
+	grant, err := requireGrant(ctx)
+	if err != nil {
+		return store.Member{}, err
+	}
+	return grant.Member, nil
+}
+
+// requireGrant rejects a request from nobody, and answers with what the caller may do.
+func requireGrant(ctx context.Context) (auth.Grant, error) {
+	grant, ok := auth.GrantFrom(ctx)
 	if !ok {
-		return store.Member{}, connect.NewError(connect.CodeUnauthenticated,
+		return auth.Grant{}, connect.NewError(connect.CodeUnauthenticated,
 			errors.New("not signed in"))
 	}
-	return member, nil
+	return grant, nil
+}
+
+// requireBrowser rejects a request that arrived with an Access token.
+//
+// A token must not be able to mint or revoke tokens: a leaked one would otherwise be
+// able to make itself permanent and to lock its Member out of noticing.
+func requireBrowser(ctx context.Context) (store.Member, error) {
+	grant, err := requireGrant(ctx)
+	if err != nil {
+		return store.Member{}, err
+	}
+	if grant.Token != nil {
+		return store.Member{}, connect.NewError(connect.CodePermissionDenied,
+			errors.New("access tokens cannot manage access tokens"))
+	}
+	return grant.Member, nil
 }
 
 // listToProto converts a List for the wire, from one Member's point of view.

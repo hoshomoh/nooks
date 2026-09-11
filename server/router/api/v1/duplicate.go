@@ -25,25 +25,25 @@ func (s *ListService) DuplicateList(
 	ctx context.Context,
 	req *connect.Request[apiv1.DuplicateListRequest],
 ) (*connect.Response[apiv1.DuplicateListResponse], error) {
-	member, err := requireMember(ctx)
+	grant, err := requireGrant(ctx)
 	if err != nil {
 		return nil, err
 	}
-	source, err := s.listWithAccess(ctx, req.Msg.GetListUid(), member, AccessRead)
+	source, err := s.listWithAccess(ctx, req.Msg.GetListUid(), grant, AccessRead)
 	if err != nil {
 		return nil, err
 	}
 
-	copied, err := s.newList(ctx, member, source.Name+copySuffix)
+	copied, err := s.newList(ctx, grant.Member, source.Name+copySuffix)
 	if err != nil {
 		return nil, err
 	}
-	if err := s.copyOpenItems(ctx, source, copied, member); err != nil {
+	if err := s.copyOpenItems(ctx, source, copied, grant.Member); err != nil {
 		return nil, err
 	}
 
 	return connect.NewResponse(&apiv1.DuplicateListResponse{
-		List: listToProto(copied, member, false, 0),
+		List: listToProto(copied, grant.Member, false, 0),
 	}), nil
 }
 

@@ -6,6 +6,7 @@ import (
 	"connectrpc.com/connect"
 
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
+	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
 )
 
@@ -19,7 +20,7 @@ func (s *ListService) Search(
 	ctx context.Context,
 	req *connect.Request[apiv1.SearchRequest],
 ) (*connect.Response[apiv1.SearchResponse], error) {
-	member, err := requireMember(ctx)
+	grant, err := requireGrant(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +34,7 @@ func (s *ListService) Search(
 	}
 
 	// One read of the Member's Lists answers every hit's "may they see this?".
-	reachable, err := s.reachableLists(ctx, member)
+	reachable, err := s.reachableLists(ctx, grant)
 	if err != nil {
 		return nil, err
 	}
@@ -49,24 +50,31 @@ func (s *ListService) Search(
 	return connect.NewResponse(&apiv1.SearchResponse{Hits: out}), nil
 }
 
-// reachableLists is every List the Member may at least read, by internal identity.
-func (s *ListService) reachableLists(ctx context.Context, member store.Member) (map[int64]store.List, error) {
-	lists, err := s.store.ListsForMember(ctx, member.ID)
-	if err != nil {
-		return nil, internalError("read lists", err)
-	}
-	shares, err := s.namedSharesFor(ctx, member)
+// reachableLists is every List the caller may at least read, by internal identity.
+//
+// For answering "may they see this one?" about something already found. Use
+// reachableListsInOrder to show them.
+func (s *ListService) reachableLists(
+	ctx context.Context,
+	grant auth.Grant,
+) (map[int64]store.List, error) {
+	lists, err := s.reachableListsInOrder(ctx, grant)
 	if err != nil {
 		return nil, err
 	}
-
 	reachable := make(map[int64]store.List, len(lists))
 	for _, list := range lists {
-		if accessTo(list, member, shares) >= AccessRead {
-			reachable[list.ID] = list
-		}
+		reachable[list.ID] = list
 	}
 	return reachable, nil
+}
+
+// reachableListsInOrder is listReach with the service's own store.
+func (s *ListService) reachableListsInOrder(
+	ctx context.Context,
+	grant auth.Grant,
+) ([]store.List, error) {
+	return listReach(ctx, s.store, grant)
 }
 
 // searchHitToProto converts a hit, naming the List it belongs to so a result reads in

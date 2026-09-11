@@ -16,7 +16,7 @@ func (s *ListService) ListDatedItems(
 	ctx context.Context,
 	req *connect.Request[apiv1.ListDatedItemsRequest],
 ) (*connect.Response[apiv1.ListDatedItemsResponse], error) {
-	member, err := requireMember(ctx)
+	grant, err := requireGrant(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (s *ListService) ListDatedItems(
 		return nil, err
 	}
 
-	items, err := s.store.DatedItemsForMember(ctx, member.ID, req.Msg.GetFrom(), req.Msg.GetTo())
+	items, err := s.store.DatedItemsForMember(ctx, grant.Member.ID, req.Msg.GetFrom(), req.Msg.GetTo())
 	if err != nil {
 		return nil, internalError("read dated items", err)
 	}
@@ -40,7 +40,7 @@ func (s *ListService) ListDatedItems(
 
 	// The store already limits these to Lists the Member can reach; this read names
 	// them, and is the same one accessTo would use.
-	reachable, err := s.reachableLists(ctx, member)
+	reachable, err := s.reachableLists(ctx, grant)
 	if err != nil {
 		return nil, err
 	}

@@ -49,7 +49,7 @@ func (s *TokenService) ListAccessTokens(
 	ctx context.Context,
 	_ *connect.Request[apiv1.ListAccessTokensRequest],
 ) (*connect.Response[apiv1.ListAccessTokensResponse], error) {
-	member, err := requireMember(ctx)
+	member, err := requireBrowser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (s *TokenService) CreateAccessToken(
 	ctx context.Context,
 	req *connect.Request[apiv1.CreateAccessTokenRequest],
 ) (*connect.Response[apiv1.CreateAccessTokenResponse], error) {
-	member, err := requireMember(ctx)
+	member, err := requireBrowser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func (s *TokenService) RevokeAccessToken(
 	ctx context.Context,
 	req *connect.Request[apiv1.RevokeAccessTokenRequest],
 ) (*connect.Response[apiv1.RevokeAccessTokenResponse], error) {
-	member, err := requireMember(ctx)
+	member, err := requireBrowser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -179,9 +179,11 @@ func (s *TokenService) reachableListIDs(
 	member store.Member,
 	uids []string,
 ) ([]int64, error) {
-	reachable, err := s.store.ListsForMember(ctx, member.ID)
+	// Through the same reach the rest of the app uses, so a token cannot be scoped to a
+	// List its Member could not open.
+	reachable, err := listReach(ctx, s.store, auth.Grant{Member: member})
 	if err != nil {
-		return nil, internalError("read lists", err)
+		return nil, err
 	}
 
 	byUID := make(map[string]int64, len(reachable))

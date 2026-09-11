@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"connectrpc.com/connect"
@@ -37,17 +38,65 @@ func NewResolver(s store.Store, now func() time.Time) *Resolver {
 func (r *Resolver) Interceptor() connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			token := tokenFromHeader(req.Header())
-			if token == "" {
-				return next(ctx, req)
+			if grant, ok := r.Grant(ctx, req.Header()); ok {
+				return next(WithGrant(ctx, grant), req)
 			}
-			member, ok := r.Member(ctx, token)
-			if !ok {
-				return next(ctx, req)
-			}
-			return next(WithMember(ctx, member), req)
+			return next(ctx, req)
 		}
 	}
+}
+
+/*
+Grant resolves whoever is asking, however they identified themselves.
+
+A session cookie is a browser and gets its Member's own access. A bearer token is a
+script, a shortcut or an MCP client, and gets that access narrowed to what the token
+names. Both end up as the same value, so nothing downstream has to know which arrived.
+
+A cookie is tried first: a browser that also happens to carry a token header is still a
+browser, and narrowing it would be a surprise.
+*/
+func (r *Resolver) Grant(ctx context.Context, header http.Header) (Grant, bool) {
+	if session := cookieToken(header); session != "" {
+		if member, ok := r.Member(ctx, session); ok {
+			return Grant{Member: member}, true
+		}
+	}
+
+	presented := bearerToken(header)
+	if presented == "" {
+		return Grant{}, false
+	}
+	return r.tokenGrant(ctx, presented)
+}
+
+// tokenGrant resolves a presented access token to what it may do.
+//
+// An expired token is refused rather than deleted: a Member should be able to see on
+// their tokens page that the thing which stopped working is the one that ran out.
+func (r *Resolver) tokenGrant(ctx context.Context, presented string) (Grant, bool) {
+	token, err := r.store.AccessTokenByHash(ctx, HashToken(presented))
+	if err != nil {
+		return Grant{}, false
+	}
+	if token.Expired(r.now()) {
+		return Grant{}, false
+	}
+
+	member, err := r.store.MemberByID(ctx, token.MemberID)
+	if err != nil {
+		return Grant{}, false
+	}
+	listIDs, err := r.store.TokenListIDs(ctx, token.ID)
+	if err != nil {
+		return Grant{}, false
+	}
+
+	// Best effort: a token that worked should not stop working because recording that
+	// it worked failed.
+	_ = r.store.MarkTokenUsed(ctx, token.ID, r.now())
+
+	return NewTokenGrant(member, token, listIDs), true
 }
 
 // Member resolves a session token to a Member, reporting whether it is usable.
@@ -79,10 +128,20 @@ func (r *Resolver) Member(ctx context.Context, token string) (store.Member, bool
 
 // tokenFromHeader pulls the session token out of request headers. http.Request is
 // borrowed purely for its cookie parsing.
-func tokenFromHeader(header http.Header) string {
+func cookieToken(header http.Header) string {
 	cookie, err := (&http.Request{Header: header}).Cookie(CookieName)
 	if err != nil {
 		return ""
 	}
 	return cookie.Value
+}
+
+// bearerToken reads an access token from the Authorization header.
+func bearerToken(header http.Header) string {
+	value := header.Get("Authorization")
+	const prefix = "Bearer "
+	if !strings.HasPrefix(value, prefix) {
+		return ""
+	}
+	return strings.TrimSpace(strings.TrimPrefix(value, prefix))
 }

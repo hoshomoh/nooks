@@ -1,11 +1,13 @@
 package v1
 
 import (
+	"context"
 	"testing"
 
 	"connectrpc.com/connect"
 
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
+	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
 )
 
@@ -96,4 +98,94 @@ func (f listFixture) search(t *testing.T, member store.Member, query string) []*
 		t.Fatalf("Search: %v", err)
 	}
 	return res.Msg.GetHits()
+}
+
+// withToken runs a request as the Member, narrowed the way a presented token narrows
+// it: to the Lists it names, at the permission it carries.
+func (f listFixture) withToken(
+	t *testing.T,
+	member store.Member,
+	permission store.Permission,
+	listUIDs ...string,
+) context.Context {
+	t.Helper()
+
+	ids := make([]int64, 0, len(listUIDs))
+	for _, uid := range listUIDs {
+		list, err := f.store.ListByUID(t.Context(), uid)
+		if err != nil {
+			t.Fatalf("ListByUID %s: %v", uid, err)
+		}
+		ids = append(ids, list.ID)
+	}
+
+	token := store.AccessToken{ID: 1, MemberID: member.ID, Permission: permission}
+	return auth.WithGrant(t.Context(), auth.NewTokenGrant(member, token, ids))
+}
+
+// A List a token does not name must be invisible, not forbidden: a token must not be a
+// way to learn which Lists its Member has.
+func TestATokenReachesOnlyTheListsItNames(t *testing.T) {
+	f := newListFixture(t)
+	groceries := f.createList(t, f.anna, "Groceries")
+	bike := f.createList(t, f.anna, "Bike")
+
+	ctx := f.withToken(t, f.anna, store.PermissionWrite, groceries)
+
+	if _, err := f.svc.GetList(ctx, connect.NewRequest(&apiv1.GetListRequest{
+		ListUid: groceries,
+	})); err != nil {
+		t.Fatalf("GetList on the List the token names: %v", err)
+	}
+
+	_, err := f.svc.GetList(ctx, connect.NewRequest(&apiv1.GetListRequest{ListUid: bike}))
+	if got := connect.CodeOf(err); got != connect.CodeNotFound {
+		t.Errorf("code = %v, want not_found for a List the token does not name", got)
+	}
+}
+
+// The sidebar is a way of learning what exists too, so it narrows with everything else.
+func TestATokenSeesOnlyItsOwnListsEverywhere(t *testing.T) {
+	f := newListFixture(t)
+	groceries := f.createList(t, f.anna, "Groceries")
+	f.createList(t, f.anna, "Bike")
+
+	ctx := f.withToken(t, f.anna, store.PermissionRead, groceries)
+
+	lists, err := f.svc.ListLists(ctx, connect.NewRequest(&apiv1.ListListsRequest{}))
+	if err != nil {
+		t.Fatalf("ListLists: %v", err)
+	}
+	if got := len(lists.Msg.GetLists()); got != 1 {
+		t.Errorf("got %d lists, want only the one the token names", got)
+	}
+
+	hits, err := f.svc.Search(ctx, connect.NewRequest(&apiv1.SearchRequest{Query: "Bike"}))
+	if err != nil {
+		t.Fatalf("Search: %v", err)
+	}
+	if got := len(hits.Msg.GetHits()); got != 0 {
+		t.Errorf("got %d hits, want none for a List the token does not name", got)
+	}
+}
+
+// A read token is its Member's access with one edge taken off: they own the List and
+// may still only look.
+func TestAReadTokenCannotWriteToItsOwnersList(t *testing.T) {
+	f := newListFixture(t)
+	groceries := f.createList(t, f.anna, "Groceries")
+	ctx := f.withToken(t, f.anna, store.PermissionRead, groceries)
+
+	if _, err := f.svc.GetList(ctx, connect.NewRequest(&apiv1.GetListRequest{
+		ListUid: groceries,
+	})); err != nil {
+		t.Fatalf("GetList with a read token: %v", err)
+	}
+
+	_, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: groceries, Label: "Milk",
+	}))
+	if got := connect.CodeOf(err); got != connect.CodePermissionDenied {
+		t.Errorf("code = %v, want permission_denied for a read token", got)
+	}
 }

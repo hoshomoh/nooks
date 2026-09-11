@@ -17,11 +17,11 @@ func (s *ListService) CreateItem(
 	ctx context.Context,
 	req *connect.Request[apiv1.CreateItemRequest],
 ) (*connect.Response[apiv1.CreateItemResponse], error) {
-	member, err := requireMember(ctx)
+	grant, err := requireGrant(ctx)
 	if err != nil {
 		return nil, err
 	}
-	list, err := s.listWithAccess(ctx, req.Msg.GetListUid(), member, AccessWrite)
+	list, err := s.listWithAccess(ctx, req.Msg.GetListUid(), grant, AccessWrite)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (s *ListService) CreateItem(
 	item, err := s.store.CreateItem(ctx, store.CreateItemParams{
 		UID: uid, ListID: list.ID, Label: req.Msg.GetLabel(),
 		Quantity: req.Msg.GetQuantity(), DueOn: req.Msg.GetDueOn(),
-		AddedByID: member.ID, At: s.now(),
+		AddedByID: grant.Member.ID, At: s.now(),
 	})
 	if err != nil {
 		return nil, internalError("create item", err)
@@ -47,7 +47,7 @@ func (s *ListService) CreateItem(
 	s.announceListChanged(ctx, list)
 
 	return connect.NewResponse(&apiv1.CreateItemResponse{
-		Item: itemToProto(item, map[int64]memberLabel{member.ID: {Name: member.Name, UID: member.UID}}),
+		Item: itemToProto(item, map[int64]memberLabel{grant.Member.ID: {Name: grant.Member.Name, UID: grant.Member.UID}}),
 	}), nil
 }
 
@@ -56,11 +56,11 @@ func (s *ListService) UpdateItem(
 	ctx context.Context,
 	req *connect.Request[apiv1.UpdateItemRequest],
 ) (*connect.Response[apiv1.UpdateItemResponse], error) {
-	member, err := requireMember(ctx)
+	grant, err := requireGrant(ctx)
 	if err != nil {
 		return nil, err
 	}
-	item, list, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), member, AccessWrite)
+	item, list, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), grant, AccessWrite)
 	if err != nil {
 		return nil, err
 	}
@@ -100,17 +100,17 @@ func (s *ListService) SetItemDone(
 	ctx context.Context,
 	req *connect.Request[apiv1.SetItemDoneRequest],
 ) (*connect.Response[apiv1.SetItemDoneResponse], error) {
-	member, err := requireMember(ctx)
+	grant, err := requireGrant(ctx)
 	if err != nil {
 		return nil, err
 	}
-	item, list, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), member, AccessWrite)
+	item, list, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), grant, AccessWrite)
 	if err != nil {
 		return nil, err
 	}
 
 	if req.Msg.GetDone() {
-		err = s.store.SetItemDone(ctx, item.UID, member.ID, s.now())
+		err = s.store.SetItemDone(ctx, item.UID, grant.Member.ID, s.now())
 	} else {
 		err = s.store.SetItemNotDone(ctx, item.UID, s.now())
 	}
@@ -133,11 +133,11 @@ func (s *ListService) MoveItem(
 	ctx context.Context,
 	req *connect.Request[apiv1.MoveItemRequest],
 ) (*connect.Response[apiv1.MoveItemResponse], error) {
-	member, err := requireMember(ctx)
+	grant, err := requireGrant(ctx)
 	if err != nil {
 		return nil, err
 	}
-	item, list, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), member, AccessWrite)
+	item, list, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), grant, AccessWrite)
 	if err != nil {
 		return nil, err
 	}
@@ -162,11 +162,11 @@ func (s *ListService) DeleteItem(
 	ctx context.Context,
 	req *connect.Request[apiv1.DeleteItemRequest],
 ) (*connect.Response[apiv1.DeleteItemResponse], error) {
-	member, err := requireMember(ctx)
+	grant, err := requireGrant(ctx)
 	if err != nil {
 		return nil, err
 	}
-	item, list, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), member, AccessWrite)
+	item, list, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), grant, AccessWrite)
 	if err != nil {
 		return nil, err
 	}

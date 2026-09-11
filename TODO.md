@@ -241,7 +241,8 @@ The single most important milestone; everything else is furniture.
 - [x] Sign in over REST — split-token: a month-long refresh token that only ever moves
       in an HttpOnly cookie, and an hour-long access token handed over in the body for
       callers that are not browsers. `RefreshAccess` exchanges one for the other
-- [ ] MCP server at `/mcp`, same token
+- [x] MCP server at `/mcp`, same token — five tools over the official Go SDK, calling the
+      same ListService with the same Grant. No second path through the permission rules
 - [x] Changes made by a token are attributed to the token in List history
 
 ---

@@ -81,6 +81,8 @@ cd proto && buf format -w        # Format proto files
 | `cmd/nooks/` | CLI setup and server startup |
 | `server/` | HTTP server, router wiring, graceful shutdown |
 | `server/auth/` | Sessions, passwords, access tokens |
+| `server/router/gateway/` | The REST API, generated from the same protos |
+| `server/router/mcp/` | The MCP tools, calling the same services |
 | `server/router/api/` | Connect RPC service implementations |
 | `store/` | Store interface, drivers, migrations, seed data |
 | `internal/` | Leaf packages with no store or server dependency |

@@ -22,6 +22,7 @@ import (
 	"github.com/hoshomoh/nooks/server/router/frontend"
 	"github.com/hoshomoh/nooks/server/router/gateway"
 	"github.com/hoshomoh/nooks/server/router/live"
+	"github.com/hoshomoh/nooks/server/router/mcp"
 	"github.com/hoshomoh/nooks/store"
 )
 
@@ -114,6 +115,10 @@ func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
 		return nil, fmt.Errorf("build the rest api: %w", err)
 	}
 	mux.Handle("/api/v1/", rest)
+
+	// The same tools an assistant gets, through the same permission rules. A token that
+	// may only read is refused a write here exactly as it is everywhere else.
+	mux.Handle("/mcp", mcp.Handler(services.List, resolver))
 
 	mux.Handle("GET /api/v1/backup", backup.NewHandler(s, resolver, nil))
 	mux.HandleFunc("GET /healthz", handleHealthz)

@@ -3,7 +3,6 @@ import { cn } from "cn"
 
 import { Checkbox } from "./checkbox"
 import { COVERING, INERT, RAISED } from "./covering"
-import { DateField } from "./date-field"
 import { EditableTitle } from "./editable-title"
 
 export type ListRowNote = {
@@ -35,20 +34,6 @@ export type ListRowProps = {
   onOpen?: () => void
   /** Renames the Item in place. Without it the label is read-only text. */
   onRename?: (label: string) => void
-  /** Sets the quantity in place. Without it the quantity is a read-only badge. */
-  onQuantityChange?: (quantity: string) => void
-  /** Sets the due date in place. Without it the date is read-only text. */
-  onDueChange?: (dueOn: string) => void
-  /**
-   * Which field something outside the row has asked to open.
-   *
-   * A menu entry called "Set a quantity" should put the caret in the quantity, not open
-   * a panel somewhere else and leave the Member to find it.
-   */
-  editing?: ListRowField
-  onEditingDone?: () => void
-  /** The due date as stored, for the date control. */
-  dueValue?: string
   /** What a screen reader calls the label field and the rest of the row. */
   labels: ListRowLabels
   /**
@@ -59,9 +44,6 @@ export type ListRowProps = {
    */
   menu?: ReactNode
 }
-
-/** A field on the row that can be opened from outside it. */
-export type ListRowField = "label" | "quantity" | "due"
 
 /** The words the row needs that are not the Item's own. */
 export interface ListRowLabels {
@@ -95,13 +77,8 @@ export function ListRow({
   onToggle,
   onOpen,
   onRename,
-  onQuantityChange,
-  onDueChange,
-  editing,
-  onEditingDone,
   labels,
   menu,
-  dueValue,
 }: ListRowProps) {
   return (
     <div className="flex flex-col">
@@ -129,34 +106,16 @@ export function ListRow({
             onCommit={onRename}
             label={labels.name}
             as="span"
-            autoFocus={editing === "label"}
             className={cn(
               "min-w-0 truncate text-body",
               done && "text-muted-foreground line-through decoration-[#C4C4BE]",
             )}
           />
 
-          {/* The badge is the field. A quantity is one word, and asking for a panel to
-              change one word is asking for more than the change is worth. */}
-          {(quantity || editing === "quantity") && onQuantityChange ? (
-            <EditableTitle
-              value={quantity ?? ""}
-              onCommit={(next) => {
-                onQuantityChange(next)
-                onEditingDone?.()
-              }}
-              label={labels.quantity}
-              as="span"
-              autoFocus={editing === "quantity"}
-              placeholder={labels.quantity}
-              className="w-16 shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[11.5px] text-muted-foreground"
-            />
-          ) : (
-            quantity && (
-              <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[11.5px] text-muted-foreground">
-                {quantity}
-              </span>
-            )
+          {quantity && (
+            <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[11.5px] text-muted-foreground">
+              {quantity}
+            </span>
           )}
         </span>
 
@@ -164,21 +123,8 @@ export function ListRow({
             hover rather than sitting beside it, because a row that widens as the
             pointer crosses it is a row nobody can aim at. */}
         <span className={cn(RAISED, "flex items-center justify-end gap-3")}>
-          {onDueChange && (dueLabel || editing === "due") && (
-            <DateField
-              value={dueValue ?? ""}
-              label={dueLabel || labels.due}
-              chosen={Boolean(dueValue)}
-              onChange={(next) => {
-                onDueChange(next)
-                onEditingDone?.()
-              }}
-              open={editing === "due" ? true : undefined}
-              onOpenChange={(next) => !next && onEditingDone?.()}
-            />
-          )}
           <span className={cn(INERT, "flex items-center gap-3 whitespace-nowrap text-micro text-muted-foreground")}>
-            {dueLabel && !onDueChange && (
+            {dueLabel && (
               <span className={overdue ? "text-overdue" : "text-shared"}>{dueLabel}</span>
             )}
             {addedByName && <span>{addedByName}</span>}

@@ -12,7 +12,7 @@ import { ListActions } from "@/components/ds/list-actions"
 import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
-import { ListRow, type ListRowField, type ListRowLabels } from "@/components/ds/list-row"
+import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
 import { PrintSheet } from "@/components/ds/print-sheet"
 import { NoteSheet } from "@/components/ds/note-sheet"
 import { listClient } from "@/lib/api"
@@ -31,12 +31,6 @@ import { useSignedInData } from "@/lib/use-signed-in-data"
 import { Sharing, type Item } from "@nooks/api"
 
 const route = getRouteApi("/lists/$listUid")
-
-/** Which field on which row something has asked to open. */
-interface RowEdit {
-  itemUid: string
-  field: ListRowField
-}
 
 /** What the quantity-and-date edit is told. Either field may be left alone. */
 interface EditItemVariables {
@@ -75,10 +69,6 @@ export function ListScreen() {
   // Which Item's sheet is open. The List keeps its place behind it, so this is the
   // screen's own state rather than a route.
   const [openItemUid, setOpenItemUid] = useState<string | null>(null)
-
-  // Which field on which row a menu entry has asked to open. "Set a quantity" should
-  // put the caret in the quantity, not open a panel and leave the Member to find it.
-  const [editing, setEditing] = useState<RowEdit | null>(null)
 
 
   const refresh = () => refreshLists(queryClient)
@@ -233,7 +223,6 @@ export function ListScreen() {
                   quantity={item.quantity}
                   addedByName={item.addedByName}
                   dueLabel={due.label(item.dueOn)}
-                  dueValue={item.dueOn}
                   overdue={isOverdue(item.dueOn, from)}
                   justTicked={justTickedByAnother(item)}
                   note={{ firstLine: item.noteFirstLine, remainingLines: item.noteRemainingLines }}
@@ -243,25 +232,17 @@ export function ListScreen() {
                   onRename={
                     canEdit ? (label) => rename.mutate({ itemUid: item.uid, label }) : undefined
                   }
-                  onQuantityChange={
-                    canEdit
-                      ? (quantity) => editItem.mutate({ itemUid: item.uid, quantity })
-                      : undefined
-                  }
-                  onDueChange={
-                    canEdit ? (dueOn) => editItem.mutate({ itemUid: item.uid, dueOn }) : undefined
-                  }
-                  editing={editing?.itemUid === item.uid ? editing.field : undefined}
-                  onEditingDone={() => setEditing(null)}
                   labels={rowLabels}
                   menu={
                     canEdit ? (
                       <ItemMenu
+                        quantity={item.quantity}
+                        dueOn={item.dueOn}
                         actions={{
-                          onEdit: () => setEditing({ itemUid: item.uid, field: "label" }),
-                          onSetDate: () => setEditing({ itemUid: item.uid, field: "due" }),
-                          onSetQuantity: () =>
-                            setEditing({ itemUid: item.uid, field: "quantity" }),
+                          onView: () => setOpenItemUid(item.uid),
+                          onSetDate: (dueOn) => editItem.mutate({ itemUid: item.uid, dueOn }),
+                          onSetQuantity: (quantity) =>
+                            editItem.mutate({ itemUid: item.uid, quantity }),
                           onDuplicate: () =>
                             addItem.mutate({
                               label: item.label,

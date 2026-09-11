@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { RouterProvider, createRootRoute, createRouter } from "@tanstack/react-router"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import type { GetPublicListResponse } from "@nooks/api"
+import type { GetPublicListResponse, PublicItem } from "@nooks/api"
 
 import "@/test/dom"
 import { readyForEnglish } from "@/test/i18n"
@@ -16,6 +16,8 @@ beforeAll(readyForEnglish)
 /** show renders the page with an answer already in the cache. */
 function show(page: Partial<GetPublicListResponse>) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  // The generated message type carries a $typeName the cache does not need for a
+  // read; the page only ever reads fields.
   queryClient.setQueryData(publicListQuery.queryKey, {
     published: false,
     instanceName: "",
@@ -23,7 +25,7 @@ function show(page: Partial<GetPublicListResponse>) {
     items: [],
     allowJoin: false,
     ...page,
-  })
+  } as GetPublicListResponse)
 
   const router = createRouter({
     routeTree: createRootRoute({ component: PublicListScreen }),
@@ -37,12 +39,12 @@ function show(page: Partial<GetPublicListResponse>) {
 }
 
 /** groceries is a published List with one thing on it. */
-const groceries = {
+const groceries: Partial<GetPublicListResponse> = {
   published: true,
   instanceName: "Brunnen Street",
   listName: "Groceries",
   allowJoin: true,
-  items: [{ label: "Milk", done: false, quantity: "2", dueOn: "", addedByName: "" }],
+  items: [{ label: "Milk", done: false, quantity: "2", dueOn: "", addedByName: "" }] as PublicItem[],
 }
 
 describe("the public list", () => {

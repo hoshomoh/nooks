@@ -363,14 +363,17 @@
   },
   "itemMenu": {
     "open": "More",
-    "edit": "Edit item",
     "setDate": "Set a date",
     "setQuantity": "Set a quantity",
     "move": "Move to another list",
     "assign": "Assign to someone",
     "addNote": "Add a note",
     "duplicate": "Duplicate",
-    "delete": "Delete item"
+    "delete": "Delete item",
+    "view": "Open",
+    "back": "Back",
+    "save": "Save",
+    "clearDate": "No date"
   },
   "starter": {
     "listName": "Groceries",

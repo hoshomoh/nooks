@@ -379,7 +379,13 @@ different things in each, because what a menu offers depends on what you are loo
 | --- | --- |
 | A **sidebar row**, on hover | What happens *to* the List: open, rename, pin, share, print, duplicate, delete |
 | The **chrome bar** of the List you are on | How the List is *shown*: sort, where completed items go, whether quantities show — plus print and export |
-| An **item row**, on hover | What happens to that Item: edit, set a date, set a quantity, move, assign, note, duplicate, delete |
+| An **item row**, on hover | What happens to that Item: open, set a date, set a quantity, move, assign, note, duplicate, delete |
+
+**An entry that names a field opens that field, in the menu.** "Set a quantity" shows a text field
+where the entry was; "Set a date" shows a calendar. One gesture, one place — sending a Member
+somewhere else to find the thing the entry just named is the menu failing at its only job. The item
+row's menu is therefore a small panel with faces rather than a list of actions, and it keeps an
+**Open** entry, because the row's label is itself a field and cannot also be the way in to the sheet.
 
 A `···` appears on hover and **takes the place of the row's metadata** rather than
 sitting beside it — a row that widens as the pointer crosses it is a row nobody can aim

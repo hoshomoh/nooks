@@ -4,7 +4,7 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Member } from "./auth_service_pb";
+import type { Member, Role } from "./auth_service_pb";
 import { file_nooks_api_v1_auth_service } from "./auth_service_pb";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nooks/api/v1/member_service.proto.
  */
 export const file_nooks_api_v1_member_service: GenFile = /*@__PURE__*/
-  fileDesc("CiFub29rcy9hcGkvdjEvbWVtYmVyX3NlcnZpY2UucHJvdG8SDG5vb2tzLmFwaS52MSJJCgVHcm91cBILCgN1aWQYASABKAkSDAoEbmFtZRgCIAEoCRIlCgdtZW1iZXJzGAMgAygLMhQubm9va3MuYXBpLnYxLk1lbWJlciIUChJMaXN0TWVtYmVyc1JlcXVlc3QiPAoTTGlzdE1lbWJlcnNSZXNwb25zZRIlCgdtZW1iZXJzGAEgAygLMhQubm9va3MuYXBpLnYxLk1lbWJlciITChFMaXN0R3JvdXBzUmVxdWVzdCI5ChJMaXN0R3JvdXBzUmVzcG9uc2USIwoGZ3JvdXBzGAEgAygLMhMubm9va3MuYXBpLnYxLkdyb3VwIiIKEkNyZWF0ZUdyb3VwUmVxdWVzdBIMCgRuYW1lGAEgASgJIjkKE0NyZWF0ZUdyb3VwUmVzcG9uc2USIgoFZ3JvdXAYASABKAsyEy5ub29rcy5hcGkudjEuR3JvdXAiQAoWU2V0R3JvdXBNZW1iZXJzUmVxdWVzdBIRCglncm91cF91aWQYASABKAkSEwoLbWVtYmVyX3VpZHMYAiADKAkiPQoXU2V0R3JvdXBNZW1iZXJzUmVzcG9uc2USIgoFZ3JvdXAYASABKAsyEy5ub29rcy5hcGkudjEuR3JvdXAy6AIKDU1lbWJlclNlcnZpY2USUgoLTGlzdE1lbWJlcnMSIC5ub29rcy5hcGkudjEuTGlzdE1lbWJlcnNSZXF1ZXN0GiEubm9va3MuYXBpLnYxLkxpc3RNZW1iZXJzUmVzcG9uc2USTwoKTGlzdEdyb3VwcxIfLm5vb2tzLmFwaS52MS5MaXN0R3JvdXBzUmVxdWVzdBogLm5vb2tzLmFwaS52MS5MaXN0R3JvdXBzUmVzcG9uc2USUgoLQ3JlYXRlR3JvdXASIC5ub29rcy5hcGkudjEuQ3JlYXRlR3JvdXBSZXF1ZXN0GiEubm9va3MuYXBpLnYxLkNyZWF0ZUdyb3VwUmVzcG9uc2USXgoPU2V0R3JvdXBNZW1iZXJzEiQubm9va3MuYXBpLnYxLlNldEdyb3VwTWVtYmVyc1JlcXVlc3QaJS5ub29rcy5hcGkudjEuU2V0R3JvdXBNZW1iZXJzUmVzcG9uc2VCsAEKEGNvbS5ub29rcy5hcGkudjFCEk1lbWJlclNlcnZpY2VQcm90b1ABWjZnaXRodWIuY29tL2hvc2hvbW9oL25vb2tzL3Byb3RvL2dlbi9ub29rcy9hcGkvdjE7YXBpdjGiAgNOQViqAgxOb29rcy5BcGkuVjHKAgxOb29rc1xBcGlcVjHiAhhOb29rc1xBcGlcVjFcR1BCTWV0YWRhdGHqAg5Ob29rczo6QXBpOjpWMWIGcHJvdG8z", [file_nooks_api_v1_auth_service]);
+  fileDesc("CiFub29rcy9hcGkvdjEvbWVtYmVyX3NlcnZpY2UucHJvdG8SDG5vb2tzLmFwaS52MSJJCgVHcm91cBILCgN1aWQYASABKAkSDAoEbmFtZRgCIAEoCRIlCgdtZW1iZXJzGAMgAygLMhQubm9va3MuYXBpLnYxLk1lbWJlciIUChJMaXN0TWVtYmVyc1JlcXVlc3QiPAoTTGlzdE1lbWJlcnNSZXNwb25zZRIlCgdtZW1iZXJzGAEgAygLMhQubm9va3MuYXBpLnYxLk1lbWJlciITChFMaXN0R3JvdXBzUmVxdWVzdCI5ChJMaXN0R3JvdXBzUmVzcG9uc2USIwoGZ3JvdXBzGAEgAygLMhMubm9va3MuYXBpLnYxLkdyb3VwIiIKEkNyZWF0ZUdyb3VwUmVxdWVzdBIMCgRuYW1lGAEgASgJIjkKE0NyZWF0ZUdyb3VwUmVzcG9uc2USIgoFZ3JvdXAYASABKAsyEy5ub29rcy5hcGkudjEuR3JvdXAiQAoWU2V0R3JvdXBNZW1iZXJzUmVxdWVzdBIRCglncm91cF91aWQYASABKAkSEwoLbWVtYmVyX3VpZHMYAiADKAkiPQoXU2V0R3JvdXBNZW1iZXJzUmVzcG9uc2USIgoFZ3JvdXAYASABKAsyEy5ub29rcy5hcGkudjEuR3JvdXAiLwoQQWRkTWVtYmVyUmVxdWVzdBIMCgRuYW1lGAEgASgJEg0KBWVtYWlsGAIgASgJIlUKEUFkZE1lbWJlclJlc3BvbnNlEiQKBm1lbWJlchgBIAEoCzIULm5vb2tzLmFwaS52MS5NZW1iZXISGgoSdGVtcG9yYXJ5X3Bhc3N3b3JkGAIgASgJIkwKFFNldE1lbWJlclJvbGVSZXF1ZXN0EhIKCm1lbWJlcl91aWQYASABKAkSIAoEcm9sZRgCIAEoDjISLm5vb2tzLmFwaS52MS5Sb2xlIj0KFVNldE1lbWJlclJvbGVSZXNwb25zZRIkCgZtZW1iZXIYASABKAsyFC5ub29rcy5hcGkudjEuTWVtYmVyIikKE1JlbW92ZU1lbWJlclJlcXVlc3QSEgoKbWVtYmVyX3VpZBgBIAEoCSIWChRSZW1vdmVNZW1iZXJSZXNwb25zZTLnBAoNTWVtYmVyU2VydmljZRJSCgtMaXN0TWVtYmVycxIgLm5vb2tzLmFwaS52MS5MaXN0TWVtYmVyc1JlcXVlc3QaIS5ub29rcy5hcGkudjEuTGlzdE1lbWJlcnNSZXNwb25zZRJPCgpMaXN0R3JvdXBzEh8ubm9va3MuYXBpLnYxLkxpc3RHcm91cHNSZXF1ZXN0GiAubm9va3MuYXBpLnYxLkxpc3RHcm91cHNSZXNwb25zZRJSCgtDcmVhdGVHcm91cBIgLm5vb2tzLmFwaS52MS5DcmVhdGVHcm91cFJlcXVlc3QaIS5ub29rcy5hcGkudjEuQ3JlYXRlR3JvdXBSZXNwb25zZRJeCg9TZXRHcm91cE1lbWJlcnMSJC5ub29rcy5hcGkudjEuU2V0R3JvdXBNZW1iZXJzUmVxdWVzdBolLm5vb2tzLmFwaS52MS5TZXRHcm91cE1lbWJlcnNSZXNwb25zZRJMCglBZGRNZW1iZXISHi5ub29rcy5hcGkudjEuQWRkTWVtYmVyUmVxdWVzdBofLm5vb2tzLmFwaS52MS5BZGRNZW1iZXJSZXNwb25zZRJYCg1TZXRNZW1iZXJSb2xlEiIubm9va3MuYXBpLnYxLlNldE1lbWJlclJvbGVSZXF1ZXN0GiMubm9va3MuYXBpLnYxLlNldE1lbWJlclJvbGVSZXNwb25zZRJVCgxSZW1vdmVNZW1iZXISIS5ub29rcy5hcGkudjEuUmVtb3ZlTWVtYmVyUmVxdWVzdBoiLm5vb2tzLmFwaS52MS5SZW1vdmVNZW1iZXJSZXNwb25zZUKwAQoQY29tLm5vb2tzLmFwaS52MUISTWVtYmVyU2VydmljZVByb3RvUAFaNmdpdGh1Yi5jb20vaG9zaG9tb2gvbm9va3MvcHJvdG8vZ2VuL25vb2tzL2FwaS92MTthcGl2MaICA05BWKoCDE5vb2tzLkFwaS5WMcoCDE5vb2tzXEFwaVxWMeICGE5vb2tzXEFwaVxWMVxHUEJNZXRhZGF0YeoCDk5vb2tzOjpBcGk6OlYxYgZwcm90bzM", [file_nooks_api_v1_auth_service]);
 
 /**
  * Group is a named set of Members.
@@ -179,6 +179,122 @@ export const SetGroupMembersResponseSchema: GenMessage<SetGroupMembersResponse> 
   messageDesc(file_nooks_api_v1_member_service, 8);
 
 /**
+ * @generated from message nooks.api.v1.AddMemberRequest
+ */
+export type AddMemberRequest = Message<"nooks.api.v1.AddMemberRequest"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string email = 2;
+   */
+  email: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.AddMemberRequest.
+ * Use `create(AddMemberRequestSchema)` to create a new message.
+ */
+export const AddMemberRequestSchema: GenMessage<AddMemberRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_member_service, 9);
+
+/**
+ * @generated from message nooks.api.v1.AddMemberResponse
+ */
+export type AddMemberResponse = Message<"nooks.api.v1.AddMemberResponse"> & {
+  /**
+   * @generated from field: nooks.api.v1.Member member = 1;
+   */
+  member?: Member | undefined;
+
+  /**
+   * The temporary password, in clear, shown once and never again. Nooks does not keep
+   * it: what is stored is a hash, and this is the only time it can be read.
+   *
+   * @generated from field: string temporary_password = 2;
+   */
+  temporaryPassword: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.AddMemberResponse.
+ * Use `create(AddMemberResponseSchema)` to create a new message.
+ */
+export const AddMemberResponseSchema: GenMessage<AddMemberResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_member_service, 10);
+
+/**
+ * @generated from message nooks.api.v1.SetMemberRoleRequest
+ */
+export type SetMemberRoleRequest = Message<"nooks.api.v1.SetMemberRoleRequest"> & {
+  /**
+   * @generated from field: string member_uid = 1;
+   */
+  memberUid: string;
+
+  /**
+   * @generated from field: nooks.api.v1.Role role = 2;
+   */
+  role: Role;
+};
+
+/**
+ * Describes the message nooks.api.v1.SetMemberRoleRequest.
+ * Use `create(SetMemberRoleRequestSchema)` to create a new message.
+ */
+export const SetMemberRoleRequestSchema: GenMessage<SetMemberRoleRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_member_service, 11);
+
+/**
+ * @generated from message nooks.api.v1.SetMemberRoleResponse
+ */
+export type SetMemberRoleResponse = Message<"nooks.api.v1.SetMemberRoleResponse"> & {
+  /**
+   * @generated from field: nooks.api.v1.Member member = 1;
+   */
+  member?: Member | undefined;
+};
+
+/**
+ * Describes the message nooks.api.v1.SetMemberRoleResponse.
+ * Use `create(SetMemberRoleResponseSchema)` to create a new message.
+ */
+export const SetMemberRoleResponseSchema: GenMessage<SetMemberRoleResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_member_service, 12);
+
+/**
+ * @generated from message nooks.api.v1.RemoveMemberRequest
+ */
+export type RemoveMemberRequest = Message<"nooks.api.v1.RemoveMemberRequest"> & {
+  /**
+   * @generated from field: string member_uid = 1;
+   */
+  memberUid: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.RemoveMemberRequest.
+ * Use `create(RemoveMemberRequestSchema)` to create a new message.
+ */
+export const RemoveMemberRequestSchema: GenMessage<RemoveMemberRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_member_service, 13);
+
+/**
+ * @generated from message nooks.api.v1.RemoveMemberResponse
+ */
+export type RemoveMemberResponse = Message<"nooks.api.v1.RemoveMemberResponse"> & {
+};
+
+/**
+ * Describes the message nooks.api.v1.RemoveMemberResponse.
+ * Use `create(RemoveMemberResponseSchema)` to create a new message.
+ */
+export const RemoveMemberResponseSchema: GenMessage<RemoveMemberResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_member_service, 14);
+
+/**
  * MemberService covers who is here and how they are grouped.
  *
  * A Group carries no permissions of its own: it is a shortcut for sharing, so that
@@ -228,6 +344,39 @@ export const MemberService: GenService<{
     methodKind: "unary";
     input: typeof SetGroupMembersRequestSchema;
     output: typeof SetGroupMembersResponseSchema;
+  },
+  /**
+   * AddMember creates an account with a temporary password, which is read out once.
+   *
+   * Nooks has no mail server, so an Admin hands the password over in person or however
+   * else they already talk. The Member must replace it before anything else.
+   *
+   * @generated from rpc nooks.api.v1.MemberService.AddMember
+   */
+  addMember: {
+    methodKind: "unary";
+    input: typeof AddMemberRequestSchema;
+    output: typeof AddMemberResponseSchema;
+  },
+  /**
+   * SetMemberRole makes somebody an Admin, or stops them being one.
+   *
+   * @generated from rpc nooks.api.v1.MemberService.SetMemberRole
+   */
+  setMemberRole: {
+    methodKind: "unary";
+    input: typeof SetMemberRoleRequestSchema;
+    output: typeof SetMemberRoleResponseSchema;
+  },
+  /**
+   * RemoveMember deletes an account. What they added stays on its Lists.
+   *
+   * @generated from rpc nooks.api.v1.MemberService.RemoveMember
+   */
+  removeMember: {
+    methodKind: "unary";
+    input: typeof RemoveMemberRequestSchema;
+    output: typeof RemoveMemberResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_nooks_api_v1_member_service, 0);

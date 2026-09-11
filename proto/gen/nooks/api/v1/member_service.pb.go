@@ -427,6 +427,288 @@ func (x *SetGroupMembersResponse) GetGroup() *Group {
 	return nil
 }
 
+type AddMemberRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddMemberRequest) Reset() {
+	*x = AddMemberRequest{}
+	mi := &file_nooks_api_v1_member_service_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddMemberRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddMemberRequest) ProtoMessage() {}
+
+func (x *AddMemberRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_member_service_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddMemberRequest.ProtoReflect.Descriptor instead.
+func (*AddMemberRequest) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_member_service_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *AddMemberRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *AddMemberRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+type AddMemberResponse struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Member *Member                `protobuf:"bytes,1,opt,name=member,proto3" json:"member,omitempty"`
+	// The temporary password, in clear, shown once and never again. Nooks does not keep
+	// it: what is stored is a hash, and this is the only time it can be read.
+	TemporaryPassword string `protobuf:"bytes,2,opt,name=temporary_password,json=temporaryPassword,proto3" json:"temporary_password,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *AddMemberResponse) Reset() {
+	*x = AddMemberResponse{}
+	mi := &file_nooks_api_v1_member_service_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddMemberResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddMemberResponse) ProtoMessage() {}
+
+func (x *AddMemberResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_member_service_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddMemberResponse.ProtoReflect.Descriptor instead.
+func (*AddMemberResponse) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_member_service_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *AddMemberResponse) GetMember() *Member {
+	if x != nil {
+		return x.Member
+	}
+	return nil
+}
+
+func (x *AddMemberResponse) GetTemporaryPassword() string {
+	if x != nil {
+		return x.TemporaryPassword
+	}
+	return ""
+}
+
+type SetMemberRoleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MemberUid     string                 `protobuf:"bytes,1,opt,name=member_uid,json=memberUid,proto3" json:"member_uid,omitempty"`
+	Role          Role                   `protobuf:"varint,2,opt,name=role,proto3,enum=nooks.api.v1.Role" json:"role,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetMemberRoleRequest) Reset() {
+	*x = SetMemberRoleRequest{}
+	mi := &file_nooks_api_v1_member_service_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetMemberRoleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetMemberRoleRequest) ProtoMessage() {}
+
+func (x *SetMemberRoleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_member_service_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetMemberRoleRequest.ProtoReflect.Descriptor instead.
+func (*SetMemberRoleRequest) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_member_service_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *SetMemberRoleRequest) GetMemberUid() string {
+	if x != nil {
+		return x.MemberUid
+	}
+	return ""
+}
+
+func (x *SetMemberRoleRequest) GetRole() Role {
+	if x != nil {
+		return x.Role
+	}
+	return Role_ROLE_UNSPECIFIED
+}
+
+type SetMemberRoleResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Member        *Member                `protobuf:"bytes,1,opt,name=member,proto3" json:"member,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetMemberRoleResponse) Reset() {
+	*x = SetMemberRoleResponse{}
+	mi := &file_nooks_api_v1_member_service_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetMemberRoleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetMemberRoleResponse) ProtoMessage() {}
+
+func (x *SetMemberRoleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_member_service_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetMemberRoleResponse.ProtoReflect.Descriptor instead.
+func (*SetMemberRoleResponse) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_member_service_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *SetMemberRoleResponse) GetMember() *Member {
+	if x != nil {
+		return x.Member
+	}
+	return nil
+}
+
+type RemoveMemberRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MemberUid     string                 `protobuf:"bytes,1,opt,name=member_uid,json=memberUid,proto3" json:"member_uid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemoveMemberRequest) Reset() {
+	*x = RemoveMemberRequest{}
+	mi := &file_nooks_api_v1_member_service_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemoveMemberRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemoveMemberRequest) ProtoMessage() {}
+
+func (x *RemoveMemberRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_member_service_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemoveMemberRequest.ProtoReflect.Descriptor instead.
+func (*RemoveMemberRequest) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_member_service_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *RemoveMemberRequest) GetMemberUid() string {
+	if x != nil {
+		return x.MemberUid
+	}
+	return ""
+}
+
+type RemoveMemberResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RemoveMemberResponse) Reset() {
+	*x = RemoveMemberResponse{}
+	mi := &file_nooks_api_v1_member_service_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemoveMemberResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemoveMemberResponse) ProtoMessage() {}
+
+func (x *RemoveMemberResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_member_service_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemoveMemberResponse.ProtoReflect.Descriptor instead.
+func (*RemoveMemberResponse) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_member_service_proto_rawDescGZIP(), []int{14}
+}
+
 var File_nooks_api_v1_member_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_member_service_proto_rawDesc = "" +
@@ -451,13 +733,32 @@ const file_nooks_api_v1_member_service_proto_rawDesc = "" +
 	"\vmember_uids\x18\x02 \x03(\tR\n" +
 	"memberUids\"D\n" +
 	"\x17SetGroupMembersResponse\x12)\n" +
-	"\x05group\x18\x01 \x01(\v2\x13.nooks.api.v1.GroupR\x05group2\xe8\x02\n" +
+	"\x05group\x18\x01 \x01(\v2\x13.nooks.api.v1.GroupR\x05group\"<\n" +
+	"\x10AddMemberRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\"p\n" +
+	"\x11AddMemberResponse\x12,\n" +
+	"\x06member\x18\x01 \x01(\v2\x14.nooks.api.v1.MemberR\x06member\x12-\n" +
+	"\x12temporary_password\x18\x02 \x01(\tR\x11temporaryPassword\"]\n" +
+	"\x14SetMemberRoleRequest\x12\x1d\n" +
+	"\n" +
+	"member_uid\x18\x01 \x01(\tR\tmemberUid\x12&\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x12.nooks.api.v1.RoleR\x04role\"E\n" +
+	"\x15SetMemberRoleResponse\x12,\n" +
+	"\x06member\x18\x01 \x01(\v2\x14.nooks.api.v1.MemberR\x06member\"4\n" +
+	"\x13RemoveMemberRequest\x12\x1d\n" +
+	"\n" +
+	"member_uid\x18\x01 \x01(\tR\tmemberUid\"\x16\n" +
+	"\x14RemoveMemberResponse2\xe7\x04\n" +
 	"\rMemberService\x12R\n" +
 	"\vListMembers\x12 .nooks.api.v1.ListMembersRequest\x1a!.nooks.api.v1.ListMembersResponse\x12O\n" +
 	"\n" +
 	"ListGroups\x12\x1f.nooks.api.v1.ListGroupsRequest\x1a .nooks.api.v1.ListGroupsResponse\x12R\n" +
 	"\vCreateGroup\x12 .nooks.api.v1.CreateGroupRequest\x1a!.nooks.api.v1.CreateGroupResponse\x12^\n" +
-	"\x0fSetGroupMembers\x12$.nooks.api.v1.SetGroupMembersRequest\x1a%.nooks.api.v1.SetGroupMembersResponseB\xb0\x01\n" +
+	"\x0fSetGroupMembers\x12$.nooks.api.v1.SetGroupMembersRequest\x1a%.nooks.api.v1.SetGroupMembersResponse\x12L\n" +
+	"\tAddMember\x12\x1e.nooks.api.v1.AddMemberRequest\x1a\x1f.nooks.api.v1.AddMemberResponse\x12X\n" +
+	"\rSetMemberRole\x12\".nooks.api.v1.SetMemberRoleRequest\x1a#.nooks.api.v1.SetMemberRoleResponse\x12U\n" +
+	"\fRemoveMember\x12!.nooks.api.v1.RemoveMemberRequest\x1a\".nooks.api.v1.RemoveMemberResponseB\xb0\x01\n" +
 	"\x10com.nooks.api.v1B\x12MemberServiceProtoP\x01Z6github.com/hoshomoh/nooks/proto/gen/nooks/api/v1;apiv1\xa2\x02\x03NAX\xaa\x02\fNooks.Api.V1\xca\x02\fNooks\\Api\\V1\xe2\x02\x18Nooks\\Api\\V1\\GPBMetadata\xea\x02\x0eNooks::Api::V1b\x06proto3"
 
 var (
@@ -472,7 +773,7 @@ func file_nooks_api_v1_member_service_proto_rawDescGZIP() []byte {
 	return file_nooks_api_v1_member_service_proto_rawDescData
 }
 
-var file_nooks_api_v1_member_service_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_nooks_api_v1_member_service_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_nooks_api_v1_member_service_proto_goTypes = []any{
 	(*Group)(nil),                   // 0: nooks.api.v1.Group
 	(*ListMembersRequest)(nil),      // 1: nooks.api.v1.ListMembersRequest
@@ -483,27 +784,43 @@ var file_nooks_api_v1_member_service_proto_goTypes = []any{
 	(*CreateGroupResponse)(nil),     // 6: nooks.api.v1.CreateGroupResponse
 	(*SetGroupMembersRequest)(nil),  // 7: nooks.api.v1.SetGroupMembersRequest
 	(*SetGroupMembersResponse)(nil), // 8: nooks.api.v1.SetGroupMembersResponse
-	(*Member)(nil),                  // 9: nooks.api.v1.Member
+	(*AddMemberRequest)(nil),        // 9: nooks.api.v1.AddMemberRequest
+	(*AddMemberResponse)(nil),       // 10: nooks.api.v1.AddMemberResponse
+	(*SetMemberRoleRequest)(nil),    // 11: nooks.api.v1.SetMemberRoleRequest
+	(*SetMemberRoleResponse)(nil),   // 12: nooks.api.v1.SetMemberRoleResponse
+	(*RemoveMemberRequest)(nil),     // 13: nooks.api.v1.RemoveMemberRequest
+	(*RemoveMemberResponse)(nil),    // 14: nooks.api.v1.RemoveMemberResponse
+	(*Member)(nil),                  // 15: nooks.api.v1.Member
+	(Role)(0),                       // 16: nooks.api.v1.Role
 }
 var file_nooks_api_v1_member_service_proto_depIdxs = []int32{
-	9, // 0: nooks.api.v1.Group.members:type_name -> nooks.api.v1.Member
-	9, // 1: nooks.api.v1.ListMembersResponse.members:type_name -> nooks.api.v1.Member
-	0, // 2: nooks.api.v1.ListGroupsResponse.groups:type_name -> nooks.api.v1.Group
-	0, // 3: nooks.api.v1.CreateGroupResponse.group:type_name -> nooks.api.v1.Group
-	0, // 4: nooks.api.v1.SetGroupMembersResponse.group:type_name -> nooks.api.v1.Group
-	1, // 5: nooks.api.v1.MemberService.ListMembers:input_type -> nooks.api.v1.ListMembersRequest
-	3, // 6: nooks.api.v1.MemberService.ListGroups:input_type -> nooks.api.v1.ListGroupsRequest
-	5, // 7: nooks.api.v1.MemberService.CreateGroup:input_type -> nooks.api.v1.CreateGroupRequest
-	7, // 8: nooks.api.v1.MemberService.SetGroupMembers:input_type -> nooks.api.v1.SetGroupMembersRequest
-	2, // 9: nooks.api.v1.MemberService.ListMembers:output_type -> nooks.api.v1.ListMembersResponse
-	4, // 10: nooks.api.v1.MemberService.ListGroups:output_type -> nooks.api.v1.ListGroupsResponse
-	6, // 11: nooks.api.v1.MemberService.CreateGroup:output_type -> nooks.api.v1.CreateGroupResponse
-	8, // 12: nooks.api.v1.MemberService.SetGroupMembers:output_type -> nooks.api.v1.SetGroupMembersResponse
-	9, // [9:13] is the sub-list for method output_type
-	5, // [5:9] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	15, // 0: nooks.api.v1.Group.members:type_name -> nooks.api.v1.Member
+	15, // 1: nooks.api.v1.ListMembersResponse.members:type_name -> nooks.api.v1.Member
+	0,  // 2: nooks.api.v1.ListGroupsResponse.groups:type_name -> nooks.api.v1.Group
+	0,  // 3: nooks.api.v1.CreateGroupResponse.group:type_name -> nooks.api.v1.Group
+	0,  // 4: nooks.api.v1.SetGroupMembersResponse.group:type_name -> nooks.api.v1.Group
+	15, // 5: nooks.api.v1.AddMemberResponse.member:type_name -> nooks.api.v1.Member
+	16, // 6: nooks.api.v1.SetMemberRoleRequest.role:type_name -> nooks.api.v1.Role
+	15, // 7: nooks.api.v1.SetMemberRoleResponse.member:type_name -> nooks.api.v1.Member
+	1,  // 8: nooks.api.v1.MemberService.ListMembers:input_type -> nooks.api.v1.ListMembersRequest
+	3,  // 9: nooks.api.v1.MemberService.ListGroups:input_type -> nooks.api.v1.ListGroupsRequest
+	5,  // 10: nooks.api.v1.MemberService.CreateGroup:input_type -> nooks.api.v1.CreateGroupRequest
+	7,  // 11: nooks.api.v1.MemberService.SetGroupMembers:input_type -> nooks.api.v1.SetGroupMembersRequest
+	9,  // 12: nooks.api.v1.MemberService.AddMember:input_type -> nooks.api.v1.AddMemberRequest
+	11, // 13: nooks.api.v1.MemberService.SetMemberRole:input_type -> nooks.api.v1.SetMemberRoleRequest
+	13, // 14: nooks.api.v1.MemberService.RemoveMember:input_type -> nooks.api.v1.RemoveMemberRequest
+	2,  // 15: nooks.api.v1.MemberService.ListMembers:output_type -> nooks.api.v1.ListMembersResponse
+	4,  // 16: nooks.api.v1.MemberService.ListGroups:output_type -> nooks.api.v1.ListGroupsResponse
+	6,  // 17: nooks.api.v1.MemberService.CreateGroup:output_type -> nooks.api.v1.CreateGroupResponse
+	8,  // 18: nooks.api.v1.MemberService.SetGroupMembers:output_type -> nooks.api.v1.SetGroupMembersResponse
+	10, // 19: nooks.api.v1.MemberService.AddMember:output_type -> nooks.api.v1.AddMemberResponse
+	12, // 20: nooks.api.v1.MemberService.SetMemberRole:output_type -> nooks.api.v1.SetMemberRoleResponse
+	14, // 21: nooks.api.v1.MemberService.RemoveMember:output_type -> nooks.api.v1.RemoveMemberResponse
+	15, // [15:22] is the sub-list for method output_type
+	8,  // [8:15] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_nooks_api_v1_member_service_proto_init() }
@@ -518,7 +835,7 @@ func file_nooks_api_v1_member_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_nooks_api_v1_member_service_proto_rawDesc), len(file_nooks_api_v1_member_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

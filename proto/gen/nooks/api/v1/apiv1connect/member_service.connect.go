@@ -45,6 +45,14 @@ const (
 	// MemberServiceSetGroupMembersProcedure is the fully-qualified name of the MemberService's
 	// SetGroupMembers RPC.
 	MemberServiceSetGroupMembersProcedure = "/nooks.api.v1.MemberService/SetGroupMembers"
+	// MemberServiceAddMemberProcedure is the fully-qualified name of the MemberService's AddMember RPC.
+	MemberServiceAddMemberProcedure = "/nooks.api.v1.MemberService/AddMember"
+	// MemberServiceSetMemberRoleProcedure is the fully-qualified name of the MemberService's
+	// SetMemberRole RPC.
+	MemberServiceSetMemberRoleProcedure = "/nooks.api.v1.MemberService/SetMemberRole"
+	// MemberServiceRemoveMemberProcedure is the fully-qualified name of the MemberService's
+	// RemoveMember RPC.
+	MemberServiceRemoveMemberProcedure = "/nooks.api.v1.MemberService/RemoveMember"
 )
 
 // MemberServiceClient is a client for the nooks.api.v1.MemberService service.
@@ -59,6 +67,15 @@ type MemberServiceClient interface {
 	//
 	// Removing someone takes away the Lists they reached through it, and nothing else.
 	SetGroupMembers(context.Context, *connect.Request[v1.SetGroupMembersRequest]) (*connect.Response[v1.SetGroupMembersResponse], error)
+	// AddMember creates an account with a temporary password, which is read out once.
+	//
+	// Nooks has no mail server, so an Admin hands the password over in person or however
+	// else they already talk. The Member must replace it before anything else.
+	AddMember(context.Context, *connect.Request[v1.AddMemberRequest]) (*connect.Response[v1.AddMemberResponse], error)
+	// SetMemberRole makes somebody an Admin, or stops them being one.
+	SetMemberRole(context.Context, *connect.Request[v1.SetMemberRoleRequest]) (*connect.Response[v1.SetMemberRoleResponse], error)
+	// RemoveMember deletes an account. What they added stays on its Lists.
+	RemoveMember(context.Context, *connect.Request[v1.RemoveMemberRequest]) (*connect.Response[v1.RemoveMemberResponse], error)
 }
 
 // NewMemberServiceClient constructs a client for the nooks.api.v1.MemberService service. By
@@ -96,6 +113,24 @@ func NewMemberServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(memberServiceMethods.ByName("SetGroupMembers")),
 			connect.WithClientOptions(opts...),
 		),
+		addMember: connect.NewClient[v1.AddMemberRequest, v1.AddMemberResponse](
+			httpClient,
+			baseURL+MemberServiceAddMemberProcedure,
+			connect.WithSchema(memberServiceMethods.ByName("AddMember")),
+			connect.WithClientOptions(opts...),
+		),
+		setMemberRole: connect.NewClient[v1.SetMemberRoleRequest, v1.SetMemberRoleResponse](
+			httpClient,
+			baseURL+MemberServiceSetMemberRoleProcedure,
+			connect.WithSchema(memberServiceMethods.ByName("SetMemberRole")),
+			connect.WithClientOptions(opts...),
+		),
+		removeMember: connect.NewClient[v1.RemoveMemberRequest, v1.RemoveMemberResponse](
+			httpClient,
+			baseURL+MemberServiceRemoveMemberProcedure,
+			connect.WithSchema(memberServiceMethods.ByName("RemoveMember")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -105,6 +140,9 @@ type memberServiceClient struct {
 	listGroups      *connect.Client[v1.ListGroupsRequest, v1.ListGroupsResponse]
 	createGroup     *connect.Client[v1.CreateGroupRequest, v1.CreateGroupResponse]
 	setGroupMembers *connect.Client[v1.SetGroupMembersRequest, v1.SetGroupMembersResponse]
+	addMember       *connect.Client[v1.AddMemberRequest, v1.AddMemberResponse]
+	setMemberRole   *connect.Client[v1.SetMemberRoleRequest, v1.SetMemberRoleResponse]
+	removeMember    *connect.Client[v1.RemoveMemberRequest, v1.RemoveMemberResponse]
 }
 
 // ListMembers calls nooks.api.v1.MemberService.ListMembers.
@@ -127,6 +165,21 @@ func (c *memberServiceClient) SetGroupMembers(ctx context.Context, req *connect.
 	return c.setGroupMembers.CallUnary(ctx, req)
 }
 
+// AddMember calls nooks.api.v1.MemberService.AddMember.
+func (c *memberServiceClient) AddMember(ctx context.Context, req *connect.Request[v1.AddMemberRequest]) (*connect.Response[v1.AddMemberResponse], error) {
+	return c.addMember.CallUnary(ctx, req)
+}
+
+// SetMemberRole calls nooks.api.v1.MemberService.SetMemberRole.
+func (c *memberServiceClient) SetMemberRole(ctx context.Context, req *connect.Request[v1.SetMemberRoleRequest]) (*connect.Response[v1.SetMemberRoleResponse], error) {
+	return c.setMemberRole.CallUnary(ctx, req)
+}
+
+// RemoveMember calls nooks.api.v1.MemberService.RemoveMember.
+func (c *memberServiceClient) RemoveMember(ctx context.Context, req *connect.Request[v1.RemoveMemberRequest]) (*connect.Response[v1.RemoveMemberResponse], error) {
+	return c.removeMember.CallUnary(ctx, req)
+}
+
 // MemberServiceHandler is an implementation of the nooks.api.v1.MemberService service.
 type MemberServiceHandler interface {
 	// ListMembers returns everyone on the Instance, by name.
@@ -139,6 +192,15 @@ type MemberServiceHandler interface {
 	//
 	// Removing someone takes away the Lists they reached through it, and nothing else.
 	SetGroupMembers(context.Context, *connect.Request[v1.SetGroupMembersRequest]) (*connect.Response[v1.SetGroupMembersResponse], error)
+	// AddMember creates an account with a temporary password, which is read out once.
+	//
+	// Nooks has no mail server, so an Admin hands the password over in person or however
+	// else they already talk. The Member must replace it before anything else.
+	AddMember(context.Context, *connect.Request[v1.AddMemberRequest]) (*connect.Response[v1.AddMemberResponse], error)
+	// SetMemberRole makes somebody an Admin, or stops them being one.
+	SetMemberRole(context.Context, *connect.Request[v1.SetMemberRoleRequest]) (*connect.Response[v1.SetMemberRoleResponse], error)
+	// RemoveMember deletes an account. What they added stays on its Lists.
+	RemoveMember(context.Context, *connect.Request[v1.RemoveMemberRequest]) (*connect.Response[v1.RemoveMemberResponse], error)
 }
 
 // NewMemberServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -172,6 +234,24 @@ func NewMemberServiceHandler(svc MemberServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(memberServiceMethods.ByName("SetGroupMembers")),
 		connect.WithHandlerOptions(opts...),
 	)
+	memberServiceAddMemberHandler := connect.NewUnaryHandler(
+		MemberServiceAddMemberProcedure,
+		svc.AddMember,
+		connect.WithSchema(memberServiceMethods.ByName("AddMember")),
+		connect.WithHandlerOptions(opts...),
+	)
+	memberServiceSetMemberRoleHandler := connect.NewUnaryHandler(
+		MemberServiceSetMemberRoleProcedure,
+		svc.SetMemberRole,
+		connect.WithSchema(memberServiceMethods.ByName("SetMemberRole")),
+		connect.WithHandlerOptions(opts...),
+	)
+	memberServiceRemoveMemberHandler := connect.NewUnaryHandler(
+		MemberServiceRemoveMemberProcedure,
+		svc.RemoveMember,
+		connect.WithSchema(memberServiceMethods.ByName("RemoveMember")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/nooks.api.v1.MemberService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case MemberServiceListMembersProcedure:
@@ -182,6 +262,12 @@ func NewMemberServiceHandler(svc MemberServiceHandler, opts ...connect.HandlerOp
 			memberServiceCreateGroupHandler.ServeHTTP(w, r)
 		case MemberServiceSetGroupMembersProcedure:
 			memberServiceSetGroupMembersHandler.ServeHTTP(w, r)
+		case MemberServiceAddMemberProcedure:
+			memberServiceAddMemberHandler.ServeHTTP(w, r)
+		case MemberServiceSetMemberRoleProcedure:
+			memberServiceSetMemberRoleHandler.ServeHTTP(w, r)
+		case MemberServiceRemoveMemberProcedure:
+			memberServiceRemoveMemberHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -205,4 +291,16 @@ func (UnimplementedMemberServiceHandler) CreateGroup(context.Context, *connect.R
 
 func (UnimplementedMemberServiceHandler) SetGroupMembers(context.Context, *connect.Request[v1.SetGroupMembersRequest]) (*connect.Response[v1.SetGroupMembersResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.MemberService.SetGroupMembers is not implemented"))
+}
+
+func (UnimplementedMemberServiceHandler) AddMember(context.Context, *connect.Request[v1.AddMemberRequest]) (*connect.Response[v1.AddMemberResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.MemberService.AddMember is not implemented"))
+}
+
+func (UnimplementedMemberServiceHandler) SetMemberRole(context.Context, *connect.Request[v1.SetMemberRoleRequest]) (*connect.Response[v1.SetMemberRoleResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.MemberService.SetMemberRole is not implemented"))
+}
+
+func (UnimplementedMemberServiceHandler) RemoveMember(context.Context, *connect.Request[v1.RemoveMemberRequest]) (*connect.Response[v1.RemoveMemberResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.MemberService.RemoveMember is not implemented"))
 }

@@ -101,6 +101,34 @@ func (s *sqlStore) MemberByEmail(ctx context.Context, email string) (Member, err
 	return s.oneMember(ctx, "email", normaliseEmail(email))
 }
 
+// SetMemberRole makes somebody an Admin, or stops them being one.
+func (s *sqlStore) SetMemberRole(ctx context.Context, id int64, role Role) error {
+	result, err := s.db.NewUpdate().
+		Model((*memberModel)(nil)).
+		Set("role = ?", string(role)).
+		Where("id = ?", id).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("set member role: %w", err)
+	}
+	return requireOneRow(result, "member")
+}
+
+// DeleteMember removes an account.
+//
+// What they added stays where it is: an Item on a shared List belongs to the List, and
+// deleting the person who typed it would delete somebody else's shopping.
+func (s *sqlStore) DeleteMember(ctx context.Context, id int64) error {
+	result, err := s.db.NewDelete().
+		Model((*memberModel)(nil)).
+		Where("id = ?", id).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("delete member: %w", err)
+	}
+	return requireOneRow(result, "member")
+}
+
 // Members returns everyone on the Instance, by name — who a List can be shared with.
 func (s *sqlStore) Members(ctx context.Context) ([]Member, error) {
 	var rows []memberModel

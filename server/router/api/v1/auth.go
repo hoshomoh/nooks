@@ -321,13 +321,46 @@ func (s *AuthService) activity() activityRecorder {
 
 // memberToProto converts a stored Member to its wire form. It never copies the hash.
 func memberToProto(m store.Member) *apiv1.Member {
-	return &apiv1.Member{
+	out := &apiv1.Member{
 		Uid:                m.UID,
 		Name:               m.Name,
 		Email:              m.Email,
 		Role:               roleToProto(m.Role),
 		MustChangePassword: m.MustChangePassword,
+		CreatedAt:          m.CreatedAt.Format(time.RFC3339),
 	}
+	// Empty for somebody who has not arrived yet: the account is real, the person has
+	// simply not used it.
+	if !m.LastSignedInAt.IsZero() {
+		out.LastSignedInAt = m.LastSignedInAt.Format(time.RFC3339)
+	}
+	return out
+}
+
+// roleFromProto returns an empty Role for an unspecified value, which callers treat as
+// a missing argument.
+func roleFromProto(role apiv1.Role) store.Role {
+	switch role {
+	case apiv1.Role_ROLE_ADMIN:
+		return store.RoleAdmin
+	case apiv1.Role_ROLE_MEMBER:
+		return store.RoleMember
+	default:
+		return ""
+	}
+}
+
+// errEmailTaken reports an email another Member already uses. It is what the caller
+// did, not a server fault.
+var errEmailTaken = connect.NewError(connect.CodeAlreadyExists,
+	errors.New("somebody here already uses that email"))
+
+// createMemberError turns a failed CreateMember into what the caller should read.
+func createMemberError(err error) error {
+	if errors.Is(err, store.ErrEmailTaken) {
+		return errEmailTaken
+	}
+	return internalError("create member", err)
 }
 
 func roleToProto(role store.Role) apiv1.Role {

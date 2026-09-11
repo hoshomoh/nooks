@@ -83,6 +83,14 @@ message Member {
   // True while an Admin-set temporary password has not been replaced. The app must
   // send the Member to replace it before anything else.
   bool must_change_password = 5;
+
+  // When the account was created, RFC 3339.
+  string created_at = 6;
+
+  // When they last signed in, RFC 3339, or empty for somebody who never has. The
+  // Members table greys the name of a Member who has not arrived yet — the account is
+  // real, the person has simply not used it.
+  string last_signed_in_at = 7;
 }
 
 message CompleteSetupRequest {

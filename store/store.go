@@ -51,6 +51,12 @@ type Store interface {
 	MemberByUID(ctx context.Context, uid string) (Member, error)
 	// Members returns everyone on the Instance, by name.
 	Members(ctx context.Context) ([]Member, error)
+
+	// SetMemberRole makes somebody an Admin, or stops them being one.
+	SetMemberRole(ctx context.Context, id int64, role Role) error
+
+	// DeleteMember removes an account. What they added stays on its Lists.
+	DeleteMember(ctx context.Context, id int64) error
 	MemberByID(ctx context.Context, id int64) (Member, error)
 
 	// CountMembers reports how many Members exist.

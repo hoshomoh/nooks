@@ -9,6 +9,7 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/hoshomoh/nooks/internal/password"
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
@@ -151,5 +152,123 @@ func TestAGroupNeedsAName(t *testing.T) {
 	}))
 	if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
 		t.Errorf("code = %v, want invalid_argument", got)
+	}
+}
+
+// Nooks has no mail server, so the password is handed over in person — and read once.
+func TestAddingAMemberReadsThePasswordOut(t *testing.T) {
+	f := newMemberFixture(t)
+
+	added, err := f.svc.AddMember(f.as(t, f.anna), connect.NewRequest(&apiv1.AddMemberRequest{
+		Name: "Til", Email: "til@example.com",
+	}))
+	if err != nil {
+		t.Fatalf("AddMember: %v", err)
+	}
+	if err := password.Validate(added.Msg.GetTemporaryPassword()); err != nil {
+		t.Errorf("the temporary password would be refused as a password: %v", err)
+	}
+	if !added.Msg.GetMember().GetMustChangePassword() {
+		t.Error("MustChangePassword = false, want the Member sent to replace it")
+	}
+	if added.Msg.GetMember().GetRole() != apiv1.Role_ROLE_MEMBER {
+		t.Error("a new account should not start as an Admin")
+	}
+}
+
+func TestAddingAMemberWithATakenEmail(t *testing.T) {
+	f := newMemberFixture(t)
+
+	_, err := f.svc.AddMember(f.as(t, f.anna), connect.NewRequest(&apiv1.AddMemberRequest{
+		Name: "Another Anna", Email: "anna@brunnen.lan",
+	}))
+	if got := connect.CodeOf(err); got != connect.CodeAlreadyExists {
+		t.Errorf("code = %v, want already_exists", got)
+	}
+}
+
+func TestOnlyAnAdminAddsAMember(t *testing.T) {
+	f := newMemberFixture(t)
+
+	_, err := f.svc.AddMember(f.as(t, f.jonas), connect.NewRequest(&apiv1.AddMemberRequest{
+		Name: "Til", Email: "til@example.com",
+	}))
+	if got := connect.CodeOf(err); got != connect.CodePermissionDenied {
+		t.Errorf("code = %v, want permission_denied", got)
+	}
+}
+
+func TestMakingSomebodyAnAdmin(t *testing.T) {
+	f := newMemberFixture(t)
+
+	res, err := f.svc.SetMemberRole(f.as(t, f.anna), connect.NewRequest(&apiv1.SetMemberRoleRequest{
+		MemberUid: f.jonas.UID, Role: apiv1.Role_ROLE_ADMIN,
+	}))
+	if err != nil {
+		t.Fatalf("SetMemberRole: %v", err)
+	}
+	if res.Msg.GetMember().GetRole() != apiv1.Role_ROLE_ADMIN {
+		t.Error("role did not change")
+	}
+}
+
+// Standing down as the only Admin would lock the Instance for everyone, including the
+// person doing it.
+func TestTheOnlyAdminCannotStandDown(t *testing.T) {
+	f := newMemberFixture(t)
+
+	_, err := f.svc.SetMemberRole(f.as(t, f.anna), connect.NewRequest(&apiv1.SetMemberRoleRequest{
+		MemberUid: f.anna.UID, Role: apiv1.Role_ROLE_MEMBER,
+	}))
+	if got := connect.CodeOf(err); got != connect.CodeFailedPrecondition {
+		t.Errorf("code = %v, want failed_precondition", got)
+	}
+}
+
+func TestRemovingAMember(t *testing.T) {
+	f := newMemberFixture(t)
+
+	if _, err := f.svc.RemoveMember(f.as(t, f.anna), connect.NewRequest(
+		&apiv1.RemoveMemberRequest{MemberUid: f.jonas.UID},
+	)); err != nil {
+		t.Fatalf("RemoveMember: %v", err)
+	}
+
+	res, err := f.svc.ListMembers(f.as(t, f.anna), connect.NewRequest(&apiv1.ListMembersRequest{}))
+	if err != nil {
+		t.Fatalf("ListMembers: %v", err)
+	}
+	if len(res.Msg.GetMembers()) != 2 {
+		t.Errorf("got %d members, want the other two", len(res.Msg.GetMembers()))
+	}
+}
+
+// The one removal nobody could undo.
+func TestAnAdminCannotRemoveThemselves(t *testing.T) {
+	f := newMemberFixture(t)
+
+	_, err := f.svc.RemoveMember(f.as(t, f.anna), connect.NewRequest(
+		&apiv1.RemoveMemberRequest{MemberUid: f.anna.UID},
+	))
+	if got := connect.CodeOf(err); got != connect.CodeFailedPrecondition {
+		t.Errorf("code = %v, want failed_precondition", got)
+	}
+}
+
+// A Member who has not arrived yet has a real account and no sign-in behind them.
+func TestAMemberWhoHasNeverSignedIn(t *testing.T) {
+	f := newMemberFixture(t)
+
+	res, err := f.svc.ListMembers(f.as(t, f.anna), connect.NewRequest(&apiv1.ListMembersRequest{}))
+	if err != nil {
+		t.Fatalf("ListMembers: %v", err)
+	}
+	for _, member := range res.Msg.GetMembers() {
+		if member.GetLastSignedInAt() != "" {
+			t.Errorf("%s has signed in already, in a store where nobody has", member.GetName())
+		}
+		if member.GetCreatedAt() == "" {
+			t.Errorf("%s has no created date, which the table shows", member.GetName())
+		}
 	}
 }

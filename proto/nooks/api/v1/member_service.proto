@@ -22,6 +22,18 @@ service MemberService {
   //
   // Removing someone takes away the Lists they reached through it, and nothing else.
   rpc SetGroupMembers(SetGroupMembersRequest) returns (SetGroupMembersResponse);
+
+  // AddMember creates an account with a temporary password, which is read out once.
+  //
+  // Nooks has no mail server, so an Admin hands the password over in person or however
+  // else they already talk. The Member must replace it before anything else.
+  rpc AddMember(AddMemberRequest) returns (AddMemberResponse);
+
+  // SetMemberRole makes somebody an Admin, or stops them being one.
+  rpc SetMemberRole(SetMemberRoleRequest) returns (SetMemberRoleResponse);
+
+  // RemoveMember deletes an account. What they added stays on its Lists.
+  rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse);
 }
 
 // Group is a named set of Members.
@@ -61,3 +73,31 @@ message SetGroupMembersRequest {
 message SetGroupMembersResponse {
   Group group = 1;
 }
+
+message AddMemberRequest {
+  string name = 1;
+  string email = 2;
+}
+
+message AddMemberResponse {
+  Member member = 1;
+
+  // The temporary password, in clear, shown once and never again. Nooks does not keep
+  // it: what is stored is a hash, and this is the only time it can be read.
+  string temporary_password = 2;
+}
+
+message SetMemberRoleRequest {
+  string member_uid = 1;
+  Role role = 2;
+}
+
+message SetMemberRoleResponse {
+  Member member = 1;
+}
+
+message RemoveMemberRequest {
+  string member_uid = 1;
+}
+
+message RemoveMemberResponse {}

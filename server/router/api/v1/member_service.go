@@ -8,6 +8,7 @@ import (
 
 	"connectrpc.com/connect"
 
+	"github.com/hoshomoh/nooks/internal/password"
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/store"
 )
@@ -175,4 +176,155 @@ func (s *MemberService) groupToProto(ctx context.Context, group store.Group) (*a
 		members = append(members, memberToProto(member))
 	}
 	return &apiv1.Group{Uid: group.UID, Name: group.Name, Members: members}, nil
+}
+
+// errLastAdmin refuses to leave an Instance with nobody who can administer it.
+var errLastAdmin = connect.NewError(connect.CodeFailedPrecondition,
+	errors.New("an instance needs at least one admin"))
+
+// errCannotRemoveYourself refuses the one removal that cannot be undone by anyone.
+var errCannotRemoveYourself = connect.NewError(connect.CodeFailedPrecondition,
+	errors.New("you cannot remove your own account"))
+
+// AddMember creates an account with a temporary password, read out once.
+//
+// Nooks has no mail server, so the Admin hands the password over however they already
+// talk to this person. The Member must replace it before anything else.
+func (s *MemberService) AddMember(
+	ctx context.Context,
+	req *connect.Request[apiv1.AddMemberRequest],
+) (*connect.Response[apiv1.AddMemberResponse], error) {
+	if _, err := requireAdmin(ctx); err != nil {
+		return nil, err
+	}
+
+	name := strings.TrimSpace(req.Msg.GetName())
+	email := strings.TrimSpace(req.Msg.GetEmail())
+	if err := requireText(name, "a name"); err != nil {
+		return nil, err
+	}
+	if err := requireText(email, "an email"); err != nil {
+		return nil, err
+	}
+
+	uid, err := s.newUID()
+	if err != nil {
+		return nil, internalError("make an identifier", err)
+	}
+
+	temporary := password.NewTemporary()
+	hash, err := password.Hash(temporary)
+	if err != nil {
+		return nil, internalError("hash password", err)
+	}
+
+	member, err := s.store.CreateMember(ctx, store.CreateMemberParams{
+		UID: uid, Name: name, Email: email, Role: store.RoleMember,
+		PasswordHash: hash, MustChangePassword: true, CreatedAt: s.now(),
+	})
+	if err != nil {
+		return nil, createMemberError(err)
+	}
+
+	// The only moment the password can be read. Nooks keeps the hash and nothing else.
+	return connect.NewResponse(&apiv1.AddMemberResponse{
+		Member:            memberToProto(member),
+		TemporaryPassword: temporary,
+	}), nil
+}
+
+// SetMemberRole makes somebody an Admin, or stops them being one.
+func (s *MemberService) SetMemberRole(
+	ctx context.Context,
+	req *connect.Request[apiv1.SetMemberRoleRequest],
+) (*connect.Response[apiv1.SetMemberRoleResponse], error) {
+	admin, err := requireAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	member, err := s.memberByUID(ctx, req.Msg.GetMemberUid())
+	if err != nil {
+		return nil, err
+	}
+	role := roleFromProto(req.Msg.GetRole())
+	if role == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("say which role"))
+	}
+
+	// Standing down as the only Admin would lock the Instance for everyone, including
+	// the person doing it.
+	if role != store.RoleAdmin && member.ID == admin.ID {
+		last, err := s.isLastAdmin(ctx, member)
+		if err != nil {
+			return nil, err
+		}
+		if last {
+			return nil, errLastAdmin
+		}
+	}
+
+	if err := s.store.SetMemberRole(ctx, member.ID, role); err != nil {
+		return nil, internalError("set member role", err)
+	}
+	member.Role = role
+	return connect.NewResponse(&apiv1.SetMemberRoleResponse{Member: memberToProto(member)}), nil
+}
+
+// RemoveMember deletes an account. What they added stays on its Lists.
+func (s *MemberService) RemoveMember(
+	ctx context.Context,
+	req *connect.Request[apiv1.RemoveMemberRequest],
+) (*connect.Response[apiv1.RemoveMemberResponse], error) {
+	admin, err := requireAdmin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	member, err := s.memberByUID(ctx, req.Msg.GetMemberUid())
+	if err != nil {
+		return nil, err
+	}
+	if member.ID == admin.ID {
+		return nil, errCannotRemoveYourself
+	}
+
+	last, err := s.isLastAdmin(ctx, member)
+	if err != nil {
+		return nil, err
+	}
+	if last {
+		return nil, errLastAdmin
+	}
+
+	if err := s.store.DeleteMember(ctx, member.ID); err != nil {
+		return nil, internalError("remove member", err)
+	}
+	return connect.NewResponse(&apiv1.RemoveMemberResponse{}), nil
+}
+
+// memberByUID finds a Member, reading a bad identifier as a bad argument rather than a
+// server fault.
+func (s *MemberService) memberByUID(ctx context.Context, uid string) (store.Member, error) {
+	member, err := s.store.MemberByUID(ctx, uid)
+	if errors.Is(err, store.ErrNotFound) {
+		return store.Member{}, errNoSuchMember
+	}
+	if err != nil {
+		return store.Member{}, internalError("read member", err)
+	}
+	return member, nil
+}
+
+// isLastAdmin reports whether this Member is the only one who can administer the
+// Instance.
+func (s *MemberService) isLastAdmin(ctx context.Context, member store.Member) (bool, error) {
+	if !member.IsAdmin() {
+		return false, nil
+	}
+	admins, err := s.store.AdminIDs(ctx)
+	if err != nil {
+		return false, internalError("read admins", err)
+	}
+	return len(admins) <= 1, nil
 }

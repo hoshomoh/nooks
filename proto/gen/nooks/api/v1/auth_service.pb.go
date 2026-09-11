@@ -141,8 +141,14 @@ type Member struct {
 	// True while an Admin-set temporary password has not been replaced. The app must
 	// send the Member to replace it before anything else.
 	MustChangePassword bool `protobuf:"varint,5,opt,name=must_change_password,json=mustChangePassword,proto3" json:"must_change_password,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// When the account was created, RFC 3339.
+	CreatedAt string `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// When they last signed in, RFC 3339, or empty for somebody who never has. The
+	// Members table greys the name of a Member who has not arrived yet — the account is
+	// real, the person has simply not used it.
+	LastSignedInAt string `protobuf:"bytes,7,opt,name=last_signed_in_at,json=lastSignedInAt,proto3" json:"last_signed_in_at,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *Member) Reset() {
@@ -208,6 +214,20 @@ func (x *Member) GetMustChangePassword() bool {
 		return x.MustChangePassword
 	}
 	return false
+}
+
+func (x *Member) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *Member) GetLastSignedInAt() string {
+	if x != nil {
+		return x.LastSignedInAt
+	}
+	return ""
 }
 
 type CompleteSetupRequest struct {
@@ -1262,13 +1282,16 @@ var File_nooks_api_v1_auth_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_auth_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1fnooks/api/v1/auth_service.proto\x12\fnooks.api.v1\"\x9e\x01\n" +
+	"\x1fnooks/api/v1/auth_service.proto\x12\fnooks.api.v1\"\xe8\x01\n" +
 	"\x06Member\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12&\n" +
 	"\x04role\x18\x04 \x01(\x0e2\x12.nooks.api.v1.RoleR\x04role\x120\n" +
-	"\x14must_change_password\x18\x05 \x01(\bR\x12mustChangePassword\"\x81\x01\n" +
+	"\x14must_change_password\x18\x05 \x01(\bR\x12mustChangePassword\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x06 \x01(\tR\tcreatedAt\x12)\n" +
+	"\x11last_signed_in_at\x18\a \x01(\tR\x0elastSignedInAt\"\x81\x01\n" +
 	"\x14CompleteSetupRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +

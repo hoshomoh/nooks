@@ -132,6 +132,11 @@ message Item {
 
   // How many further lines the Note has, for the "+N lines" after the first.
   int32 note_remaining_lines = 10;
+
+  // The Access token it came through, by name, or empty when a browser added it. The
+  // Member in added_by_name is still the one who did it: a token is somebody's access
+  // narrowed, never an identity of its own.
+  string added_via_token = 13;
 }
 
 message ListListsRequest {}

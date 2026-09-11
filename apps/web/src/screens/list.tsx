@@ -222,6 +222,7 @@ export function ListScreen() {
                   label={item.label}
                   quantity={item.quantity}
                   addedByName={item.addedByName}
+                  addedVia={viaLabel(t, item.addedViaToken)}
                   dueLabel={due.label(item.dueOn)}
                   overdue={isOverdue(item.dueOn, from)}
                   justTicked={justTickedByAnother(item)}
@@ -342,4 +343,14 @@ function sharingKey(sharing: Sharing, canEdit: boolean): string {
     return canEdit ? "list.namedCanEdit" : "list.namedReadOnly"
   }
   return canEdit ? "list.sharedCanEdit" : "list.sharedReadOnly"
+}
+
+/**
+ * viaLabel says what an Item came through, when that was not a browser.
+ *
+ * Nothing for the ordinary case, so a List nobody scripts against reads exactly as it
+ * did before tokens existed.
+ */
+function viaLabel(t: Translate, tokenName: string): string | undefined {
+  return tokenName ? t("list.addedVia", { name: tokenName }) : undefined
 }

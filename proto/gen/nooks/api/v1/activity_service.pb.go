@@ -34,6 +34,9 @@ const (
 	ActivityKind_ACTIVITY_KIND_LIST_SHARED ActivityKind = 3
 	// ACTIVITY_KIND_CONFLICT is two people having edited the same text.
 	ActivityKind_ACTIVITY_KIND_CONFLICT ActivityKind = 4
+	// ACTIVITY_KIND_TOKEN_USED is an access token reaching the Instance for the first
+	// time, or one being stopped by somebody other than its owner.
+	ActivityKind_ACTIVITY_KIND_TOKEN_USED ActivityKind = 5
 )
 
 // Enum value maps for ActivityKind.
@@ -44,6 +47,7 @@ var (
 		2: "ACTIVITY_KIND_RESET_REQUEST",
 		3: "ACTIVITY_KIND_LIST_SHARED",
 		4: "ACTIVITY_KIND_CONFLICT",
+		5: "ACTIVITY_KIND_TOKEN_USED",
 	}
 	ActivityKind_value = map[string]int32{
 		"ACTIVITY_KIND_UNSPECIFIED":   0,
@@ -51,6 +55,7 @@ var (
 		"ACTIVITY_KIND_RESET_REQUEST": 2,
 		"ACTIVITY_KIND_LIST_SHARED":   3,
 		"ACTIVITY_KIND_CONFLICT":      4,
+		"ACTIVITY_KIND_TOKEN_USED":    5,
 	}
 )
 
@@ -411,13 +416,14 @@ const file_nooks_api_v1_activity_service_proto_rawDesc = "" +
 	"\bactivity\x18\x01 \x03(\v2\x16.nooks.api.v1.ActivityR\bactivity\x12!\n" +
 	"\funread_count\x18\x02 \x01(\x05R\vunreadCount\"\x19\n" +
 	"\x17MarkActivityReadRequest\"\x1a\n" +
-	"\x18MarkActivityReadResponse*\xa9\x01\n" +
+	"\x18MarkActivityReadResponse*\xc7\x01\n" +
 	"\fActivityKind\x12\x1d\n" +
 	"\x19ACTIVITY_KIND_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aACTIVITY_KIND_JOIN_REQUEST\x10\x01\x12\x1f\n" +
 	"\x1bACTIVITY_KIND_RESET_REQUEST\x10\x02\x12\x1d\n" +
 	"\x19ACTIVITY_KIND_LIST_SHARED\x10\x03\x12\x1a\n" +
-	"\x16ACTIVITY_KIND_CONFLICT\x10\x04*p\n" +
+	"\x16ACTIVITY_KIND_CONFLICT\x10\x04\x12\x1c\n" +
+	"\x18ACTIVITY_KIND_TOKEN_USED\x10\x05*p\n" +
 	"\x0fActivityOutcome\x12 \n" +
 	"\x1cACTIVITY_OUTCOME_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19ACTIVITY_OUTCOME_APPROVED\x10\x01\x12\x1c\n" +

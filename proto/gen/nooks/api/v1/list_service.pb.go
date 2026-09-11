@@ -254,8 +254,12 @@ type Item struct {
 	NoteFirstLine string `protobuf:"bytes,9,opt,name=note_first_line,json=noteFirstLine,proto3" json:"note_first_line,omitempty"`
 	// How many further lines the Note has, for the "+N lines" after the first.
 	NoteRemainingLines int32 `protobuf:"varint,10,opt,name=note_remaining_lines,json=noteRemainingLines,proto3" json:"note_remaining_lines,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// The Access token it came through, by name, or empty when a browser added it. The
+	// Member in added_by_name is still the one who did it: a token is somebody's access
+	// narrowed, never an identity of its own.
+	AddedViaToken string `protobuf:"bytes,13,opt,name=added_via_token,json=addedViaToken,proto3" json:"added_via_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Item) Reset() {
@@ -370,6 +374,13 @@ func (x *Item) GetNoteRemainingLines() int32 {
 		return x.NoteRemainingLines
 	}
 	return 0
+}
+
+func (x *Item) GetAddedViaToken() string {
+	if x != nil {
+		return x.AddedViaToken
+	}
+	return ""
 }
 
 type ListListsRequest struct {
@@ -2050,7 +2061,7 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\bis_owner\x18\x05 \x01(\bR\aisOwner\x12\x1b\n" +
 	"\tis_pinned\x18\x06 \x01(\bR\bisPinned\x12\x1d\n" +
 	"\n" +
-	"open_count\x18\a \x01(\x05R\topenCount\"\xe2\x02\n" +
+	"open_count\x18\a \x01(\x05R\topenCount\"\x8a\x03\n" +
 	"\x04Item\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x14\n" +
 	"\x05label\x18\x02 \x01(\tR\x05label\x12\x1a\n" +
@@ -2065,7 +2076,8 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\x04note\x18\b \x01(\tR\x04note\x12&\n" +
 	"\x0fnote_first_line\x18\t \x01(\tR\rnoteFirstLine\x120\n" +
 	"\x14note_remaining_lines\x18\n" +
-	" \x01(\x05R\x12noteRemainingLines\"\x12\n" +
+	" \x01(\x05R\x12noteRemainingLines\x12&\n" +
+	"\x0fadded_via_token\x18\r \x01(\tR\raddedViaToken\"\x12\n" +
 	"\x10ListListsRequest\"=\n" +
 	"\x11ListListsResponse\x12(\n" +
 	"\x05lists\x18\x01 \x03(\v2\x12.nooks.api.v1.ListR\x05lists\"+\n" +

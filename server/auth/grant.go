@@ -51,6 +51,17 @@ func (g Grant) Reaches(listID int64) bool {
 	return g.reach[listID]
 }
 
+// TokenID is the Access token the caller presented, or zero for a browser.
+//
+// For recording what a change came through. Nothing decides access from it: that is
+// Reaches and ReadOnly, which are the same question asked the way the rules ask it.
+func (g Grant) TokenID() int64 {
+	if g.Token == nil {
+		return 0
+	}
+	return g.Token.ID
+}
+
 // ReadOnly reports whether the caller may only look.
 func (g Grant) ReadOnly() bool {
 	return g.Token != nil && g.Token.Permission == store.PermissionRead

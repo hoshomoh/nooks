@@ -65,13 +65,16 @@ func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
 	// Every request passes through the resolver, which attaches the signed-in Member
 	// when there is one. It never rejects: first run, sign-in and the Public list are
 	// all legitimately anonymous.
-	resolver := auth.NewResolver(s, nil)
-	interceptors := connect.WithInterceptors(resolver.Interceptor())
-
 	// One broker per process. Nooks is one binary on one machine, so there is nothing
 	// to coordinate between.
 	broker := events.NewBroker()
 	publisher := live.NewPublisher(s, broker)
+
+	// The resolver is the only thing that sees a token presented, so it is what tells a
+	// Member their key has started being used.
+	tokenActivity := v1.NewTokenActivity(s, nil, nil).WithAnnouncer(publisher)
+	resolver := auth.NewResolver(s, nil).WithTokenWatcher(tokenActivity)
+	interceptors := connect.WithInterceptors(resolver.Interceptor())
 
 	authService := v1.NewAuthService(s, v1.AuthServiceOptions{
 		Secure: cfg.SecureCookies,
@@ -87,7 +90,9 @@ func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
 	mux.Handle(apiv1.NewMemberServiceHandler(v1.NewMemberService(s, nil, nil), interceptors))
 	mux.Handle(apiv1.NewActivityServiceHandler(v1.NewActivityService(s, nil), interceptors))
 	mux.Handle(apiv1.NewPublicServiceHandler(v1.NewPublicService(s), interceptors))
-	mux.Handle(apiv1.NewTokenServiceHandler(v1.NewTokenService(s, nil, nil, nil), interceptors))
+	mux.Handle(apiv1.NewTokenServiceHandler(
+		v1.NewTokenService(s, nil, nil, nil).WithActivity(tokenActivity), interceptors,
+	))
 	mux.Handle("GET /api/v1/events", live.NewHandler(s, broker, resolver))
 	mux.HandleFunc("GET /healthz", handleHealthz)
 

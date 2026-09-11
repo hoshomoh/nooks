@@ -44,7 +44,7 @@ func (s *ListService) ListDatedItems(
 	if err != nil {
 		return nil, err
 	}
-	labels, err := s.memberLabels(ctx, items)
+	names, err := s.rowNamesFor(ctx, items)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (s *ListService) ListDatedItems(
 			continue
 		}
 		out = append(out, &apiv1.DatedItem{
-			Item:     itemToProto(item, labels),
+			Item:     itemToProto(item, names),
 			ListUid:  list.UID,
 			ListName: list.Name,
 		})

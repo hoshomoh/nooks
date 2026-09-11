@@ -100,6 +100,8 @@ func activityKindToProto(kind store.ActivityKind) apiv1.ActivityKind {
 		return apiv1.ActivityKind_ACTIVITY_KIND_LIST_SHARED
 	case store.ActivityConflict:
 		return apiv1.ActivityKind_ACTIVITY_KIND_CONFLICT
+	case store.ActivityTokenUsed:
+		return apiv1.ActivityKind_ACTIVITY_KIND_TOKEN_USED
 	default:
 		return apiv1.ActivityKind_ACTIVITY_KIND_UNSPECIFIED
 	}

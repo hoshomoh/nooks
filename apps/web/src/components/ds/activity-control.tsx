@@ -69,6 +69,11 @@ export function ActivityControl() {
     if (entry.kind === ActivityKind.LIST_SHARED) {
       void navigate({ to: "/lists/$listUid", params: { listUid: entry.targetUid } })
     }
+    // An entry about a key points at the page where keys are managed. The token itself
+    // has no page of its own, and never will: there is nothing to read.
+    if (entry.kind === ActivityKind.TOKEN_USED) {
+      void navigate({ to: "/settings/tokens" })
+    }
   }
 
   return (

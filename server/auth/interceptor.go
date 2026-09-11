@@ -19,6 +19,19 @@ import (
 type Resolver struct {
 	store store.Store
 	now   func() time.Time
+	// watcher is nil unless somebody asked to be told about token use.
+	watcher TokenWatcher
+}
+
+/*
+TokenWatcher is told the first time an Access token reaches the Instance.
+
+An interface, and optional, so the resolver stays a thing that answers "who is this?".
+What Nooks does about a key starting to be used is a decision for the layer that owns
+the Activity panel, not for the layer that reads a header.
+*/
+type TokenWatcher interface {
+	TokenFirstUsed(ctx context.Context, member store.Member, token store.AccessToken)
 }
 
 // NewResolver builds a Resolver. now may be nil, in which case time.Now is used.
@@ -27,6 +40,12 @@ func NewResolver(s store.Store, now func() time.Time) *Resolver {
 		now = time.Now
 	}
 	return &Resolver{store: s, now: now}
+}
+
+// WithTokenWatcher asks to be told the first time each token is used.
+func (r *Resolver) WithTokenWatcher(watcher TokenWatcher) *Resolver {
+	r.watcher = watcher
+	return r
 }
 
 // Interceptor attaches the signed-in Member to the context of every request that
@@ -90,6 +109,11 @@ func (r *Resolver) tokenGrant(ctx context.Context, presented string) (Grant, boo
 	listIDs, err := r.store.TokenListIDs(ctx, token.ID)
 	if err != nil {
 		return Grant{}, false
+	}
+
+	// Before the mark, which is what makes "first" knowable at all.
+	if token.LastUsedAt.IsZero() && r.watcher != nil {
+		r.watcher.TokenFirstUsed(ctx, member, token)
 	}
 
 	// Best effort: a token that worked should not stop working because recording that

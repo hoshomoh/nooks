@@ -17,6 +17,22 @@ const labels: ListRowLabels = {
 }
 
 describe("the list row", () => {
+  // A token is somebody's access narrowed, never an identity of its own, so a row says
+  // who did it and only then what through.
+  it("names the Member as well as the token an Item came through", () => {
+    render(<ListRow label="Milk" addedByName="Anna" addedVia="via Kitchen tablet" labels={labels} />)
+
+    expect(screen.getByText("Anna")).toBeInTheDocument()
+    expect(screen.getByText("via Kitchen tablet")).toBeInTheDocument()
+  })
+
+  it("says nothing about a token when a browser added the Item", () => {
+    render(<ListRow label="Milk" addedByName="Anna" labels={labels} />)
+
+    expect(screen.getByText("Anna")).toBeInTheDocument()
+    expect(screen.queryByText(/via/)).not.toBeInTheDocument()
+  })
+
   it("opens the Item from anywhere in the row, not only its label", async () => {
     const onOpen = vi.fn()
     render(<ListRow label="Milk" onOpen={onOpen} labels={labels} />)

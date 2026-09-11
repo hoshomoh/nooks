@@ -39,16 +39,18 @@ func (s *ListService) CreateItem(
 	item, err := s.store.CreateItem(ctx, store.CreateItemParams{
 		UID: uid, ListID: list.ID, Label: req.Msg.GetLabel(),
 		Quantity: req.Msg.GetQuantity(), DueOn: req.Msg.GetDueOn(),
-		AddedByID: grant.Member.ID, At: s.now(),
+		AddedByID: grant.Member.ID, AddedByTokenID: grant.TokenID(), At: s.now(),
 	})
 	if err != nil {
 		return nil, internalError("create item", err)
 	}
 	s.announceListChanged(ctx, list)
 
-	return connect.NewResponse(&apiv1.CreateItemResponse{
-		Item: itemToProto(item, map[int64]memberLabel{grant.Member.ID: {Name: grant.Member.Name, UID: grant.Member.UID}}),
-	}), nil
+	names, err := s.rowNamesFor(ctx, []store.Item{item})
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&apiv1.CreateItemResponse{Item: itemToProto(item, names)}), nil
 }
 
 // UpdateItem changes an Item's label, quantity or due date.
@@ -185,11 +187,11 @@ func (s *ListService) readItem(ctx context.Context, uid string) (*apiv1.Item, er
 	if err != nil {
 		return nil, internalError("read item", err)
 	}
-	labels, err := s.memberLabels(ctx, []store.Item{item})
+	names, err := s.rowNamesFor(ctx, []store.Item{item})
 	if err != nil {
 		return nil, err
 	}
-	return itemToProto(item, labels), nil
+	return itemToProto(item, names), nil
 }
 
 // positionAfter works out where an Item should sit, given the List's current order and
@@ -235,36 +237,87 @@ type memberLabel struct {
 	UID  string
 }
 
-// memberLabels looks up what an Item's rows need, once per Member rather than once per
-// Item.
-func (s *ListService) memberLabels(
-	ctx context.Context,
-	items []store.Item,
-) (map[int64]memberLabel, error) {
-	labels := map[int64]memberLabel{}
+/*
+rowNames is everything a row needs in order to say who put it there.
+
+Two maps rather than two arguments, because they are always wanted together and adding
+a third thing a row names should be a change in one place.
+*/
+type rowNames struct {
+	members map[int64]memberLabel
+	// tokens is what each Access token is called. Empty for a List nothing scripted
+	// has touched, which is most of them.
+	tokens map[int64]string
+}
+
+// nameOf is what one Member is called, or nothing when they are gone.
+func (n rowNames) nameOf(memberID int64) memberLabel { return n.members[memberID] }
+
+// rowNamesFor looks up what a page of rows needs, once per Member and once per token
+// rather than once per Item.
+func (s *ListService) rowNamesFor(ctx context.Context, items []store.Item) (rowNames, error) {
+	names := rowNames{members: map[int64]memberLabel{}, tokens: map[int64]string{}}
+
 	for _, item := range items {
-		for _, id := range []int64{item.AddedByID, item.DoneByID} {
-			if id == 0 {
-				continue
-			}
-			if _, known := labels[id]; known {
-				continue
-			}
-			member, err := s.store.MemberByID(ctx, id)
-			if err != nil {
-				if errors.Is(err, store.ErrNotFound) {
-					continue
-				}
-				return nil, internalError("read member", err)
-			}
-			labels[id] = memberLabel{Name: member.Name, UID: member.UID}
+		if err := s.nameMembers(ctx, names.members, item); err != nil {
+			return rowNames{}, err
+		}
+		if err := s.nameToken(ctx, names.tokens, item.AddedByTokenID); err != nil {
+			return rowNames{}, err
 		}
 	}
-	return labels, nil
+	return names, nil
+}
+
+// nameMembers adds whoever one Item names, if they are not known already.
+func (s *ListService) nameMembers(
+	ctx context.Context,
+	into map[int64]memberLabel,
+	item store.Item,
+) error {
+	for _, id := range []int64{item.AddedByID, item.DoneByID} {
+		if id == 0 {
+			continue
+		}
+		if _, known := into[id]; known {
+			continue
+		}
+		member, err := s.store.MemberByID(ctx, id)
+		if err != nil {
+			// A Member who is gone leaves rows behind. The row simply stops naming them.
+			if errors.Is(err, store.ErrNotFound) {
+				continue
+			}
+			return internalError("read member", err)
+		}
+		into[id] = memberLabel{Name: member.Name, UID: member.UID}
+	}
+	return nil
+}
+
+// nameToken adds what one token is called, if it is not known already.
+func (s *ListService) nameToken(ctx context.Context, into map[int64]string, id int64) error {
+	if id == 0 {
+		return nil
+	}
+	if _, known := into[id]; known {
+		return nil
+	}
+	token, err := s.store.AccessTokenByID(ctx, id)
+	if err != nil {
+		// A revoked token leaves its rows on the List; they stop saying what they came
+		// through, which is the only honest thing left to say.
+		if errors.Is(err, store.ErrNotFound) {
+			return nil
+		}
+		return internalError("read access token", err)
+	}
+	into[id] = token.Name
+	return nil
 }
 
 // itemToProto converts an Item for the wire.
-func itemToProto(item store.Item, labels map[int64]memberLabel) *apiv1.Item {
+func itemToProto(item store.Item, names rowNames) *apiv1.Item {
 	preview := note.PreviewOf(item.Note)
 	out := &apiv1.Item{
 		Uid:                item.UID,
@@ -272,9 +325,10 @@ func itemToProto(item store.Item, labels map[int64]memberLabel) *apiv1.Item {
 		Quantity:           item.Quantity,
 		DueOn:              item.DueOn,
 		Done:               item.Done(),
-		AddedByName:        labels[item.AddedByID].Name,
-		DoneByName:         labels[item.DoneByID].Name,
-		DoneByUid:          labels[item.DoneByID].UID,
+		AddedByName:        names.nameOf(item.AddedByID).Name,
+		AddedViaToken:      names.tokens[item.AddedByTokenID],
+		DoneByName:         names.nameOf(item.DoneByID).Name,
+		DoneByUid:          names.nameOf(item.DoneByID).UID,
 		Note:               item.Note,
 		NoteFirstLine:      preview.FirstLine,
 		NoteRemainingLines: int32(preview.RemainingLines),

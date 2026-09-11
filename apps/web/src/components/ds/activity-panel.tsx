@@ -116,8 +116,8 @@ function Entry({ entry, when, onOpen, onDecide, deciding }: EntryProps) {
               />
             </>
           ) : (
-            entry.kind === ActivityKind.LIST_SHARED && (
-              <Action label={t("activity.open")} onClick={() => onOpen(entry)} />
+            followable(entry.kind) && (
+              <Action label={t(openLabelOf(entry.kind))} onClick={() => onOpen(entry)} />
             )
           )}
         </span>
@@ -155,6 +155,16 @@ function Action({ label, quiet, disabled, onClick }: ActionProps) {
       {label}
     </button>
   )
+}
+
+/** followable reports whether an entry points somewhere a Member can go. */
+function followable(kind: ActivityKind): boolean {
+  return kind === ActivityKind.LIST_SHARED || kind === ActivityKind.TOKEN_USED
+}
+
+/** openLabelOf names where following an entry leads, rather than saying "open". */
+function openLabelOf(kind: ActivityKind): string {
+  return kind === ActivityKind.TOKEN_USED ? "activity.openTokens" : "activity.open"
 }
 
 /** isRequest reports whether an entry is somebody waiting on an Admin's decision. */

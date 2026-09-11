@@ -235,10 +235,10 @@ The single most important milestone; everything else is furniture.
 - [x] Add a token dialog: name, List scope picker, permissions, expiry
 - [x] The secret is handed over once by the API and never again
 - [x] Unpicked Lists are invisible to a token — it cannot see that they exist
-- [ ] Token activity log
+- [x] Token activity log
 - [ ] REST API at `/api/v1`
 - [ ] MCP server at `/mcp`, same token
-- [ ] Changes made by a token are attributed to the token in List history
+- [x] Changes made by a token are attributed to the token in List history
 
 ---
 

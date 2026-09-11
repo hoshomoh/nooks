@@ -20,6 +20,18 @@ type activityRecorder struct {
 	announce Announcer
 }
 
+// newRecorder builds a recorder, filling in the real clock and identifiers when none
+// are supplied. Nothing announces until WithAnnouncer is used.
+func newRecorder(s store.Store, now func() time.Time, newUID func() (string, error)) activityRecorder {
+	if now == nil {
+		now = time.Now
+	}
+	if newUID == nil {
+		newUID = newMemberUID
+	}
+	return activityRecorder{store: s, now: now, newUID: newUID}
+}
+
 // record puts one entry in front of one Member.
 func (r activityRecorder) record(
 	ctx context.Context,

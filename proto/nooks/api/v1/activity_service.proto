@@ -25,6 +25,9 @@ enum ActivityKind {
   ACTIVITY_KIND_LIST_SHARED = 3;
   // ACTIVITY_KIND_CONFLICT is two people having edited the same text.
   ACTIVITY_KIND_CONFLICT = 4;
+  // ACTIVITY_KIND_TOKEN_USED is an access token reaching the Instance for the first
+  // time, or one being stopped by somebody other than its owner.
+  ACTIVITY_KIND_TOKEN_USED = 5;
 }
 
 // Activity is one thing waiting for attention.

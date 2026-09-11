@@ -116,6 +116,19 @@ func (s *sqlStore) AccessTokenByHash(ctx context.Context, hash string) (AccessTo
 	return row.toToken()
 }
 
+// AccessTokenByID finds a token by its internal identity, for naming what came through
+// it on a row.
+func (s *sqlStore) AccessTokenByID(ctx context.Context, id int64) (AccessToken, error) {
+	row := new(accessTokenModel)
+	if err := s.db.NewSelect().Model(row).Where("id = ?", id).Scan(ctx); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return AccessToken{}, ErrNotFound
+		}
+		return AccessToken{}, fmt.Errorf("read access token: %w", err)
+	}
+	return row.toToken()
+}
+
 // AccessTokensFor lists a Member's own tokens, newest first.
 func (s *sqlStore) AccessTokensFor(ctx context.Context, memberID int64) ([]AccessToken, error) {
 	return s.accessTokens(ctx, &memberID)

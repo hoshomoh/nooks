@@ -19,6 +19,8 @@ type TokenService struct {
 	now      func() time.Time
 	newUID   func() (string, error)
 	newToken func() (token string, hash string, err error)
+	// activity is nil when nothing is listening, which is what a test usually wants.
+	activity *TokenActivity
 }
 
 // NewTokenService builds the service. Everything it depends on is injected, so a test
@@ -39,6 +41,13 @@ func NewTokenService(
 		newToken = auth.NewToken
 	}
 	return &TokenService{store: s, now: now, newUID: newUID, newToken: newToken}
+}
+
+// WithActivity tells a Member when somebody else stops one of their keys. Optional: a
+// service built without it simply records nothing.
+func (s *TokenService) WithActivity(activity *TokenActivity) *TokenService {
+	s.activity = activity
+	return s
 }
 
 // ListAccessTokens returns the signed-in Member's own tokens.
@@ -92,6 +101,22 @@ func (s *TokenService) visibleTokens(
 		return nil, internalError("read access tokens", err)
 	}
 	return tokens, nil
+}
+
+// tellOwnerOfRevocation puts an Admin's revocation in front of whoever cut the token.
+func (s *TokenService) tellOwnerOfRevocation(
+	ctx context.Context,
+	token store.AccessToken,
+	by store.Member,
+) error {
+	if s.activity == nil {
+		return nil
+	}
+	owner, err := s.store.MemberByID(ctx, token.MemberID)
+	if err != nil {
+		return internalError("read token owner", err)
+	}
+	return s.activity.TokenRevokedByAdmin(ctx, owner, token, by)
 }
 
 // errNoLists refuses a token that could not reach anything.
@@ -186,6 +211,14 @@ func (s *TokenService) RevokeAccessToken(
 
 	if err := s.store.DeleteAccessToken(ctx, token.ID); err != nil {
 		return nil, internalError("revoke access token", err)
+	}
+
+	// Somebody whose key has been stopped by an Admin has to be told: the alternative is
+	// a script that fails silently and a Member who does not know why.
+	if token.MemberID != member.ID {
+		if err := s.tellOwnerOfRevocation(ctx, token, member); err != nil {
+			return nil, err
+		}
 	}
 	return connect.NewResponse(&apiv1.RevokeAccessTokenResponse{}), nil
 }

@@ -2,6 +2,7 @@ package v1
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -285,5 +286,74 @@ func TestAMemberSeesOnlyTheirOwnTokens(t *testing.T) {
 	}
 	if got := tokens[0].GetListNames(); len(got) != 1 || got[0] != "Bike" {
 		t.Errorf("listNames = %v, want the List their own token names", got)
+	}
+}
+
+// Somebody whose key has been stopped by an Admin has to be told: the alternative is a
+// script that fails silently and a Member who does not know why.
+func TestRevokingSomebodyElsesTokenTellsThem(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.jonas, "Bike")
+
+	svc := f.tokens(t).WithActivity(NewTokenActivity(f.store, func() time.Time { return testClock }, nil))
+	made, err := svc.CreateAccessToken(f.as(t, f.jonas), connect.NewRequest(
+		&apiv1.CreateAccessTokenRequest{
+			Name: "Shortcut", ListUids: []string{uid},
+			Permission: apiv1.Permission_PERMISSION_READ,
+		},
+	))
+	if err != nil {
+		t.Fatalf("CreateAccessToken: %v", err)
+	}
+
+	_, err = svc.RevokeAccessToken(f.as(t, f.anna), connect.NewRequest(
+		&apiv1.RevokeAccessTokenRequest{TokenUid: made.Msg.GetToken().GetUid()},
+	))
+	if err != nil {
+		t.Fatalf("RevokeAccessToken as an Admin: %v", err)
+	}
+
+	entries, err := f.store.ActivityFor(t.Context(), f.jonas.ID)
+	if err != nil {
+		t.Fatalf("ActivityFor: %v", err)
+	}
+	if len(entries) != 1 || entries[0].Kind != store.ActivityTokenUsed {
+		t.Fatalf("got %d entries, want one about the revoked token", len(entries))
+	}
+	if !strings.Contains(entries[0].Text, "Shortcut") {
+		t.Errorf("text = %q, want it to name the token", entries[0].Text)
+	}
+}
+
+// Revoking your own key is not news. Telling you about it would be a panel that fills
+// up with things you just did.
+func TestRevokingYourOwnTokenTellsNobody(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.jonas, "Bike")
+
+	svc := f.tokens(t).WithActivity(NewTokenActivity(f.store, func() time.Time { return testClock }, nil))
+	made, err := svc.CreateAccessToken(f.as(t, f.jonas), connect.NewRequest(
+		&apiv1.CreateAccessTokenRequest{
+			Name: "Shortcut", ListUids: []string{uid},
+			Permission: apiv1.Permission_PERMISSION_READ,
+		},
+	))
+	if err != nil {
+		t.Fatalf("CreateAccessToken: %v", err)
+	}
+
+	_, err = svc.RevokeAccessToken(f.as(t, f.jonas), connect.NewRequest(
+		&apiv1.RevokeAccessTokenRequest{TokenUid: made.Msg.GetToken().GetUid()},
+	))
+	if err != nil {
+		t.Fatalf("RevokeAccessToken: %v", err)
+	}
+
+	entries, err := f.store.ActivityFor(t.Context(), f.jonas.ID)
+	if err != nil {
+		t.Fatalf("ActivityFor: %v", err)
+	}
+	if len(entries) != 0 {
+		t.Errorf("got %d entries, want none for revoking your own token", len(entries))
 	}
 }

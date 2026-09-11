@@ -18,6 +18,13 @@ export type ListRowProps = {
   quantity?: string
   /** Who put it on the List. Sits at the right of the row. */
   addedByName?: string
+  /**
+   * What it came through, when that was not a browser: "Anna · via Kitchen tablet".
+   *
+   * The Member is still named. A token is somebody's access narrowed, never an identity
+   * of its own, so a row says who did it and only then what through.
+   */
+  addedVia?: string
   /** A date, already formatted for reading: "Fri", "Mon 1 Sep". */
   dueLabel?: string
   /** Overdue dates are the one thing in a row that takes a meaning colour. */
@@ -68,6 +75,7 @@ export function ListRow({
   label,
   quantity,
   addedByName,
+  addedVia,
   dueLabel,
   overdue,
   done,
@@ -128,6 +136,7 @@ export function ListRow({
               <span className={overdue ? "text-overdue" : "text-shared"}>{dueLabel}</span>
             )}
             {addedByName && <span>{addedByName}</span>}
+            {addedVia && <span className="text-muted-foreground">{addedVia}</span>}
           </span>
 
           {/* The `···` has a slot of its own, always the same size, so the row's

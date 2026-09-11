@@ -251,6 +251,9 @@ type Store interface {
 	// AccessTokenByUID finds a token by its public identifier.
 	AccessTokenByUID(ctx context.Context, uid string) (AccessToken, error)
 
+	// AccessTokenByID finds a token by its internal identity.
+	AccessTokenByID(ctx context.Context, id int64) (AccessToken, error)
+
 	// AccessTokensFor lists a Member's own tokens, newest first.
 	AccessTokensFor(ctx context.Context, memberID int64) ([]AccessToken, error)
 

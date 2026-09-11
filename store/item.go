@@ -38,9 +38,12 @@ type Item struct {
 	DoneByID int64
 	// AddedByID is who put it on the List. Shown at the right of the row.
 	AddedByID int64
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
+	// AddedByTokenID is the Access token it came through, or zero for a browser. The
+	// Member is still recorded: a token is somebody's access narrowed, not an identity.
+	AddedByTokenID int64
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      time.Time
 }
 
 // Done reports whether the Item has been ticked.
@@ -58,7 +61,9 @@ type CreateItemParams struct {
 	// a copy of an Item carries the Note it was copied from.
 	Note      string
 	AddedByID int64
-	At        time.Time
+	// AddedByTokenID is the token it came through, or zero for a browser.
+	AddedByTokenID int64
+	At             time.Time
 }
 
 // CreateItem appends an Item to a List.
@@ -83,6 +88,9 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 		AddedByID: params.AddedByID,
 		CreatedAt: formatTime(params.At),
 		UpdatedAt: formatTime(params.At),
+	}
+	if params.AddedByTokenID != 0 {
+		row.AddedByTokenID = &params.AddedByTokenID
 	}
 	if _, err := s.db.NewInsert().Model(row).Returning("*").Exec(ctx); err != nil {
 		return Item{}, fmt.Errorf("create item: %w", err)
@@ -347,9 +355,11 @@ type itemModel struct {
 	DoneAt    string  `bun:"done_at,notnull"`
 	DoneByID  *int64  `bun:"done_by_id"`
 	AddedByID int64   `bun:"added_by_id,notnull"`
-	CreatedAt string  `bun:"created_at,notnull"`
-	UpdatedAt string  `bun:"updated_at,notnull"`
-	DeletedAt string  `bun:"deleted_at,notnull"`
+	// AddedByTokenID is null for anything a browser added, which is most things.
+	AddedByTokenID *int64 `bun:"added_by_token_id"`
+	CreatedAt      string `bun:"created_at,notnull"`
+	UpdatedAt      string `bun:"updated_at,notnull"`
+	DeletedAt      string `bun:"deleted_at,notnull"`
 }
 
 func (m itemModel) toItem() (Item, error) {
@@ -377,6 +387,9 @@ func (m itemModel) toItem() (Item, error) {
 	}
 	if m.DoneByID != nil {
 		item.DoneByID = *m.DoneByID
+	}
+	if m.AddedByTokenID != nil {
+		item.AddedByTokenID = *m.AddedByTokenID
 	}
 	return item, nil
 }

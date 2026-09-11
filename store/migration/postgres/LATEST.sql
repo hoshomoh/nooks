@@ -99,6 +99,10 @@ CREATE TABLE item (
   done_at     TEXT    NOT NULL DEFAULT '',
   done_by_id  BIGINT REFERENCES member (id) ON DELETE SET NULL,
   added_by_id BIGINT NOT NULL REFERENCES member (id) ON DELETE CASCADE,
+  -- Which token put it here, when it was not a browser. The Member is still recorded
+  -- beside it: a token is somebody's access narrowed, never an identity of its own.
+  -- Declared after access_token below; stated here because this is where it lives.
+  added_by_token_id BIGINT REFERENCES access_token (id) ON DELETE SET NULL,
   created_at  TEXT    NOT NULL,
   updated_at  TEXT    NOT NULL,
   deleted_at  TEXT    NOT NULL DEFAULT ''

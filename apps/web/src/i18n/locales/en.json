@@ -120,7 +120,8 @@
     "doneToday_zero": "nothing done today",
     "doneEarlier": "{{count}} done",
     "allDoneTitle": "Nothing left on this list",
-    "allDoneBody": "Everything on it is ticked. What is done is at the foot of the list, and anything new goes below."
+    "allDoneBody": "Everything on it is ticked. What is done is at the foot of the list, and anything new goes below.",
+    "addedVia": "via {{name}}"
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",
@@ -270,7 +271,8 @@
     "ignore": "Ignore",
     "ignored": "Ignored, silently",
     "approved": "Approved",
-    "deciding": "Approving…"
+    "deciding": "Approving…",
+    "openTokens": "Tokens"
   },
   "listMenu": {
     "open": "More",

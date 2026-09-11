@@ -189,3 +189,86 @@ func TestAReadTokenCannotWriteToItsOwnersList(t *testing.T) {
 		t.Errorf("code = %v, want permission_denied for a read token", got)
 	}
 }
+
+// A row says who did it and only then what through: a token is somebody's access
+// narrowed, never an identity of its own.
+func TestAnItemAddedByATokenNamesBoth(t *testing.T) {
+	f := newListFixture(t)
+	groceries := f.createList(t, f.anna, "Groceries")
+
+	list, err := f.store.ListByUID(t.Context(), groceries)
+	if err != nil {
+		t.Fatalf("ListByUID: %v", err)
+	}
+	token, err := f.store.CreateAccessToken(t.Context(), store.CreateAccessTokenParams{
+		UID: "tok_1", MemberID: f.anna.ID, Name: "Kitchen tablet", TokenHash: "hash-1",
+		Permission: store.PermissionWrite, ListIDs: []int64{list.ID}, At: testClock,
+	})
+	if err != nil {
+		t.Fatalf("CreateAccessToken: %v", err)
+	}
+
+	ctx := auth.WithGrant(t.Context(),
+		auth.NewTokenGrant(f.anna, token, []int64{list.ID}))
+	made, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: groceries, Label: "Milk",
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem through a token: %v", err)
+	}
+
+	if got := made.Msg.GetItem().GetAddedByName(); got != f.anna.Name {
+		t.Errorf("addedByName = %q, want the Member who owns the token", got)
+	}
+	if got := made.Msg.GetItem().GetAddedViaToken(); got != "Kitchen tablet" {
+		t.Errorf("addedViaToken = %q, want the token's name", got)
+	}
+}
+
+// Revoking a key must not take what it added off the List. The row stops saying what it
+// came through, which is the only honest thing left to say.
+func TestRevokingATokenLeavesWhatItAdded(t *testing.T) {
+	f := newListFixture(t)
+	groceries := f.createList(t, f.anna, "Groceries")
+
+	list, err := f.store.ListByUID(t.Context(), groceries)
+	if err != nil {
+		t.Fatalf("ListByUID: %v", err)
+	}
+	token, err := f.store.CreateAccessToken(t.Context(), store.CreateAccessTokenParams{
+		UID: "tok_1", MemberID: f.anna.ID, Name: "Kitchen tablet", TokenHash: "hash-1",
+		Permission: store.PermissionWrite, ListIDs: []int64{list.ID}, At: testClock,
+	})
+	if err != nil {
+		t.Fatalf("CreateAccessToken: %v", err)
+	}
+
+	ctx := auth.WithGrant(t.Context(), auth.NewTokenGrant(f.anna, token, []int64{list.ID}))
+	if _, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: groceries, Label: "Milk",
+	})); err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+
+	if err := f.store.DeleteAccessToken(t.Context(), token.ID); err != nil {
+		t.Fatalf("DeleteAccessToken: %v", err)
+	}
+
+	read, err := f.svc.GetList(f.as(t, f.anna), connect.NewRequest(&apiv1.GetListRequest{
+		ListUid: groceries,
+	}))
+	if err != nil {
+		t.Fatalf("GetList: %v", err)
+	}
+
+	items := read.Msg.GetItems()
+	if len(items) != 1 || items[0].GetLabel() != "Milk" {
+		t.Fatalf("got %d items, want the one the token added", len(items))
+	}
+	if got := items[0].GetAddedByName(); got != f.anna.Name {
+		t.Errorf("addedByName = %q, want the Member it belonged to", got)
+	}
+	if got := items[0].GetAddedViaToken(); got != "" {
+		t.Errorf("addedViaToken = %q, want nothing once the token is gone", got)
+	}
+}

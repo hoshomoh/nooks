@@ -6,12 +6,13 @@ import { AppShell } from "@/components/ds/app-shell"
 import { Button } from "@/components/ds/button"
 import { ActivityControl } from "@/components/ds/activity-control"
 import { ChromeBar } from "@/components/ds/chrome-bar"
+import { DatedAddRow } from "@/components/ds/dated-add-row"
 import { EmptyState } from "@/components/ds/empty-state"
 import { SectionHeading } from "@/components/ds/section-heading"
 import { listClient } from "@/lib/api"
 import { groupByDay, upcomingQuery } from "@/lib/dated-queries"
 import type { RenameItemVariables, SetDoneVariables } from "@/lib/item-mutations"
-import { today } from "@/lib/dates"
+import { shift, today, toStored } from "@/lib/dates"
 import { refreshLists } from "@/lib/refresh"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useDueLabel } from "@/lib/use-due-label"
@@ -105,6 +106,9 @@ export function UpcomingScreen() {
               ))}
             </div>
           )}
+
+          {/* Upcoming is what is not today, so a new Item here is due tomorrow. */}
+          <DatedAddRow lists={lists} defaultDue={toStored(shift(today(), 1))} />
         </div>
       </div>
     </AppShell>

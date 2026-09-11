@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 import { AppShell } from "@/components/ds/app-shell"
 import { ActivityControl } from "@/components/ds/activity-control"
 import { ChromeBar } from "@/components/ds/chrome-bar"
+import { DatedAddRow } from "@/components/ds/dated-add-row"
 import { EmptyState } from "@/components/ds/empty-state"
 import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
 import { SectionHeading } from "@/components/ds/section-heading"
@@ -12,7 +13,7 @@ import { listClient } from "@/lib/api"
 import { todayQuery } from "@/lib/dated-queries"
 import type { RenameItemVariables, SetDoneVariables } from "@/lib/item-mutations"
 import type { DatedItem } from "@nooks/api"
-import { dayFullHeading, isDueToday, isOverdue, today } from "@/lib/dates"
+import { dayFullHeading, isDueToday, isOverdue, today, toStored } from "@/lib/dates"
 import { refreshLists } from "@/lib/refresh"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useDueLabel } from "@/lib/use-due-label"
@@ -132,6 +133,8 @@ export function TodayScreen() {
               )}
             </div>
           )}
+
+          <DatedAddRow lists={lists} defaultDue={toStored(from)} />
         </div>
       </div>
     </AppShell>

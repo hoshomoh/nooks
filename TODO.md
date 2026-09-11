@@ -17,7 +17,7 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M1 · Skeleton that runs | `[x]` |
 | M2 · Auth and first run | `[x]` |
 | M3 · Lists and Items — the core | `[~]` lists, items, search and the list view |
-| M4 · Views: Today, Upcoming, Calendar | `[~]` add row from context left |
+| M4 · Views: Today, Upcoming, Calendar | `[x]` |
 | M5 · Notes | `[x]` |
 | M6 · Sharing, presence, Activity | `[x]` |
 | M7 · Members and Groups | `[ ]` |
@@ -139,7 +139,8 @@ The single most important milestone; everything else is furniture.
 - [x] Upcoming: next two weeks, grouped by day
 - [x] Calendar: month grid, 1060px column, **dated Items only**. Weeks start on Monday,
       and the grid pads to whole weeks either side
-- [ ] Add row that targets a List and a date from context — needs the date parser
+- [x] Add row that targets a List and a date from context: the List last added to, due today
+      on Today and tomorrow on Upcoming, both stated in the placeholder
 - [x] Empty states for both views
 
 ---

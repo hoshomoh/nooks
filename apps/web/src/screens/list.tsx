@@ -18,6 +18,7 @@ import { ShareDialog, type ShareDecision } from "@/components/ds/share-dialog"
 import { Button } from "@/components/ds/button"
 import { listClient } from "@/lib/api"
 import { listQuery } from "@/lib/list-queries"
+import { lastListStore } from "@/lib/last-list-store"
 import { refreshLists } from "@/lib/refresh"
 import type { Translate } from "@/lib/translate"
 import { debounce } from "@/lib/debounce"
@@ -70,7 +71,11 @@ export function ListScreen() {
   const addItem = useMutation({
     mutationFn: ({ label, quantity, dueOn }: AddRowSubmission) =>
       listClient.createItem({ listUid, label, quantity, dueOn }),
-    onSuccess: refresh,
+    onSuccess: () => {
+      // Adding here is what makes this the List Today and Upcoming will add to next.
+      lastListStore.remember(listUid)
+      return refresh()
+    },
   })
 
   const saveNote = useMutation({

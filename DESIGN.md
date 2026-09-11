@@ -268,6 +268,13 @@ value, and the last action wins.
 Quantity has no permanent control — only the date earned one, because a date is the one field whose
 absence changes where the Item appears. Notes, assignment and moving between Lists are all sheet-level.
 
+*Per-view defaults.* On a List, the Item lands there with no date. On **Today** and **Upcoming** it
+lands on the List last added to — that is what the Member means by "somewhere" — due today and
+tomorrow respectively. The placeholder states both in words: *"Add to Groceries, due today"*. A
+default that is not stated is a default nobody can trust. The **calendar** has no add row at all: it
+is a lens on dates, not a home for Items. Where the Member has no Lists yet, the row is absent rather
+than disabled — a row that swallows an Item is worse than no row.
+
 ---
 
 ## 7. Controls

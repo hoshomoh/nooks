@@ -9,7 +9,12 @@ import { ListRow, type ListRowLabels } from "./list-row"
 
 beforeAll(readyForEnglish)
 
-const labels: ListRowLabels = { name: "Item name", open: "Open item" }
+const labels: ListRowLabels = {
+  name: "Item name",
+  open: "Open item",
+  quantity: "Quantity",
+  due: "Add a date",
+}
 
 describe("the list row", () => {
   it("opens the Item from anywhere in the row, not only its label", async () => {
@@ -77,6 +82,57 @@ describe("the list row", () => {
       )
 
       expect(screen.getByRole("button", { name: "More" })).toBeInTheDocument()
+    })
+  })
+
+  // A menu entry called "Set a quantity" should put the caret in the quantity, not
+  // open a panel somewhere else and leave the Member to find it.
+  describe("changing a field in place", () => {
+    it("opens the quantity where the badge is, when asked", () => {
+      render(
+        <ListRow
+          label="Milk"
+          onQuantityChange={vi.fn()}
+          editing="quantity"
+          labels={labels}
+        />,
+      )
+
+      expect(screen.getByRole("textbox", { name: "Quantity" })).toBeInTheDocument()
+    })
+
+    it("saves the quantity and closes the field", async () => {
+      const onQuantityChange = vi.fn()
+      const onEditingDone = vi.fn()
+      render(
+        <ListRow
+          label="Milk"
+          onQuantityChange={onQuantityChange}
+          onEditingDone={onEditingDone}
+          editing="quantity"
+          labels={labels}
+        />,
+      )
+
+      await userEvent.type(screen.getByRole("textbox", { name: "Quantity" }), "1 kg{Enter}")
+
+      expect(onQuantityChange).toHaveBeenCalledWith("1 kg")
+      expect(onEditingDone).toHaveBeenCalled()
+    })
+
+    it("leaves the quantity a plain badge when it cannot be changed", () => {
+      render(<ListRow label="Milk" quantity="2" labels={labels} />)
+
+      expect(screen.getByText("2")).toBeInTheDocument()
+      expect(screen.queryByRole("textbox", { name: "Quantity" })).not.toBeInTheDocument()
+    })
+
+    it("opens the date control on the row, not a panel elsewhere", () => {
+      render(
+        <ListRow label="Milk" onDueChange={vi.fn()} editing="due" labels={labels} />,
+      )
+
+      expect(screen.getByRole("button", { name: "Due date" })).toBeInTheDocument()
     })
   })
 

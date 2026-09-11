@@ -20,6 +20,9 @@ export interface DateFieldProps {
    */
   chosen: boolean
   onChange: (value: DueDate) => void
+  /** Opened from outside, when something other than the pill asks for it. */
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 /**
@@ -30,10 +33,20 @@ export interface DateFieldProps {
  * input looks different in every browser, and this is a control a Member sees on every
  * row they add.
  */
-export function DateField({ value, label, chosen, onChange }: DateFieldProps) {
+export function DateField({
+  value,
+  label,
+  chosen,
+  onChange,
+  open: openFromOutside,
+  onOpenChange,
+}: DateFieldProps) {
   const { t } = useTranslation()
   const { dateLocale } = useLocale()
-  const [open, setOpen] = useState(false)
+  const [openOnItsOwn, setOpenOnItsOwn] = useState(false)
+
+  const open = openFromOutside ?? openOnItsOwn
+  const setOpen = onOpenChange ?? setOpenOnItsOwn
 
   const selected = parseDue(value) ?? undefined
 

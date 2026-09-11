@@ -19,6 +19,8 @@ export interface EditableTitleProps {
   label: string
   /** What an empty field reads as, e.g. "Add". Without it, empty is invisible. */
   placeholder?: string
+  /** Takes the caret on mount, for a field something else asked to open. */
+  autoFocus?: boolean
 }
 
 /**
@@ -40,6 +42,7 @@ export function EditableTitle({
   className,
   label,
   placeholder,
+  autoFocus,
 }: EditableTitleProps) {
   const [draft, setDraft] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -60,6 +63,7 @@ export function EditableTitle({
   return (
     <input
       ref={inputRef}
+      autoFocus={autoFocus}
       aria-label={label}
       placeholder={placeholder}
       value={draft ?? value}

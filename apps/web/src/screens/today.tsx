@@ -49,7 +49,12 @@ export function TodayScreen() {
     onSuccess: () => refreshLists(queryClient),
   })
 
-  const rowLabels: ListRowLabels = { name: t("note.itemName"), open: t("list.openItem") }
+  const rowLabels: ListRowLabels = {
+    name: t("note.itemName"),
+    open: t("list.openItem"),
+    quantity: t("note.quantity"),
+    due: t("note.addDate"),
+  }
 
   const overdue = dated.items.filter((entry) => isOverdue(entry.item?.dueOn ?? "", from))
   const dueToday = dated.items.filter((entry) => isDueToday(entry.item?.dueOn ?? "", from))

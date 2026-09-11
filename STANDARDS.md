@@ -156,6 +156,15 @@ Otherwise:
 **Before every commit**, run `./scripts/ci.sh`. It is exactly what CI runs, in the same
 order. Discovering a break after pushing is the same information, slower and noisier.
 
+**Before every push**, run `./scripts/preflight.sh`. It checks out `HEAD` somewhere
+else, installs from the lockfile and runs the same script there — so what passes is what
+you are about to push, rather than a working tree that has moved on since.
+
+The difference is not pedantry. `ci.sh` checks the tree you are looking at, and two
+ordinary things break that: a fix made *after* the run passed, and a file that was never
+`git add`ed. Both leave a green run locally and a red one on GitHub. Note also that
+`tsc -b` is incremental, so a local run can skip files a fresh checkout will not.
+
 **Conventional Commits, and keep them short.**
 
 ```

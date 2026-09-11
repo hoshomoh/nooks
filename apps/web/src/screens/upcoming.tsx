@@ -45,7 +45,12 @@ export function UpcomingScreen() {
     onSuccess: () => refreshLists(queryClient),
   })
 
-  const rowLabels: ListRowLabels = { name: t("note.itemName"), open: t("list.openItem") }
+  const rowLabels: ListRowLabels = {
+    name: t("note.itemName"),
+    open: t("list.openItem"),
+    quantity: t("note.quantity"),
+    due: t("note.addDate"),
+  }
 
   const days = groupByDay(dated.items)
 

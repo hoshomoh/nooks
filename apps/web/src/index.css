@@ -609,8 +609,12 @@
 
 .nooks-note ul[data-type="taskList"] li > label {
   flex: none;
-  margin-top: 4px;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  /* Exactly one line of the text beside it, so the box centres on that first line
+     whatever the type is set to. The nudge this replaces was a fixed 4px, which is
+     right at one font size and wrong at every other — and wrong is what it looked. */
+  height: 1lh;
 }
 
 .nooks-note ul[data-type="taskList"] li > div {

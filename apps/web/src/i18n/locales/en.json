@@ -220,7 +220,11 @@
     "addToNote": "Add to the note",
     "backToList": "Back to list",
     "escapeReturns": "Esc returns to the list",
-    "itemName": "Item name"
+    "itemName": "Item name",
+    "bold": "Bold",
+    "italic": "Italic",
+    "strike": "Strikethrough",
+    "code": "Code"
   },
   "addRow": {
     "todayWords": [

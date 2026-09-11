@@ -8,6 +8,11 @@ import { ConnectError } from "@connectrpc/connect"
  * server wrote.
  */
 export function messageFrom(error: unknown, fallback = "Something went wrong reaching the server."): string {
+  // No error is not a failure to describe. A form that has not been submitted was
+  // printing the fallback, so every sign-in page opened already apologising.
+  if (error === null || error === undefined) {
+    return ""
+  }
   if (error instanceof ConnectError) {
     return error.rawMessage
   }

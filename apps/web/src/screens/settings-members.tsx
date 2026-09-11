@@ -22,6 +22,7 @@ import { useMomentLabel } from "@/lib/use-moment-label"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 import { JoinRequests } from "./join-requests"
 import { useSettingsCounts } from "@/lib/use-settings-counts"
+import { IconButton } from "@/components/ds/icon-button"
 
 /**
  * The Members page: who is here, what they may do, and who is waiting.
@@ -86,7 +87,7 @@ export function SettingsMembersScreen() {
       </header>
 
       <div className="flex flex-col">
-        <div className="grid grid-cols-[1fr_120px_110px_24px] items-center gap-4 border-b border-border pb-2.5 text-label text-muted-foreground uppercase">
+        <div className="grid grid-cols-[1fr_120px_110px_28px] items-center gap-4 border-b border-border pb-2.5 text-label text-muted-foreground uppercase">
           <span>{t("members.person")}</span>
           <span>{t("members.groupsColumn")}</span>
           <span>{t("members.role")}</span>
@@ -160,7 +161,7 @@ function MemberRow({ member, groups, isSignedIn, onSetRole, onRemove }: MemberRo
   const arrived = member.lastSignedInAt !== ""
 
   return (
-    <div className="grid min-h-14 grid-cols-[1fr_120px_110px_24px] items-center gap-4 border-b border-hair">
+    <div className="grid min-h-14 grid-cols-[1fr_120px_110px_28px] items-center gap-4 border-b border-hair">
       <span className="flex items-center gap-3">
         <span className="grid size-7 shrink-0 place-items-center rounded-full bg-chip text-[11px] text-secondary-foreground">
           {initialsOf(member.name)}
@@ -189,9 +190,12 @@ function MemberRow({ member, groups, isSignedIn, onSetRole, onRemove }: MemberRo
 
       <Menu
         trigger={
-          <Button tone="quiet" scale="toolbar" aria-label={t("listMenu.open")}>
-            ···
-          </Button>
+          <IconButton
+            name="more"
+            scale="compact"
+            label={t("listMenu.open")}
+            className="justify-self-end"
+          />
         }
       >
         <MenuItem

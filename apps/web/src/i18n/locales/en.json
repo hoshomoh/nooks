@@ -118,7 +118,9 @@
     "areHere": "{{names}} are here",
     "doneToday": "{{count}} done today",
     "doneToday_zero": "nothing done today",
-    "doneEarlier": "{{count}} done"
+    "doneEarlier": "{{count}} done",
+    "allDoneTitle": "Nothing left on this list",
+    "allDoneBody": "Everything on it is ticked. What is done is at the foot of the list, and anything new goes below."
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",
@@ -272,18 +274,16 @@
   },
   "listMenu": {
     "open": "More",
-    "rename": "Rename",
-    "pin": "Pin to sidebar",
-    "unpin": "Unpin",
-    "duplicate": "Duplicate",
+    "sort": "Sort: {{how}}",
+    "sortManual": "manually",
+    "sortAlphabetical": "by name",
+    "sortDue": "by date",
+    "completed": "Completed: {{where}}",
+    "completedBottom": "at the bottom",
+    "completedHidden": "hidden",
+    "showQuantities": "Show quantities",
     "print": "Print",
-    "export": "Export as plain text",
-    "delete": "Delete list",
-    "deleteTitle": "Delete “{{name}}”?",
-    "deleteBlurb": "The list and everything on it goes. Nobody it was shared with keeps a copy.",
-    "deleteConfirm": "Delete",
-    "renameTitle": "Rename “{{name}}”",
-    "renameBlurb": "What the list is called, in the sidebar and on anything printed from it."
+    "export": "Export as plain text"
   },
   "settings": {
     "title": "Settings",
@@ -344,5 +344,43 @@
     "save": "Save",
     "emptyTitle": "No groups yet",
     "emptyBody": "A group is worth making when you share the same lists with the same people more than once. Until then, sharing with them by name is less to keep up to date."
+  },
+  "sidebarMenu": {
+    "open": "More",
+    "openList": "Open list",
+    "rename": "Rename",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "share": "Share…",
+    "print": "Print",
+    "duplicate": "Duplicate",
+    "delete": "Delete list",
+    "deleteTitle": "Delete “{{name}}”?",
+    "deleteBlurb": "The list and everything on it goes. Nobody it was shared with keeps a copy.",
+    "deleteConfirm": "Delete",
+    "renameTitle": "Rename “{{name}}”",
+    "renameBlurb": "What the list is called, in the sidebar and on anything printed from it."
+  },
+  "itemMenu": {
+    "open": "More",
+    "edit": "Edit item",
+    "setDate": "Set a date",
+    "setQuantity": "Set a quantity",
+    "move": "Move to another list",
+    "assign": "Assign to someone",
+    "addNote": "Add a note",
+    "duplicate": "Duplicate",
+    "delete": "Delete item"
+  },
+  "starter": {
+    "listName": "Groceries",
+    "milk": "Milk",
+    "milkQuantity": "2",
+    "tomatoes": "Tomatoes",
+    "tomatoesQuantity": "1 kg",
+    "coffee": "Coffee — the good beans from the market",
+    "coffeeNote": "### Where\nSaturday market, second row.\n\n- [ ] Ethiopian, whole bean\n\n> They pack up around two.",
+    "bakingPaper": "Baking paper",
+    "washingUp": "Washing-up liquid"
   }
 }

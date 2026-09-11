@@ -123,8 +123,9 @@ The single most important milestone; everything else is furniture.
 - [x] Tick and untick, with attribution
 - [x] Completed Items: collapsed at the foot of the List, behind the "3 done today" row
 - [x] Empty states: empty List, cold-start All lists
-- [~] List menu (`···`): rename, pin, duplicate, print, export and delete done. Sort order
-      and completed placement need a per-List setting, and arrive with it
+- [~] Three menus, per the design: the sidebar row's (open, rename, pin, share, print,
+      duplicate, delete) and the item row's are done. The chrome bar's — sort, completed
+      placement, show quantities — needs a per-List setting and arrives with it
       text, delete
 - [x] Pinning, per Member — store done, and it never touches anyone else's sidebar
 - [~] Keyboard: `↵` and `⌘K` done, including Ctrl+K. `↑` `↓` and `space` arrive with row
@@ -278,6 +279,8 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
 
 ## M14 · Ship
 
+- [ ] Split the bundle. It is 1.47 MB minified and every screen pays for the calendar,
+      the command menu and the editor whether or not it opens one
 - [ ] Docker image, `docker-compose.yml`, and a one-line run command
 - [ ] Release workflow, versioned binaries
 - [x] `README.md`: what it is, how to run it, how to back it up

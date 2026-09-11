@@ -1,7 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { cn } from "cn"
-import type { List } from "@nooks/api"
+import { Sharing, type List } from "@nooks/api"
+
+import { ListActions } from "./list-actions"
 
 import { Mark } from "@/components/mark"
 
@@ -91,9 +93,24 @@ export function Sidebar({
         />
       </div>
 
-      <ListGroup label={t("sidebar.pinned")} lists={pinned} activeListUid={activeListUid} />
-      <ListGroup label={t("sidebar.myLists")} lists={mine} activeListUid={activeListUid} />
-      <ListGroup label={t("sidebar.sharedWithMe")} lists={shared} activeListUid={activeListUid} />
+      <ListGroup
+        label={t("sidebar.pinned")}
+        lists={pinned}
+        activeListUid={activeListUid}
+        instanceName={instanceName}
+      />
+      <ListGroup
+        label={t("sidebar.myLists")}
+        lists={mine}
+        activeListUid={activeListUid}
+        instanceName={instanceName}
+      />
+      <ListGroup
+        label={t("sidebar.sharedWithMe")}
+        lists={shared}
+        activeListUid={activeListUid}
+        instanceName={instanceName}
+      />
 
       <button
         type="button"
@@ -166,14 +183,16 @@ function ViewLink({ to, label, count, active, accent }: ViewLinkProps) {
   )
 }
 
-type ListGroupProps = {
+interface ListGroupProps {
   label: string
   lists: List[]
   activeListUid?: string
+  /** What this Instance calls itself, for the share dialog behind each row's menu. */
+  instanceName: string
 }
 
 /** One labelled group of Lists. An empty group is not rendered at all. */
-function ListGroup({ label, lists, activeListUid }: ListGroupProps) {
+function ListGroup({ label, lists, activeListUid, instanceName }: ListGroupProps) {
   if (lists.length === 0) {
     return null
   }
@@ -184,24 +203,43 @@ function ListGroup({ label, lists, activeListUid }: ListGroupProps) {
         {label}
       </div>
       {lists.map((list) => (
-        <Link
+        <div
           key={list.uid}
-          to="/lists/$listUid"
-          params={{ listUid: list.uid }}
           className={cn(
-            "flex h-7.5 items-center gap-2.5 rounded-md px-2",
+            "group/list relative flex h-7.5 items-center gap-2.5 rounded-md px-2",
             list.uid === activeListUid ? "bg-secondary font-medium" : "hover:bg-secondary",
           )}
         >
+          <Link
+            to="/lists/$listUid"
+            params={{ listUid: list.uid }}
+            aria-label={list.name}
+            className="absolute inset-0 rounded-md"
+          />
+
           {/* One blue dot per shared List — the only colour on a screen at rest. */}
-          {list.sharing !== 1 && <span className="size-[5px] shrink-0 rounded-full bg-shared" />}
-          <span className="truncate text-chrome">{list.name}</span>
+          {list.sharing !== Sharing.PRIVATE && (
+            <span className="relative size-[5px] shrink-0 rounded-full bg-shared" />
+          )}
+          <span className="relative truncate text-chrome">{list.name}</span>
+
+          {/* The count gives way to the menu on hover. They share the slot rather than
+              sitting side by side, because a row that widens as the pointer crosses it
+              is a row nobody can aim at. */}
           {list.openCount > 0 && (
-            <span className="ml-auto shrink-0 text-[11.5px] text-muted-foreground">
+            <span className="relative ml-auto shrink-0 text-[11.5px] text-muted-foreground group-hover/list:hidden">
               {list.openCount}
             </span>
           )}
-        </Link>
+          <span
+            className={cn(
+              "relative z-10 -mr-1 hidden shrink-0 group-hover/list:block",
+              list.openCount > 0 || "ml-auto",
+            )}
+          >
+            <ListActions list={list} instanceName={instanceName} />
+          </span>
+        </div>
       ))}
     </div>
   )

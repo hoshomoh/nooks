@@ -4,7 +4,10 @@ import { useTranslation } from "react-i18next"
 import { useNavigate } from "@tanstack/react-router"
 import { SearchHitKind, type SearchHit } from "@nooks/api"
 
+import { cn } from "cn"
+
 import { Button } from "./button"
+import { DIALOG_SURFACE } from "./dialog-surface"
 import { Field } from "./field"
 import {
   Command,
@@ -40,7 +43,9 @@ export function CommandPalette() {
           palette.close()
         }
       }}
-      className="max-w-dialog"
+      // The generated command dialog sets its own width and radius, the radius with
+      // !important, so both have to be answered in kind.
+      className={cn(DIALOG_SURFACE, "rounded-2xl!")}
     >
       {palette.mode === "add-list" ? <AddListPanel /> : <SearchPanel />}
     </CommandDialog>

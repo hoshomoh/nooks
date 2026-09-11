@@ -372,6 +372,20 @@ page.**
 mono 13.5 with `word-break: break-all`, a primary Copy button, and a sentence saying plainly that it
 cannot be shown again. **Never a warning triangle.**
 
+**Three menus, three jobs.** A List is reached from two places and its `···` says
+different things in each, because what a menu offers depends on what you are looking at:
+
+| Where | What it holds |
+| --- | --- |
+| A **sidebar row**, on hover | What happens *to* the List: open, rename, pin, share, print, duplicate, delete |
+| The **chrome bar** of the List you are on | How the List is *shown*: sort, where completed items go, whether quantities show — plus print and export |
+| An **item row**, on hover | What happens to that Item: edit, set a date, set a quantity, move, assign, note, duplicate, delete |
+
+A `···` appears on hover and **takes the place of the row's metadata** rather than
+sitting beside it — a row that widens as the pointer crosses it is a row nobody can aim
+at. An action that is already a permanent control in the chrome bar is absent from the
+menu beside it: the same action twice in one place reads as two different actions.
+
 **Layers.** Three, and no others. A component that needs to sit above something reaches for the layer
 that describes it rather than for a bigger number.
 

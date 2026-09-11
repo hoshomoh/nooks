@@ -4,6 +4,7 @@ import { cn } from "cn"
 import type { Member } from "@nooks/api"
 
 import { Button } from "./button"
+import { DIALOG_SURFACE } from "./dialog-surface"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 
 export interface PickPeopleProps {
@@ -40,7 +41,7 @@ export function PickPeople({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="w-full max-w-dialog gap-0 rounded-2xl p-0 sm:max-w-dialog"
+        className={DIALOG_SURFACE}
       >
         {/* Keyed on who is picked, so opening it again starts from what is true now. */}
         <PickPeopleForm

@@ -1,0 +1,58 @@
+import { listClient } from "./api"
+import { shift, today, toStored } from "./dates"
+import type { Translate } from "./translate"
+
+/**
+ * The List a new Instance opens onto.
+ *
+ * An empty Instance is a fair description of the truth and a poor way to meet a
+ * product: a Member who has never seen Nooks cannot tell that an Item can carry a
+ * quantity, a date or a Note, because nothing on screen has one. So the first List
+ * shows each of them once, on things somebody might actually buy.
+ *
+ * Written from the browser rather than the server, because the words have to be in the
+ * Member's language and only the browser knows which that is. It is one round of calls,
+ * once, on the day an Instance is created.
+ */
+export async function createStarterList(t: Translate, now: Date = new Date()): Promise<void> {
+  const created = await listClient.createList({ name: t("starter.listName") })
+  const listUid = created.list?.uid
+  if (!listUid) {
+    return
+  }
+
+  for (const item of starterItems(t, now)) {
+    await listClient.createItem({ listUid, ...item })
+  }
+}
+
+/** One line of the starter List. */
+interface StarterItem {
+  label: string
+  quantity: string
+  dueOn: string
+  note: string
+}
+
+/**
+ * starterItems is what the first List holds.
+ *
+ * Between them they show a quantity, a date, and a Note with every block type in it —
+ * each feature once, and nothing that looks like filler. Pure, so what a new Instance
+ * opens onto can be read here rather than run.
+ */
+export function starterItems(t: Translate, now: Date): StarterItem[] {
+  const plain = { quantity: "", dueOn: "", note: "" }
+  return [
+    { ...plain, label: t("starter.washingUp") },
+    { ...plain, label: t("starter.milk"), quantity: t("starter.milkQuantity") },
+    {
+      ...plain,
+      label: t("starter.tomatoes"),
+      quantity: t("starter.tomatoesQuantity"),
+      dueOn: toStored(shift(today(now), 2)),
+    },
+    { ...plain, label: t("starter.coffee"), note: t("starter.coffeeNote") },
+    { ...plain, label: t("starter.bakingPaper") },
+  ]
+}

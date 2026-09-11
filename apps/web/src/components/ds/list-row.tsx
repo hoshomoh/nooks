@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import { cn } from "cn"
 
 import { Checkbox } from "./checkbox"
@@ -34,6 +35,13 @@ export type ListRowProps = {
   onRename?: (label: string) => void
   /** What a screen reader calls the label field and the rest of the row. */
   labels: ListRowLabels
+  /**
+   * The row's own `···`, shown on hover.
+   *
+   * Passed in rather than built here: what can be done to an Item is the screen's
+   * business, and a row that knew would need every mutation the screen has.
+   */
+  menu?: ReactNode
 }
 
 /** The words the row needs that are not the Item's own. */
@@ -65,6 +73,7 @@ export function ListRow({
   onOpen,
   onRename,
   labels,
+  menu,
 }: ListRowProps) {
   return (
     <div className="flex flex-col">
@@ -109,9 +118,23 @@ export function ListRow({
           )}
         </span>
 
-        <span className="pointer-events-none relative z-10 flex items-center gap-3 whitespace-nowrap text-micro text-muted-foreground">
-          {dueLabel && <span className={overdue ? "text-overdue" : "text-shared"}>{dueLabel}</span>}
-          {addedByName && <span>{addedByName}</span>}
+        {/* The metadata and the menu share the last column: the menu takes its place on
+            hover rather than sitting beside it, because a row that widens as the
+            pointer crosses it is a row nobody can aim at. */}
+        <span className="relative z-10 flex items-center justify-end">
+          <span
+            className={cn(
+              "pointer-events-none flex items-center gap-3 whitespace-nowrap text-micro text-muted-foreground",
+              menu && "group-hover:hidden",
+            )}
+          >
+            {dueLabel && (
+              <span className={overdue ? "text-overdue" : "text-shared"}>{dueLabel}</span>
+            )}
+            {addedByName && <span>{addedByName}</span>}
+          </span>
+
+          {menu && <span className="hidden -mr-1 group-hover:block">{menu}</span>}
         </span>
       </div>
 

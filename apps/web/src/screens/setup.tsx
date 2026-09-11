@@ -8,6 +8,7 @@ import { Button } from "@/components/ds/button"
 import { Field } from "@/components/ds/field"
 import { FormError } from "@/components/ds/form-error"
 import { authClient } from "@/lib/api"
+import { createStarterList } from "@/lib/starter-list"
 import { messageFrom } from "@/lib/errors"
 
 export function Setup() {
@@ -23,7 +24,12 @@ export function Setup() {
   const completeSetup = useMutation({
     mutationFn: () => authClient.completeSetup({ name, email, password, instanceName }),
     onSuccess: async () => {
-      // The Instance is now named and there is a session, so both answers are stale.
+      // A first List, so the Instance opens onto something that shows what an Item can
+      // carry. It is a courtesy: if it fails, the Admin gets an empty Instance, which
+      // is the thing they asked for and can fill themselves.
+      await createStarterList(t).catch(() => undefined)
+
+      // The Instance is now named, there is a session, and there is a List.
       await queryClient.invalidateQueries()
       await navigate({ to: "/" })
     },

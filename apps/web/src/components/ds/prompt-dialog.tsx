@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 
 import { Button } from "./button"
 import { Field } from "./field"
+import { DIALOG_SURFACE } from "./dialog-surface"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 
 export interface PromptDialogProps {
@@ -40,7 +41,7 @@ export function PromptDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="w-full max-w-dialog gap-0 rounded-2xl p-0 sm:max-w-dialog"
+        className={DIALOG_SURFACE}
       >
         <PromptForm
           key={initialValue}

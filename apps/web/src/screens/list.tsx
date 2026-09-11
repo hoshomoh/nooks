@@ -7,15 +7,13 @@ import { ActivityControl } from "@/components/ds/activity-control"
 import { Presence } from "@/components/ds/presence"
 import { AddRow, type AddRowSubmission } from "@/components/ds/add-row"
 import { DoneSection } from "@/components/ds/done-section"
-import { ListMenu } from "@/components/ds/list-menu"
+import { ItemMenu } from "@/components/ds/item-menu"
+import { ListActions } from "@/components/ds/list-actions"
 import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
 import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
 import { NoteSheet } from "@/components/ds/note-sheet"
-import { PromptDialog } from "@/components/ds/prompt-dialog"
-import { ShareDialog, type ShareDecision } from "@/components/ds/share-dialog"
-import { Button } from "@/components/ds/button"
 import { listClient } from "@/lib/api"
 import { listQuery } from "@/lib/list-queries"
 import { lastListStore } from "@/lib/last-list-store"
@@ -68,10 +66,6 @@ export function ListScreen() {
   // screen's own state rather than a route.
   const [openItemUid, setOpenItemUid] = useState<string | null>(null)
 
-  // Sharing is a decision the owner makes in a dialog, so whether it is open is the
-  // screen's own state. Renaming is the same.
-  const [sharingOpen, setSharingOpen] = useState(false)
-  const [renaming, setRenaming] = useState(false)
 
   const refresh = () => refreshLists(queryClient)
 
@@ -128,39 +122,15 @@ export function ListScreen() {
     onSuccess: refresh,
   })
 
-  const share = useMutation({
-    mutationFn: (decision: ShareDecision) =>
-      listClient.setListSharing({ listUid, ...decision }),
+  const removeItem = useMutation({
+    mutationFn: (itemUid: string) => listClient.deleteItem({ itemUid }),
     onSuccess: refresh,
   })
 
-  const pin = useMutation({
-    mutationFn: (pinned: boolean) => listClient.setListPinned({ listUid, pinned }),
-    onSuccess: refresh,
-  })
 
-  const duplicate = useMutation({
-    mutationFn: () => listClient.duplicateList({ listUid }),
-    onSuccess: async (res) => {
-      await refresh()
-      if (res.list) {
-        void navigate({ to: "/lists/$listUid", params: { listUid: res.list.uid } })
-      }
-    },
-  })
 
-  const remove = useMutation({
-    mutationFn: () => listClient.deleteList({ listUid }),
-    onSuccess: async () => {
-      await refresh()
-      void navigate({ to: "/" })
-    },
-  })
 
-  const renameList = useMutation({
-    mutationFn: (name: string) => listClient.renameList({ listUid, name }),
-    onSuccess: refresh,
-  })
+
 
   const rowLabels: ListRowLabels = { name: t("note.itemName"), open: t("list.openItem") }
 
@@ -182,50 +152,20 @@ export function ListScreen() {
         crumbs={[t(list.list?.isOwner ? "list.myListsCrumb" : "list.sharedCrumb"), list.list?.name ?? ""]}
         actions={
           <>
-            {list.list?.isOwner && (
-              <Button tone="secondary" scale="toolbar" onClick={() => setSharingOpen(true)}>
-                {t("share.action")}
-              </Button>
-            )}
             <ActivityControl />
             {list.list && (
-              <ListMenu
+              <ListActions
                 list={list.list}
+                instanceName={instanceName}
                 items={list.items}
-                actions={{
-                  onRename: () => setRenaming(true),
-                  onPin: (pinned) => pin.mutate(pinned),
-                  onDuplicate: () => duplicate.mutate(),
-                  onDelete: () => remove.mutate(),
-                }}
+                withControls
               />
             )}
           </>
         }
       />
 
-      {list.list && (
-        <PromptDialog
-          open={renaming}
-          onOpenChange={setRenaming}
-          title={t("listMenu.renameTitle", { name: list.list.name })}
-          blurb={t("listMenu.renameBlurb")}
-          label={t("palette.name")}
-          initialValue={list.list.name}
-          confirmLabel={t("action.save")}
-          onConfirm={(name) => renameList.mutate(name)}
-        />
-      )}
 
-      {list.list && (
-        <ShareDialog
-          list={list.list}
-          instanceName={instanceName}
-          open={sharingOpen}
-          onOpenChange={setSharingOpen}
-          onSave={(decision) => share.mutate(decision)}
-        />
-      )}
 
       <div className="relative flex flex-1 justify-center px-5.5 pt-14 pb-22">
         <div className="w-full max-w-content">
@@ -246,8 +186,14 @@ export function ListScreen() {
             </div>
           </header>
 
-          {list.items.length === 0 ? (
-            <EmptyState title={t("list.emptyTitle")} body={t("list.emptyBody")} />
+          {/* Emptiness is about what is left to do, not about what the List holds: a
+              List whose Items are all ticked has nothing on it to read, and without
+              this the add row draws its top border against nothing at all. */}
+          {open.length === 0 ? (
+            <EmptyState
+              title={t(done.length > 0 ? "list.allDoneTitle" : "list.emptyTitle")}
+              body={t(done.length > 0 ? "list.allDoneBody" : "list.emptyBody")}
+            />
           ) : (
             <div className="flex flex-col">
               {open.map((item) => (
@@ -267,6 +213,24 @@ export function ListScreen() {
                     canEdit ? (label) => rename.mutate({ itemUid: item.uid, label }) : undefined
                   }
                   labels={rowLabels}
+                  menu={
+                    canEdit ? (
+                      <ItemMenu
+                        actions={{
+                          onEdit: () => setOpenItemUid(item.uid),
+                          onSetDate: () => setOpenItemUid(item.uid),
+                          onSetQuantity: () => setOpenItemUid(item.uid),
+                          onDuplicate: () =>
+                            addItem.mutate({
+                              label: item.label,
+                              quantity: item.quantity,
+                              dueOn: item.dueOn,
+                            }),
+                          onDelete: () => removeItem.mutate(item.uid),
+                        }}
+                      />
+                    ) : undefined
+                  }
                 />
               ))}
             </div>

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next"
 
 import { Button } from "./button"
+import { DIALOG_SURFACE } from "./dialog-surface"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 
 export interface ConfirmDialogProps {
@@ -36,7 +37,7 @@ export function ConfirmDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="w-full max-w-dialog gap-0 rounded-2xl p-0 sm:max-w-dialog"
+        className={DIALOG_SURFACE}
       >
         <header className="flex flex-col gap-2 px-6.5 pt-6 pb-5">
           <h2 className="text-dialog">{title}</h2>

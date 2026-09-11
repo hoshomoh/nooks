@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom"
 import { useTranslation } from "react-i18next"
 import type { Item } from "@nooks/api"
 
@@ -30,13 +31,17 @@ const ROWS_PER_COLUMN = 18
  * the chrome bar and the menus are all things a person standing in a shop has no use
  * for.
  *
+ * It goes through a portal because printing hides the app's root: a sheet rendered
+ * inside that root would be hidden along with everything else, and the page would come
+ * out blank.
+ *
  * It renders **every** Item, ticked ones included: a printed sheet is a snapshot of the
  * List, and somebody who ticked something on the way out still wants to see they did.
  */
 export function PrintSheet({ instanceName, listName, printedOn, items }: PrintSheetProps) {
   const { t } = useTranslation()
 
-  return (
+  return createPortal(
     <article className="nooks-print-sheet" aria-hidden>
       <header className="nooks-print-header">
         <p className="nooks-print-eyebrow">{t("print.eyebrow", { instance: instanceName })}</p>
@@ -81,6 +86,17 @@ export function PrintSheet({ instanceName, listName, printedOn, items }: PrintSh
         <span>{t("print.footer")}</span>
         <span className="nooks-print-sheet-name">{t("print.sheet")}</span>
       </footer>
-    </article>
+    </article>,
+    printHost(),
   )
+}
+
+/**
+ * Where the sheet is rendered: the host beside the app, or the body when there is none.
+ *
+ * The fallback is for a page that renders the sheet without the app's own document —
+ * a test. It only has to be outside the app's root, and in that document it is.
+ */
+function printHost(): HTMLElement {
+  return document.getElementById("print-root") ?? document.body
 }

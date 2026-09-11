@@ -28,6 +28,12 @@
   </head>
   <body>
     <div id="root"></div>
+    <!--
+      Where the printed List is rendered. A sibling of the app rather than a part of it:
+      printing hides #root so the sidebar and the chrome do not come with the sheet, and
+      anything inside #root would be hidden along with them.
+    -->
+    <div id="print-root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

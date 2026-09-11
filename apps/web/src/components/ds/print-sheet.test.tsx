@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { beforeAll, describe, expect, it } from "vitest"
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest"
 import { render } from "@testing-library/react"
 import type { Item } from "@nooks/api"
 
@@ -8,6 +8,17 @@ import { readyForEnglish } from "@/test/i18n"
 import { PrintSheet } from "./print-sheet"
 
 beforeAll(readyForEnglish)
+
+/** The host the sheet portals into, standing in for the one in index.html. */
+let printRoot: HTMLElement
+
+beforeEach(() => {
+  printRoot = document.createElement("div")
+  printRoot.id = "print-root"
+  document.body.append(printRoot)
+})
+
+afterEach(() => printRoot.remove())
 
 /** someItems builds a List of a given length. */
 function someItems(count: number): Item[] {
@@ -20,9 +31,14 @@ function someItems(count: number): Item[] {
   })) as Item[]
 }
 
-/** show renders the sheet for a List. */
+/**
+ * show renders the sheet for a List, and answers with where it landed.
+ *
+ * Not the render container: the sheet portals itself out of the app's root, which is
+ * the whole point of it — printing hides that root.
+ */
 function show(items: Item[]) {
-  const { container } = render(
+  render(
     <PrintSheet
       instanceName="Brunnen Street"
       listName="Groceries"
@@ -30,10 +46,26 @@ function show(items: Item[]) {
       items={items}
     />,
   )
-  return container
+  return printRoot
 }
 
 describe("the printed sheet", () => {
+  // Printing hides the app's root. A sheet inside it is hidden too, and the page comes
+  // out blank.
+  it("renders outside the app's root", () => {
+    const { container } = render(
+      <PrintSheet
+        instanceName="Brunnen Street"
+        listName="Groceries"
+        printedOn="Tuesday, 25 August"
+        items={someItems(1)}
+      />,
+    )
+
+    expect(container.querySelector(".nooks-print-sheet")).toBeNull()
+    expect(document.querySelector(".nooks-print-sheet")).not.toBeNull()
+  })
+
   // A sheet is a snapshot of the List: somebody who ticked something on the way out
   // still wants to see that they did.
   it("prints every Item, ticked ones included", () => {

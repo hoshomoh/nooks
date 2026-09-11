@@ -252,6 +252,8 @@ The single most important milestone; everything else is furniture.
       Settings, so one-click sign-out needs a member menu the design does not have yet
 - [x] Token permissions are three abilities, not two levels — "Read items", "Add and
       tick off items" and "Delete items and lists", the last off by default
+- [x] `buf breaking` in CI, against main — the protos are the contract every client is
+      built against, and nothing was checking it
 - [ ] Export everything — one JSON file plus the printed pages as PDFs
 - [ ] Import a backup — the same file the exporter writes, so moving machines is copy and restore
 

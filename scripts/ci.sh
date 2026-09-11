@@ -45,6 +45,19 @@ if [ -n "$(cd proto && pnpm exec buf format -d)" ]; then
   echo "proto files are not formatted; run pnpm proto:format"; exit 1
 fi
 
+# The protos are the contract every client is built against: the web app, a mobile
+# client, and anything anybody writes against the REST API. Checking against main means
+# a change that would break one of those stops here rather than in somebody's build.
+#
+# It is skipped where there is no main to compare with — a fresh clone with no remote,
+# or the first commit on a new branch that has not been pushed.
+step "buf breaking"
+if git rev-parse --verify --quiet main >/dev/null; then
+  (cd proto && pnpm exec buf breaking --against "../.git#branch=main,subdir=proto")
+else
+  echo "no main to compare against; skipped"
+fi
+
 step "web lint and typecheck"
 pnpm --filter @nooks/web lint
 

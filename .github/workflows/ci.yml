@@ -48,7 +48,11 @@ jobs:
     name: Proto
     runs-on: ubuntu-latest
     steps:
+      # The whole history, because buf breaking compares against main. A shallow
+      # checkout has no main to compare with and the check would quietly skip.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -60,6 +64,11 @@ jobs:
       - name: Formatted
         working-directory: proto
         run: test -z "$(pnpm exec buf format -d)"
+      # The protos are the contract every client is built against. A change that would
+      # break one stops here rather than in somebody's build.
+      - name: No breaking changes
+        working-directory: proto
+        run: pnpm exec buf breaking --against "../.git#branch=origin/main,subdir=proto"
 
   web:
     name: Web

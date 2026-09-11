@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nooks/api/v1/public_service.proto.
  */
 export const file_nooks_api_v1_public_service: GenFile = /*@__PURE__*/
-  fileDesc("CiFub29rcy9hcGkvdjEvcHVibGljX3NlcnZpY2UucHJvdG8SDG5vb2tzLmFwaS52MSJvCgpQdWJsaWNJdGVtEg0KBWxhYmVsGAEgASgJEgwKBGRvbmUYAiABKAgSCwoDdWlkGAYgASgJEhAKCHF1YW50aXR5GAMgASgJEg4KBmR1ZV9vbhgEIAEoCRIVCg1hZGRlZF9ieV9uYW1lGAUgASgJIhYKFEdldFB1YmxpY0xpc3RSZXF1ZXN0IpEBChVHZXRQdWJsaWNMaXN0UmVzcG9uc2USEQoJcHVibGlzaGVkGAEgASgIEhUKDWluc3RhbmNlX25hbWUYAiABKAkSEQoJbGlzdF9uYW1lGAMgASgJEicKBWl0ZW1zGAQgAygLMhgubm9va3MuYXBpLnYxLlB1YmxpY0l0ZW0SEgoKYWxsb3dfam9pbhgFIAEoCDJpCg1QdWJsaWNTZXJ2aWNlElgKDUdldFB1YmxpY0xpc3QSIi5ub29rcy5hcGkudjEuR2V0UHVibGljTGlzdFJlcXVlc3QaIy5ub29rcy5hcGkudjEuR2V0UHVibGljTGlzdFJlc3BvbnNlQrABChBjb20ubm9va3MuYXBpLnYxQhJQdWJsaWNTZXJ2aWNlUHJvdG9QAVo2Z2l0aHViLmNvbS9ob3Nob21vaC9ub29rcy9wcm90by9nZW4vbm9va3MvYXBpL3YxO2FwaXYxogIDTkFYqgIMTm9va3MuQXBpLlYxygIMTm9va3NcQXBpXFYx4gIYTm9va3NcQXBpXFYxXEdQQk1ldGFkYXRh6gIOTm9va3M6OkFwaTo6VjFiBnByb3RvMw");
+  fileDesc("CiFub29rcy9hcGkvdjEvcHVibGljX3NlcnZpY2UucHJvdG8SDG5vb2tzLmFwaS52MSJvCgpQdWJsaWNJdGVtEg0KBWxhYmVsGAEgASgJEgwKBGRvbmUYAiABKAgSCwoDdWlkGAYgASgJEhAKCHF1YW50aXR5GAMgASgJEg4KBmR1ZV9vbhgEIAEoCRIVCg1hZGRlZF9ieV9uYW1lGAUgASgJIhYKFEdldFB1YmxpY0xpc3RSZXF1ZXN0IrkBChVHZXRQdWJsaWNMaXN0UmVzcG9uc2USEQoJcHVibGlzaGVkGAEgASgIEhUKDWluc3RhbmNlX25hbWUYAiABKAkSEQoJbGlzdF9uYW1lGAMgASgJEicKBWl0ZW1zGAQgAygLMhgubm9va3MuYXBpLnYxLlB1YmxpY0l0ZW0SEgoKYWxsb3dfam9pbhgFIAEoCBISCgpvcGVuX2NvdW50GAYgASgFEhIKCnVwZGF0ZWRfYXQYByABKAkyaQoNUHVibGljU2VydmljZRJYCg1HZXRQdWJsaWNMaXN0EiIubm9va3MuYXBpLnYxLkdldFB1YmxpY0xpc3RSZXF1ZXN0GiMubm9va3MuYXBpLnYxLkdldFB1YmxpY0xpc3RSZXNwb25zZUKwAQoQY29tLm5vb2tzLmFwaS52MUISUHVibGljU2VydmljZVByb3RvUAFaNmdpdGh1Yi5jb20vaG9zaG9tb2gvbm9va3MvcHJvdG8vZ2VuL25vb2tzL2FwaS92MTthcGl2MaICA05BWKoCDE5vb2tzLkFwaS5WMcoCDE5vb2tzXEFwaVxWMeICGE5vb2tzXEFwaVxWMVxHUEJNZXRhZGF0YeoCDk5vb2tzOjpBcGk6OlYxYgZwcm90bzM");
 
 /**
  * PublicItem is one line of the public page.
@@ -117,6 +117,22 @@ export type GetPublicListResponse = Message<"nooks.api.v1.GetPublicListResponse"
    * @generated from field: bool allow_join = 5;
    */
   allowJoin: boolean;
+
+  /**
+   * How many Items are still open. The page leads with this: a shopper wants the number
+   * of things left, not the length of the list.
+   *
+   * @generated from field: int32 open_count = 6;
+   */
+  openCount: number;
+
+  /**
+   * When the List last changed, RFC 3339. A page somebody keeps open on the way to the
+   * shop has to say how fresh it is.
+   *
+   * @generated from field: string updated_at = 7;
+   */
+  updatedAt: string;
 };
 
 /**

@@ -162,7 +162,13 @@ type GetPublicListResponse struct {
 	ListName     string        `protobuf:"bytes,3,opt,name=list_name,json=listName,proto3" json:"list_name,omitempty"`
 	Items        []*PublicItem `protobuf:"bytes,4,rep,name=items,proto3" json:"items,omitempty"`
 	// Whether a Visitor may ask for an account from this page.
-	AllowJoin     bool `protobuf:"varint,5,opt,name=allow_join,json=allowJoin,proto3" json:"allow_join,omitempty"`
+	AllowJoin bool `protobuf:"varint,5,opt,name=allow_join,json=allowJoin,proto3" json:"allow_join,omitempty"`
+	// How many Items are still open. The page leads with this: a shopper wants the number
+	// of things left, not the length of the list.
+	OpenCount int32 `protobuf:"varint,6,opt,name=open_count,json=openCount,proto3" json:"open_count,omitempty"`
+	// When the List last changed, RFC 3339. A page somebody keeps open on the way to the
+	// shop has to say how fresh it is.
+	UpdatedAt     string `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -232,6 +238,20 @@ func (x *GetPublicListResponse) GetAllowJoin() bool {
 	return false
 }
 
+func (x *GetPublicListResponse) GetOpenCount() int32 {
+	if x != nil {
+		return x.OpenCount
+	}
+	return 0
+}
+
+func (x *GetPublicListResponse) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
 var File_nooks_api_v1_public_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_public_service_proto_rawDesc = "" +
@@ -245,14 +265,18 @@ const file_nooks_api_v1_public_service_proto_rawDesc = "" +
 	"\bquantity\x18\x03 \x01(\tR\bquantity\x12\x15\n" +
 	"\x06due_on\x18\x04 \x01(\tR\x05dueOn\x12\"\n" +
 	"\radded_by_name\x18\x05 \x01(\tR\vaddedByName\"\x16\n" +
-	"\x14GetPublicListRequest\"\xc6\x01\n" +
+	"\x14GetPublicListRequest\"\x84\x02\n" +
 	"\x15GetPublicListResponse\x12\x1c\n" +
 	"\tpublished\x18\x01 \x01(\bR\tpublished\x12#\n" +
 	"\rinstance_name\x18\x02 \x01(\tR\finstanceName\x12\x1b\n" +
 	"\tlist_name\x18\x03 \x01(\tR\blistName\x12.\n" +
 	"\x05items\x18\x04 \x03(\v2\x18.nooks.api.v1.PublicItemR\x05items\x12\x1d\n" +
 	"\n" +
-	"allow_join\x18\x05 \x01(\bR\tallowJoin2i\n" +
+	"allow_join\x18\x05 \x01(\bR\tallowJoin\x12\x1d\n" +
+	"\n" +
+	"open_count\x18\x06 \x01(\x05R\topenCount\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\a \x01(\tR\tupdatedAt2i\n" +
 	"\rPublicService\x12X\n" +
 	"\rGetPublicList\x12\".nooks.api.v1.GetPublicListRequest\x1a#.nooks.api.v1.GetPublicListResponseB\xb0\x01\n" +
 	"\x10com.nooks.api.v1B\x12PublicServiceProtoP\x01Z6github.com/hoshomoh/nooks/proto/gen/nooks/api/v1;apiv1\xa2\x02\x03NAX\xaa\x02\fNooks.Api.V1\xca\x02\fNooks\\Api\\V1\xe2\x02\x18Nooks\\Api\\V1\\GPBMetadata\xea\x02\x0eNooks::Api::V1b\x06proto3"

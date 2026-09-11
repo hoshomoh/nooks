@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
@@ -11,6 +11,7 @@ import { Mark } from "@/components/mark"
 import { pendingTickStore } from "@/lib/pending-tick-store"
 import { publicListQuery } from "@/lib/public-queries"
 import { useDueLabel } from "@/lib/use-due-label"
+import { useMomentLabel } from "@/lib/use-moment-label"
 
 /**
  * The public page: one List, no account, no sidebar.
@@ -24,6 +25,7 @@ export function PublicListScreen() {
   const { t } = useTranslation()
   const page = useSuspenseQuery(publicListQuery).data
   const due = useDueLabel()
+  const moment = useMomentLabel()
 
   // Which row a Visitor reached for. The prompt appears under that row rather than as
   // a wall across the page: they were trying to do one thing, and being told "sign in"
@@ -39,10 +41,20 @@ export function PublicListScreen() {
   }
 
   return (
-    <PublicShell instanceName={page.instanceName}>
-      <header className="mb-8.5 flex flex-col gap-3.5">
+    <PublicShell instanceName={page.instanceName} allowJoin={page.allowJoin}>
+      <header className="mb-8 flex flex-col gap-3">
         <h1 className="text-display">{page.listName}</h1>
-        <p className="text-meta text-secondary-foreground">{t("public.readOnly")}</p>
+        <div className="flex items-center gap-3 text-meta text-secondary-foreground">
+          <span>{t("public.openCount", { count: page.openCount })}</span>
+          {page.updatedAt && (
+            <>
+              <span className="h-3 w-px bg-border" />
+              <span>{t("public.updated", { when: moment(page.updatedAt) })}</span>
+            </>
+          )}
+          <span className="h-3 w-px bg-border" />
+          <span>{t("public.readOnly")}</span>
+        </div>
       </header>
 
       {page.items.length === 0 ? (
@@ -57,6 +69,7 @@ export function PublicListScreen() {
               <PublicRow
                 item={item}
                 dueLabel={due.label(item.dueOn)}
+                reached={reachedFor === index}
                 onReach={() => {
                   // What they meant to do, kept until they have an account to do it
                   // with.
@@ -64,11 +77,29 @@ export function PublicListScreen() {
                   setReachedFor(index)
                 }}
               />
-              {reachedFor === index && <SignInPrompt allowJoin={page.allowJoin} />}
+              {reachedFor === index && (
+                <SignInPrompt
+                  label={item.label}
+                  allowJoin={page.allowJoin}
+                  instanceName={page.instanceName}
+                  onDismiss={() => setReachedFor(null)}
+                />
+              )}
             </div>
           ))}
         </div>
       )}
+
+      {/* What a Visitor cannot do here, said once at the foot rather than beside every
+          row they cannot use. */}
+      <div className="mt-6.5 flex flex-wrap items-center gap-3.5 border-t border-hair pt-4.5 text-meta">
+        <span className="text-secondary-foreground">{t("public.needsAccount")}</span>
+        {page.allowJoin && (
+          <Link to="/join" className="text-shared hover:underline">
+            {t("public.askToJoinInstance", { name: page.instanceName })}
+          </Link>
+        )}
+      </div>
     </PublicShell>
   )
 }
@@ -77,6 +108,8 @@ interface PublicRowProps {
   item: PublicItem
   /** The date as it reads, or empty when the Instance does not show dates. */
   dueLabel: string
+  /** Whether this is the row the prompt below belongs to. */
+  reached: boolean
   onReach: () => void
 }
 
@@ -87,9 +120,16 @@ interface PublicRowProps {
  * is how they find out they need an account, and a box that ignores the pointer would
  * leave them clicking at nothing.
  */
-function PublicRow({ item, dueLabel, onReach }: PublicRowProps) {
+function PublicRow({ item, dueLabel, reached, onReach }: PublicRowProps) {
   return (
-    <div className="grid min-h-row grid-cols-[20px_1fr_auto] items-center gap-3.5 px-2 py-1.5 -mx-2">
+    <div
+      className={cn(
+        "grid min-h-row grid-cols-[20px_1fr_auto] items-center gap-3.5 rounded-md border px-2 py-1.5 -mx-2",
+        // The row they touched is what the prompt is about, so the row is what is
+        // marked. The prompt itself stays quiet: two accents would be two questions.
+        reached ? "border-[length:1.5px] border-shared bg-shared-bg" : "border-transparent",
+      )}
+    >
       <button
         type="button"
         onClick={onReach}
@@ -98,6 +138,7 @@ function PublicRow({ item, dueLabel, onReach }: PublicRowProps) {
           "size-[17px] rounded-sm border-[length:1.5px]",
           // Lighter than a Member's, because it is not interactive in the way theirs is.
           item.done ? "border-muted-foreground bg-muted-foreground" : "border-toggle-off",
+          reached && !item.done && "border-shared",
         )}
       />
 
@@ -121,7 +162,11 @@ function PublicRow({ item, dueLabel, onReach }: PublicRowProps) {
 }
 
 interface SignInPromptProps {
+  /** The Item they reached for, named back to them. */
+  label: string
   allowJoin: boolean
+  instanceName: string
+  onDismiss: () => void
 }
 
 /**
@@ -130,40 +175,76 @@ interface SignInPromptProps {
  * Under the row they touched, not across the page: it answers the thing they just
  * tried, and leaves everything else readable.
  */
-function SignInPrompt({ allowJoin }: SignInPromptProps) {
+function SignInPrompt({ label, allowJoin, instanceName, onDismiss }: SignInPromptProps) {
   const { t } = useTranslation()
 
   return (
-    <div className="mb-2 ml-8 flex flex-wrap items-center gap-3 rounded-xl border border-shared-line bg-shared-bg px-4 py-3">
-      <span className="text-small">{t("public.signInToTick")}</span>
-      <span className="text-micro text-muted-foreground">{t("public.signInBlurb")}</span>
-      <span className="flex-1" />
-      {allowJoin && (
-        <Link to="/join">
-          <Button tone="secondary" scale="compact">
-            {t("public.askToJoin")}
-          </Button>
+    <div className="mt-2.5 mb-4.5 flex flex-col gap-3.5 rounded-lg border border-border bg-sidebar px-5 py-4.5 -mx-2">
+      <div className="flex flex-col gap-1">
+        <span className="text-field font-medium">{t("public.signInToTick", { label })}</span>
+        <span className="text-meta leading-[1.6] text-secondary-foreground">
+          {t("public.signInBlurb", { name: instanceName })}
+        </span>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2.5">
+        <Link to="/sign-in">
+          <Button scale="compact">{t("public.signIn")}</Button>
         </Link>
-      )}
-      <Link to="/sign-in">
-        <Button scale="compact">{t("public.signIn")}</Button>
-      </Link>
+        {allowJoin && (
+          <Link to="/join">
+            <Button tone="secondary" scale="compact">
+              {t("public.askToJoin")}
+            </Button>
+          </Link>
+        )}
+        <span className="flex-1" />
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="text-meta text-muted-foreground transition-colors hover:text-foreground"
+        >
+          {t("public.notNow")}
+        </button>
+      </div>
+
+      {/* Not a promise about signing in — a statement about what already happened. The
+          tick is in this browser's storage the moment they reach for the row. */}
+      <span className="text-micro text-muted-foreground">{t("public.tickRemembered")}</span>
     </div>
   )
 }
 
 interface PublicShellProps {
   instanceName: string
-  children: React.ReactNode
+  /** Whether the Instance takes requests for an account from this page. */
+  allowJoin?: boolean
+  children: ReactNode
 }
 
 /** The page a Visitor sees: a mark, a name, and the List. Nothing else. */
-function PublicShell({ instanceName, children }: PublicShellProps) {
+function PublicShell({ instanceName, allowJoin, children }: PublicShellProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       <header className="flex h-chrome-auth items-center gap-3 border-b border-hair px-6">
         <Mark size={20} />
         <span className="text-chrome font-medium">{instanceName}</span>
+        {instanceName && (
+          <span className="text-micro text-muted-foreground">{t("public.label")}</span>
+        )}
+        <span className="flex-1" />
+        <Link to="/sign-in">
+          <Button tone="quiet" scale="compact">
+            {t("public.signIn")}
+          </Button>
+        </Link>
+        {allowJoin && (
+          <Link to="/join">
+            <Button scale="compact">{t("public.askToJoin")}</Button>
+          </Link>
+        )}
       </header>
 
       <div className="flex flex-1 justify-center px-5.5 pt-14 pb-22">

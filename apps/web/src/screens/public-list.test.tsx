@@ -64,15 +64,27 @@ describe("the public list", () => {
     expect(screen.queryByText("All lists")).not.toBeInTheDocument()
   })
 
-  // Under the row they touched, not as a wall: it answers the thing they just tried.
-  it("says nothing about signing in until a Visitor reaches for something", async () => {
+  // Under the row they touched, not as a wall: it answers the thing they just tried,
+  // and it names the thing rather than talking about ticking in general.
+  it("asks nothing until a Visitor reaches for a row, then names what they reached for", async () => {
     show(groceries)
 
     await screen.findByRole("heading", { name: "Groceries" })
-    expect(screen.queryByText("Sign in to tick things off")).not.toBeInTheDocument()
+    expect(screen.queryByText(/Sign in to tick/)).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByRole("button", { name: "Milk" }))
-    expect(screen.getByText("Sign in to tick things off")).toBeInTheDocument()
+    expect(screen.getByText("Sign in to tick “Milk” off")).toBeInTheDocument()
+  })
+
+  // Reaching for a row files the tick, so the sentence is a statement about what has
+  // already happened rather than a promise about signing in.
+  it("says the tick is kept", async () => {
+    show(groceries)
+
+    await screen.findByRole("heading", { name: "Groceries" })
+    await userEvent.click(screen.getByRole("button", { name: "Milk" }))
+
+    expect(screen.getByText(/remembered and applied/)).toBeInTheDocument()
   })
 
   it("offers to ask for an account only when the Instance allows it", async () => {
@@ -81,8 +93,17 @@ describe("the public list", () => {
     await screen.findByRole("heading", { name: "Groceries" })
     await userEvent.click(screen.getByRole("button", { name: "Milk" }))
 
-    expect(screen.getByRole("link", { name: "Sign in" })).toBeInTheDocument()
-    expect(screen.queryByRole("link", { name: "Ask to join" })).not.toBeInTheDocument()
+    // Signing in is always offered; asking for an account is the Instance's decision.
+    expect(screen.getAllByRole("link", { name: "Sign in" }).length).toBeGreaterThan(0)
+    expect(screen.queryByRole("link", { name: /Ask to join/ })).not.toBeInTheDocument()
+  })
+
+  it("leads with how much is left, and how fresh the page is", async () => {
+    show({ ...groceries, openCount: 6, updatedAt: new Date().toISOString() })
+
+    expect(await screen.findByText("6 open")).toBeInTheDocument()
+    expect(screen.getByText(/^updated /)).toBeInTheDocument()
+    expect(screen.getByText("read-only for visitors")).toBeInTheDocument()
   })
 
   // An Instance with nothing published must not hint at what it holds.

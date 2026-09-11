@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"errors"
+	"time"
 
 	"connectrpc.com/connect"
 
@@ -62,7 +63,11 @@ func (s *PublicService) GetPublicList(
 	}
 
 	out := make([]*apiv1.PublicItem, 0, len(items))
+	open := 0
 	for _, item := range items {
+		if !item.Done() {
+			open++
+		}
 		out = append(out, publicItemOf(item, settings.Public, names))
 	}
 
@@ -72,7 +77,29 @@ func (s *PublicService) GetPublicList(
 		ListName:     list.Name,
 		Items:        out,
 		AllowJoin:    settings.Public.AllowJoin,
+		OpenCount:    int32(open),
+		UpdatedAt:    lastChangedAt(list, items),
 	}), nil
+}
+
+/*
+lastChangedAt is when the page last had something to say.
+
+The List's own timestamp moves when it is renamed or reshared, which a Visitor cannot
+see and does not care about. What they came for is whether anything on the list changed,
+so the newest Item wins where there is one.
+*/
+func lastChangedAt(list store.List, items []store.Item) string {
+	newest := list.UpdatedAt
+	for _, item := range items {
+		if item.UpdatedAt.After(newest) {
+			newest = item.UpdatedAt
+		}
+	}
+	if newest.IsZero() {
+		return ""
+	}
+	return newest.Format(time.RFC3339)
 }
 
 // contributorNames looks up who added what, but only when the page shows it.

@@ -53,4 +53,12 @@ message GetPublicListResponse {
 
   // Whether a Visitor may ask for an account from this page.
   bool allow_join = 5;
+
+  // How many Items are still open. The page leads with this: a shopper wants the number
+  // of things left, not the length of the list.
+  int32 open_count = 6;
+
+  // When the List last changed, RFC 3339. A page somebody keeps open on the way to the
+  // shop has to say how fresh it is.
+  string updated_at = 7;
 }

@@ -122,3 +122,22 @@ func TestAPublishedListThatIsGone(t *testing.T) {
 		t.Error("Published = true for a List that is not there")
 	}
 }
+
+// A page somebody keeps open on the way to the shop has to say how much is left and
+// how fresh it is.
+func TestThePublicPageSaysWhatIsLeftAndWhenItChanged(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+	f.addItem(t, f.anna, uid, "Milk")
+	f.addItem(t, f.anna, uid, "Oats")
+	f.publish(t, uid, store.PublicList{})
+
+	res := f.readPublic(t)
+
+	if got := res.GetOpenCount(); got != 2 {
+		t.Errorf("openCount = %d, want 2", got)
+	}
+	if res.GetUpdatedAt() == "" {
+		t.Error("updatedAt is empty, want when the list last changed")
+	}
+}

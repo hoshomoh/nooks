@@ -415,12 +415,20 @@
     "nothingBody": "This nooks instance has no public list. If you were sent a link, whoever sent it can publish one from their settings.",
     "emptyTitle": "Nothing on the list",
     "emptyBody": "This page shows one list from {{name}}, so anybody can read it without an account. There is nothing on it at the moment.",
-    "signInToTick": "Sign in to tick things off",
-    "signInBlurb": "This page is read-only without an account.",
+    "signInToTick": "Sign in to tick “{{label}}” off",
+    "signInBlurb": "Anyone at {{name}} can. If you live here and don’t have an account yet, ask for one — whoever runs this instance will see the request.",
     "signIn": "Sign in",
     "askToJoin": "Ask to join",
     "dismiss": "Not now",
-    "readOnly": "Read-only · anybody with the link can see this"
+    "readOnly": "read-only for visitors",
+    "label": "public list",
+    "openCount": "{{count}} open",
+    "openCount_zero": "nothing open",
+    "updated": "updated {{when}}",
+    "notNow": "Not now",
+    "tickRemembered": "The tick is remembered and applied once you’re in.",
+    "needsAccount": "Ticking, adding and printing need an account.",
+    "askToJoinInstance": "Ask to join {{name}}"
   },
   "publicSettings": {
     "title": "Public list",

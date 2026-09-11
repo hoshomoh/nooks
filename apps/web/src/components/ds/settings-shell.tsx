@@ -9,7 +9,7 @@ import { useCommandPalette } from "@/lib/use-command-palette"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 
 /** Where a settings page lives. Only routes that exist are listed. */
-export type SettingsRoute = "/settings/members" | "/settings/groups"
+export type SettingsRoute = "/settings/members" | "/settings/groups" | "/settings/public"
 
 /** One entry in the settings column. */
 interface SettingsSection {
@@ -26,6 +26,7 @@ interface SettingsSection {
 const SECTIONS: SettingsSection[] = [
   { to: "/settings/members", labelKey: "settings.members" },
   { to: "/settings/groups", labelKey: "settings.groups" },
+  { to: "/settings/public", labelKey: "settings.publicList" },
 ]
 
 export interface SettingsShellProps {

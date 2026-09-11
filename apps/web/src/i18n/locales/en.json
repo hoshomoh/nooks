@@ -289,7 +289,8 @@
     "title": "Settings",
     "members": "Members",
     "groups": "Groups",
-    "backToLists": "Back to lists"
+    "backToLists": "Back to lists",
+    "publicList": "Public list"
   },
   "members": {
     "title": "Members",
@@ -407,5 +408,21 @@
     "askToJoin": "Ask to join",
     "dismiss": "Not now",
     "readOnly": "Read-only · anybody with the link can see this"
+  },
+  "publicSettings": {
+    "title": "Public list",
+    "blurb": "One list, at an address anybody can open without an account. Everything else on this instance stays private.",
+    "whichList": "Which list",
+    "whichListBlurb": "Only one list can be public at a time.",
+    "none": "Nothing published",
+    "showNames": "Show contributor names",
+    "showNamesBlurb": "Visitors see the items, not who added them.",
+    "showMeta": "Show quantities and dates",
+    "showMetaBlurb": "The metadata a shopper actually needs.",
+    "allowJoin": "Let visitors ask to join",
+    "allowJoinBlurb": "Adds a quiet link at the foot of the page.",
+    "address": "The page is at {{url}}",
+    "save": "Save",
+    "saved": "Saved"
   }
 }

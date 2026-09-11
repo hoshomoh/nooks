@@ -21,6 +21,310 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// PublicListSettings is the Instance's one public page, and what a Visitor sees of it.
+type PublicListSettings struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The List on the page, or empty for no public page at all.
+	ListUid string `protobuf:"bytes,1,opt,name=list_uid,json=listUid,proto3" json:"list_uid,omitempty"`
+	// Contributor names on the rows. Off by default: a public page is about what needs
+	// buying, not about who is in the household.
+	ShowNames bool `protobuf:"varint,2,opt,name=show_names,json=showNames,proto3" json:"show_names,omitempty"`
+	// Quantities and dates on the rows — the metadata a shopper actually needs.
+	ShowMeta bool `protobuf:"varint,3,opt,name=show_meta,json=showMeta,proto3" json:"show_meta,omitempty"`
+	// A quiet link at the foot of the page for a Visitor to ask for an account.
+	AllowJoin     bool `protobuf:"varint,4,opt,name=allow_join,json=allowJoin,proto3" json:"allow_join,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PublicListSettings) Reset() {
+	*x = PublicListSettings{}
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PublicListSettings) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PublicListSettings) ProtoMessage() {}
+
+func (x *PublicListSettings) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PublicListSettings.ProtoReflect.Descriptor instead.
+func (*PublicListSettings) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_instance_service_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *PublicListSettings) GetListUid() string {
+	if x != nil {
+		return x.ListUid
+	}
+	return ""
+}
+
+func (x *PublicListSettings) GetShowNames() bool {
+	if x != nil {
+		return x.ShowNames
+	}
+	return false
+}
+
+func (x *PublicListSettings) GetShowMeta() bool {
+	if x != nil {
+		return x.ShowMeta
+	}
+	return false
+}
+
+func (x *PublicListSettings) GetAllowJoin() bool {
+	if x != nil {
+		return x.AllowJoin
+	}
+	return false
+}
+
+type InstanceSettings struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// What the Instance calls itself, e.g. "Brunnen Street".
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// When false, every account starts as a join request an Admin approves.
+	PublicSignup  bool                `protobuf:"varint,2,opt,name=public_signup,json=publicSignup,proto3" json:"public_signup,omitempty"`
+	PublicList    *PublicListSettings `protobuf:"bytes,3,opt,name=public_list,json=publicList,proto3" json:"public_list,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InstanceSettings) Reset() {
+	*x = InstanceSettings{}
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InstanceSettings) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InstanceSettings) ProtoMessage() {}
+
+func (x *InstanceSettings) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InstanceSettings.ProtoReflect.Descriptor instead.
+func (*InstanceSettings) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_instance_service_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *InstanceSettings) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *InstanceSettings) GetPublicSignup() bool {
+	if x != nil {
+		return x.PublicSignup
+	}
+	return false
+}
+
+func (x *InstanceSettings) GetPublicList() *PublicListSettings {
+	if x != nil {
+		return x.PublicList
+	}
+	return nil
+}
+
+type GetInstanceSettingsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetInstanceSettingsRequest) Reset() {
+	*x = GetInstanceSettingsRequest{}
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetInstanceSettingsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetInstanceSettingsRequest) ProtoMessage() {}
+
+func (x *GetInstanceSettingsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetInstanceSettingsRequest.ProtoReflect.Descriptor instead.
+func (*GetInstanceSettingsRequest) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_instance_service_proto_rawDescGZIP(), []int{2}
+}
+
+type GetInstanceSettingsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Settings      *InstanceSettings      `protobuf:"bytes,1,opt,name=settings,proto3" json:"settings,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetInstanceSettingsResponse) Reset() {
+	*x = GetInstanceSettingsResponse{}
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetInstanceSettingsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetInstanceSettingsResponse) ProtoMessage() {}
+
+func (x *GetInstanceSettingsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetInstanceSettingsResponse.ProtoReflect.Descriptor instead.
+func (*GetInstanceSettingsResponse) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_instance_service_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetInstanceSettingsResponse) GetSettings() *InstanceSettings {
+	if x != nil {
+		return x.Settings
+	}
+	return nil
+}
+
+type UpdateInstanceSettingsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Settings      *InstanceSettings      `protobuf:"bytes,1,opt,name=settings,proto3" json:"settings,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateInstanceSettingsRequest) Reset() {
+	*x = UpdateInstanceSettingsRequest{}
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateInstanceSettingsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateInstanceSettingsRequest) ProtoMessage() {}
+
+func (x *UpdateInstanceSettingsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateInstanceSettingsRequest.ProtoReflect.Descriptor instead.
+func (*UpdateInstanceSettingsRequest) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_instance_service_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *UpdateInstanceSettingsRequest) GetSettings() *InstanceSettings {
+	if x != nil {
+		return x.Settings
+	}
+	return nil
+}
+
+type UpdateInstanceSettingsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Settings      *InstanceSettings      `protobuf:"bytes,1,opt,name=settings,proto3" json:"settings,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateInstanceSettingsResponse) Reset() {
+	*x = UpdateInstanceSettingsResponse{}
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateInstanceSettingsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateInstanceSettingsResponse) ProtoMessage() {}
+
+func (x *UpdateInstanceSettingsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateInstanceSettingsResponse.ProtoReflect.Descriptor instead.
+func (*UpdateInstanceSettingsResponse) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_instance_service_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *UpdateInstanceSettingsResponse) GetSettings() *InstanceSettings {
+	if x != nil {
+		return x.Settings
+	}
+	return nil
+}
+
 type GetInstanceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -29,7 +333,7 @@ type GetInstanceRequest struct {
 
 func (x *GetInstanceRequest) Reset() {
 	*x = GetInstanceRequest{}
-	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[0]
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -41,7 +345,7 @@ func (x *GetInstanceRequest) String() string {
 func (*GetInstanceRequest) ProtoMessage() {}
 
 func (x *GetInstanceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[0]
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -54,7 +358,7 @@ func (x *GetInstanceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetInstanceRequest.ProtoReflect.Descriptor instead.
 func (*GetInstanceRequest) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_instance_service_proto_rawDescGZIP(), []int{0}
+	return file_nooks_api_v1_instance_service_proto_rawDescGZIP(), []int{6}
 }
 
 type GetInstanceResponse struct {
@@ -74,7 +378,7 @@ type GetInstanceResponse struct {
 
 func (x *GetInstanceResponse) Reset() {
 	*x = GetInstanceResponse{}
-	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[1]
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -86,7 +390,7 @@ func (x *GetInstanceResponse) String() string {
 func (*GetInstanceResponse) ProtoMessage() {}
 
 func (x *GetInstanceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[1]
+	mi := &file_nooks_api_v1_instance_service_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -99,7 +403,7 @@ func (x *GetInstanceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetInstanceResponse.ProtoReflect.Descriptor instead.
 func (*GetInstanceResponse) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_instance_service_proto_rawDescGZIP(), []int{1}
+	return file_nooks_api_v1_instance_service_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetInstanceResponse) GetName() string {
@@ -134,16 +438,37 @@ var File_nooks_api_v1_instance_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_instance_service_proto_rawDesc = "" +
 	"\n" +
-	"#nooks/api/v1/instance_service.proto\x12\fnooks.api.v1\"\x14\n" +
+	"#nooks/api/v1/instance_service.proto\x12\fnooks.api.v1\"\x8a\x01\n" +
+	"\x12PublicListSettings\x12\x19\n" +
+	"\blist_uid\x18\x01 \x01(\tR\alistUid\x12\x1d\n" +
+	"\n" +
+	"show_names\x18\x02 \x01(\bR\tshowNames\x12\x1b\n" +
+	"\tshow_meta\x18\x03 \x01(\bR\bshowMeta\x12\x1d\n" +
+	"\n" +
+	"allow_join\x18\x04 \x01(\bR\tallowJoin\"\x8e\x01\n" +
+	"\x10InstanceSettings\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12#\n" +
+	"\rpublic_signup\x18\x02 \x01(\bR\fpublicSignup\x12A\n" +
+	"\vpublic_list\x18\x03 \x01(\v2 .nooks.api.v1.PublicListSettingsR\n" +
+	"publicList\"\x1c\n" +
+	"\x1aGetInstanceSettingsRequest\"Y\n" +
+	"\x1bGetInstanceSettingsResponse\x12:\n" +
+	"\bsettings\x18\x01 \x01(\v2\x1e.nooks.api.v1.InstanceSettingsR\bsettings\"[\n" +
+	"\x1dUpdateInstanceSettingsRequest\x12:\n" +
+	"\bsettings\x18\x01 \x01(\v2\x1e.nooks.api.v1.InstanceSettingsR\bsettings\"\\\n" +
+	"\x1eUpdateInstanceSettingsResponse\x12:\n" +
+	"\bsettings\x18\x01 \x01(\v2\x1e.nooks.api.v1.InstanceSettingsR\bsettings\"\x14\n" +
 	"\x12GetInstanceRequest\"\x89\x01\n" +
 	"\x13GetInstanceResponse\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
 	"\aversion\x18\x02 \x01(\tR\aversion\x12\x1f\n" +
 	"\vneeds_setup\x18\x03 \x01(\bR\n" +
 	"needsSetup\x12#\n" +
-	"\rpublic_signup\x18\x04 \x01(\bR\fpublicSignup2e\n" +
+	"\rpublic_signup\x18\x04 \x01(\bR\fpublicSignup2\xc6\x02\n" +
 	"\x0fInstanceService\x12R\n" +
-	"\vGetInstance\x12 .nooks.api.v1.GetInstanceRequest\x1a!.nooks.api.v1.GetInstanceResponseB\xb2\x01\n" +
+	"\vGetInstance\x12 .nooks.api.v1.GetInstanceRequest\x1a!.nooks.api.v1.GetInstanceResponse\x12j\n" +
+	"\x13GetInstanceSettings\x12(.nooks.api.v1.GetInstanceSettingsRequest\x1a).nooks.api.v1.GetInstanceSettingsResponse\x12s\n" +
+	"\x16UpdateInstanceSettings\x12+.nooks.api.v1.UpdateInstanceSettingsRequest\x1a,.nooks.api.v1.UpdateInstanceSettingsResponseB\xb2\x01\n" +
 	"\x10com.nooks.api.v1B\x14InstanceServiceProtoP\x01Z6github.com/hoshomoh/nooks/proto/gen/nooks/api/v1;apiv1\xa2\x02\x03NAX\xaa\x02\fNooks.Api.V1\xca\x02\fNooks\\Api\\V1\xe2\x02\x18Nooks\\Api\\V1\\GPBMetadata\xea\x02\x0eNooks::Api::V1b\x06proto3"
 
 var (
@@ -158,19 +483,33 @@ func file_nooks_api_v1_instance_service_proto_rawDescGZIP() []byte {
 	return file_nooks_api_v1_instance_service_proto_rawDescData
 }
 
-var file_nooks_api_v1_instance_service_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_nooks_api_v1_instance_service_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_nooks_api_v1_instance_service_proto_goTypes = []any{
-	(*GetInstanceRequest)(nil),  // 0: nooks.api.v1.GetInstanceRequest
-	(*GetInstanceResponse)(nil), // 1: nooks.api.v1.GetInstanceResponse
+	(*PublicListSettings)(nil),             // 0: nooks.api.v1.PublicListSettings
+	(*InstanceSettings)(nil),               // 1: nooks.api.v1.InstanceSettings
+	(*GetInstanceSettingsRequest)(nil),     // 2: nooks.api.v1.GetInstanceSettingsRequest
+	(*GetInstanceSettingsResponse)(nil),    // 3: nooks.api.v1.GetInstanceSettingsResponse
+	(*UpdateInstanceSettingsRequest)(nil),  // 4: nooks.api.v1.UpdateInstanceSettingsRequest
+	(*UpdateInstanceSettingsResponse)(nil), // 5: nooks.api.v1.UpdateInstanceSettingsResponse
+	(*GetInstanceRequest)(nil),             // 6: nooks.api.v1.GetInstanceRequest
+	(*GetInstanceResponse)(nil),            // 7: nooks.api.v1.GetInstanceResponse
 }
 var file_nooks_api_v1_instance_service_proto_depIdxs = []int32{
-	0, // 0: nooks.api.v1.InstanceService.GetInstance:input_type -> nooks.api.v1.GetInstanceRequest
-	1, // 1: nooks.api.v1.InstanceService.GetInstance:output_type -> nooks.api.v1.GetInstanceResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: nooks.api.v1.InstanceSettings.public_list:type_name -> nooks.api.v1.PublicListSettings
+	1, // 1: nooks.api.v1.GetInstanceSettingsResponse.settings:type_name -> nooks.api.v1.InstanceSettings
+	1, // 2: nooks.api.v1.UpdateInstanceSettingsRequest.settings:type_name -> nooks.api.v1.InstanceSettings
+	1, // 3: nooks.api.v1.UpdateInstanceSettingsResponse.settings:type_name -> nooks.api.v1.InstanceSettings
+	6, // 4: nooks.api.v1.InstanceService.GetInstance:input_type -> nooks.api.v1.GetInstanceRequest
+	2, // 5: nooks.api.v1.InstanceService.GetInstanceSettings:input_type -> nooks.api.v1.GetInstanceSettingsRequest
+	4, // 6: nooks.api.v1.InstanceService.UpdateInstanceSettings:input_type -> nooks.api.v1.UpdateInstanceSettingsRequest
+	7, // 7: nooks.api.v1.InstanceService.GetInstance:output_type -> nooks.api.v1.GetInstanceResponse
+	3, // 8: nooks.api.v1.InstanceService.GetInstanceSettings:output_type -> nooks.api.v1.GetInstanceSettingsResponse
+	5, // 9: nooks.api.v1.InstanceService.UpdateInstanceSettings:output_type -> nooks.api.v1.UpdateInstanceSettingsResponse
+	7, // [7:10] is the sub-list for method output_type
+	4, // [4:7] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_nooks_api_v1_instance_service_proto_init() }
@@ -184,7 +523,7 @@ func file_nooks_api_v1_instance_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_nooks_api_v1_instance_service_proto_rawDesc), len(file_nooks_api_v1_instance_service_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

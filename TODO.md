@@ -198,7 +198,8 @@ The single most important milestone; everything else is furniture.
 - [x] At most one Public list per Instance, at a stable address, no password, no account.
       A service of its own, so a method that answers anonymously cannot be added by accident
 - [x] Public page: no sidebar, no search, no other List reachable
-- [ ] Settings: which List, show contributor names, show quantities and dates, let visitors ask to join
+- [x] Settings: which List, show contributor names, show quantities and dates, let visitors ask
+      to join. Everything off by default
 - [x] Sign-in prompt appears **under the row the Visitor touched**, not as a wall
 - [ ] The attempted tick is remembered and applied once they are in
 - [~] Ask to join is offered from the page, and goes to the existing join screen. Its own

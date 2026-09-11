@@ -8,6 +8,54 @@ service InstanceService {
   // authentication because the sign-in page and the Public list both need it before
   // anyone has signed in.
   rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse);
+
+  // GetInstanceSettings returns everything an Admin may change, including which List
+  // is public. Admins only: which List is published is not a fact a Visitor gets to
+  // read from the outside.
+  rpc GetInstanceSettings(GetInstanceSettingsRequest) returns (GetInstanceSettingsResponse);
+
+  // UpdateInstanceSettings replaces them. Admins only.
+  rpc UpdateInstanceSettings(UpdateInstanceSettingsRequest) returns (UpdateInstanceSettingsResponse);
+}
+
+// PublicListSettings is the Instance's one public page, and what a Visitor sees of it.
+message PublicListSettings {
+  // The List on the page, or empty for no public page at all.
+  string list_uid = 1;
+
+  // Contributor names on the rows. Off by default: a public page is about what needs
+  // buying, not about who is in the household.
+  bool show_names = 2;
+
+  // Quantities and dates on the rows — the metadata a shopper actually needs.
+  bool show_meta = 3;
+
+  // A quiet link at the foot of the page for a Visitor to ask for an account.
+  bool allow_join = 4;
+}
+
+message InstanceSettings {
+  // What the Instance calls itself, e.g. "Brunnen Street".
+  string name = 1;
+
+  // When false, every account starts as a join request an Admin approves.
+  bool public_signup = 2;
+
+  PublicListSettings public_list = 3;
+}
+
+message GetInstanceSettingsRequest {}
+
+message GetInstanceSettingsResponse {
+  InstanceSettings settings = 1;
+}
+
+message UpdateInstanceSettingsRequest {
+  InstanceSettings settings = 1;
+}
+
+message UpdateInstanceSettingsResponse {
+  InstanceSettings settings = 1;
 }
 
 message GetInstanceRequest {}

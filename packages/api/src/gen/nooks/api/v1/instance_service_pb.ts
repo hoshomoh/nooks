@@ -10,7 +10,145 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nooks/api/v1/instance_service.proto.
  */
 export const file_nooks_api_v1_instance_service: GenFile = /*@__PURE__*/
-  fileDesc("CiNub29rcy9hcGkvdjEvaW5zdGFuY2Vfc2VydmljZS5wcm90bxIMbm9va3MuYXBpLnYxIhQKEkdldEluc3RhbmNlUmVxdWVzdCJgChNHZXRJbnN0YW5jZVJlc3BvbnNlEgwKBG5hbWUYASABKAkSDwoHdmVyc2lvbhgCIAEoCRITCgtuZWVkc19zZXR1cBgDIAEoCBIVCg1wdWJsaWNfc2lnbnVwGAQgASgIMmUKD0luc3RhbmNlU2VydmljZRJSCgtHZXRJbnN0YW5jZRIgLm5vb2tzLmFwaS52MS5HZXRJbnN0YW5jZVJlcXVlc3QaIS5ub29rcy5hcGkudjEuR2V0SW5zdGFuY2VSZXNwb25zZUKyAQoQY29tLm5vb2tzLmFwaS52MUIUSW5zdGFuY2VTZXJ2aWNlUHJvdG9QAVo2Z2l0aHViLmNvbS9ob3Nob21vaC9ub29rcy9wcm90by9nZW4vbm9va3MvYXBpL3YxO2FwaXYxogIDTkFYqgIMTm9va3MuQXBpLlYxygIMTm9va3NcQXBpXFYx4gIYTm9va3NcQXBpXFYxXEdQQk1ldGFkYXRh6gIOTm9va3M6OkFwaTo6VjFiBnByb3RvMw");
+  fileDesc("CiNub29rcy9hcGkvdjEvaW5zdGFuY2Vfc2VydmljZS5wcm90bxIMbm9va3MuYXBpLnYxImEKElB1YmxpY0xpc3RTZXR0aW5ncxIQCghsaXN0X3VpZBgBIAEoCRISCgpzaG93X25hbWVzGAIgASgIEhEKCXNob3dfbWV0YRgDIAEoCBISCgphbGxvd19qb2luGAQgASgIIm4KEEluc3RhbmNlU2V0dGluZ3MSDAoEbmFtZRgBIAEoCRIVCg1wdWJsaWNfc2lnbnVwGAIgASgIEjUKC3B1YmxpY19saXN0GAMgASgLMiAubm9va3MuYXBpLnYxLlB1YmxpY0xpc3RTZXR0aW5ncyIcChpHZXRJbnN0YW5jZVNldHRpbmdzUmVxdWVzdCJPChtHZXRJbnN0YW5jZVNldHRpbmdzUmVzcG9uc2USMAoIc2V0dGluZ3MYASABKAsyHi5ub29rcy5hcGkudjEuSW5zdGFuY2VTZXR0aW5ncyJRCh1VcGRhdGVJbnN0YW5jZVNldHRpbmdzUmVxdWVzdBIwCghzZXR0aW5ncxgBIAEoCzIeLm5vb2tzLmFwaS52MS5JbnN0YW5jZVNldHRpbmdzIlIKHlVwZGF0ZUluc3RhbmNlU2V0dGluZ3NSZXNwb25zZRIwCghzZXR0aW5ncxgBIAEoCzIeLm5vb2tzLmFwaS52MS5JbnN0YW5jZVNldHRpbmdzIhQKEkdldEluc3RhbmNlUmVxdWVzdCJgChNHZXRJbnN0YW5jZVJlc3BvbnNlEgwKBG5hbWUYASABKAkSDwoHdmVyc2lvbhgCIAEoCRITCgtuZWVkc19zZXR1cBgDIAEoCBIVCg1wdWJsaWNfc2lnbnVwGAQgASgIMsYCCg9JbnN0YW5jZVNlcnZpY2USUgoLR2V0SW5zdGFuY2USIC5ub29rcy5hcGkudjEuR2V0SW5zdGFuY2VSZXF1ZXN0GiEubm9va3MuYXBpLnYxLkdldEluc3RhbmNlUmVzcG9uc2USagoTR2V0SW5zdGFuY2VTZXR0aW5ncxIoLm5vb2tzLmFwaS52MS5HZXRJbnN0YW5jZVNldHRpbmdzUmVxdWVzdBopLm5vb2tzLmFwaS52MS5HZXRJbnN0YW5jZVNldHRpbmdzUmVzcG9uc2UScwoWVXBkYXRlSW5zdGFuY2VTZXR0aW5ncxIrLm5vb2tzLmFwaS52MS5VcGRhdGVJbnN0YW5jZVNldHRpbmdzUmVxdWVzdBosLm5vb2tzLmFwaS52MS5VcGRhdGVJbnN0YW5jZVNldHRpbmdzUmVzcG9uc2VCsgEKEGNvbS5ub29rcy5hcGkudjFCFEluc3RhbmNlU2VydmljZVByb3RvUAFaNmdpdGh1Yi5jb20vaG9zaG9tb2gvbm9va3MvcHJvdG8vZ2VuL25vb2tzL2FwaS92MTthcGl2MaICA05BWKoCDE5vb2tzLkFwaS5WMcoCDE5vb2tzXEFwaVxWMeICGE5vb2tzXEFwaVxWMVxHUEJNZXRhZGF0YeoCDk5vb2tzOjpBcGk6OlYxYgZwcm90bzM");
+
+/**
+ * PublicListSettings is the Instance's one public page, and what a Visitor sees of it.
+ *
+ * @generated from message nooks.api.v1.PublicListSettings
+ */
+export type PublicListSettings = Message<"nooks.api.v1.PublicListSettings"> & {
+  /**
+   * The List on the page, or empty for no public page at all.
+   *
+   * @generated from field: string list_uid = 1;
+   */
+  listUid: string;
+
+  /**
+   * Contributor names on the rows. Off by default: a public page is about what needs
+   * buying, not about who is in the household.
+   *
+   * @generated from field: bool show_names = 2;
+   */
+  showNames: boolean;
+
+  /**
+   * Quantities and dates on the rows — the metadata a shopper actually needs.
+   *
+   * @generated from field: bool show_meta = 3;
+   */
+  showMeta: boolean;
+
+  /**
+   * A quiet link at the foot of the page for a Visitor to ask for an account.
+   *
+   * @generated from field: bool allow_join = 4;
+   */
+  allowJoin: boolean;
+};
+
+/**
+ * Describes the message nooks.api.v1.PublicListSettings.
+ * Use `create(PublicListSettingsSchema)` to create a new message.
+ */
+export const PublicListSettingsSchema: GenMessage<PublicListSettings> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_instance_service, 0);
+
+/**
+ * @generated from message nooks.api.v1.InstanceSettings
+ */
+export type InstanceSettings = Message<"nooks.api.v1.InstanceSettings"> & {
+  /**
+   * What the Instance calls itself, e.g. "Brunnen Street".
+   *
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * When false, every account starts as a join request an Admin approves.
+   *
+   * @generated from field: bool public_signup = 2;
+   */
+  publicSignup: boolean;
+
+  /**
+   * @generated from field: nooks.api.v1.PublicListSettings public_list = 3;
+   */
+  publicList?: PublicListSettings | undefined;
+};
+
+/**
+ * Describes the message nooks.api.v1.InstanceSettings.
+ * Use `create(InstanceSettingsSchema)` to create a new message.
+ */
+export const InstanceSettingsSchema: GenMessage<InstanceSettings> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_instance_service, 1);
+
+/**
+ * @generated from message nooks.api.v1.GetInstanceSettingsRequest
+ */
+export type GetInstanceSettingsRequest = Message<"nooks.api.v1.GetInstanceSettingsRequest"> & {
+};
+
+/**
+ * Describes the message nooks.api.v1.GetInstanceSettingsRequest.
+ * Use `create(GetInstanceSettingsRequestSchema)` to create a new message.
+ */
+export const GetInstanceSettingsRequestSchema: GenMessage<GetInstanceSettingsRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_instance_service, 2);
+
+/**
+ * @generated from message nooks.api.v1.GetInstanceSettingsResponse
+ */
+export type GetInstanceSettingsResponse = Message<"nooks.api.v1.GetInstanceSettingsResponse"> & {
+  /**
+   * @generated from field: nooks.api.v1.InstanceSettings settings = 1;
+   */
+  settings?: InstanceSettings | undefined;
+};
+
+/**
+ * Describes the message nooks.api.v1.GetInstanceSettingsResponse.
+ * Use `create(GetInstanceSettingsResponseSchema)` to create a new message.
+ */
+export const GetInstanceSettingsResponseSchema: GenMessage<GetInstanceSettingsResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_instance_service, 3);
+
+/**
+ * @generated from message nooks.api.v1.UpdateInstanceSettingsRequest
+ */
+export type UpdateInstanceSettingsRequest = Message<"nooks.api.v1.UpdateInstanceSettingsRequest"> & {
+  /**
+   * @generated from field: nooks.api.v1.InstanceSettings settings = 1;
+   */
+  settings?: InstanceSettings | undefined;
+};
+
+/**
+ * Describes the message nooks.api.v1.UpdateInstanceSettingsRequest.
+ * Use `create(UpdateInstanceSettingsRequestSchema)` to create a new message.
+ */
+export const UpdateInstanceSettingsRequestSchema: GenMessage<UpdateInstanceSettingsRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_instance_service, 4);
+
+/**
+ * @generated from message nooks.api.v1.UpdateInstanceSettingsResponse
+ */
+export type UpdateInstanceSettingsResponse = Message<"nooks.api.v1.UpdateInstanceSettingsResponse"> & {
+  /**
+   * @generated from field: nooks.api.v1.InstanceSettings settings = 1;
+   */
+  settings?: InstanceSettings | undefined;
+};
+
+/**
+ * Describes the message nooks.api.v1.UpdateInstanceSettingsResponse.
+ * Use `create(UpdateInstanceSettingsResponseSchema)` to create a new message.
+ */
+export const UpdateInstanceSettingsResponseSchema: GenMessage<UpdateInstanceSettingsResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_instance_service, 5);
 
 /**
  * @generated from message nooks.api.v1.GetInstanceRequest
@@ -23,7 +161,7 @@ export type GetInstanceRequest = Message<"nooks.api.v1.GetInstanceRequest"> & {
  * Use `create(GetInstanceRequestSchema)` to create a new message.
  */
 export const GetInstanceRequestSchema: GenMessage<GetInstanceRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 0);
+  messageDesc(file_nooks_api_v1_instance_service, 6);
 
 /**
  * @generated from message nooks.api.v1.GetInstanceResponse
@@ -64,7 +202,7 @@ export type GetInstanceResponse = Message<"nooks.api.v1.GetInstanceResponse"> & 
  * Use `create(GetInstanceResponseSchema)` to create a new message.
  */
 export const GetInstanceResponseSchema: GenMessage<GetInstanceResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 1);
+  messageDesc(file_nooks_api_v1_instance_service, 7);
 
 /**
  * InstanceService reports what this copy of Nooks is and how it is configured.
@@ -83,6 +221,28 @@ export const InstanceService: GenService<{
     methodKind: "unary";
     input: typeof GetInstanceRequestSchema;
     output: typeof GetInstanceResponseSchema;
+  },
+  /**
+   * GetInstanceSettings returns everything an Admin may change, including which List
+   * is public. Admins only: which List is published is not a fact a Visitor gets to
+   * read from the outside.
+   *
+   * @generated from rpc nooks.api.v1.InstanceService.GetInstanceSettings
+   */
+  getInstanceSettings: {
+    methodKind: "unary";
+    input: typeof GetInstanceSettingsRequestSchema;
+    output: typeof GetInstanceSettingsResponseSchema;
+  },
+  /**
+   * UpdateInstanceSettings replaces them. Admins only.
+   *
+   * @generated from rpc nooks.api.v1.InstanceService.UpdateInstanceSettings
+   */
+  updateInstanceSettings: {
+    methodKind: "unary";
+    input: typeof UpdateInstanceSettingsRequestSchema;
+    output: typeof UpdateInstanceSettingsResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_nooks_api_v1_instance_service, 0);

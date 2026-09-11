@@ -6,7 +6,9 @@ package v1
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 
 	"connectrpc.com/connect"
 
@@ -43,4 +45,105 @@ func (s *InstanceService) GetInstance(
 		NeedsSetup:   settings.NeedsSetup(),
 		PublicSignup: settings.PublicSignup,
 	}), nil
+}
+
+// GetInstanceSettings returns everything an Admin may change.
+//
+// Admins only, and deliberately separate from GetInstance: which List is published is
+// not a fact a Visitor gets to read from the outside, and the public profile is read
+// before anybody has signed in.
+func (s *InstanceService) GetInstanceSettings(
+	ctx context.Context,
+	_ *connect.Request[apiv1.GetInstanceSettingsRequest],
+) (*connect.Response[apiv1.GetInstanceSettingsResponse], error) {
+	if _, err := requireAdmin(ctx); err != nil {
+		return nil, err
+	}
+
+	settings, err := s.store.InstanceSettings(ctx)
+	if err != nil {
+		return nil, internalError("read instance settings", err)
+	}
+	return connect.NewResponse(&apiv1.GetInstanceSettingsResponse{
+		Settings: settingsToProto(settings),
+	}), nil
+}
+
+// UpdateInstanceSettings replaces them.
+func (s *InstanceService) UpdateInstanceSettings(
+	ctx context.Context,
+	req *connect.Request[apiv1.UpdateInstanceSettingsRequest],
+) (*connect.Response[apiv1.UpdateInstanceSettingsResponse], error) {
+	if _, err := requireAdmin(ctx); err != nil {
+		return nil, err
+	}
+
+	wanted := req.Msg.GetSettings()
+	name := strings.TrimSpace(wanted.GetName())
+	if err := requireText(name, "a name"); err != nil {
+		return nil, err
+	}
+
+	public, err := s.publicFromProto(ctx, wanted.GetPublicList())
+	if err != nil {
+		return nil, err
+	}
+
+	// Read first, so the parts an Admin cannot change — when first run finished — are
+	// carried over rather than reset by anything this call leaves out.
+	settings, err := s.store.InstanceSettings(ctx)
+	if err != nil {
+		return nil, internalError("read instance settings", err)
+	}
+	settings.Name = name
+	settings.PublicSignup = wanted.GetPublicSignup()
+	settings.Public = public
+
+	if err := s.store.SaveInstanceSettings(ctx, settings); err != nil {
+		return nil, internalError("save instance settings", err)
+	}
+	return connect.NewResponse(&apiv1.UpdateInstanceSettingsResponse{
+		Settings: settingsToProto(settings),
+	}), nil
+}
+
+// publicFromProto checks that the List being published is one that exists.
+//
+// An identifier that names nothing would publish a page that answers "nothing here" to
+// everybody, which looks exactly like the Admin having turned it off.
+func (s *InstanceService) publicFromProto(
+	ctx context.Context,
+	wanted *apiv1.PublicListSettings,
+) (store.PublicList, error) {
+	public := store.PublicList{
+		ListUID:   wanted.GetListUid(),
+		ShowNames: wanted.GetShowNames(),
+		ShowMeta:  wanted.GetShowMeta(),
+		AllowJoin: wanted.GetAllowJoin(),
+	}
+	if !public.IsPublished() {
+		return public, nil
+	}
+
+	if _, err := s.store.ListByUID(ctx, public.ListUID); err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			return store.PublicList{}, errListNotFound
+		}
+		return store.PublicList{}, internalError("read list", err)
+	}
+	return public, nil
+}
+
+// settingsToProto converts the Instance's configuration for the wire.
+func settingsToProto(settings store.InstanceSettings) *apiv1.InstanceSettings {
+	return &apiv1.InstanceSettings{
+		Name:         settings.Name,
+		PublicSignup: settings.PublicSignup,
+		PublicList: &apiv1.PublicListSettings{
+			ListUid:   settings.Public.ListUID,
+			ShowNames: settings.Public.ShowNames,
+			ShowMeta:  settings.Public.ShowMeta,
+			AllowJoin: settings.Public.AllowJoin,
+		},
+	}
 }

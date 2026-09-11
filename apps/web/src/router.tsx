@@ -17,6 +17,7 @@ import { replacePasswordRoute } from "./routes/replace-password"
 import { rootRoute } from "./routes/root"
 import { settingsGroupsRoute } from "./routes/settings-groups"
 import { settingsMembersRoute } from "./routes/settings-members"
+import { settingsPublicRoute } from "./routes/settings-public"
 import { setupRoute } from "./routes/setup"
 import { signInRoute } from "./routes/sign-in"
 
@@ -35,6 +36,7 @@ const routeTree = rootRoute.addChildren([
   settingsMembersRoute,
   settingsGroupsRoute,
   publicListRoute,
+  settingsPublicRoute,
 ])
 
 /** buildRouter takes the query client so loaders can prime the cache before rendering. */

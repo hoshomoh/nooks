@@ -496,3 +496,116 @@
     font-family: var(--font-mono);
   }
 }
+
+/* The Note editor — DESIGN.md §10.
+   Two scales for the same blocks, so the rules are written once and the sizes come
+   from whichever scale the editor was told it is. */
+.nooks-note-sheet {
+  --note-body: var(--text-note-sheet);
+  --note-heading: var(--text-note-heading-sheet);
+  --note-code: var(--text-micro);
+}
+
+.nooks-note-full {
+  --note-body: var(--text-note);
+  --note-heading: var(--text-note-heading);
+  --note-code: var(--text-small);
+}
+
+.nooks-note {
+  font-size: var(--note-body);
+  line-height: 1.6;
+  color: var(--foreground);
+  /* The editor fills its container, so a click anywhere below the last line lands in
+     the document rather than on nothing. */
+  min-height: 100%;
+}
+
+.nooks-note p {
+  margin: 0;
+  padding: 5px 0;
+}
+
+.nooks-note h3 {
+  margin: 0;
+  padding: 18px 0 3px;
+  font-size: var(--note-heading);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+.nooks-note blockquote {
+  margin: 10px 0;
+  padding-left: 13px;
+  border-left: 2px solid var(--border);
+  color: var(--secondary-foreground);
+}
+
+.nooks-note pre {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-xl);
+  background: var(--chip);
+  font-family: var(--font-mono);
+  font-size: var(--note-code);
+  color: var(--secondary-foreground);
+  overflow-x: auto;
+}
+
+.nooks-note code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+.nooks-note ul[data-type="taskList"] {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nooks-note ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 3px 0;
+}
+
+.nooks-note ul[data-type="taskList"] li > label {
+  flex: none;
+  margin-top: 4px;
+  line-height: 1;
+}
+
+.nooks-note ul[data-type="taskList"] li > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.nooks-note input[type="checkbox"] {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border: 1.5px solid var(--control);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.nooks-note input[type="checkbox"]:checked {
+  background: var(--muted-foreground);
+  border-color: var(--muted-foreground);
+}
+
+.nooks-note li[data-checked="true"] > div {
+  color: var(--muted-foreground);
+  text-decoration: line-through;
+}
+
+/* What an empty Note says, per the placeholder extension. */
+.nooks-note p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--muted-foreground);
+}

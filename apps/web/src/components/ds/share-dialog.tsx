@@ -5,6 +5,7 @@ import { cn } from "cn"
 import { Sharing, type Group, type List, type Member } from "@nooks/api"
 
 import { Button } from "./button"
+import { COVERING, INERT, RAISED } from "./covering"
 import { DIALOG_SURFACE } from "./dialog-surface"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { groupsQuery, listSharesQuery, membersQuery } from "@/lib/sharing-queries"
@@ -223,25 +224,28 @@ function Choice({ title, blurb, selected, onSelect, action }: ChoiceProps) {
         aria-checked={selected}
         aria-label={title}
         onClick={onSelect}
-        className="absolute inset-0 rounded-xl"
+        className={COVERING}
       />
 
+      {/* Inert, all of it. A positioned child paints above the button behind it and
+          would swallow the click that the whole card is supposed to answer. */}
       <span
         aria-hidden
         className={cn(
-          "relative mt-0.5 size-[15px] rounded-full transition-colors",
+          INERT,
+          "mt-0.5 size-[15px] rounded-full transition-colors",
           selected ? "border-[4.5px] border-shared" : "border-[1.5px] border-control",
         )}
       />
 
-      <div className="relative flex flex-col gap-0.5">
+      <div className={cn(INERT, "flex flex-col gap-0.5")}>
         <span className="text-field font-medium">{title}</span>
         <span className="text-small text-secondary-foreground">{blurb}</span>
         {action && (
           <button
             type="button"
             onClick={action.onClick}
-            className="relative z-10 self-start pt-1 text-small text-shared hover:underline"
+            className={cn(RAISED, "pointer-events-auto self-start pt-1 text-small text-shared hover:underline")}
           >
             {action.label}
           </button>

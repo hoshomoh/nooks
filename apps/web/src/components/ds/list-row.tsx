@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import { cn } from "cn"
 
 import { Checkbox } from "./checkbox"
+import { COVERING, INERT, RAISED } from "./covering"
 import { EditableTitle } from "./editable-title"
 
 export type ListRowNote = {
@@ -90,17 +91,12 @@ export function ListRow({
             to hit the label alone wastes most of it. It sits behind the row's own
             controls, so the checkbox still ticks and the label still edits. */}
         {onOpen && (
-          <button
-            type="button"
-            onClick={onOpen}
-            aria-label={labels.open}
-            className="absolute inset-0 rounded-md"
-          />
+          <button type="button" onClick={onOpen} aria-label={labels.open} className={COVERING} />
         )}
 
         <Checkbox checked={done} justTicked={justTicked} onCheckedChange={onToggle} />
 
-        <span className="relative z-10 flex min-w-0 items-baseline gap-2.5">
+        <span className={cn(RAISED, "flex min-w-0 items-baseline gap-2.5")}>
           <EditableTitle
             value={label}
             onCommit={onRename}
@@ -121,8 +117,8 @@ export function ListRow({
         {/* The metadata and the menu share the last column: the menu takes its place on
             hover rather than sitting beside it, because a row that widens as the
             pointer crosses it is a row nobody can aim at. */}
-        <span className="relative z-10 flex items-center gap-3 justify-end">
-          <span className="pointer-events-none flex items-center gap-3 whitespace-nowrap text-micro text-muted-foreground">
+        <span className={cn(RAISED, "flex items-center justify-end gap-3")}>
+          <span className={cn(INERT, "flex items-center gap-3 whitespace-nowrap text-micro text-muted-foreground")}>
             {dueLabel && (
               <span className={overdue ? "text-overdue" : "text-shared"}>{dueLabel}</span>
             )}

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"time"
 
@@ -29,6 +30,8 @@ const shutdownGrace = 10 * time.Second
 type Server struct {
 	http *http.Server
 	log  *slog.Logger
+	// mode is kept so the startup lines can say what this process is actually serving.
+	mode profile.Mode
 }
 
 // New builds a Server. Its dependencies are passed in rather than constructed here, so
@@ -47,6 +50,7 @@ func New(cfg profile.Config, s store.Store, log *slog.Logger) (*Server, error) {
 	}
 
 	return &Server{
+		mode: cfg.Mode,
 		http: &http.Server{
 			Addr:              cfg.Addr,
 			Handler:           requestLogger(log, mux),
@@ -105,12 +109,25 @@ func handleHealthz(w http.ResponseWriter, _ *http.Request) {
 }
 
 // Serve listens until the context is cancelled, then shuts down gracefully.
+//
+// The port is taken before anything is logged, so "listening" is only ever said by a
+// process that is. Announcing it first and binding afterwards means a server that
+// failed to start still reports that it started, which is the one line somebody reads
+// before deciding the problem is somewhere else.
 func (s *Server) Serve(ctx context.Context) error {
+	listener, err := net.Listen("tcp", s.http.Addr)
+	if err != nil {
+		return fmt.Errorf("listen on %s: %w", s.http.Addr, err)
+	}
+	s.log.Info("nooks listening", "addr", listener.Addr().String(), "mode", string(s.mode))
+	if s.mode == profile.ModeDev {
+		s.log.Info("serving the api only; the app is served by vite", "app", "http://localhost:3001")
+	}
+
 	errs := make(chan error, 1)
 	go func() {
-		s.log.Info("nooks listening", "addr", s.http.Addr)
-		if err := s.http.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			errs <- fmt.Errorf("listen on %s: %w", s.http.Addr, err)
+		if err := s.http.Serve(listener); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			errs <- fmt.Errorf("serve on %s: %w", s.http.Addr, err)
 			return
 		}
 		errs <- nil
@@ -136,12 +153,29 @@ func (s *Server) shutdown() error {
 	return nil
 }
 
-// requestLogger records one line per request at debug level. It is deliberately quiet:
-// a home server's log should be readable a week later.
+/*
+requestLogger records one line per request.
+
+At info, not debug. Somebody self-hosting has no other window into what their Instance
+is doing, and a server that says nothing between starting and stopping is one you cannot
+tell apart from a server that has hung. Turning it down is a flag away.
+
+Two paths are left out, because both would drown the rest: the health check, which
+something may be polling every few seconds, and the event stream, which is one request
+that stays open for as long as a browser is watching.
+*/
 func requestLogger(log *slog.Logger, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		next.ServeHTTP(w, r)
-		log.Debug("request", "method", r.Method, "path", r.URL.Path, "took", time.Since(start))
+		if quietPath(r.URL.Path) {
+			return
+		}
+		log.Info("request", "method", r.Method, "path", r.URL.Path, "took", time.Since(start))
 	})
+}
+
+// quietPath reports whether a path is one that would fill the log by itself.
+func quietPath(path string) bool {
+	return path == "/healthz" || path == "/api/v1/events"
 }

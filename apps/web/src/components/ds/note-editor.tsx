@@ -1,127 +1,121 @@
-import { useCallback, useMemo, useRef, useState } from "react"
-import type { CSSProperties } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { EditorState } from "@codemirror/state"
-import { EditorView, keymap } from "@codemirror/view"
-import { defaultKeymap, history, historyKeymap } from "@codemirror/commands"
-import { markdown } from "@codemirror/lang-markdown"
+import { EditorContent, useEditor, type JSONContent } from "@tiptap/react"
+import { cn } from "cn"
 
-import { listContinuation } from "@/lib/editor/list-continuation"
-import { liveMarkers } from "@/lib/editor/live-markers"
-import { slashMenu, type SlashOption } from "@/lib/editor/slash-menu"
-import { buildNoteTheme, type NoteScale } from "@/lib/editor/theme"
+import { SlashMenu } from "./slash-menu"
+import { noteExtensions } from "@/lib/editor/extensions"
+import { documentFrom, markdownFrom } from "@/lib/editor/markdown"
+import { matching, slashItems } from "@/lib/editor/slash-items"
+import { slashSuggestion, type SlashState } from "@/lib/editor/slash-suggestion"
 
-export type NoteEditorProps = {
+/**
+ * Which of the design's two sizes to draw the blocks at.
+ *
+ * DESIGN.md §10 gives two scales for the same blocks, so the editor is built once and
+ * told which it is rather than written twice.
+ */
+export type NoteScale = "sheet" | "full"
+
+export interface NoteEditorProps {
   /**
    * The Note the editor opens with, as markdown.
    *
-   * Read once, when the editor mounts: CodeMirror owns the document from then on, and
+   * Read once, when the editor mounts: the editor owns the document from then on, and
    * feeding it back on every render would fight the Member for the cursor. Give the
    * component a `key` to point it at a different Note.
    */
   initialValue: string
-  /** Called on every change. Whoever owns the saving decides when to act on it. */
+  /** Called on every change, as markdown. Whoever owns the saving decides when to act. */
   onChange: (markdown: string) => void
   readOnly?: boolean
-  /** Which of the design's two sizes to render the blocks at. */
   scale?: NoteScale
 }
 
 /**
  * The Note editor.
  *
- * A Note is markdown, and this shows it as blocks: the shorthand converts the line as
- * it is typed and is then hidden, so a Member sees a heading rather than `### Where`.
- * The marker reappears on the line the cursor is on, because otherwise there would be
- * no way to take it off again.
+ * A Note is a document, and this edits it as one: a heading is a heading, a checklist
+ * is a checklist, and the markdown that describes them is never on screen because the
+ * document does not contain any. Markdown is what a Note is *stored* as, and the
+ * conversion happens at the two moments that matter — opening and saving.
  *
- * The view is created once and driven imperatively. CodeMirror owns its own DOM and
- * state; re-creating it on every render would lose the cursor mid-sentence.
+ * That is the whole reason this is ProseMirror rather than a text editor with the
+ * markup painted over: there is no markup to hide.
  */
-/** The custom properties the editor hands down to its own stylesheet. */
-type EditorStyle = CSSProperties & Record<"--nooks-slash-title", string>
-
-/**
- * slashTitleStyle carries the menu's heading into CSS.
- *
- * `content` takes a quoted string, so the words are quoted here rather than in the
- * stylesheet, where they could not be translated.
- */
-function slashTitleStyle(title: string): EditorStyle {
-  return { "--nooks-slash-title": JSON.stringify(title) }
-}
-
-export function NoteEditor({ initialValue, onChange, readOnly, scale = "sheet" }: NoteEditorProps) {
+export function NoteEditor({
+  initialValue,
+  onChange,
+  readOnly,
+  scale = "sheet",
+}: NoteEditorProps) {
   const { t } = useTranslation()
-  const viewRef = useRef<EditorView | null>(null)
 
   // Captured once. The prop changes after every save, as the Item comes back from the
-  // server, and reacting to that would rebuild the editor under the Member's cursor.
-  const [initialDoc] = useState(initialValue)
+  // server, and reacting to that would rebuild the document under the Member's cursor.
+  const [initialDocument] = useState<JSONContent>(() => documentFrom(initialValue))
 
-  const options: SlashOption[] = useMemo(
+  // What the `/` menu is showing, if anything. It is the editor that decides — the
+  // slash, the query and the caret's rectangle all come from the document.
+  const [slash, setSlash] = useState<SlashState | null>(null)
+
+  const entries = useMemo(() => slashItems(t), [t])
+
+  const extensions = useMemo(
     () => [
-      { kind: "todo", label: t("note.blocks.todo"), glyph: "☐" },
-      { kind: "heading", label: t("note.blocks.heading"), glyph: "H" },
-      { kind: "quote", label: t("note.blocks.quote"), glyph: "❝" },
-      { kind: "code", label: t("note.blocks.code"), glyph: "{}" },
+      ...noteExtensions({ placeholder: t("note.placeholder") }),
+      slashSuggestion({
+        onChange: setSlash,
+        countFor: (query) => matching(entries, query).length,
+        resolve: (query, index) => matching(entries, query)[index]?.kind ?? null,
+      }),
     ],
-    [t],
+    [entries, t],
   )
 
-  /**
-   * Mounts the editor when the element appears and tears it down when it goes.
-   *
-   * A callback ref rather than an effect: the element's arrival is the event, and React
-   * hands it over directly. There is nothing to synchronise afterwards.
-   *
-   * Its dependencies are all stable, so in practice it runs once: the initial document
-   * is captured with useState, the menu options are memoised, and the caller passes a
-   * stable onChange. A different Note means a different `key`, and a fresh editor.
-   */
-  const mount = useCallback(
-    (element: HTMLDivElement | null) => {
-      if (!element) {
-        viewRef.current?.destroy()
-        viewRef.current = null
-        return
-      }
+  const editor = useEditor({
+    extensions,
+    content: initialDocument,
+    editable: !readOnly,
+    onUpdate: ({ editor: changed }) => onChange(markdownFrom(changed.getJSON())),
+    editorProps: { attributes: { class: "nooks-note outline-none" } },
+  })
 
-      const view = new EditorView({
-        parent: element,
-        state: EditorState.create({
-          doc: initialDoc,
-          extensions: [
-            history(),
-            // Above the default keymap, so Enter in a list is decided here first.
-            listContinuation,
-            keymap.of([...defaultKeymap, ...historyKeymap]),
-            markdown(),
-            liveMarkers,
-            slashMenu({ options }),
-            buildNoteTheme(scale),
-            EditorView.lineWrapping,
-            EditorState.readOnly.of(Boolean(readOnly)),
-            EditorView.updateListener.of((update) => {
-              if (update.docChanged) {
-                onChange(update.state.doc.toString())
-              }
-            }),
-          ],
-        }),
-      })
-      viewRef.current = view
-    },
-    [initialDoc, onChange, options, readOnly, scale],
-  )
+  const visible = slash ? matching(entries, slash.query) : []
 
   return (
     <div
-      ref={mount}
-      className="flex-1"
-      // The / menu's heading is drawn by CSS, which cannot read a translation. Handing
-      // it down as a custom property keeps the words in the Member's language.
-      style={slashTitleStyle(t("note.addToNote"))}
-    />
+      className={cn(
+        "relative flex flex-1 flex-col",
+        scale === "full" ? "nooks-note-full" : "nooks-note-sheet",
+      )}
+      // A Note is a page, so the whole of it is the page. Clicking the space below the
+      // last line puts the caret at the end, rather than doing nothing because the
+      // document happens to be shorter than the panel it sits in.
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          event.preventDefault()
+          editor?.commands.focus("end")
+        }
+      }}
+    >
+      <EditorContent editor={editor} className="flex-1" />
+
+      {slash && visible.length > 0 && (
+        <div
+          className="fixed z-50"
+          style={{ left: slash.rect.left, top: slash.rect.bottom + 6 }}
+          // The editor keeps the focus: clicking an entry must not take it away, or the
+          // block would be inserted nowhere.
+          onMouseDown={(event) => event.preventDefault()}
+        >
+          <SlashMenu
+            items={visible}
+            selected={slash.selected % visible.length}
+            onChoose={(item) => slash.choose(item.kind)}
+          />
+        </div>
+      )}
+    </div>
   )
 }

@@ -43,7 +43,7 @@ func run(ctx context.Context, args []string, env func(string) string, stdout, st
 		return err
 	}
 
-	log := slog.New(slog.NewTextHandler(stderr, &slog.HandlerOptions{Level: slog.LevelInfo}))
+	log := slog.New(slog.NewTextHandler(stderr, &slog.HandlerOptions{Level: cfg.LogLevel}))
 
 	s, err := openStore(ctx, cfg)
 	if err != nil {

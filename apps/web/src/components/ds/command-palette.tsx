@@ -47,14 +47,14 @@ export function CommandPalette() {
       // !important, so both have to be answered in kind.
       className={cn(DIALOG_SURFACE, "rounded-2xl!")}
     >
-      {palette.mode === "add-list" ? <AddListPanel /> : <SearchPanel />}
+      {palette.panel === "add-list" ? <AddListPanel /> : <SearchPanel />}
     </CommandDialog>
   )
 }
 
 /** Where a Member can go that is not a List. */
 interface Destination {
-  to: "/today" | "/upcoming" | "/calendar" | "/"
+  to: "/today" | "/upcoming" | "/calendar" | "/" | "/settings/members" | "/settings/groups"
   labelKey: string
 }
 
@@ -63,6 +63,8 @@ const DESTINATIONS: Destination[] = [
   { to: "/upcoming", labelKey: "views.upcoming" },
   { to: "/calendar", labelKey: "views.calendar" },
   { to: "/", labelKey: "list.allLists" },
+  { to: "/settings/members", labelKey: "settings.members" },
+  { to: "/settings/groups", labelKey: "settings.groups" },
 ]
 
 function SearchPanel() {

@@ -9,6 +9,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log/slog"
 	"path/filepath"
 	"strings"
 )
@@ -37,6 +38,10 @@ const (
 type Config struct {
 	// Addr is the host:port to listen on, e.g. ":8081".
 	Addr string
+
+	// LogLevel is how much the Instance says about itself. Requests are logged at info,
+	// so somebody self-hosting can see traffic without being told to turn it on.
+	LogLevel slog.Level
 	// Data is the directory holding the SQLite file and any other instance data.
 	Data string
 	// Driver selects the database backend.
@@ -77,6 +82,8 @@ func Parse(args []string, env func(string) string, out io.Writer) (Config, error
 	mode := set.String("mode", envOr(env, "NOOKS_MODE", string(ModeProd)), "prod or dev")
 	secure := set.Bool("secure-cookies", envOr(env, "NOOKS_SECURE_COOKIES", "") == "true",
 		"mark session cookies Secure; set this when the instance is served over HTTPS")
+	level := set.String("log-level", envOr(env, "NOOKS_LOG_LEVEL", "info"),
+		"debug, info, warn or error")
 
 	if err := set.Parse(args); err != nil {
 		return Config{}, err
@@ -91,6 +98,13 @@ func Parse(args []string, env func(string) string, out io.Writer) (Config, error
 
 		SecureCookies: *secure,
 	}
+
+	parsedLevel, err := parseLevel(strings.TrimSpace(*level))
+	if err != nil {
+		return Config{}, err
+	}
+	cfg.LogLevel = parsedLevel
+
 	if err := cfg.validate(); err != nil {
 		return Config{}, err
 	}
@@ -137,4 +151,23 @@ func envOr(env func(string) string, key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+// parseLevel reads how much the Instance should say about itself.
+//
+// Named levels rather than numbers: somebody editing a compose file should not have to
+// look up what 4 means.
+func parseLevel(name string) (slog.Level, error) {
+	switch strings.ToLower(name) {
+	case "debug":
+		return slog.LevelDebug, nil
+	case "", "info":
+		return slog.LevelInfo, nil
+	case "warn", "warning":
+		return slog.LevelWarn, nil
+	case "error":
+		return slog.LevelError, nil
+	default:
+		return 0, fmt.Errorf("profile: log level must be debug, info, warn or error, not %q", name)
+	}
 }

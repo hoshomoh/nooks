@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import { cn } from "cn"
 import { Sharing, type List } from "@nooks/api"
 
+import { COVERING, INERT, RAISED } from "./covering"
 import { ListActions } from "./list-actions"
 
 import { Mark } from "@/components/mark"
@@ -214,18 +215,18 @@ function ListGroup({ label, lists, activeListUid, instanceName }: ListGroupProps
             to="/lists/$listUid"
             params={{ listUid: list.uid }}
             aria-label={list.name}
-            className="absolute inset-0 rounded-md"
+            className={COVERING}
           />
 
           {/* Everything that only shows the List is inert, so the whole row stays one
               target and the link behind it is what answers a click. */}
           {list.sharing !== Sharing.PRIVATE && (
-            <span className="pointer-events-none relative size-[5px] shrink-0 rounded-full bg-shared" />
+            <span className={cn(INERT, "size-[5px] shrink-0 rounded-full bg-shared")} />
           )}
-          <span className="pointer-events-none relative truncate text-chrome">{list.name}</span>
+          <span className={cn(INERT, "truncate text-chrome")}>{list.name}</span>
 
           {list.openCount > 0 && (
-            <span className="pointer-events-none relative ml-auto text-[11.5px] text-muted-foreground">
+            <span className={cn(INERT, "ml-auto text-[11.5px] text-muted-foreground")}>
               {list.openCount}
             </span>
           )}
@@ -237,7 +238,8 @@ function ListGroup({ label, lists, activeListUid, instanceName }: ListGroupProps
               the moment the pointer leaves the row to reach it. */}
           <span
             className={cn(
-              "relative z-10 -mr-1 shrink-0 opacity-0 transition-opacity",
+              RAISED,
+              "-mr-1 shrink-0 opacity-0 transition-opacity",
               "group-hover/list:opacity-100 focus-within:opacity-100",
               "has-[[data-popup-open]]:opacity-100",
               list.openCount > 0 || "ml-auto",

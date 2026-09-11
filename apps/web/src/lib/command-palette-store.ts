@@ -10,10 +10,21 @@ export type PaletteMode = "closed" | "search" | "add-list"
 export type CommandPaletteStore = {
   subscribe: (listener: () => void) => () => void
   getMode: () => PaletteMode
+  /**
+   * Which panel to draw, including while the palette is closing.
+   *
+   * A dialog takes a moment to animate out, and reading `mode` during that moment
+   * would swap the panel for the search one on the way — so closing "Add a list" would
+   * flash the search box at the Member as it went.
+   */
+  getPanel: () => OpenMode
   open: () => void
   openAddList: () => void
   close: () => void
 }
+
+/** The panels the palette has, leaving out the closed state. */
+export type OpenMode = Exclude<PaletteMode, "closed">
 
 export type CommandPaletteDeps = {
   /** Where the ⌘K listener is attached. */
@@ -22,6 +33,7 @@ export type CommandPaletteDeps = {
 
 export function createCommandPaletteStore(deps: CommandPaletteDeps): CommandPaletteStore {
   let mode: PaletteMode = "closed"
+  let panel: OpenMode = "search"
   const listeners = new Set<() => void>()
 
   const set = (next: PaletteMode) => {
@@ -29,6 +41,9 @@ export function createCommandPaletteStore(deps: CommandPaletteDeps): CommandPale
       return
     }
     mode = next
+    if (next !== "closed") {
+      panel = next
+    }
     for (const listener of listeners) {
       listener()
     }
@@ -49,6 +64,7 @@ export function createCommandPaletteStore(deps: CommandPaletteDeps): CommandPale
       return () => listeners.delete(listener)
     },
     getMode: () => mode,
+    getPanel: () => panel,
     open: () => set("search"),
     openAddList: () => set("add-list"),
     close: () => set("closed"),
@@ -61,6 +77,7 @@ export const commandPaletteStore: CommandPaletteStore =
     ? {
         subscribe: () => () => {},
         getMode: () => "closed",
+        getPanel: () => "search",
         open: () => {},
         openAddList: () => {},
         close: () => {},

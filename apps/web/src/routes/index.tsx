@@ -1,17 +1,21 @@
 import { createRoute, redirect } from "@tanstack/react-router"
 
-import { Home } from "@/screens/home"
+import { Landing } from "@/screens/landing"
 import { currentMemberQuery, instanceQuery } from "@/lib/queries"
 import { listsQuery } from "@/lib/list-queries"
+import { publicListQuery } from "@/lib/public-queries"
 import { rootRoute } from "./root"
 
 /**
- * Where an arriving Member lands.
+ * Where an arriving browser lands, whoever it belongs to.
  *
- * The decision happens in the loader, before anything renders: an Instance with no
- * Admin goes to first run, a signed-out browser goes to sign in, and a Member who was
- * given a temporary password goes to replace it. Doing this in a loader rather than an
- * effect means no screen flashes on the way through.
+ * A Member gets their Lists. Somebody with no account gets the public list, if there is
+ * one — that is the address an Instance hands out, so it has to be the one that answers.
+ * Sending them to a sign-in page first would mean the link somebody shared opens a
+ * request for credentials rather than the shopping.
+ *
+ * The decision happens in the loader, before anything renders, so no screen flashes on
+ * the way through.
  */
 export const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -24,14 +28,21 @@ export const indexRoute = createRoute({
 
     const member = await context.queryClient.ensureQueryData(currentMemberQuery)
     if (!member) {
-      throw redirect({ to: "/sign-in" })
+      // Nothing published is the only case where a Visitor is asked to identify
+      // themselves: there is genuinely nothing here for them otherwise.
+      const page = await context.queryClient.ensureQueryData(publicListQuery)
+      if (!page.published) {
+        throw redirect({ to: "/sign-in" })
+      }
+      return { signedIn: false }
     }
+
     if (member.mustChangePassword) {
       throw redirect({ to: "/replace-password" })
     }
 
-    const lists = await context.queryClient.ensureQueryData(listsQuery)
-    return { instance, member, lists }
+    await context.queryClient.ensureQueryData(listsQuery)
+    return { signedIn: true }
   },
-  component: Home,
+  component: Landing,
 })

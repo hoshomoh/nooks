@@ -1,4 +1,6 @@
-import { listClient } from "./api"
+import type { PublicListSettings } from "@nooks/api"
+
+import { instanceClient, listClient } from "./api"
 import { shift, today, toStored } from "./dates"
 import type { Translate } from "./translate"
 
@@ -24,6 +26,37 @@ export async function createStarterList(t: Translate, now: Date = new Date()): P
   for (const item of starterItems(t, now)) {
     await listClient.createItem({ listUid, ...item })
   }
+
+  await publish(listUid)
+}
+
+/**
+ * Publishes the first List, so the Instance's address answers with something.
+ *
+ * An Instance whose front door asks for credentials is one nobody can be shown. The
+ * first List is also the least private thing on it — it was made by Nooks, not by
+ * anybody — so it is the one that can be public before an Admin has decided anything.
+ *
+ * Contributor names stay off, as they do everywhere by default. Settings → Public list
+ * is where that is changed, or the page taken down.
+ */
+async function publish(listUid: string): Promise<void> {
+  const current = await instanceClient.getInstanceSettings({})
+  if (!current.settings) {
+    return
+  }
+
+  const publicList: PublicListSettings = {
+    ...(current.settings.publicList as PublicListSettings),
+    listUid,
+    showNames: false,
+    showMeta: true,
+    allowJoin: true,
+  }
+
+  await instanceClient.updateInstanceSettings({
+    settings: { ...current.settings, publicList },
+  })
 }
 
 /** One line of the starter List. */

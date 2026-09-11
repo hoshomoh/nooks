@@ -195,8 +195,9 @@ The single most important milestone; everything else is furniture.
 
 ## M8 · Public list
 
-- [x] At most one Public list per Instance, at a stable address, no password, no account.
-      A service of its own, so a method that answers anonymously cannot be added by accident
+- [x] At most one Public list per Instance, at the Instance's own address — a signed-out
+      browser lands on it. No password, no account. A service of its own, so a method that
+      answers anonymously cannot be added by accident
 - [x] Public page: no sidebar, no search, no other List reachable
 - [x] Settings: which List, show contributor names, show quantities and dates, let visitors ask
       to join. Everything off by default

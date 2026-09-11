@@ -104,7 +104,7 @@ export function SettingsPublicScreen() {
       <div className="mt-4 flex items-center gap-3">
         {published && (
           <span className="text-micro text-muted-foreground">
-            {t("publicSettings.address", { url: `${window.location.origin}/public` })}
+            {t("publicSettings.address", { url: window.location.origin })}
           </span>
         )}
         <span className="flex-1" />

@@ -52,6 +52,34 @@ describe("the list row", () => {
     expect(screen.getByText("Milk")).toBeInTheDocument()
   })
 
+  // Two regressions this catches, both from making the `···` appear on hover.
+  describe("the row's own menu", () => {
+    it("keeps the metadata on screen, rather than swapping it for the menu", () => {
+      render(
+        <ListRow
+          label="Milk"
+          addedByName="Anna"
+          dueLabel="Fri"
+          labels={labels}
+          menu={<button type="button">More</button>}
+        />,
+      )
+
+      expect(screen.getByText("Anna")).toBeInTheDocument()
+      expect(screen.getByText("Fri")).toBeInTheDocument()
+    })
+
+    // A trigger that is only mounted on hover takes with it the element its menu is
+    // positioned against, and the menu jumps to the corner of the page.
+    it("keeps the trigger mounted whether or not the pointer is over the row", () => {
+      render(
+        <ListRow label="Milk" labels={labels} menu={<button type="button">More</button>} />,
+      )
+
+      expect(screen.getByRole("button", { name: "More" })).toBeInTheDocument()
+    })
+  })
+
   it("shows the Note's own first line under the row", () => {
     render(
       <ListRow

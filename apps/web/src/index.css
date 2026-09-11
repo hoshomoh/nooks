@@ -372,3 +372,127 @@
     }
   }
 }
+
+/* The Print sheet — DESIGN.md §15.
+   A deliverable, not a screenshot: on paper the app disappears and the List is what is
+   left. Measured in millimetres and points, because that is what the page is. */
+.nooks-print-sheet {
+  display: none;
+}
+
+@media print {
+  /* Everything that is the app rather than the List. A person standing in a shop has
+     no use for a sidebar. */
+  body > #root {
+    display: none;
+  }
+
+  .nooks-print-sheet {
+    display: block;
+    font-family: var(--font-sans);
+    color: #1f1f1e;
+  }
+
+  @page {
+    size: A4;
+    margin: 18mm 18mm 14mm;
+  }
+
+  .nooks-print-eyebrow {
+    margin: 0 0 3mm;
+    font-family: var(--font-mono);
+    font-size: 8.5pt;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .nooks-print-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8mm;
+  }
+
+  .nooks-print-title {
+    margin: 0;
+    font-size: 27pt;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .nooks-print-meta {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1mm;
+    font-size: 9.5pt;
+  }
+
+  /* The one mark that survives from screen to paper. */
+  .nooks-print-header {
+    border-bottom: 0.7pt solid #1f1f1e;
+    padding-bottom: 3mm;
+    margin-bottom: 2mm;
+  }
+
+  .nooks-print-items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .nooks-print-item {
+    display: grid;
+    grid-template-columns: 11mm 1fr auto;
+    align-items: baseline;
+    padding: 4.4mm 0;
+    border-bottom: 0.4pt solid #e2e2dc;
+    break-inside: avoid;
+  }
+
+  .nooks-print-box {
+    width: 6mm;
+    height: 6mm;
+    border: 0.7pt solid #1f1f1e;
+    border-radius: 0.8mm;
+  }
+
+  .nooks-print-box[data-done] {
+    background: #1f1f1e;
+  }
+
+  .nooks-print-label {
+    font-size: 16pt;
+  }
+
+  .nooks-print-quantity {
+    margin-left: 3mm;
+    font-family: var(--font-mono);
+    font-size: 10.5pt;
+  }
+
+  .nooks-print-who {
+    font-size: 9.5pt;
+  }
+
+  .nooks-print-blank .nooks-print-box {
+    border-style: dashed;
+  }
+
+  .nooks-print-blank .nooks-print-label {
+    border-bottom: 0.4pt dashed #b4b4ae;
+    height: 6mm;
+  }
+
+  .nooks-print-footer {
+    display: flex;
+    gap: 8mm;
+    padding-top: 4mm;
+    font-size: 8.5pt;
+  }
+
+  .nooks-print-sheet-name {
+    margin-left: auto;
+    font-family: var(--font-mono);
+  }
+}

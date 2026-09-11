@@ -382,5 +382,15 @@
     "coffeeNote": "### Where\nSaturday market, second row.\n\n- [ ] Ethiopian, whole bean\n\n> They pack up around two.",
     "bakingPaper": "Baking paper",
     "washingUp": "Washing-up liquid"
+  },
+  "print": {
+    "eyebrow": "{{instance}} · shopping list",
+    "counts": "{{items}} · {{people}}",
+    "itemCount": "{{count}} item",
+    "itemCount_other": "{{count}} items",
+    "peopleCount": "{{count}} person",
+    "peopleCount_other": "{{count}} people",
+    "footer": "Tick as you go. Whatever gets remembered in the shop goes on the dashed lines.",
+    "sheet": "nooks · A4 210 × 297 mm"
   }
 }

@@ -13,6 +13,7 @@ import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
 import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
+import { PrintSheet } from "@/components/ds/print-sheet"
 import { NoteSheet } from "@/components/ds/note-sheet"
 import { listClient } from "@/lib/api"
 import { listQuery } from "@/lib/list-queries"
@@ -21,8 +22,9 @@ import { refreshLists } from "@/lib/refresh"
 import type { Translate } from "@/lib/translate"
 import { debounce } from "@/lib/debounce"
 import type { RenameItemVariables, SaveNoteVariables, SetDoneVariables } from "@/lib/item-mutations"
-import { happenedToday, isOverdue, justHappened, today } from "@/lib/dates"
+import { dayFullHeading, happenedToday, isOverdue, justHappened, today } from "@/lib/dates"
 import { useDueLabel } from "@/lib/use-due-label"
+import { useLocale } from "@/lib/use-locale"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useLive } from "@/lib/use-live"
 import { useSignedInData } from "@/lib/use-signed-in-data"
@@ -54,6 +56,8 @@ export function ListScreen() {
   // measured against the same moment.
   const from = today()
   const due = useDueLabel()
+  const { dateLocale } = useLocale()
+  const printedOn = dayFullHeading(from, dateLocale)
 
   // A tick somebody else just made lands with a highlight and then settles. Read from
   // the Item itself rather than remembered between renders: the Item already says when
@@ -148,6 +152,17 @@ export function ListScreen() {
       onSearch={palette.open}
       onAddList={palette.openAddList}
     >
+      {/* Rendered into the page and hidden on screen, so ⌘P and the Print entry take
+          the List rather than the browser's idea of the app. */}
+      {list.list && (
+        <PrintSheet
+          instanceName={instanceName}
+          listName={list.list.name}
+          printedOn={printedOn}
+          items={list.items}
+        />
+      )}
+
       <ChromeBar
         crumbs={[t(list.list?.isOwner ? "list.myListsCrumb" : "list.sharedCrumb"), list.list?.name ?? ""]}
         actions={
@@ -241,6 +256,7 @@ export function ListScreen() {
               placeholder={t("list.addItem")}
               onAdd={(item) => addItem.mutate(item)}
               disabled={addItem.isPending}
+              divided={open.length > 0}
             />
           )}
 

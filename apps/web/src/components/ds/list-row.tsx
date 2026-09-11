@@ -121,20 +121,23 @@ export function ListRow({
         {/* The metadata and the menu share the last column: the menu takes its place on
             hover rather than sitting beside it, because a row that widens as the
             pointer crosses it is a row nobody can aim at. */}
-        <span className="relative z-10 flex items-center justify-end">
-          <span
-            className={cn(
-              "pointer-events-none flex items-center gap-3 whitespace-nowrap text-micro text-muted-foreground",
-              menu && "group-hover:hidden",
-            )}
-          >
+        <span className="relative z-10 flex items-center gap-3 justify-end">
+          <span className="pointer-events-none flex items-center gap-3 whitespace-nowrap text-micro text-muted-foreground">
             {dueLabel && (
               <span className={overdue ? "text-overdue" : "text-shared"}>{dueLabel}</span>
             )}
             {addedByName && <span>{addedByName}</span>}
           </span>
 
-          {menu && <span className="hidden -mr-1 group-hover:block">{menu}</span>}
+          {/* The `···` has a slot of its own, always the same size, so the row's
+              metadata neither moves nor disappears when the pointer crosses it. Hidden
+              by opacity rather than by display: a trigger that stops being rendered
+              takes with it the element its menu is positioned against. */}
+          {menu && (
+            <span className="-mr-1 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100 has-[[data-popup-open]]:opacity-100">
+              {menu}
+            </span>
+          )}
         </span>
       </div>
 

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 
-import { Button } from "./button"
+import { DotsButton } from "./dots-button"
 import { Menu, MenuItem, MenuSeparator } from "./menu"
 
 export interface ItemMenuActions {
@@ -27,11 +27,7 @@ export function ItemMenu({ actions }: ItemMenuProps) {
 
   return (
     <Menu
-      trigger={
-        <Button tone="quiet" scale="toolbar" aria-label={t("itemMenu.open")}>
-          <Dots />
-        </Button>
-      }
+      trigger={<DotsButton aria-label={t("itemMenu.open")} />}
     >
       <MenuItem shortcut="↵" onSelect={actions.onEdit}>
         {t("itemMenu.edit")}
@@ -50,16 +46,5 @@ export function ItemMenu({ actions }: ItemMenuProps) {
         {t("itemMenu.delete")}
       </MenuItem>
     </Menu>
-  )
-}
-
-/** The three dots, drawn rather than typed: `···` is punctuation, not an icon. */
-function Dots() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 14 14" fill="currentColor" aria-hidden>
-      <circle cx="3" cy="7" r="1.3" />
-      <circle cx="7" cy="7" r="1.3" />
-      <circle cx="11" cy="7" r="1.3" />
-    </svg>
   )
 }

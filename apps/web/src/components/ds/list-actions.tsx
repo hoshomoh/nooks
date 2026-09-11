@@ -6,6 +6,7 @@ import type { Item, List } from "@nooks/api"
 
 import { Button } from "./button"
 import { ConfirmDialog } from "./confirm-dialog"
+import { DotsButton } from "./dots-button"
 import { Menu, MenuItem, MenuSeparator } from "./menu"
 import { PromptDialog } from "./prompt-dialog"
 import { ShareDialog, type ShareDecision } from "./share-dialog"
@@ -101,11 +102,7 @@ export function ListActions({ list, instanceName, items, withControls }: ListAct
       )}
 
       <Menu
-        trigger={
-          <Button tone="quiet" scale="toolbar" aria-label={t("sidebarMenu.open")}>
-            <Dots />
-          </Button>
-        }
+        trigger={<DotsButton aria-label={t("sidebarMenu.open")} />}
       >
         <MenuItem
           shortcut="↵"
@@ -181,16 +178,5 @@ export function ListActions({ list, instanceName, items, withControls }: ListAct
         onConfirm={() => remove.mutate()}
       />
     </>
-  )
-}
-
-/** The three dots, drawn rather than typed: `···` is punctuation, not an icon. */
-function Dots() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 14 14" fill="currentColor" aria-hidden>
-      <circle cx="3" cy="7" r="1.3" />
-      <circle cx="7" cy="7" r="1.3" />
-      <circle cx="11" cy="7" r="1.3" />
-    </svg>
   )
 }

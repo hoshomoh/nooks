@@ -217,23 +217,29 @@ function ListGroup({ label, lists, activeListUid, instanceName }: ListGroupProps
             className="absolute inset-0 rounded-md"
           />
 
-          {/* One blue dot per shared List — the only colour on a screen at rest. */}
+          {/* Everything that only shows the List is inert, so the whole row stays one
+              target and the link behind it is what answers a click. */}
           {list.sharing !== Sharing.PRIVATE && (
-            <span className="relative size-[5px] shrink-0 rounded-full bg-shared" />
+            <span className="pointer-events-none relative size-[5px] shrink-0 rounded-full bg-shared" />
           )}
-          <span className="relative truncate text-chrome">{list.name}</span>
+          <span className="pointer-events-none relative truncate text-chrome">{list.name}</span>
 
-          {/* The count gives way to the menu on hover. They share the slot rather than
-              sitting side by side, because a row that widens as the pointer crosses it
-              is a row nobody can aim at. */}
           {list.openCount > 0 && (
-            <span className="relative ml-auto shrink-0 text-[11.5px] text-muted-foreground group-hover/list:hidden">
+            <span className="pointer-events-none relative ml-auto text-[11.5px] text-muted-foreground">
               {list.openCount}
             </span>
           )}
+
+          {/* The `···` has a slot of its own, always the same size, so nothing moves
+              when the pointer crosses the row. It is hidden by opacity rather than by
+              display: a trigger that stops being rendered takes with it the element its
+              menu is positioned against, and the menu jumps to the corner of the page
+              the moment the pointer leaves the row to reach it. */}
           <span
             className={cn(
-              "relative z-10 -mr-1 hidden shrink-0 group-hover/list:block",
+              "relative z-10 -mr-1 shrink-0 opacity-0 transition-opacity",
+              "group-hover/list:opacity-100 focus-within:opacity-100",
+              "has-[[data-popup-open]]:opacity-100",
               list.openCount > 0 || "ml-auto",
             )}
           >

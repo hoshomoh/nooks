@@ -27,6 +27,14 @@ export interface AddRowProps {
   defaultDue?: DueDate
   onAdd: (item: AddRowSubmission) => void
   disabled?: boolean
+  /**
+   * Whether a rule separates the row from what is above it.
+   *
+   * True after a run of Items, which is what the rule is for. False when there are
+   * none: a rule drawn under an empty state is a line between a box and nothing, and
+   * the two end up almost touching.
+   */
+  divided?: boolean
 }
 
 /** What the row is holding, before it becomes an Item. */
@@ -56,7 +64,13 @@ const EMPTY: AddRowDraft = { name: "", typing: "", chips: [], picked: null, clea
  * Enter adds and keeps the focus, so a Member can type a whole shopping list without
  * touching the mouse.
  */
-export function AddRow({ placeholder, defaultDue = "", onAdd, disabled }: AddRowProps) {
+export function AddRow({
+  placeholder,
+  defaultDue = "",
+  onAdd,
+  disabled,
+  divided = true,
+}: AddRowProps) {
   const { t } = useTranslation()
   const parse = useAddRowParse()
   const due = useDueLabel()
@@ -134,7 +148,10 @@ export function AddRow({ placeholder, defaultDue = "", onAdd, disabled }: AddRow
         event.preventDefault()
         submit()
       }}
-      className="mt-1 grid min-h-row grid-cols-[20px_1fr_auto] items-center gap-3.5 border-t border-hair px-2 py-1.5 -mx-2"
+      className={cn(
+        "grid min-h-row grid-cols-[20px_1fr_auto] items-center gap-3.5 px-2 py-1.5 -mx-2",
+        divided ? "mt-1 border-t border-hair" : "mt-5",
+      )}
     >
       <span className="text-center text-[15px] text-muted-foreground">+</span>
 

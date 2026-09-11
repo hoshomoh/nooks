@@ -38,7 +38,11 @@ message AccessToken {
   Permission permission = 3;
 
   // The Lists it may reach, by name. A List it does not name is invisible to it.
+  // Empty when all_lists is set, because then there is no list to name.
   repeated string list_names = 4;
+
+  // True when it reaches every List its Member can, including ones made later.
+  bool all_lists = 9;
 
   // RFC 3339, or empty for a token that does not expire.
   string expires_at = 5;
@@ -63,8 +67,13 @@ message CreateAccessTokenRequest {
   string name = 1;
   Permission permission = 2;
 
-  // The Lists it may reach. A token that names none reaches none.
+  // The Lists it may reach. A token that names none reaches none, unless all_lists is
+  // set instead.
   repeated string list_uids = 3;
+
+  // Reach every List the Member can, including ones made later. Not the same as naming
+  // them all: that would stop at the Lists that exist today.
+  bool all_lists = 5;
 
   // RFC 3339, or empty for a token that does not expire.
   string expires_at = 4;

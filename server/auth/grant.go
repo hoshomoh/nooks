@@ -45,7 +45,7 @@ func NewTokenGrant(member store.Member, token store.AccessToken, listIDs []int64
 // and a List it does not name is invisible rather than forbidden, so this is asked
 // before anything else.
 func (g Grant) Reaches(listID int64) bool {
-	if g.Token == nil {
+	if g.Token == nil || g.Token.AllLists {
 		return true
 	}
 	return g.reach[listID]

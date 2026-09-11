@@ -81,7 +81,10 @@ type AccessToken struct {
 	Name       string     `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Permission Permission `protobuf:"varint,3,opt,name=permission,proto3,enum=nooks.api.v1.Permission" json:"permission,omitempty"`
 	// The Lists it may reach, by name. A List it does not name is invisible to it.
+	// Empty when all_lists is set, because then there is no list to name.
 	ListNames []string `protobuf:"bytes,4,rep,name=list_names,json=listNames,proto3" json:"list_names,omitempty"`
+	// True when it reaches every List its Member can, including ones made later.
+	AllLists bool `protobuf:"varint,9,opt,name=all_lists,json=allLists,proto3" json:"all_lists,omitempty"`
 	// RFC 3339, or empty for a token that does not expire.
 	ExpiresAt string `protobuf:"bytes,5,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	// RFC 3339, or empty for one nothing has used yet.
@@ -150,6 +153,13 @@ func (x *AccessToken) GetListNames() []string {
 		return x.ListNames
 	}
 	return nil
+}
+
+func (x *AccessToken) GetAllLists() bool {
+	if x != nil {
+		return x.AllLists
+	}
+	return false
 }
 
 func (x *AccessToken) GetExpiresAt() string {
@@ -264,8 +274,12 @@ type CreateAccessTokenRequest struct {
 	state      protoimpl.MessageState `protogen:"open.v1"`
 	Name       string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Permission Permission             `protobuf:"varint,2,opt,name=permission,proto3,enum=nooks.api.v1.Permission" json:"permission,omitempty"`
-	// The Lists it may reach. A token that names none reaches none.
+	// The Lists it may reach. A token that names none reaches none, unless all_lists is
+	// set instead.
 	ListUids []string `protobuf:"bytes,3,rep,name=list_uids,json=listUids,proto3" json:"list_uids,omitempty"`
+	// Reach every List the Member can, including ones made later. Not the same as naming
+	// them all: that would stop at the Lists that exist today.
+	AllLists bool `protobuf:"varint,5,opt,name=all_lists,json=allLists,proto3" json:"all_lists,omitempty"`
 	// RFC 3339, or empty for a token that does not expire.
 	ExpiresAt     string `protobuf:"bytes,4,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -321,6 +335,13 @@ func (x *CreateAccessTokenRequest) GetListUids() []string {
 		return x.ListUids
 	}
 	return nil
+}
+
+func (x *CreateAccessTokenRequest) GetAllLists() bool {
+	if x != nil {
+		return x.AllLists
+	}
+	return false
 }
 
 func (x *CreateAccessTokenRequest) GetExpiresAt() string {
@@ -467,7 +488,7 @@ var File_nooks_api_v1_token_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_token_service_proto_rawDesc = "" +
 	"\n" +
-	" nooks/api/v1/token_service.proto\x12\fnooks.api.v1\"\x8d\x02\n" +
+	" nooks/api/v1/token_service.proto\x12\fnooks.api.v1\"\xaa\x02\n" +
 	"\vAccessToken\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x128\n" +
@@ -475,7 +496,8 @@ const file_nooks_api_v1_token_service_proto_rawDesc = "" +
 	"permission\x18\x03 \x01(\x0e2\x18.nooks.api.v1.PermissionR\n" +
 	"permission\x12\x1d\n" +
 	"\n" +
-	"list_names\x18\x04 \x03(\tR\tlistNames\x12\x1d\n" +
+	"list_names\x18\x04 \x03(\tR\tlistNames\x12\x1b\n" +
+	"\tall_lists\x18\t \x01(\bR\ballLists\x12\x1d\n" +
 	"\n" +
 	"expires_at\x18\x05 \x01(\tR\texpiresAt\x12 \n" +
 	"\flast_used_at\x18\x06 \x01(\tR\n" +
@@ -486,13 +508,14 @@ const file_nooks_api_v1_token_service_proto_rawDesc = "" +
 	"memberName\"\x19\n" +
 	"\x17ListAccessTokensRequest\"M\n" +
 	"\x18ListAccessTokensResponse\x121\n" +
-	"\x06tokens\x18\x01 \x03(\v2\x19.nooks.api.v1.AccessTokenR\x06tokens\"\xa4\x01\n" +
+	"\x06tokens\x18\x01 \x03(\v2\x19.nooks.api.v1.AccessTokenR\x06tokens\"\xc1\x01\n" +
 	"\x18CreateAccessTokenRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x128\n" +
 	"\n" +
 	"permission\x18\x02 \x01(\x0e2\x18.nooks.api.v1.PermissionR\n" +
 	"permission\x12\x1b\n" +
-	"\tlist_uids\x18\x03 \x03(\tR\blistUids\x12\x1d\n" +
+	"\tlist_uids\x18\x03 \x03(\tR\blistUids\x12\x1b\n" +
+	"\tall_lists\x18\x05 \x01(\bR\ballLists\x12\x1d\n" +
 	"\n" +
 	"expires_at\x18\x04 \x01(\tR\texpiresAt\"d\n" +
 	"\x19CreateAccessTokenResponse\x12/\n" +

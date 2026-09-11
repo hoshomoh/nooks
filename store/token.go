@@ -38,7 +38,10 @@ type AccessToken struct {
 	ExpiresAt time.Time
 	// LastUsedAt is the zero value until something has used it.
 	LastUsedAt time.Time
-	CreatedAt  time.Time
+	// AllLists is true when it reaches every List its Member can, including ones made
+	// later. A token that names Lists instead is limited to exactly those.
+	AllLists  bool
+	CreatedAt time.Time
 }
 
 // Expired reports whether a token has passed its expiry.
@@ -56,8 +59,10 @@ type CreateAccessTokenParams struct {
 	Permission Permission
 	ExpiresAt  time.Time
 	// ListIDs are the Lists it may reach. A List not named here is invisible to it.
-	ListIDs []int64
-	At      time.Time
+	// Ignored when AllLists is set.
+	ListIDs  []int64
+	AllLists bool
+	At       time.Time
 }
 
 // CreateAccessToken cuts a token and records what it may reach.
@@ -82,10 +87,17 @@ func (s *sqlStore) CreateAccessToken(
 		TokenHash:  params.TokenHash,
 		Permission: string(params.Permission),
 		ExpiresAt:  formatTime(params.ExpiresAt),
+		AllLists:   params.AllLists,
 		CreatedAt:  formatTime(params.At),
 	}
 	if _, err := tx.NewInsert().Model(row).Returning("*").Exec(ctx); err != nil {
 		return AccessToken{}, fmt.Errorf("create access token: %w", err)
+	}
+
+	// A token that reaches everything names nothing: the rows would go stale the moment
+	// a List is made, and the empty set is what "all" means here.
+	if params.AllLists {
+		params.ListIDs = nil
 	}
 
 	scope := make([]accessTokenListModel, 0, len(params.ListIDs))
@@ -226,6 +238,7 @@ type accessTokenModel struct {
 	Permission string `bun:"permission,notnull"`
 	ExpiresAt  string `bun:"expires_at,notnull"`
 	LastUsedAt string `bun:"last_used_at,notnull"`
+	AllLists   bool   `bun:"all_lists,notnull"`
 	CreatedAt  string `bun:"created_at,notnull"`
 }
 
@@ -245,7 +258,7 @@ func (m accessTokenModel) toToken() (AccessToken, error) {
 	return AccessToken{
 		ID: m.ID, UID: m.UID, MemberID: m.MemberID, Name: m.Name,
 		Permission: Permission(m.Permission), ExpiresAt: expiresAt,
-		LastUsedAt: lastUsedAt, CreatedAt: createdAt,
+		LastUsedAt: lastUsedAt, AllLists: m.AllLists, CreatedAt: createdAt,
 	}, nil
 }
 

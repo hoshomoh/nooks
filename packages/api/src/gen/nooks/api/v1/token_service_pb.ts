@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nooks/api/v1/token_service.proto.
  */
 export const file_nooks_api_v1_token_service: GenFile = /*@__PURE__*/
-  fileDesc("CiBub29rcy9hcGkvdjEvdG9rZW5fc2VydmljZS5wcm90bxIMbm9va3MuYXBpLnYxIr0BCgtBY2Nlc3NUb2tlbhILCgN1aWQYASABKAkSDAoEbmFtZRgCIAEoCRIsCgpwZXJtaXNzaW9uGAMgASgOMhgubm9va3MuYXBpLnYxLlBlcm1pc3Npb24SEgoKbGlzdF9uYW1lcxgEIAMoCRISCgpleHBpcmVzX2F0GAUgASgJEhQKDGxhc3RfdXNlZF9hdBgGIAEoCRISCgpjcmVhdGVkX2F0GAcgASgJEhMKC21lbWJlcl9uYW1lGAggASgJIhkKF0xpc3RBY2Nlc3NUb2tlbnNSZXF1ZXN0IkUKGExpc3RBY2Nlc3NUb2tlbnNSZXNwb25zZRIpCgZ0b2tlbnMYASADKAsyGS5ub29rcy5hcGkudjEuQWNjZXNzVG9rZW4ifQoYQ3JlYXRlQWNjZXNzVG9rZW5SZXF1ZXN0EgwKBG5hbWUYASABKAkSLAoKcGVybWlzc2lvbhgCIAEoDjIYLm5vb2tzLmFwaS52MS5QZXJtaXNzaW9uEhEKCWxpc3RfdWlkcxgDIAMoCRISCgpleHBpcmVzX2F0GAQgASgJIlUKGUNyZWF0ZUFjY2Vzc1Rva2VuUmVzcG9uc2USKAoFdG9rZW4YASABKAsyGS5ub29rcy5hcGkudjEuQWNjZXNzVG9rZW4SDgoGc2VjcmV0GAIgASgJIi0KGFJldm9rZUFjY2Vzc1Rva2VuUmVxdWVzdBIRCgl0b2tlbl91aWQYASABKAkiGwoZUmV2b2tlQWNjZXNzVG9rZW5SZXNwb25zZSpTCgpQZXJtaXNzaW9uEhoKFlBFUk1JU1NJT05fVU5TUEVDSUZJRUQQABITCg9QRVJNSVNTSU9OX1JFQUQQARIUChBQRVJNSVNTSU9OX1dSSVRFEAIyvQIKDFRva2VuU2VydmljZRJhChBMaXN0QWNjZXNzVG9rZW5zEiUubm9va3MuYXBpLnYxLkxpc3RBY2Nlc3NUb2tlbnNSZXF1ZXN0GiYubm9va3MuYXBpLnYxLkxpc3RBY2Nlc3NUb2tlbnNSZXNwb25zZRJkChFDcmVhdGVBY2Nlc3NUb2tlbhImLm5vb2tzLmFwaS52MS5DcmVhdGVBY2Nlc3NUb2tlblJlcXVlc3QaJy5ub29rcy5hcGkudjEuQ3JlYXRlQWNjZXNzVG9rZW5SZXNwb25zZRJkChFSZXZva2VBY2Nlc3NUb2tlbhImLm5vb2tzLmFwaS52MS5SZXZva2VBY2Nlc3NUb2tlblJlcXVlc3QaJy5ub29rcy5hcGkudjEuUmV2b2tlQWNjZXNzVG9rZW5SZXNwb25zZUKvAQoQY29tLm5vb2tzLmFwaS52MUIRVG9rZW5TZXJ2aWNlUHJvdG9QAVo2Z2l0aHViLmNvbS9ob3Nob21vaC9ub29rcy9wcm90by9nZW4vbm9va3MvYXBpL3YxO2FwaXYxogIDTkFYqgIMTm9va3MuQXBpLlYxygIMTm9va3NcQXBpXFYx4gIYTm9va3NcQXBpXFYxXEdQQk1ldGFkYXRh6gIOTm9va3M6OkFwaTo6VjFiBnByb3RvMw");
+  fileDesc("CiBub29rcy9hcGkvdjEvdG9rZW5fc2VydmljZS5wcm90bxIMbm9va3MuYXBpLnYxItABCgtBY2Nlc3NUb2tlbhILCgN1aWQYASABKAkSDAoEbmFtZRgCIAEoCRIsCgpwZXJtaXNzaW9uGAMgASgOMhgubm9va3MuYXBpLnYxLlBlcm1pc3Npb24SEgoKbGlzdF9uYW1lcxgEIAMoCRIRCglhbGxfbGlzdHMYCSABKAgSEgoKZXhwaXJlc19hdBgFIAEoCRIUCgxsYXN0X3VzZWRfYXQYBiABKAkSEgoKY3JlYXRlZF9hdBgHIAEoCRITCgttZW1iZXJfbmFtZRgIIAEoCSIZChdMaXN0QWNjZXNzVG9rZW5zUmVxdWVzdCJFChhMaXN0QWNjZXNzVG9rZW5zUmVzcG9uc2USKQoGdG9rZW5zGAEgAygLMhkubm9va3MuYXBpLnYxLkFjY2Vzc1Rva2VuIpABChhDcmVhdGVBY2Nlc3NUb2tlblJlcXVlc3QSDAoEbmFtZRgBIAEoCRIsCgpwZXJtaXNzaW9uGAIgASgOMhgubm9va3MuYXBpLnYxLlBlcm1pc3Npb24SEQoJbGlzdF91aWRzGAMgAygJEhEKCWFsbF9saXN0cxgFIAEoCBISCgpleHBpcmVzX2F0GAQgASgJIlUKGUNyZWF0ZUFjY2Vzc1Rva2VuUmVzcG9uc2USKAoFdG9rZW4YASABKAsyGS5ub29rcy5hcGkudjEuQWNjZXNzVG9rZW4SDgoGc2VjcmV0GAIgASgJIi0KGFJldm9rZUFjY2Vzc1Rva2VuUmVxdWVzdBIRCgl0b2tlbl91aWQYASABKAkiGwoZUmV2b2tlQWNjZXNzVG9rZW5SZXNwb25zZSpTCgpQZXJtaXNzaW9uEhoKFlBFUk1JU1NJT05fVU5TUEVDSUZJRUQQABITCg9QRVJNSVNTSU9OX1JFQUQQARIUChBQRVJNSVNTSU9OX1dSSVRFEAIyvQIKDFRva2VuU2VydmljZRJhChBMaXN0QWNjZXNzVG9rZW5zEiUubm9va3MuYXBpLnYxLkxpc3RBY2Nlc3NUb2tlbnNSZXF1ZXN0GiYubm9va3MuYXBpLnYxLkxpc3RBY2Nlc3NUb2tlbnNSZXNwb25zZRJkChFDcmVhdGVBY2Nlc3NUb2tlbhImLm5vb2tzLmFwaS52MS5DcmVhdGVBY2Nlc3NUb2tlblJlcXVlc3QaJy5ub29rcy5hcGkudjEuQ3JlYXRlQWNjZXNzVG9rZW5SZXNwb25zZRJkChFSZXZva2VBY2Nlc3NUb2tlbhImLm5vb2tzLmFwaS52MS5SZXZva2VBY2Nlc3NUb2tlblJlcXVlc3QaJy5ub29rcy5hcGkudjEuUmV2b2tlQWNjZXNzVG9rZW5SZXNwb25zZUKvAQoQY29tLm5vb2tzLmFwaS52MUIRVG9rZW5TZXJ2aWNlUHJvdG9QAVo2Z2l0aHViLmNvbS9ob3Nob21vaC9ub29rcy9wcm90by9nZW4vbm9va3MvYXBpL3YxO2FwaXYxogIDTkFYqgIMTm9va3MuQXBpLlYxygIMTm9va3NcQXBpXFYx4gIYTm9va3NcQXBpXFYxXEdQQk1ldGFkYXRh6gIOTm9va3M6OkFwaTo6VjFiBnByb3RvMw");
 
 /**
  * AccessToken is a key, described. Never the key itself.
@@ -37,10 +37,18 @@ export type AccessToken = Message<"nooks.api.v1.AccessToken"> & {
 
   /**
    * The Lists it may reach, by name. A List it does not name is invisible to it.
+   * Empty when all_lists is set, because then there is no list to name.
    *
    * @generated from field: repeated string list_names = 4;
    */
   listNames: string[];
+
+  /**
+   * True when it reaches every List its Member can, including ones made later.
+   *
+   * @generated from field: bool all_lists = 9;
+   */
+  allLists: boolean;
 
   /**
    * RFC 3339, or empty for a token that does not expire.
@@ -122,11 +130,20 @@ export type CreateAccessTokenRequest = Message<"nooks.api.v1.CreateAccessTokenRe
   permission: Permission;
 
   /**
-   * The Lists it may reach. A token that names none reaches none.
+   * The Lists it may reach. A token that names none reaches none, unless all_lists is
+   * set instead.
    *
    * @generated from field: repeated string list_uids = 3;
    */
   listUids: string[];
+
+  /**
+   * Reach every List the Member can, including ones made later. Not the same as naming
+   * them all: that would stop at the Lists that exist today.
+   *
+   * @generated from field: bool all_lists = 5;
+   */
+  allLists: boolean;
 
   /**
    * RFC 3339, or empty for a token that does not expire.

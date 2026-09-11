@@ -9,13 +9,19 @@ import { Field } from "./field"
 import { SecretOnce } from "./secret-once"
 import { TickBox } from "./tick-box"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { momentIn } from "@/lib/dates"
+import { DateField } from "./date-field"
+import { atEndOf, momentIn, type DueDate } from "@/lib/dates"
+import { toggled } from "@/lib/toggle-uid"
+import { useDueLabel } from "@/lib/use-due-label"
 
 /** What a Member asked for, to cut a token from. */
 export interface NewToken {
   name: string
   permission: Permission
+  /** The Lists it may reach. Empty when allLists is set. */
   listUids: string[]
+  /** Reach every List, including ones made later. */
+  allLists: boolean
   /** RFC 3339, or empty for a token that does not expire. */
   expiresAt: string
 }
@@ -80,9 +86,12 @@ export function AddTokenDialog({
 }
 
 /** How long a token lasts, as a Member thinks about it rather than as a date. */
-type Lifetime = "30" | "90" | "365" | "never"
+type Lifetime = "30" | "90" | "365" | "never" | "pick"
 
-const LIFETIMES: Lifetime[] = ["30", "90", "365", "never"]
+const LIFETIMES: Lifetime[] = ["30", "90", "365", "never", "pick"]
+
+/** What a token is pointed at. */
+type Scope = "all" | "some"
 
 interface AddTokenFormProps {
   lists: List[]
@@ -93,16 +102,18 @@ interface AddTokenFormProps {
 /** The form itself, which owns the answers so far. */
 function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
   const { t } = useTranslation()
+  const due = useDueLabel()
   const [name, setName] = useState("")
   const [permission, setPermission] = useState<Permission>(Permission.WRITE)
-  const [scope, setScope] = useState<string[]>([])
+  const [scope, setScope] = useState<Scope>("all")
+  const [picked, setPicked] = useState<string[]>([])
   const [lifetime, setLifetime] = useState<Lifetime>("90")
-
-  const toggle = (uid: string) =>
-    setScope(scope.includes(uid) ? scope.filter((each) => each !== uid) : [...scope, uid])
+  const [chosenDay, setChosenDay] = useState<DueDate>("")
 
   // A token that names no List reaches none, so there is nothing to cut yet.
-  const ready = name.trim().length > 0 && scope.length > 0
+  const scopeReady = scope === "all" || picked.length > 0
+  const expiryReady = lifetime !== "pick" || chosenDay !== ""
+  const ready = name.trim().length > 0 && scopeReady && expiryReady
 
   return (
     <form
@@ -114,8 +125,9 @@ function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
         onAdd({
           name: name.trim(),
           permission,
-          listUids: scope,
-          expiresAt: expiryOf(lifetime),
+          listUids: scope === "all" ? [] : picked,
+          allLists: scope === "all",
+          expiresAt: expiryOf(lifetime, chosenDay),
         })
       }}
     >
@@ -133,40 +145,46 @@ function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
           autoFocus
         />
 
-        <Choice
+        <ExplainedChoice
           label={t("tokens.permission")}
           options={[
-            { value: Permission.READ, label: t("tokens.read"), blurb: t("tokens.readBlurb") },
-            { value: Permission.WRITE, label: t("tokens.write"), blurb: t("tokens.writeBlurb") },
+            { value: Permission.READ, title: t("tokens.read"), blurb: t("tokens.readBlurb") },
+            { value: Permission.WRITE, title: t("tokens.write"), blurb: t("tokens.writeBlurb") },
           ]}
           chosen={permission}
           onChoose={setPermission}
         />
 
-        <fieldset className="flex flex-col gap-2">
-          <legend className="pb-2 text-label text-muted-foreground uppercase">
-            {t("tokens.scope")}
-          </legend>
-          <p className="pb-1 text-micro leading-[1.5] text-muted-foreground">
-            {t("tokens.scopeBlurb")}
-          </p>
-          {lists.map((list) => (
-            <button
-              key={list.uid}
-              type="button"
-              role="checkbox"
-              aria-checked={scope.includes(list.uid)}
-              onClick={() => toggle(list.uid)}
-              className={cn(
-                "flex min-h-row items-center gap-3 rounded-md px-2 py-1.5 text-left transition-colors",
-                scope.includes(list.uid) ? "bg-secondary" : "hover:bg-secondary",
-              )}
-            >
-              <span className="text-field">{list.name}</span>
-              <TickBox picked={scope.includes(list.uid)} className="ml-auto" />
-            </button>
-          ))}
-        </fieldset>
+        <ExplainedChoice
+          label={t("tokens.scope")}
+          options={[
+            { value: "all", title: t("tokens.allLists"), blurb: t("tokens.allListsBlurb") },
+            { value: "some", title: t("tokens.someLists"), blurb: t("tokens.someListsBlurb") },
+          ]}
+          chosen={scope}
+          onChoose={setScope}
+        />
+
+        {scope === "some" && (
+          <div className="flex flex-col gap-0.5">
+            {lists.map((list) => (
+              <button
+                key={list.uid}
+                type="button"
+                role="checkbox"
+                aria-checked={picked.includes(list.uid)}
+                onClick={() => setPicked(toggled(picked, list.uid))}
+                className={cn(
+                  "flex min-h-row items-center gap-3 rounded-md px-2 py-1.5 text-left transition-colors",
+                  picked.includes(list.uid) ? "bg-secondary" : "hover:bg-secondary",
+                )}
+              >
+                <span className="text-field">{list.name}</span>
+                <TickBox picked={picked.includes(list.uid)} className="ml-auto" />
+              </button>
+            ))}
+          </div>
+        )}
 
         <Choice
           label={t("tokens.expiry")}
@@ -177,9 +195,19 @@ function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
           chosen={lifetime}
           onChoose={setLifetime}
         />
+
+        {lifetime === "pick" && (
+          <DateField
+            value={chosenDay}
+            label={chosenDay ? due.label(chosenDay) : t("tokens.pickADay")}
+            chosen={Boolean(chosenDay)}
+            onChange={setChosenDay}
+          />
+        )}
       </div>
 
       <footer className="flex items-center gap-3 border-t border-hair px-6.5 py-3.5">
+        <span className="text-micro text-muted-foreground">{t("tokens.shownOnce")}</span>
         <span className="flex-1" />
         <Button tone="secondary" type="button" onClick={onCancel}>
           {t("action.cancel")}
@@ -245,7 +273,69 @@ function Choice<T extends string | number>({ label, options, chosen, onChoose }:
   )
 }
 
-/** expiryOf turns a lifetime into the moment the token stops working. */
-function expiryOf(lifetime: Lifetime): string {
-  return lifetime === "never" ? "" : momentIn(Number(lifetime))
+/** expiryOf turns the answer into the moment the token stops working. */
+function expiryOf(lifetime: Lifetime, chosenDay: DueDate): string {
+  if (lifetime === "never") {
+    return ""
+  }
+  if (lifetime === "pick") {
+    return atEndOf(chosenDay)
+  }
+  return momentIn(Number(lifetime))
+}
+
+/** One of the answers an ExplainedChoice offers. */
+interface ExplainedOption<T> {
+  value: T
+  title: string
+  /** What picking it costs. Always shown: a choice nobody can read is not a choice. */
+  blurb: string
+}
+
+interface ExplainedChoiceProps<T> {
+  label: string
+  options: ExplainedOption<T>[]
+  chosen: T
+  onChoose: (value: T) => void
+}
+
+/**
+ * One answer out of a few, where each needs a sentence — DESIGN.md §7's bordered list.
+ *
+ * Every sentence is on the page at once. A control that explains only the answer
+ * already chosen asks a Member to pick first and understand afterwards.
+ */
+function ExplainedChoice<T extends string | number>({
+  label,
+  options,
+  chosen,
+  onChoose,
+}: ExplainedChoiceProps<T>) {
+  return (
+    <fieldset className="flex flex-col gap-2.5">
+      <legend className="pb-2 text-small font-medium text-secondary-foreground">{label}</legend>
+      <div className="flex flex-col gap-1.5">
+        {options.map((option) => (
+          <button
+            key={String(option.value)}
+            type="button"
+            role="radio"
+            aria-checked={option.value === chosen}
+            onClick={() => onChoose(option.value)}
+            className={cn(
+              "flex flex-col gap-1 rounded-xl border px-3.5 py-3 text-left transition-colors",
+              option.value === chosen
+                ? "border-[length:1.5px] border-shared bg-shared-bg"
+                : "border-border hover:bg-secondary",
+            )}
+          >
+            <span className="text-field font-medium">{option.title}</span>
+            <span className="text-meta leading-[1.5] text-secondary-foreground">
+              {option.blurb}
+            </span>
+          </button>
+        ))}
+      </div>
+    </fieldset>
+  )
 }

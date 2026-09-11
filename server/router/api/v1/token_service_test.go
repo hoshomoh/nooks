@@ -357,3 +357,51 @@ func TestRevokingYourOwnTokenTellsNobody(t *testing.T) {
 		t.Errorf("got %d entries, want none for revoking your own token", len(entries))
 	}
 }
+
+// Reaching everything and naming every List are different answers: the first keeps
+// working when a List is made next week, the second deliberately does not.
+func TestATokenForAllListsReachesOnesMadeLater(t *testing.T) {
+	f := newListFixture(t)
+	f.createList(t, f.anna, "Groceries")
+
+	svc := NewTokenService(f.store, func() time.Time { return testClock }, nil, nil)
+	made, err := svc.CreateAccessToken(f.as(t, f.anna), connect.NewRequest(
+		&apiv1.CreateAccessTokenRequest{
+			Name: "My client", AllLists: true,
+			Permission: apiv1.Permission_PERMISSION_WRITE,
+		},
+	))
+	if err != nil {
+		t.Fatalf("CreateAccessToken for all lists: %v", err)
+	}
+	if !made.Msg.GetToken().GetAllLists() {
+		t.Error("the token does not say it reaches everything")
+	}
+
+	// Made after the token was cut, which is the whole point.
+	later := f.createList(t, f.anna, "Bike")
+
+	resolver := auth.NewResolver(f.store, func() time.Time { return testClock })
+	grant, ok := resolver.Grant(t.Context(), bearer(made.Msg.GetSecret()))
+	if !ok {
+		t.Fatal("the token was not accepted")
+	}
+
+	if _, err := f.svc.GetList(auth.WithGrant(t.Context(), grant), connect.NewRequest(
+		&apiv1.GetListRequest{ListUid: later},
+	)); err != nil {
+		t.Errorf("GetList on a List made after the token: %v", err)
+	}
+}
+
+// A token that reaches nothing is a key to no door.
+func TestATokenMustReachSomething(t *testing.T) {
+	f := newListFixture(t)
+
+	_, err := f.tokens(t).CreateAccessToken(f.as(t, f.anna), connect.NewRequest(
+		&apiv1.CreateAccessTokenRequest{Name: "Nothing"},
+	))
+	if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
+		t.Errorf("code = %v, want invalid_argument", got)
+	}
+}

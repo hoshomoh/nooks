@@ -2,6 +2,7 @@ import {
   addDays,
   addYears,
   differenceInCalendarDays,
+  endOfDay,
   endOfMonth,
   format,
   formatISO,
@@ -197,6 +198,18 @@ export function parseMoment(value: string): Date | null {
  */
 export function momentIn(days: number, from: Date = new Date()): string {
   return formatISO(addDays(from, days))
+}
+
+/**
+ * atEndOf is the last moment of a chosen day, as an RFC 3339 timestamp.
+ *
+ * A Member picking a day for an expiry means the end of that day, not midnight at the
+ * start of it: a token that stops working the moment the day begins would have expired
+ * the day before, as far as anybody using it is concerned.
+ */
+export function atEndOf(day: DueDate): string {
+  const parsed = parseDue(day)
+  return parsed ? formatISO(endOfDay(parsed)) : ""
 }
 
 /** rangeFrom returns the stored dates bounding a window of days starting at from. */

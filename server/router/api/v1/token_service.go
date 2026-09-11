@@ -143,12 +143,7 @@ func (s *TokenService) CreateAccessToken(
 			errors.New("say what the token may do"))
 	}
 
-	// A token that reaches nothing is a key to no door. Refusing it is kinder than
-	// handing somebody a secret that will answer nothing.
-	if len(req.Msg.GetListUids()) == 0 {
-		return nil, errNoLists
-	}
-	listIDs, err := s.reachableListIDs(ctx, member, req.Msg.GetListUids())
+	listIDs, err := s.scopeOf(ctx, member, req.Msg)
 	if err != nil {
 		return nil, err
 	}
@@ -169,6 +164,7 @@ func (s *TokenService) CreateAccessToken(
 
 	token, err := s.store.CreateAccessToken(ctx, store.CreateAccessTokenParams{
 		UID: uid, MemberID: member.ID, Name: name, TokenHash: hash,
+		AllLists:   req.Msg.GetAllLists(),
 		Permission: permission, ExpiresAt: expiresAt, ListIDs: listIDs, At: s.now(),
 	})
 	if err != nil {
@@ -227,6 +223,26 @@ func (s *TokenService) RevokeAccessToken(
 // may not touch. Telling them apart would let anyone probe for tokens.
 var errNoSuchToken = connect.NewError(connect.CodeNotFound, errors.New("no such token"))
 
+// scopeOf resolves what a token is being pointed at.
+//
+// Reaching everything and naming every List are different answers: the first keeps
+// working when a List is made next week, the second deliberately does not.
+func (s *TokenService) scopeOf(
+	ctx context.Context,
+	member store.Member,
+	msg *apiv1.CreateAccessTokenRequest,
+) ([]int64, error) {
+	if msg.GetAllLists() {
+		return nil, nil
+	}
+	// A token that reaches nothing is a key to no door. Refusing it is kinder than
+	// handing somebody a secret that will answer nothing.
+	if len(msg.GetListUids()) == 0 {
+		return nil, errNoLists
+	}
+	return s.reachableListIDs(ctx, member, msg.GetListUids())
+}
+
 // reachableListIDs resolves the Lists a token is being scoped to.
 //
 // Only Lists the Member can already reach: a token is their access narrowed, so it
@@ -281,12 +297,16 @@ func (s *TokenService) describe(
 		ExpiresAt:  formatMoment(token.ExpiresAt),
 		LastUsedAt: formatMoment(token.LastUsedAt),
 		CreatedAt:  formatMoment(token.CreatedAt),
+		AllLists:   token.AllLists,
 		MemberName: owner.Name,
 	}
 	if token.MemberID != reader.ID {
 		return described, nil
 	}
 
+	if token.AllLists {
+		return described, nil
+	}
 	described.ListNames, err = s.scopeNames(ctx, token)
 	if err != nil {
 		return nil, err

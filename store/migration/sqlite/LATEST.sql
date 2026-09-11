@@ -206,6 +206,9 @@ CREATE TABLE access_token (
   expires_at TEXT    NOT NULL DEFAULT '',
   -- When it was last used, so a Member can tell which tokens are doing nothing.
   last_used_at TEXT  NOT NULL DEFAULT '',
+  -- True when it reaches every List its Member can, including ones made later. A token
+  -- that names Lists instead is limited to exactly those.
+  all_lists  BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TEXT    NOT NULL
 );
 

@@ -459,18 +459,19 @@
     "noLists": "no lists",
     "expires": "expires {{date}}",
     "neverExpires": "does not expire",
-    "read": "Read",
-    "readBlurb": "See and print. It cannot tick anything off or add to a list.",
-    "write": "Write",
-    "writeBlurb": "Tick, add and edit items on the lists it names.",
-    "scope": "Lists",
+    "read": "Read only",
+    "readBlurb": "See lists and items, and print. It cannot tick anything off, add anything, or change a list.",
+    "write": "Read and write",
+    "writeBlurb": "Everything read can do, plus ticking off, adding, editing and deleting items.",
+    "scope": "Which lists",
     "scopeBlurb": "A list you do not pick is invisible to this token — it cannot see that it exists.",
     "expiry": "Expires",
     "lifetime": {
       "30": "In 30 days",
       "90": "In 90 days",
       "365": "In a year",
-      "never": "Never"
+      "never": "Never",
+      "pick": "Pick a day"
     },
     "name": "Name",
     "nameHint": "What it is for, so you recognise it later: “kitchen tablet”.",
@@ -483,7 +484,13 @@
     "revokeTitle": "Revoke “{{name}}”?",
     "revokeBlurb": "Whatever is using it stops working straight away. What it added stays on its lists.",
     "revokeConfirm": "Revoke",
-    "someoneElses": "{{name}}'s token"
+    "someoneElses": "{{name}}'s token",
+    "allLists": "Every list",
+    "allListsBlurb": "Everything you can reach now, and anything you make later. What a client you build yourself will want.",
+    "someLists": "Only the lists I pick",
+    "someListsBlurb": "A list you do not pick is invisible to this token — it cannot see that it exists.",
+    "pickADay": "Pick a day",
+    "shownOnce": "The secret is shown once."
   },
   "account": {
     "title": "Account",

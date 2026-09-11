@@ -183,7 +183,7 @@ function TokenRow({ token, ownName, moment, onRevoke }: TokenRowProps) {
  * that had somewhere to put them would be a page waiting for the server to slip.
  */
 function describeScope(token: AccessToken, t: Translate, moment: FormatMoment): string {
-  const lists = token.listNames.join(", ") || t("tokens.noLists")
+  const lists = token.allLists ? t("tokens.allLists") : token.listNames.join(", ") || t("tokens.noLists")
   if (!token.expiresAt) {
     return `${lists} · ${t("tokens.neverExpires")}`
   }

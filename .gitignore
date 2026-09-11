@@ -30,3 +30,6 @@ go*.linux-amd64.tar.gz
 .DS_Store
 .idea/
 .vscode/
+
+# The checkout ./scripts/preflight.sh verifies a commit in.
+.preflight/

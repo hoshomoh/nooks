@@ -299,9 +299,8 @@
     "backToLists": "Back to lists",
     "publicList": "Public list",
     "tokens": "Access tokens",
-    "account": "Account",
-    "appearance": "Appearance",
-    "instance": "Instance"
+    "general": "General",
+    "about": "About"
   },
   "members": {
     "title": "Members",
@@ -512,7 +511,9 @@
     "saved": "Saved",
     "signOut": "Signing out",
     "signOutBlurb": "Ends this session in this browser. Your access tokens keep working — revoke them on the tokens page if you want them stopped too.",
-    "signOutAction": "Sign out"
+    "signOutAction": "Sign out",
+    "changePassword": "Change password",
+    "passwordNote": "Your access tokens keep working."
   },
   "appearance": {
     "title": "Appearance",
@@ -536,5 +537,40 @@
     "publicSignupBlurb": "Off means anybody asking for an account waits for an admin to approve them. Off is the default, and usually the right answer.",
     "language": "Default language",
     "languageBlurb": "Used for the public page, printed sheets, and anyone who has not chosen one of their own."
+  },
+  "general": {
+    "signedIn": "Signed in as {{name}} · member at {{instance}}",
+    "signedInAdmin": "Signed in as {{name}} · admin at {{instance}}",
+    "account": "Account",
+    "appearance": "Appearance",
+    "instance": "Instance",
+    "adminsOnly": "admins only",
+    "nameBlurb": "How you appear on items you add.",
+    "passwordBlurb": "You set it yourself; nobody can read it.",
+    "languageNote": "Only English is translated so far.",
+    "footerNote": "Nothing on this page affects anyone else.",
+    "on": "On",
+    "off": "Off"
+  },
+  "about": {
+    "blurb": "What this copy of nooks is, and how much it is holding. Everything here is on your machine.",
+    "version": "Version",
+    "versionValue": "nooks {{version}}",
+    "storage": "Storage",
+    "storageBlurb": "One file you can copy.",
+    "instance": "Instance",
+    "since": "Since {{when}}",
+    "inIt": "In it",
+    "listCount": "{{count}} list",
+    "listCount_other": "{{count}} lists",
+    "itemCount": "{{count}} item",
+    "itemCount_other": "{{count}} items",
+    "memberCount": "{{count}} person",
+    "memberCount_other": "{{count}} people",
+    "licence": "Licence",
+    "licenceBlurb": "The source is yours, and so is anything you change.",
+    "telemetry": "Telemetry",
+    "telemetryBlurb": "There is nothing to turn off.",
+    "none": "None"
   }
 }

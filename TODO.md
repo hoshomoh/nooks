@@ -244,17 +244,12 @@ The single most important milestone; everything else is furniture.
 
 ## M11 · Settings, export, import
 
-- [x] Account: name, email, change password
-- [x] Appearance: theme segment and the language picker
-- [x] Instance default language, for public lists, printed sheets and anyone who has not
-      chosen one
-- [x] Instance (admins only): Instance name, public signup toggle
-- [ ] About: version, storage, instance age, counts, licence, **Telemetry: None**
+- [x] General: account, appearance and (for an admin) instance, as one page of sections
+- [x] About: version, storage, instance age, counts, licence, **Telemetry: None**
 - [ ] Delete instance, from About — takes everything and returns the Instance to first run.
       Any Admin, behind the irreversible confirmation in DESIGN.md §9
-- [x] Sign out — on the account page. The design gives the sidebar's member row one
-      label and it says Settings, so one-click sign-out needs a member menu the design
-      does not have yet
+- [x] Sign out — the design gives the sidebar's member row one label and it says
+      Settings, so one-click sign-out needs a member menu the design does not have yet
 - [ ] Export everything — one JSON file plus the printed pages as PDFs
 - [ ] Import a backup — the same file the exporter writes, so moving machines is copy and restore
 

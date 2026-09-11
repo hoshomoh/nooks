@@ -10,7 +10,90 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nooks/api/v1/instance_service.proto.
  */
 export const file_nooks_api_v1_instance_service: GenFile = /*@__PURE__*/
-  fileDesc("CiNub29rcy9hcGkvdjEvaW5zdGFuY2Vfc2VydmljZS5wcm90bxIMbm9va3MuYXBpLnYxImEKElB1YmxpY0xpc3RTZXR0aW5ncxIQCghsaXN0X3VpZBgBIAEoCRISCgpzaG93X25hbWVzGAIgASgIEhEKCXNob3dfbWV0YRgDIAEoCBISCgphbGxvd19qb2luGAQgASgIIoYBChBJbnN0YW5jZVNldHRpbmdzEgwKBG5hbWUYASABKAkSFQoNcHVibGljX3NpZ251cBgCIAEoCBI1CgtwdWJsaWNfbGlzdBgDIAEoCzIgLm5vb2tzLmFwaS52MS5QdWJsaWNMaXN0U2V0dGluZ3MSFgoOZGVmYXVsdF9sb2NhbGUYBCABKAkiHAoaR2V0SW5zdGFuY2VTZXR0aW5nc1JlcXVlc3QiTwobR2V0SW5zdGFuY2VTZXR0aW5nc1Jlc3BvbnNlEjAKCHNldHRpbmdzGAEgASgLMh4ubm9va3MuYXBpLnYxLkluc3RhbmNlU2V0dGluZ3MiUQodVXBkYXRlSW5zdGFuY2VTZXR0aW5nc1JlcXVlc3QSMAoIc2V0dGluZ3MYASABKAsyHi5ub29rcy5hcGkudjEuSW5zdGFuY2VTZXR0aW5ncyJSCh5VcGRhdGVJbnN0YW5jZVNldHRpbmdzUmVzcG9uc2USMAoIc2V0dGluZ3MYASABKAsyHi5ub29rcy5hcGkudjEuSW5zdGFuY2VTZXR0aW5ncyIUChJHZXRJbnN0YW5jZVJlcXVlc3QieAoTR2V0SW5zdGFuY2VSZXNwb25zZRIMCgRuYW1lGAEgASgJEg8KB3ZlcnNpb24YAiABKAkSEwoLbmVlZHNfc2V0dXAYAyABKAgSFQoNcHVibGljX3NpZ251cBgEIAEoCBIWCg5kZWZhdWx0X2xvY2FsZRgFIAEoCTLGAgoPSW5zdGFuY2VTZXJ2aWNlElIKC0dldEluc3RhbmNlEiAubm9va3MuYXBpLnYxLkdldEluc3RhbmNlUmVxdWVzdBohLm5vb2tzLmFwaS52MS5HZXRJbnN0YW5jZVJlc3BvbnNlEmoKE0dldEluc3RhbmNlU2V0dGluZ3MSKC5ub29rcy5hcGkudjEuR2V0SW5zdGFuY2VTZXR0aW5nc1JlcXVlc3QaKS5ub29rcy5hcGkudjEuR2V0SW5zdGFuY2VTZXR0aW5nc1Jlc3BvbnNlEnMKFlVwZGF0ZUluc3RhbmNlU2V0dGluZ3MSKy5ub29rcy5hcGkudjEuVXBkYXRlSW5zdGFuY2VTZXR0aW5nc1JlcXVlc3QaLC5ub29rcy5hcGkudjEuVXBkYXRlSW5zdGFuY2VTZXR0aW5nc1Jlc3BvbnNlQrIBChBjb20ubm9va3MuYXBpLnYxQhRJbnN0YW5jZVNlcnZpY2VQcm90b1ABWjZnaXRodWIuY29tL2hvc2hvbW9oL25vb2tzL3Byb3RvL2dlbi9ub29rcy9hcGkvdjE7YXBpdjGiAgNOQViqAgxOb29rcy5BcGkuVjHKAgxOb29rc1xBcGlcVjHiAhhOb29rc1xBcGlcVjFcR1BCTWV0YWRhdGHqAg5Ob29rczo6QXBpOjpWMWIGcHJvdG8z");
+  fileDesc("CiNub29rcy9hcGkvdjEvaW5zdGFuY2Vfc2VydmljZS5wcm90bxIMbm9va3MuYXBpLnYxIhkKF0dldEluc3RhbmNlQWJvdXRSZXF1ZXN0ItQBChhHZXRJbnN0YW5jZUFib3V0UmVzcG9uc2USDwoHdmVyc2lvbhgBIAEoCRISCgpzdGFydGVkX2F0GAIgASgJEhQKDG1lbWJlcl9jb3VudBgDIAEoBRISCgpsaXN0X2NvdW50GAQgASgFEhIKCml0ZW1fY291bnQYBSABKAUSFQoNc3RvcmFnZV9ieXRlcxgGIAEoAxIPCgdsaWNlbmNlGAcgASgJEhYKDnN0b3JhZ2VfZHJpdmVyGAggASgJEhUKDWluc3RhbmNlX25hbWUYCSABKAkiYQoSUHVibGljTGlzdFNldHRpbmdzEhAKCGxpc3RfdWlkGAEgASgJEhIKCnNob3dfbmFtZXMYAiABKAgSEQoJc2hvd19tZXRhGAMgASgIEhIKCmFsbG93X2pvaW4YBCABKAgihgEKEEluc3RhbmNlU2V0dGluZ3MSDAoEbmFtZRgBIAEoCRIVCg1wdWJsaWNfc2lnbnVwGAIgASgIEjUKC3B1YmxpY19saXN0GAMgASgLMiAubm9va3MuYXBpLnYxLlB1YmxpY0xpc3RTZXR0aW5ncxIWCg5kZWZhdWx0X2xvY2FsZRgEIAEoCSIcChpHZXRJbnN0YW5jZVNldHRpbmdzUmVxdWVzdCJPChtHZXRJbnN0YW5jZVNldHRpbmdzUmVzcG9uc2USMAoIc2V0dGluZ3MYASABKAsyHi5ub29rcy5hcGkudjEuSW5zdGFuY2VTZXR0aW5ncyJRCh1VcGRhdGVJbnN0YW5jZVNldHRpbmdzUmVxdWVzdBIwCghzZXR0aW5ncxgBIAEoCzIeLm5vb2tzLmFwaS52MS5JbnN0YW5jZVNldHRpbmdzIlIKHlVwZGF0ZUluc3RhbmNlU2V0dGluZ3NSZXNwb25zZRIwCghzZXR0aW5ncxgBIAEoCzIeLm5vb2tzLmFwaS52MS5JbnN0YW5jZVNldHRpbmdzIhQKEkdldEluc3RhbmNlUmVxdWVzdCJ4ChNHZXRJbnN0YW5jZVJlc3BvbnNlEgwKBG5hbWUYASABKAkSDwoHdmVyc2lvbhgCIAEoCRITCgtuZWVkc19zZXR1cBgDIAEoCBIVCg1wdWJsaWNfc2lnbnVwGAQgASgIEhYKDmRlZmF1bHRfbG9jYWxlGAUgASgJMqkDCg9JbnN0YW5jZVNlcnZpY2USUgoLR2V0SW5zdGFuY2USIC5ub29rcy5hcGkudjEuR2V0SW5zdGFuY2VSZXF1ZXN0GiEubm9va3MuYXBpLnYxLkdldEluc3RhbmNlUmVzcG9uc2USagoTR2V0SW5zdGFuY2VTZXR0aW5ncxIoLm5vb2tzLmFwaS52MS5HZXRJbnN0YW5jZVNldHRpbmdzUmVxdWVzdBopLm5vb2tzLmFwaS52MS5HZXRJbnN0YW5jZVNldHRpbmdzUmVzcG9uc2UScwoWVXBkYXRlSW5zdGFuY2VTZXR0aW5ncxIrLm5vb2tzLmFwaS52MS5VcGRhdGVJbnN0YW5jZVNldHRpbmdzUmVxdWVzdBosLm5vb2tzLmFwaS52MS5VcGRhdGVJbnN0YW5jZVNldHRpbmdzUmVzcG9uc2USYQoQR2V0SW5zdGFuY2VBYm91dBIlLm5vb2tzLmFwaS52MS5HZXRJbnN0YW5jZUFib3V0UmVxdWVzdBomLm5vb2tzLmFwaS52MS5HZXRJbnN0YW5jZUFib3V0UmVzcG9uc2VCsgEKEGNvbS5ub29rcy5hcGkudjFCFEluc3RhbmNlU2VydmljZVByb3RvUAFaNmdpdGh1Yi5jb20vaG9zaG9tb2gvbm9va3MvcHJvdG8vZ2VuL25vb2tzL2FwaS92MTthcGl2MaICA05BWKoCDE5vb2tzLkFwaS5WMcoCDE5vb2tzXEFwaVxWMeICGE5vb2tzXEFwaVxWMVxHUEJNZXRhZGF0YeoCDk5vb2tzOjpBcGk6OlYxYgZwcm90bzM");
+
+/**
+ * @generated from message nooks.api.v1.GetInstanceAboutRequest
+ */
+export type GetInstanceAboutRequest = Message<"nooks.api.v1.GetInstanceAboutRequest"> & {
+};
+
+/**
+ * Describes the message nooks.api.v1.GetInstanceAboutRequest.
+ * Use `create(GetInstanceAboutRequestSchema)` to create a new message.
+ */
+export const GetInstanceAboutRequestSchema: GenMessage<GetInstanceAboutRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_instance_service, 0);
+
+/**
+ * @generated from message nooks.api.v1.GetInstanceAboutResponse
+ */
+export type GetInstanceAboutResponse = Message<"nooks.api.v1.GetInstanceAboutResponse"> & {
+  /**
+   * The build that is running, e.g. "1.0.2".
+   *
+   * @generated from field: string version = 1;
+   */
+  version: string;
+
+  /**
+   * When first run finished, RFC 3339. How long the Instance has been going.
+   *
+   * @generated from field: string started_at = 2;
+   */
+  startedAt: string;
+
+  /**
+   * @generated from field: int32 member_count = 3;
+   */
+  memberCount: number;
+
+  /**
+   * @generated from field: int32 list_count = 4;
+   */
+  listCount: number;
+
+  /**
+   * @generated from field: int32 item_count = 5;
+   */
+  itemCount: number;
+
+  /**
+   * How much room the database is taking, or zero where the driver cannot say. Zero
+   * renders as nothing: a wrong number about somebody's disk is worse than no number.
+   *
+   * @generated from field: int64 storage_bytes = 6;
+   */
+  storageBytes: bigint;
+
+  /**
+   * The licence this build is under, e.g. "AGPL-3.0".
+   *
+   * @generated from field: string licence = 7;
+   */
+  licence: string;
+
+  /**
+   * What is holding the data, e.g. "sqlite". Shown beside the size.
+   *
+   * @generated from field: string storage_driver = 8;
+   */
+  storageDriver: string;
+
+  /**
+   * What the Instance calls itself, so About can be read without a second request.
+   *
+   * @generated from field: string instance_name = 9;
+   */
+  instanceName: string;
+};
+
+/**
+ * Describes the message nooks.api.v1.GetInstanceAboutResponse.
+ * Use `create(GetInstanceAboutResponseSchema)` to create a new message.
+ */
+export const GetInstanceAboutResponseSchema: GenMessage<GetInstanceAboutResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_instance_service, 1);
 
 /**
  * PublicListSettings is the Instance's one public page, and what a Visitor sees of it.
@@ -53,7 +136,7 @@ export type PublicListSettings = Message<"nooks.api.v1.PublicListSettings"> & {
  * Use `create(PublicListSettingsSchema)` to create a new message.
  */
 export const PublicListSettingsSchema: GenMessage<PublicListSettings> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 0);
+  messageDesc(file_nooks_api_v1_instance_service, 2);
 
 /**
  * @generated from message nooks.api.v1.InstanceSettings
@@ -92,7 +175,7 @@ export type InstanceSettings = Message<"nooks.api.v1.InstanceSettings"> & {
  * Use `create(InstanceSettingsSchema)` to create a new message.
  */
 export const InstanceSettingsSchema: GenMessage<InstanceSettings> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 1);
+  messageDesc(file_nooks_api_v1_instance_service, 3);
 
 /**
  * @generated from message nooks.api.v1.GetInstanceSettingsRequest
@@ -105,7 +188,7 @@ export type GetInstanceSettingsRequest = Message<"nooks.api.v1.GetInstanceSettin
  * Use `create(GetInstanceSettingsRequestSchema)` to create a new message.
  */
 export const GetInstanceSettingsRequestSchema: GenMessage<GetInstanceSettingsRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 2);
+  messageDesc(file_nooks_api_v1_instance_service, 4);
 
 /**
  * @generated from message nooks.api.v1.GetInstanceSettingsResponse
@@ -122,7 +205,7 @@ export type GetInstanceSettingsResponse = Message<"nooks.api.v1.GetInstanceSetti
  * Use `create(GetInstanceSettingsResponseSchema)` to create a new message.
  */
 export const GetInstanceSettingsResponseSchema: GenMessage<GetInstanceSettingsResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 3);
+  messageDesc(file_nooks_api_v1_instance_service, 5);
 
 /**
  * @generated from message nooks.api.v1.UpdateInstanceSettingsRequest
@@ -139,7 +222,7 @@ export type UpdateInstanceSettingsRequest = Message<"nooks.api.v1.UpdateInstance
  * Use `create(UpdateInstanceSettingsRequestSchema)` to create a new message.
  */
 export const UpdateInstanceSettingsRequestSchema: GenMessage<UpdateInstanceSettingsRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 4);
+  messageDesc(file_nooks_api_v1_instance_service, 6);
 
 /**
  * @generated from message nooks.api.v1.UpdateInstanceSettingsResponse
@@ -156,7 +239,7 @@ export type UpdateInstanceSettingsResponse = Message<"nooks.api.v1.UpdateInstanc
  * Use `create(UpdateInstanceSettingsResponseSchema)` to create a new message.
  */
 export const UpdateInstanceSettingsResponseSchema: GenMessage<UpdateInstanceSettingsResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 5);
+  messageDesc(file_nooks_api_v1_instance_service, 7);
 
 /**
  * @generated from message nooks.api.v1.GetInstanceRequest
@@ -169,7 +252,7 @@ export type GetInstanceRequest = Message<"nooks.api.v1.GetInstanceRequest"> & {
  * Use `create(GetInstanceRequestSchema)` to create a new message.
  */
 export const GetInstanceRequestSchema: GenMessage<GetInstanceRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 6);
+  messageDesc(file_nooks_api_v1_instance_service, 8);
 
 /**
  * @generated from message nooks.api.v1.GetInstanceResponse
@@ -218,7 +301,7 @@ export type GetInstanceResponse = Message<"nooks.api.v1.GetInstanceResponse"> & 
  * Use `create(GetInstanceResponseSchema)` to create a new message.
  */
 export const GetInstanceResponseSchema: GenMessage<GetInstanceResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_instance_service, 7);
+  messageDesc(file_nooks_api_v1_instance_service, 9);
 
 /**
  * InstanceService reports what this copy of Nooks is and how it is configured.
@@ -259,6 +342,17 @@ export const InstanceService: GenService<{
     methodKind: "unary";
     input: typeof UpdateInstanceSettingsRequestSchema;
     output: typeof UpdateInstanceSettingsResponseSchema;
+  },
+  /**
+   * GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
+   * Member: it is their Instance too, and none of it is anybody else's business.
+   *
+   * @generated from rpc nooks.api.v1.InstanceService.GetInstanceAbout
+   */
+  getInstanceAbout: {
+    methodKind: "unary";
+    input: typeof GetInstanceAboutRequestSchema;
+    output: typeof GetInstanceAboutResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_nooks_api_v1_instance_service, 0);

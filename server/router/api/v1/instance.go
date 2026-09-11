@@ -150,3 +150,43 @@ func settingsToProto(settings store.InstanceSettings) *apiv1.InstanceSettings {
 		},
 	}
 }
+
+// licence is what this build is under. Stated rather than looked up: it is a fact about
+// the source, and a file read at runtime would be a file somebody could replace.
+const licence = "AGPL-3.0-or-later"
+
+/*
+GetInstanceAbout reports what this copy of Nooks is and how much it holds.
+
+Any Member, not only an Admin. It is their Instance too, and none of it — a version, a
+count, the size on disk — is anybody else's business to keep from them.
+*/
+func (s *InstanceService) GetInstanceAbout(
+	ctx context.Context,
+	_ *connect.Request[apiv1.GetInstanceAboutRequest],
+) (*connect.Response[apiv1.GetInstanceAboutResponse], error) {
+	if _, err := requireMember(ctx); err != nil {
+		return nil, err
+	}
+
+	settings, err := s.store.InstanceSettings(ctx)
+	if err != nil {
+		return nil, internalError("read instance settings", err)
+	}
+	stats, err := s.store.Stats(ctx)
+	if err != nil {
+		return nil, internalError("count what the instance holds", err)
+	}
+
+	return connect.NewResponse(&apiv1.GetInstanceAboutResponse{
+		Version:       version.String(),
+		StartedAt:     formatMoment(settings.SetupCompletedAt),
+		MemberCount:   int32(stats.Members),
+		ListCount:     int32(stats.Lists),
+		ItemCount:     int32(stats.Items),
+		StorageBytes:  stats.StorageBytes,
+		Licence:       licence,
+		StorageDriver: stats.Driver,
+		InstanceName:  settings.Name,
+	}), nil
+}

@@ -16,6 +16,37 @@ service InstanceService {
 
   // UpdateInstanceSettings replaces them. Admins only.
   rpc UpdateInstanceSettings(UpdateInstanceSettingsRequest) returns (UpdateInstanceSettingsResponse);
+
+  // GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
+  // Member: it is their Instance too, and none of it is anybody else's business.
+  rpc GetInstanceAbout(GetInstanceAboutRequest) returns (GetInstanceAboutResponse);
+}
+
+message GetInstanceAboutRequest {}
+
+message GetInstanceAboutResponse {
+  // The build that is running, e.g. "1.0.2".
+  string version = 1;
+
+  // When first run finished, RFC 3339. How long the Instance has been going.
+  string started_at = 2;
+
+  int32 member_count = 3;
+  int32 list_count = 4;
+  int32 item_count = 5;
+
+  // How much room the database is taking, or zero where the driver cannot say. Zero
+  // renders as nothing: a wrong number about somebody's disk is worse than no number.
+  int64 storage_bytes = 6;
+
+  // The licence this build is under, e.g. "AGPL-3.0".
+  string licence = 7;
+
+  // What is holding the data, e.g. "sqlite". Shown beside the size.
+  string storage_driver = 8;
+
+  // What the Instance calls itself, so About can be read without a second request.
+  string instance_name = 9;
 }
 
 // PublicListSettings is the Instance's one public page, and what a Visitor sees of it.

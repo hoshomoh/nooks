@@ -10,11 +10,26 @@ import { SETTINGS_SECTIONS, type SettingsRoute } from "./settings-sections"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 
+/** The numbers beside the nav entries, read once by the shell. */
+export interface SettingsCounts {
+  tokens?: number
+  members?: number
+  groups?: number
+}
+
 export interface SettingsShellProps {
   /** The page being read, so its entry is marked. */
   active: SettingsRoute
   /** What the chrome bar says after "Settings". */
   crumb: string
+  /**
+   * The counts beside the entries.
+   *
+   * Passed by every settings page rather than by some of them: a column whose entries
+   * grow a number depending on which page you are standing on is a column that changes
+   * shape as you walk through it.
+   */
+  counts: SettingsCounts
   children: ReactNode
 }
 
@@ -27,7 +42,7 @@ export interface SettingsShellProps {
  * rather than a click. The content column is wider than a List's 660px because these
  * pages hold tables rather than sentences, per DESIGN.md §5.
  */
-export function SettingsShell({ active, crumb, children }: SettingsShellProps) {
+export function SettingsShell({ active, crumb, counts, children }: SettingsShellProps) {
   const { t } = useTranslation()
   const { instanceName, member, lists } = useSignedInData()
   const isAdmin = member?.role === Role.ADMIN
@@ -59,7 +74,12 @@ export function SettingsShell({ active, crumb, children }: SettingsShellProps) {
                 section.to === active && "bg-secondary font-medium text-foreground",
               )}
             >
-              {t(section.labelKey)}
+              <span>{t(section.labelKey)}</span>
+              {section.counts && counts[section.counts] !== undefined && (
+                <span className="ml-auto text-micro text-muted-foreground">
+                  {counts[section.counts]}
+                </span>
+              )}
             </Link>
           ))}
         </div>

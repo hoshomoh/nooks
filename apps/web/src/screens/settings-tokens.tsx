@@ -14,6 +14,7 @@ import { tokensQuery } from "@/lib/token-queries"
 import type { Translate } from "@/lib/translate"
 import { useMomentLabel, type FormatMoment } from "@/lib/use-moment-label"
 import { useSignedInData } from "@/lib/use-signed-in-data"
+import { useSettingsCounts } from "@/lib/use-settings-counts"
 
 /**
  * The Access tokens page: the keys a Member has cut, and a way to stop one working.
@@ -24,6 +25,7 @@ import { useSignedInData } from "@/lib/use-signed-in-data"
  */
 export function SettingsTokensScreen() {
   const { t } = useTranslation()
+  const counts = useSettingsCounts()
   const queryClient = useQueryClient()
   const { lists, member } = useSignedInData()
   const tokens = useSuspenseQuery(tokensQuery).data.tokens
@@ -51,6 +53,7 @@ export function SettingsTokensScreen() {
     <SettingsShell
       active="/settings/tokens"
       crumb={t("settings.tokens")}
+      counts={counts}
     >
       <header className="flex items-start gap-6">
         <div className="min-w-0">

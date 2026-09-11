@@ -93,6 +93,9 @@ type Store interface {
 	// CountMembers reports how many Members exist.
 	CountMembers(ctx context.Context) (int, error)
 
+	// Stats counts what the Instance holds, for the About page.
+	Stats(ctx context.Context) (InstanceStats, error)
+
 	// SetMemberPassword replaces a password and clears the must-change flag.
 	SetMemberPassword(ctx context.Context, id int64, hash string) error
 

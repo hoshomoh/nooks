@@ -42,6 +42,9 @@ const (
 	// InstanceServiceUpdateInstanceSettingsProcedure is the fully-qualified name of the
 	// InstanceService's UpdateInstanceSettings RPC.
 	InstanceServiceUpdateInstanceSettingsProcedure = "/nooks.api.v1.InstanceService/UpdateInstanceSettings"
+	// InstanceServiceGetInstanceAboutProcedure is the fully-qualified name of the InstanceService's
+	// GetInstanceAbout RPC.
+	InstanceServiceGetInstanceAboutProcedure = "/nooks.api.v1.InstanceService/GetInstanceAbout"
 )
 
 // InstanceServiceClient is a client for the nooks.api.v1.InstanceService service.
@@ -56,6 +59,9 @@ type InstanceServiceClient interface {
 	GetInstanceSettings(context.Context, *connect.Request[v1.GetInstanceSettingsRequest]) (*connect.Response[v1.GetInstanceSettingsResponse], error)
 	// UpdateInstanceSettings replaces them. Admins only.
 	UpdateInstanceSettings(context.Context, *connect.Request[v1.UpdateInstanceSettingsRequest]) (*connect.Response[v1.UpdateInstanceSettingsResponse], error)
+	// GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
+	// Member: it is their Instance too, and none of it is anybody else's business.
+	GetInstanceAbout(context.Context, *connect.Request[v1.GetInstanceAboutRequest]) (*connect.Response[v1.GetInstanceAboutResponse], error)
 }
 
 // NewInstanceServiceClient constructs a client for the nooks.api.v1.InstanceService service. By
@@ -87,6 +93,12 @@ func NewInstanceServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(instanceServiceMethods.ByName("UpdateInstanceSettings")),
 			connect.WithClientOptions(opts...),
 		),
+		getInstanceAbout: connect.NewClient[v1.GetInstanceAboutRequest, v1.GetInstanceAboutResponse](
+			httpClient,
+			baseURL+InstanceServiceGetInstanceAboutProcedure,
+			connect.WithSchema(instanceServiceMethods.ByName("GetInstanceAbout")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -95,6 +107,7 @@ type instanceServiceClient struct {
 	getInstance            *connect.Client[v1.GetInstanceRequest, v1.GetInstanceResponse]
 	getInstanceSettings    *connect.Client[v1.GetInstanceSettingsRequest, v1.GetInstanceSettingsResponse]
 	updateInstanceSettings *connect.Client[v1.UpdateInstanceSettingsRequest, v1.UpdateInstanceSettingsResponse]
+	getInstanceAbout       *connect.Client[v1.GetInstanceAboutRequest, v1.GetInstanceAboutResponse]
 }
 
 // GetInstance calls nooks.api.v1.InstanceService.GetInstance.
@@ -112,6 +125,11 @@ func (c *instanceServiceClient) UpdateInstanceSettings(ctx context.Context, req 
 	return c.updateInstanceSettings.CallUnary(ctx, req)
 }
 
+// GetInstanceAbout calls nooks.api.v1.InstanceService.GetInstanceAbout.
+func (c *instanceServiceClient) GetInstanceAbout(ctx context.Context, req *connect.Request[v1.GetInstanceAboutRequest]) (*connect.Response[v1.GetInstanceAboutResponse], error) {
+	return c.getInstanceAbout.CallUnary(ctx, req)
+}
+
 // InstanceServiceHandler is an implementation of the nooks.api.v1.InstanceService service.
 type InstanceServiceHandler interface {
 	// GetInstance returns the public profile of this Instance. It is reachable without
@@ -124,6 +142,9 @@ type InstanceServiceHandler interface {
 	GetInstanceSettings(context.Context, *connect.Request[v1.GetInstanceSettingsRequest]) (*connect.Response[v1.GetInstanceSettingsResponse], error)
 	// UpdateInstanceSettings replaces them. Admins only.
 	UpdateInstanceSettings(context.Context, *connect.Request[v1.UpdateInstanceSettingsRequest]) (*connect.Response[v1.UpdateInstanceSettingsResponse], error)
+	// GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
+	// Member: it is their Instance too, and none of it is anybody else's business.
+	GetInstanceAbout(context.Context, *connect.Request[v1.GetInstanceAboutRequest]) (*connect.Response[v1.GetInstanceAboutResponse], error)
 }
 
 // NewInstanceServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -151,6 +172,12 @@ func NewInstanceServiceHandler(svc InstanceServiceHandler, opts ...connect.Handl
 		connect.WithSchema(instanceServiceMethods.ByName("UpdateInstanceSettings")),
 		connect.WithHandlerOptions(opts...),
 	)
+	instanceServiceGetInstanceAboutHandler := connect.NewUnaryHandler(
+		InstanceServiceGetInstanceAboutProcedure,
+		svc.GetInstanceAbout,
+		connect.WithSchema(instanceServiceMethods.ByName("GetInstanceAbout")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/nooks.api.v1.InstanceService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case InstanceServiceGetInstanceProcedure:
@@ -159,6 +186,8 @@ func NewInstanceServiceHandler(svc InstanceServiceHandler, opts ...connect.Handl
 			instanceServiceGetInstanceSettingsHandler.ServeHTTP(w, r)
 		case InstanceServiceUpdateInstanceSettingsProcedure:
 			instanceServiceUpdateInstanceSettingsHandler.ServeHTTP(w, r)
+		case InstanceServiceGetInstanceAboutProcedure:
+			instanceServiceGetInstanceAboutHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -178,4 +207,8 @@ func (UnimplementedInstanceServiceHandler) GetInstanceSettings(context.Context, 
 
 func (UnimplementedInstanceServiceHandler) UpdateInstanceSettings(context.Context, *connect.Request[v1.UpdateInstanceSettingsRequest]) (*connect.Response[v1.UpdateInstanceSettingsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.InstanceService.UpdateInstanceSettings is not implemented"))
+}
+
+func (UnimplementedInstanceServiceHandler) GetInstanceAbout(context.Context, *connect.Request[v1.GetInstanceAboutRequest]) (*connect.Response[v1.GetInstanceAboutResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.InstanceService.GetInstanceAbout is not implemented"))
 }

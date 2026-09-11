@@ -10,6 +10,7 @@ import { SettingsShell } from "@/components/ds/settings-shell"
 import { instanceClient } from "@/lib/api"
 import { instanceSettingsQuery } from "@/lib/instance-queries"
 import { listsQuery } from "@/lib/list-queries"
+import { useSettingsCounts } from "@/lib/use-settings-counts"
 
 /**
  * The public list settings: which List, and how much of it a Visitor sees.
@@ -19,6 +20,7 @@ import { listsQuery } from "@/lib/list-queries"
  */
 export function SettingsPublicScreen() {
   const { t } = useTranslation()
+  const counts = useSettingsCounts()
   const queryClient = useQueryClient()
   const saved = useSuspenseQuery(instanceSettingsQuery).data.settings
   const lists = useSuspenseQuery(listsQuery).data.lists
@@ -38,7 +40,8 @@ export function SettingsPublicScreen() {
   const published = Boolean(draft?.listUid)
 
   return (
-    <SettingsShell active="/settings/public" crumb={t("settings.publicList")}>
+    <SettingsShell active="/settings/public" crumb={t("settings.publicList")}
+      counts={counts}>
       <header className="flex flex-col gap-1.5">
         <h1 className="text-page">{t("publicSettings.title")}</h1>
         <p className="max-w-135 text-chrome leading-[1.55] text-secondary-foreground">

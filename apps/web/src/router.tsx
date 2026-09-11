@@ -16,9 +16,8 @@ import { replacePasswordRoute } from "./routes/replace-password"
 import { rootRoute } from "./routes/root"
 import { settingsGroupsRoute } from "./routes/settings-groups"
 import { settingsMembersRoute } from "./routes/settings-members"
-import { settingsAccountRoute } from "./routes/settings-account"
-import { settingsAppearanceRoute } from "./routes/settings-appearance"
-import { settingsInstanceRoute } from "./routes/settings-instance"
+import { settingsAboutRoute } from "./routes/settings-about"
+import { settingsGeneralRoute } from "./routes/settings-general"
 import { settingsPublicRoute } from "./routes/settings-public"
 import { settingsTokensRoute } from "./routes/settings-tokens"
 import { setupRoute } from "./routes/setup"
@@ -38,9 +37,8 @@ const routeTree = rootRoute.addChildren([
   noteRoute,
   settingsMembersRoute,
   settingsGroupsRoute,
-  settingsAccountRoute,
-  settingsAppearanceRoute,
-  settingsInstanceRoute,
+  settingsAboutRoute,
+  settingsGeneralRoute,
   settingsPublicRoute,
   settingsTokensRoute,
 ])

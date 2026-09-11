@@ -12,6 +12,7 @@ import { memberClient } from "@/lib/api"
 import { formatList } from "@/lib/format"
 import { groupsQuery, membersQuery } from "@/lib/sharing-queries"
 import { useLocale } from "@/lib/use-locale"
+import { useSettingsCounts } from "@/lib/use-settings-counts"
 
 /**
  * The Groups page: cards two-up, who is in each, and what each one reaches.
@@ -22,6 +23,7 @@ import { useLocale } from "@/lib/use-locale"
  */
 export function SettingsGroupsScreen() {
   const { t } = useTranslation()
+  const counts = useSettingsCounts()
   const queryClient = useQueryClient()
   const groups = useSuspenseQuery(groupsQuery).data.groups
   const members = useSuspenseQuery(membersQuery).data.members
@@ -48,6 +50,7 @@ export function SettingsGroupsScreen() {
     <SettingsShell
       active="/settings/groups"
       crumb={t("settings.groups")}
+      counts={counts}
     >
       <header className="flex items-start gap-6">
         <div className="min-w-0">

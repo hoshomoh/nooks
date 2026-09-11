@@ -6,7 +6,7 @@ export interface Segment<T> {
   label: string
 }
 
-export interface SegmentedProps<T> {
+export interface SegmentedControlProps<T> {
   /** What a screen reader calls the group — usually the settings row's own label. */
   label: string
   options: Segment<T>[]
@@ -21,12 +21,12 @@ export interface SegmentedProps<T> {
  * options would hide the thing that makes the choice easy. Three is the size it was
  * drawn for; more than four belongs in a select.
  */
-export function Segmented<T extends string>({
+export function SegmentedControl<T extends string>({
   label,
   options,
   chosen,
   onChoose,
-}: SegmentedProps<T>) {
+}: SegmentedControlProps<T>) {
   return (
     <div
       role="radiogroup"

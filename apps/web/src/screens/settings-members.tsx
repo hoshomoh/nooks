@@ -21,6 +21,7 @@ import type { Translate } from "@/lib/translate"
 import { useMomentLabel } from "@/lib/use-moment-label"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 import { JoinRequests } from "./join-requests"
+import { useSettingsCounts } from "@/lib/use-settings-counts"
 
 /**
  * The Members page: who is here, what they may do, and who is waiting.
@@ -30,6 +31,7 @@ import { JoinRequests } from "./join-requests"
  */
 export function SettingsMembersScreen() {
   const { t } = useTranslation()
+  const counts = useSettingsCounts()
   const queryClient = useQueryClient()
   const { member: signedIn } = useSignedInData()
   const instance = useSuspenseQuery(instanceQuery).data
@@ -69,6 +71,7 @@ export function SettingsMembersScreen() {
     <SettingsShell
       active="/settings/members"
       crumb={t("settings.members")}
+      counts={counts}
     >
       <header className="flex items-start gap-6">
         <div className="min-w-0">

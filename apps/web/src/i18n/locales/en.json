@@ -392,5 +392,17 @@
     "peopleCount_other": "{{count}} people",
     "footer": "Tick as you go. Whatever gets remembered in the shop goes on the dashed lines.",
     "sheet": "nooks · A4 210 × 297 mm"
+  },
+  "public": {
+    "nothingTitle": "Nothing is published here",
+    "nothingBody": "This nooks instance has no public list. If you were sent a link, whoever sent it can publish one from their settings.",
+    "emptyTitle": "Nothing on the list",
+    "emptyBody": "This page shows one list from {{name}}, so anybody can read it without an account. There is nothing on it at the moment.",
+    "signInToTick": "Sign in to tick things off",
+    "signInBlurb": "This page is read-only without an account.",
+    "signIn": "Sign in",
+    "askToJoin": "Ask to join",
+    "dismiss": "Not now",
+    "readOnly": "Read-only · anybody with the link can see this"
   }
 }

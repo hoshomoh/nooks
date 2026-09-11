@@ -5,6 +5,7 @@ import {
   InstanceService,
   ListService,
   MemberService,
+  PublicService,
   RequestService,
 } from "@nooks/api"
 
@@ -17,3 +18,4 @@ export const listClient = createClient(ListService, transport)
 export const memberClient = createClient(MemberService, transport)
 export const activityClient = createClient(ActivityService, transport)
 export const requestClient = createClient(RequestService, transport)
+export const publicClient = createClient(PublicService, transport)

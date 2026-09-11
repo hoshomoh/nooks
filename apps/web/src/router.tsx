@@ -9,6 +9,7 @@ import { indexRoute } from "./routes/index"
 import { joinRoute } from "./routes/join"
 import { listRoute } from "./routes/list"
 import { noteRoute } from "./routes/note"
+import { publicListRoute } from "./routes/public-list"
 import { calendarRoute } from "./routes/calendar"
 import { todayRoute } from "./routes/today"
 import { upcomingRoute } from "./routes/upcoming"
@@ -33,6 +34,7 @@ const routeTree = rootRoute.addChildren([
   noteRoute,
   settingsMembersRoute,
   settingsGroupsRoute,
+  publicListRoute,
 ])
 
 /** buildRouter takes the query client so loaders can prime the cache before rendering. */

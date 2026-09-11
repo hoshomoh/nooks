@@ -587,7 +587,12 @@ The Print sheet is a deliverable, not a screenshot. A4, 210 × 297mm, margins `1
 - **A 0.7pt solid ink rule under the header** — the one mark that survives from screen to paper.
 - Items: `11mm 1fr auto` grid, 4.4mm vertical padding, split by 0.4pt `#E2E2DC`. A real **6mm
   checkbox** at 0.7pt. Label 16pt, quantity mono 10.5pt, attribution 9.5pt.
-- **Three blank dashed rows** at the end, for whatever gets remembered in the shop.
+- **A ticked Item gets a drawn check inside its box, never a filled square.** A shaded box says a
+  cell has been coloured in; a check says the thing was done, which is the only claim the sheet is
+  making. Two borders rotated 45°, so it does not depend on a font being available to the printer.
+- **Three blank rows** at the end, for whatever gets remembered in the shop: an empty box and the
+  space beside it, and no ruled line. A rule tells somebody how big their handwriting should be,
+  which is not the sheet's business.
 - Long lists go two-up: `column-count: 2`, 12mm gap, a 0.4pt column rule, type down one step to 13pt
   and 5.5mm boxes. **Never below 13pt.**
 - Footer: a sentence left, and `nooks · A4 210 × 297 mm` right in mono 8.5pt.

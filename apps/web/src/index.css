@@ -461,8 +461,19 @@
     border-radius: 0.8mm;
   }
 
-  .nooks-print-box[data-done] {
-    background: #1f1f1e;
+  /* A tick, drawn rather than filled. A solid black square says "this cell is shaded";
+     a check says "this one is done", which is the only thing a printed list is for.
+     Two borders rotated 45° rather than a glyph, so it does not depend on a font. */
+  .nooks-print-box[data-done]::after {
+    content: "";
+    display: block;
+    width: 1.9mm;
+    height: 3.6mm;
+    margin: 0.5mm auto 0;
+    border: 0.9pt solid #1f1f1e;
+    border-top: 0;
+    border-left: 0;
+    transform: rotate(45deg);
   }
 
   .nooks-print-label {
@@ -502,12 +513,10 @@
     padding: 3.4mm 0;
   }
 
-  .nooks-print-blank .nooks-print-box {
-    border-style: dashed;
-  }
-
+  /* The spare rows are room to write, not a form to fill in. An empty box and the
+     space beside it is the whole of it: a ruled line tells somebody how big their
+     handwriting should be, which is not the sheet's business. */
   .nooks-print-blank .nooks-print-label {
-    border-bottom: 0.4pt dashed #b4b4ae;
     height: 6mm;
   }
 

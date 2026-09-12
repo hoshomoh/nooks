@@ -853,3 +853,58 @@ func TestDuplicatingSomebodyElsesList(t *testing.T) {
 		t.Error("IsOwner = false, want the copy to belong to whoever made it")
 	}
 }
+
+/*
+A tick is a tick, whoever made it.
+
+DESIGN.md §11: ticks never conflict. There is no version on a tick and no comparison
+against what was there — the request says what the Item should be, and the last one to
+arrive is what it becomes. That is what lets a tick made with no connection be sent
+later without anybody being asked a question about it.
+*/
+func TestTheLastTickWinsWhoeverMadeIt(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+	f.share(t, f.anna, uid, true)
+
+	added, err := f.svc.CreateItem(f.as(t, f.anna), connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: uid, Label: "Milk",
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+	itemUID := added.Msg.GetItem().GetUid()
+
+	tick := func(as store.Member, done bool) *apiv1.Item {
+		t.Helper()
+		res, err := f.svc.SetItemDone(f.as(t, as), connect.NewRequest(&apiv1.SetItemDoneRequest{
+			ItemUid: itemUID, Done: done,
+		}))
+		if err != nil {
+			t.Fatalf("SetItemDone: %v", err)
+		}
+		return res.Msg.GetItem()
+	}
+
+	// Anna ticks it, then Jonas unticks it. Neither is refused, and the Item is what
+	// the second one said.
+	tick(f.anna, true)
+	after := tick(f.jonas, false)
+	if after.GetDone() {
+		t.Error("Done = true after the second caller unticked it")
+	}
+	// Unticking takes the attribution with it: nobody has ticked this Item.
+	if got := after.GetDoneByName(); got != "" {
+		t.Errorf("DoneByName = %q, want nobody", got)
+	}
+
+	// And the other way round, so the rule is not "whoever ticks beats whoever unticks".
+	tick(f.anna, false)
+	back := tick(f.jonas, true)
+	if !back.GetDone() {
+		t.Error("Done = false after the second caller ticked it")
+	}
+	if got := back.GetDoneByName(); got != "Jonas" {
+		t.Errorf("DoneByName = %q, want the last caller", got)
+	}
+}

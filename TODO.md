@@ -352,7 +352,12 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
   have the Note fetch from somebody else's server when it opens — telling that server
   the Note was read, from which address, on an app whose whole claim is that nothing
   leaves the machine. A URL stays a link. Decided 2026-09-12
-- [ ] **Ticks never conflict** — last write wins, whoever made it
+- [x] **Ticks never conflict** — last write wins, whoever made it. True at the server by
+      construction: a tick says what the Item should be rather than what it was, so
+      there is nothing to compare and nothing to refuse. What was missing was the other
+      end — a change the Instance refuses now goes back and reads what is actually
+      there, rather than leaving the optimistic row on screen claiming something that
+      never happened
 - [ ] Competing text prompts, on the row it affects only: Keep mine / Keep both
 - [ ] Error on save keeps the Member's text and offers real options
 - [x] Loading skeletons that hold the exact height of real rows

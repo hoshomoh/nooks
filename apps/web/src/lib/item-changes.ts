@@ -18,6 +18,12 @@ import { refreshLists } from "./refresh"
  *
  * The screens still use hooks — see use-item-changes.ts. They carry the key and
  * nothing else, so there is exactly one description of what ticking an Item does.
+ *
+ * Both converge rather than roll back when a change is refused. A tick queued offline
+ * can come back to an Item somebody deleted in the meantime, and the honest answer is
+ * not the value this browser had before — it is whatever the Instance has now. Putting
+ * back what was on screen would replace one wrong answer with an older one, and leaving
+ * the optimistic row where it is would have the app claiming something it never did.
  */
 export function registerItemChanges(queryClient: QueryClient): void {
   queryClient.setMutationDefaults(TICK_MUTATION, {
@@ -31,6 +37,7 @@ export function registerItemChanges(queryClient: QueryClient): void {
       }
     },
     onSuccess: () => refreshLists(queryClient),
+    onError: () => refreshLists(queryClient),
   })
 
   queryClient.setMutationDefaults(ADD_MUTATION, {
@@ -48,6 +55,7 @@ export function registerItemChanges(queryClient: QueryClient): void {
       lastListStore.remember(listUid)
     },
     onSuccess: () => refreshLists(queryClient),
+    onError: () => refreshLists(queryClient),
   })
 }
 

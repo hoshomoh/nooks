@@ -128,7 +128,16 @@
     "allDoneTitle": "Nothing left on this list",
     "allDoneBody": "Everything on it is ticked. What is done is at the foot of the list, and anything new goes below.",
     "addedVia": "via {{name}}",
-    "notSynced": "not synced"
+    "notSynced": "not synced",
+    "conflictTitle": "Somebody else renamed this while you were writing.",
+    "versionMine": "Yours",
+    "versionTheirs": "On the list now",
+    "keepMine": "Keep mine",
+    "keepBoth": "Keep both",
+    "saveFailed": "That did not save.",
+    "textKept": "What you wrote is still here:",
+    "tryAgain": "Try again",
+    "discardMine": "Discard mine"
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",

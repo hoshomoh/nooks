@@ -358,8 +358,14 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       end — a change the Instance refuses now goes back and reads what is actually
       there, rather than leaving the optimistic row on screen claiming something that
       never happened
-- [ ] Competing text prompts, on the row it affects only: Keep mine / Keep both
-- [ ] Error on save keeps the Member's text and offers real options
+- [x] Competing text prompts, on the row it affects only: Keep mine / Keep both — a
+      rename says what it believed the name was, so the Instance refuses it rather than
+      writing over something this Member never saw. Both versions are then shown under
+      the row, theirs first and the Member's own outlined in accent
+- [x] Error on save keeps the Member's text and offers real options — the row takes
+      the destructive treatment, says what the Instance said, shows what was written,
+      and offers it again. Nothing here discards somebody's words except the button
+      that says so
 - [x] Loading skeletons that hold the exact height of real rows
 - [x] "Still waiting on the server" after 4s
 

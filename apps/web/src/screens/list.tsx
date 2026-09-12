@@ -21,9 +21,11 @@ import { refreshLists } from "@/lib/refresh"
 import { useAddItem, useSetDone } from "@/lib/use-item-changes"
 import { isProvisional } from "@/lib/queued-changes"
 import { useQueuedChanges } from "@/lib/use-queued-changes"
+import { useRenameItem } from "@/lib/use-rename-item"
+import { RowTrouble, type RowTroubleLabels } from "@/components/ds/row-trouble"
 import type { Translate } from "@/lib/translate"
 import { debounce } from "@/lib/debounce"
-import type { RenameItemVariables, SaveNoteVariables } from "@/lib/item-mutations"
+import type { SaveNoteVariables } from "@/lib/item-mutations"
 import { dayFullHeading, happenedToday, isOverdue, justHappened, today } from "@/lib/dates"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useLocale } from "@/lib/use-locale"
@@ -105,11 +107,7 @@ export function ListScreen() {
   const setDone = useSetDone()
   const queued = useQueuedChanges()
 
-  const rename = useMutation({
-    mutationFn: ({ itemUid, label }: RenameItemVariables) =>
-      listClient.updateItem({ itemUid, label }),
-    onSuccess: refresh,
-  })
+  const rename = useRenameItem()
 
   // Quantity and due date are two fields of the same edit, so they are one mutation.
   const editItem = useMutation({
@@ -127,6 +125,18 @@ export function ListScreen() {
 
 
 
+
+  const troubleLabels: RowTroubleLabels = {
+    conflict: t("list.conflictTitle"),
+    mine: t("list.versionMine"),
+    theirs: t("list.versionTheirs"),
+    keepMine: t("list.keepMine"),
+    keepBoth: t("list.keepBoth"),
+    failed: t("list.saveFailed"),
+    kept: t("list.textKept"),
+    tryAgain: t("list.tryAgain"),
+    discard: t("list.discardMine"),
+  }
 
   const rowLabels: ListRowLabels = {
     name: t("note.itemName"),
@@ -225,7 +235,26 @@ export function ListScreen() {
                   onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
                   onOpen={() => setOpenItemUid(item.uid)}
                   onRename={
-                    canEdit ? (label) => rename.mutate({ itemUid: item.uid, label }) : undefined
+                    canEdit
+                      ? (label) =>
+                          rename.rename({ itemUid: item.uid, label, expected: item.label })
+                      : undefined
+                  }
+                  trouble={
+                    rename.trouble?.itemUid === item.uid ? (
+                      <RowTrouble
+                        trouble={rename.trouble}
+                        theirs={item.label}
+                        onKeepMine={rename.keepMine}
+                        onKeepBoth={() => rename.keepBoth(item.label)}
+                        onTryAgain={rename.tryAgain}
+                        onDiscard={rename.discard}
+                        labels={troubleLabels}
+                      />
+                    ) : undefined
+                  }
+                  failed={
+                    rename.trouble?.itemUid === item.uid && rename.trouble.kind === "error"
                   }
                   labels={rowLabels}
                   menu={
@@ -278,7 +307,10 @@ export function ListScreen() {
                   onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
                   onOpen={() => setOpenItemUid(item.uid)}
                   onRename={
-                    canEdit ? (label) => rename.mutate({ itemUid: item.uid, label }) : undefined
+                    canEdit
+                      ? (label) =>
+                          rename.rename({ itemUid: item.uid, label, expected: item.label })
+                      : undefined
                   }
                   labels={rowLabels}
                 />
@@ -296,7 +328,9 @@ export function ListScreen() {
             status={saveNote.isPending ? t("note.saving") : undefined}
             onNoteChange={onNoteChange}
             onToggleDone={(done) => setDone.mutate({ itemUid: openItem.uid, done })}
-            onRename={(label) => rename.mutate({ itemUid: openItem.uid, label })}
+            onRename={(label) =>
+              rename.rename({ itemUid: openItem.uid, label, expected: openItem.label })
+            }
             onQuantityChange={(quantity) =>
               editItem.mutate({ itemUid: openItem.uid, quantity })
             }

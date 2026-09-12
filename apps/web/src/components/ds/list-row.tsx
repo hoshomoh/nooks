@@ -47,6 +47,16 @@ export type ListRowProps = {
    * so until the change lands.
    */
   notSynced?: boolean
+  /**
+   * What this row has to say about a change that did not land, under the row itself.
+   *
+   * DESIGN.md §11 puts it here rather than anywhere else: the question is about this
+   * Item's words, and a banner at the top of the screen is a question about nothing in
+   * particular.
+   */
+  trouble?: ReactNode
+  /** Whether that trouble was a refusal, which the row itself is drawn for. */
+  failed?: boolean
   /** The Note attached to the Item, previewed under the row. */
   note?: ListRowNote
   /** How "+N lines" reads in the Member's language. */
@@ -99,6 +109,8 @@ export function ListRow({
   done,
   justTicked,
   notSynced,
+  trouble,
+  failed,
   note,
   moreLinesLabel,
   onToggle,
@@ -116,6 +128,9 @@ export function ListRow({
           // The animation paints the highlight and takes it away again; the class
           // must not also paint it, or it would never settle.
           justTicked && "animate-settle",
+          // A refusal is the one thing that colours the row. A conflict does not: both
+          // versions are somebody's words, and neither of them is an error.
+          failed && "border border-destructive-line bg-destructive-bg hover:bg-destructive-bg",
         )}
       >
         {/* The whole row opens the Item — a 44px row is a target, and asking a Member
@@ -200,6 +215,15 @@ export function ListRow({
               </span>
             )}
           </span>
+        </div>
+      )}
+
+      {/* Aligned with the label rather than the checkbox: the question is about the
+          words, and it should start where the words start. */}
+      {trouble && (
+        <div className="grid grid-cols-[20px_1fr] gap-3.5 px-2 -mx-2">
+          <span />
+          {trouble}
         </div>
       )}
     </div>

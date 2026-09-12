@@ -293,7 +293,8 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
 - [x] API docs generated from the OpenAPI spec via `fumadocs-openapi` — 45 reference
       pages, all derived from the protos, none of them written by hand
 - [x] MCP docs: what a token reaches, how to point a client at `/mcp`
-- [ ] Dark mode, sharing the app's `.dark` contract
+- [x] Dark mode, sharing the app's `.dark` contract — the provider is pinned to
+      `attribute: "class"` because the palette in @nooks/design hangs off that selector
 - [ ] Deploy target and a preview build in CI
 
 ---

@@ -18,10 +18,19 @@ export const metadata: Metadata = {
  * would tell Google the site was visited.
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // next-themes writes the theme class onto <html> before React runs, so the markup
+  // React sees does not match what it rendered. suppressHydrationWarning says so on
+  // purpose rather than leaving a warning nobody can act on.
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="bg-background text-foreground flex min-h-dvh flex-col font-sans antialiased">
-        <RootProvider>{children}</RootProvider>
+        {/* attribute: "class" is already the default, but it is stated because it is a
+            contract rather than a preference: the app toggles a `.dark` class on the
+            root element and the palette in @nooks/design hangs off that exact selector.
+            A provider switched to data-theme would leave the site light forever. */}
+        <RootProvider theme={{ attribute: "class", defaultTheme: "system" }}>
+          {children}
+        </RootProvider>
       </body>
     </html>
   )

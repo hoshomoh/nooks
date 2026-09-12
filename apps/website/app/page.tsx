@@ -1,5 +1,7 @@
 import { Mark } from "@nooks/design/mark"
 
+import { ThemeToggle } from "@/components/theme-toggle"
+
 /** What somebody has to type to have Nooks running, and nothing more. */
 const RUN = `go build -o nooks ./cmd/nooks
 ./nooks --data ./data`
@@ -18,6 +20,8 @@ export default function Home() {
         <span className="flex items-center gap-2.5">
           <Mark size={28} />
           <span className="text-page">nooks</span>
+          <span className="flex-1" />
+          <ThemeToggle />
         </span>
 
         <h1 className="text-display max-w-135">A household todo app you run on your own machine.</h1>

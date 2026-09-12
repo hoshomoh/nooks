@@ -7,7 +7,7 @@ import type { PublicItem } from "@nooks/api"
 
 import { Button } from "@/components/ds/button"
 import { EmptyState } from "@/components/ds/empty-state"
-import { Mark } from "@/components/mark"
+import { Mark } from "@nooks/design/mark"
 import { pendingTickStore } from "@/lib/pending-tick-store"
 import { publicListQuery } from "@/lib/public-queries"
 import { useDueLabel } from "@/lib/use-due-label"

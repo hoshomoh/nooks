@@ -1,0 +1,16 @@
+{
+  "name": "@nooks/design",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./foundations.css": "./foundations.css",
+    "./mark": "./mark.tsx"
+  },
+  "peerDependencies": {
+    "react": ">=19"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0"
+  }
+}

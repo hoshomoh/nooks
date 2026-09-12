@@ -1,8 +1,8 @@
 /*
  * The website reads the same foundations the app does.
  *
- * Not a copy: @nooks/tokens is one file, so a colour changed in DESIGN.md changes both
+ * Not a copy: @nooks/design is one file, so a colour changed in DESIGN.md changes both
  * at once. A marketing site whose blue is almost the app's blue is worse than one that
  * looks nothing like it — the near miss is what people notice.
  */
-@import "@nooks/tokens/foundations.css";
+@import "@nooks/design/foundations.css";

@@ -1,11 +1,11 @@
 /*
  * The app's own styles.
  *
- * Everything a Member's browser and the website both need is in @nooks/tokens; what is
+ * Everything a Member's browser and the website both need is in @nooks/design; what is
  * left here is the parts only the app has — the printed sheet and the Note editor,
  * neither of which is styled by classes.
  */
-@import "@nooks/tokens/foundations.css";
+@import "@nooks/design/foundations.css";
 
 /* The Print sheet — DESIGN.md §15.
    A deliverable, not a screenshot: on paper the app disappears and the List is what is

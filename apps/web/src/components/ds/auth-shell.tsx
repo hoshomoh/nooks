@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 
-import { Mark } from "@/components/mark"
+import { Mark } from "@nooks/design/mark"
 
 export type AuthShellProps = {
   /** Small line above the title, e.g. "Signing in to" or "Anna approved your request". */

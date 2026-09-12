@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 /**
  * The document.
  *
- * No font links: the faces are bundled by @nooks/tokens for the same reason the app
+ * No font links: the faces are bundled by @nooks/design for the same reason the app
  * bundles them — an Instance may run on a machine with no internet, and a CDN call
  * would tell Google the site was visited.
  */

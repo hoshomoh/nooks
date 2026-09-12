@@ -19,7 +19,7 @@
     "@fontsource-variable/public-sans": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@nooks/api": "workspace:*",
-    "@nooks/tokens": "workspace:*",
+    "@nooks/design": "workspace:*",
     "@tanstack/react-query": "^5.100.9",
     "@tanstack/react-router": "^1.135.2",
     "@tiptap/extension-placeholder": "^3.31.3",

@@ -9,12 +9,12 @@ import { cn, NOOKS_COLORS, NOOKS_CONTAINERS, NOOKS_SPACING, NOOKS_TEXT_SIZES } f
 /*
  * The foundations, not the app's own stylesheet.
  *
- * The tokens live in @nooks/tokens because the website has to look like the app, and
+ * The tokens live in @nooks/design because the website has to look like the app, and
  * two copies of a palette are two palettes. This test follows them there: what it is
  * guarding is that every token the scale declares is one `cn` knows how to merge.
  */
 const stylesheet = readFileSync(
-  fileURLToPath(new URL("../../../../packages/tokens/foundations.css", import.meta.url)),
+  fileURLToPath(new URL("../../../../packages/design/foundations.css", import.meta.url)),
   "utf8",
 )
 

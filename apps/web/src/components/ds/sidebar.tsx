@@ -6,7 +6,7 @@ import { Sharing, type List } from "@nooks/api"
 import { COVERING, INERT, RAISED } from "./covering"
 import { ListActions } from "./list-actions"
 
-import { Mark } from "@/components/mark"
+import { Mark } from "@nooks/design/mark"
 
 export type SidebarViewCounts = {
   /** How many Items are overdue or due today. */

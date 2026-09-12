@@ -284,7 +284,9 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
 
 - [x] Next.js app in `apps/website` with Tailwind and the Nooks tokens — the tokens are
       `packages/tokens`, read by both apps, so a colour changed in DESIGN.md changes both
-- [ ] Landing page: what Nooks is, the printed page, one screenshot, how to run it
+- [x] Landing page: what Nooks is, the printed page, how to run it
+- [ ] One screenshot on the landing page — a real capture of the app, not a drawing of
+      it. Needs the binary running with the starter list, and the image committed
 - [ ] Docs with Fumadocs MDX: install, configure, back up, upgrade, reverse proxy
 - [ ] API docs generated from the OpenAPI spec via `fumadocs-openapi` — **needs buf's
       gnostic-openapi plugin, pulled forward from M10**

@@ -16,18 +16,18 @@ Terms are from `CONTEXT.md`. UI work is specified in `DESIGN.md`. Code rules are
 | M0 · Groundwork | `[x]` |
 | M1 · Skeleton that runs | `[x]` |
 | M2 · Auth and first run | `[x]` |
-| M3 · Lists and Items — the core | `[~]` lists, items, search and the list view |
+| M3 · Lists and Items — the core | `[x]` |
 | M4 · Views: Today, Upcoming, Calendar | `[x]` |
 | M5 · Notes | `[x]` |
 | M6 · Sharing, presence, Activity | `[x]` |
 | M7 · Members and Groups | `[x]` |
 | M8 · Public list | `[x]` |
 | M9 · Print | `[x]` |
-| M10 · Access tokens, REST, MCP | `[~]` schema done |
-| M11 · Settings, export, import | `[ ]` |
-| M12 · Website: marketing, docs, API docs | `[ ]` |
-| M13 · Offline and conflicts | `[ ]` |
-| M14 · Ship | `[ ]` |
+| M10 · Access tokens, REST, MCP | `[x]` |
+| M11 · Settings, export, import | `[x]` |
+| M12 · Website: marketing, docs, API docs | `[x]` |
+| M13 · Offline and conflicts | `[x]` |
+| M14 · Ship | `[x]` |
 
 ---
 

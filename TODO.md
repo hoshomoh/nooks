@@ -303,6 +303,14 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       follows the reader's theme. Nothing to photograph, and nothing to retake
 - [x] Docs with Fumadocs MDX: install, configure, back up, upgrade, reverse proxy —
       re-themed onto the app's tokens rather than shipping Fumadocs' own palette
+- [x] Docs grouped the way the design groups them — Deploy, Using Nooks, Running an
+      instance, Operations — and the pages that were missing written: lists and views,
+      adding items, sharing, printing, people, groups, access tokens, instance
+      settings, troubleshooting. Seven pages became fifteen, and the permission model
+      is finally written down somewhere other than access.go
+- [x] `scripts/check-links.mjs` in CI — the API link pointed at a folder with no page
+      for a release and nothing failed. A build that succeeds while the navigation is
+      broken is a build that cannot be trusted
 - [x] A docs landing of its own, so `/docs` is a way in rather than the install page
       doing double duty. Install moved to its own page and the Install button points
       at it

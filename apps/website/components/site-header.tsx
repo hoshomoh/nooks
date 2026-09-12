@@ -60,7 +60,7 @@ export function SiteHeader() {
           GitHub
         </a>
         <Link
-          href="/docs/install"
+          href="/docs/deploy"
           className="flex h-8.5 flex-none items-center rounded-md bg-primary px-3.5 text-chrome font-medium text-primary-foreground"
         >
           Install

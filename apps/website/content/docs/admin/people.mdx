@@ -1,0 +1,61 @@
+---
+title: People
+description: Getting the household onto the instance, and what happens when somebody forgets a password.
+---
+
+There is no mail server in Nooks, and that decision shapes everything on this page.
+Nobody is emailed an invitation, nobody is emailed a reset link, and there is no SMTP
+configuration to get wrong on a machine in a hallway. What replaces email is somebody in
+the house saying a password out loud.
+
+## The first account
+
+The first person to open a fresh instance is offered the chance to create the owner
+account rather than asked to sign in. They pick a name, an email and a password, and
+name the instance.
+
+The email is how you sign in. Nooks never sends anything to it.
+
+## Adding somebody
+
+**Settings → People → Add**. You give a name and an email; Nooks gives you back a
+**temporary password, once**.
+
+Hand it over however you like — say it, write it on the fridge. It is shown exactly once
+because what Nooks stores is a hash: there is no screen anywhere that can show it to you
+again, including to you as an admin.
+
+The new account must replace that password before it can do anything else. Until they
+do, the members table shows them as not yet arrived.
+
+## Letting people ask
+
+If you would rather not create accounts by hand, turn on **open signup** in
+[instance settings](/docs/admin/instance). Somebody can then ask for an account, and the
+request waits for an admin to approve or refuse it.
+
+With signup closed — the default — there is no way in from outside at all.
+
+## Forgotten passwords
+
+The person asks for a reset from the sign-in screen. That becomes a request in
+**Settings → Requests**, and an admin approving it hands back a temporary password to
+pass on, exactly as adding somebody does.
+
+No link is emailed, so there is no link to intercept and no token to expire.
+
+## Roles
+
+| Role | Can |
+| --- | --- |
+| **Member** | Make lists, share them, use everything on this instance |
+| **Admin** | All of that, plus people, groups, requests and instance settings |
+
+An admin can revoke another member's access token but **cannot read one or create one in
+their name** — see [Access tokens](/docs/admin/tokens).
+
+## Removing somebody
+
+Removing a member takes their access away. What they wrote stays: a list they added
+things to still says who added them, because a shopping list with half its history
+deleted is worse than one with a name on it nobody recognises.

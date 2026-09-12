@@ -175,7 +175,7 @@ export default function Home() {
         </div>
         <div className="flex flex-wrap gap-2.5">
           <Link
-            href="/docs/install"
+            href="/docs/deploy"
             className="flex h-8.5 items-center rounded-md bg-primary px-4 text-chrome font-medium text-primary-foreground"
           >
             Install Nooks

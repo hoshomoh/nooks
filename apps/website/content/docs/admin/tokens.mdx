@@ -1,0 +1,62 @@
+---
+title: Access tokens
+description: How a script, a shortcut or an assistant reaches an instance, and what narrows what it can do.
+---
+
+An access token is somebody's access, narrowed. It never has more than the member who
+made it, and three things narrow it further.
+
+Make one in **Settings → Access tokens**.
+
+## What you choose
+
+**The lists it reaches.** Pick named lists, or all of them. A list a token was not given
+is not forbidden to it — it is invisible. The token cannot read it and cannot discover
+that it exists.
+
+**What it may do**, as three separate abilities:
+
+| Ability | Allows |
+| --- | --- |
+| Read | Reading lists, items, notes and search |
+| Write | Adding, ticking, editing, moving |
+| Delete | Removing items and lists |
+
+They are separate on purpose. A token that may write but not delete can tick the milk
+off and cannot remove it, which is the right shape for a kitchen tablet or an assistant.
+
+**When it expires.** A few quick choices, a date of your own, or never.
+
+## The secret
+
+Handed over once, when the token is made. Nooks stores a hash, so there is no screen
+that can show it again — including to an admin.
+
+If it is lost, revoke it and make another. That is not a limitation to work around; it
+is the reason a leaked token is a small problem.
+
+## What a token can never do
+
+Running the instance. Adding a member, deciding a request, changing instance settings,
+minting another token, changing a password — all of it needs a signed-in browser. No
+access token can do any of it, over REST or over MCP.
+
+An admin can revoke another member's token but cannot read it or create one in their
+name. An admin is somebody who runs the instance, not somebody who can act as you.
+
+## Watching what it does
+
+Every change a token makes is attributed to it in the list's history — *Anna · via
+Kitchen tablet* — naming the member and then what it came through. The token's own
+activity is on its page.
+
+## Using it
+
+Bearer auth over REST, and the same token over MCP:
+
+```bash
+curl https://nooks.example.com/api/v1/lists \
+  -H "Authorization: Bearer $NOOKS_TOKEN"
+```
+
+See [Using the API](/docs/api) and [the MCP server](/docs/mcp).

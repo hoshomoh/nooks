@@ -118,6 +118,12 @@ jobs:
       # site actually has one.
       - name: The reference has pages
         run: test "$(find apps/website/content/docs/api -name '*.mdx' | wc -l)" -gt 20
+
+      # A build that succeeds while the navigation is broken is a build that cannot be
+      # trusted. This caught nothing when it was written because it was written after
+      # the header spent a release pointing at a folder rather than a page.
+      - name: Every internal link reaches a page
+        run: pnpm --filter @nooks/website check-links
       # Somebody reviewing a change to the docs or the landing page can read the built
       # site rather than the diff.
       - name: Upload the built site

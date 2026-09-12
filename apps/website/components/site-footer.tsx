@@ -21,8 +21,8 @@ const COLUMNS: FooterColumn[] = [
     links: [
       { label: "Install", href: "/docs" },
       { label: "Configure", href: "/docs/configure" },
-      { label: "Back up", href: "/docs/back-up" },
-      { label: "Reverse proxy", href: "/docs/reverse-proxy" },
+      { label: "Back up", href: "/docs/operations/back-up" },
+      { label: "Reverse proxy", href: "/docs/deploy/reverse-proxy" },
     ],
   },
   {
@@ -30,7 +30,7 @@ const COLUMNS: FooterColumn[] = [
     links: [
       { label: "API reference", href: "/docs/api" },
       { label: "MCP server", href: "/docs/mcp" },
-      { label: "Upgrading", href: "/docs/upgrade" },
+      { label: "Upgrading", href: "/docs/operations/upgrade" },
     ],
   },
   {

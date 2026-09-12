@@ -1,0 +1,64 @@
+---
+title: Troubleshooting
+description: The failures that actually come up, and what each one really is.
+---
+
+## Ticks from other people never arrive
+
+Almost always a reverse proxy buffering the event stream. Nooks pushes changes over
+server-sent events on one long-lived connection, and a proxy that buffers responses
+holds every event until the connection closes — which looks exactly like live updates
+being broken rather than delayed.
+
+The headers that fix it are on [the reverse proxy page](/docs/deploy/reverse-proxy).
+The quick check: open two browsers, tick something in one, and watch the other. If it
+arrives on reload but not before, it is buffering.
+
+## It will not start: address already in use
+
+Something else has the port. Move Nooks:
+
+```bash
+./nooks --addr :9090
+```
+
+Or find what is holding it — `ss -lptn 'sport = :8081'` on Linux.
+
+## Signing in says the instance needs setting up
+
+The instance cannot find its database. Usually `--data` is pointing somewhere new: a
+relative path resolves against the working directory, so starting Nooks from a different
+folder finds a different — empty — instance.
+
+Give it an absolute path in whatever starts it.
+
+## Postgres: too many connections
+
+Small hosts often cap connections lower than you expect. Nooks holds a pool; the host
+counts every one of them, alongside whatever else is connected.
+
+Lower the cap in the connection string:
+
+```
+postgres://nooks:...@localhost:5432/nooks?sslmode=disable&pool_max_conns=4
+```
+
+## A token gets 404 for a list that exists
+
+Working as intended. A list a token was not scoped to is invisible rather than
+forbidden, so it answers "no such list" — saying "forbidden" would tell the holder the
+list exists, which is itself something the token is not allowed to know.
+
+Check the token's scope in **Settings → Access tokens**.
+
+## A temporary password is not accepted
+
+It is shown once and never stored in clear, so if it was mistyped when it was passed on
+there is no way to look it up. Approve a reset in **Settings → Requests**, or remove and
+re-add the account.
+
+## Still stuck
+
+[Raise an issue](https://github.com/hoshomoh/nooks/issues). Include what the log says at
+`--log-level debug`, the driver, and how Nooks is started. A self-hosted app failing
+quietly on somebody else's machine is a bug report nobody can write without help.

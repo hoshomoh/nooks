@@ -7,34 +7,31 @@ Nooks is one binary. It serves the API and the app from the same process and kee
 everything in one SQLite file you can copy — no separate database to stand up, no queue,
 and no mail server.
 
-These pages are written for whoever runs the instance. Nothing here assumes a cluster.
-
 ## Start here
 
 <Cards>
-  <Card title="Install" href="/docs/install" description="Build it, run it, and create the first account. The fastest path to a working instance." />
+  <Card title="Deploy" href="/docs/deploy" description="Build it, run it, and create the first account." />
   <Card title="Configure" href="/docs/configure" description="Flags and environment: where the data lives, which database, what port." />
-  <Card title="Put it behind your domain" href="/docs/reverse-proxy" description="TLS, and the headers live updates need to survive a proxy." />
-  <Card title="Back it up" href="/docs/back-up" description="A recovery path written down before the day you need it." />
+  <Card title="Put it behind your domain" href="/docs/deploy/reverse-proxy" description="TLS, and the headers live updates need to survive a proxy." />
+  <Card title="Back it up" href="/docs/operations/back-up" description="A recovery path written down before the day you need it." />
   <Card title="Using the API" href="/docs/api" description="Base URL, tokens, and what comes back when something goes wrong." />
   <Card title="Point an assistant at it" href="/docs/mcp" description="The MCP server, and what a token lets an assistant reach." />
 </Cards>
 
 ## How these pages are organised
 
-**Install**, **Configure** and **Reverse proxy** get an instance up and pointed at the
-right database and domain. **Back up** and **Upgrade** are the two things you will do
-again, so they are written to be re-read rather than read once.
+**Deploy** and **Configure** get an instance up and pointed at the right database and
+domain.
 
-**Using the API** and the **reference** are for anybody automating against an instance —
-a script, a shortcut, or an assistant over MCP. The reference is generated from the same
+**Using Nooks** is written for the people on the list rather than the person running the
+server, so it can be sent to somebody in the house as a link.
+
+**Running an instance** is the settings only an admin sees: people, groups, access
+tokens, and what the instance calls itself.
+
+**Operations** is the two things you will do again — backing up and upgrading — plus the
+failures that actually come up.
+
+The **API** has a section of its own. Its reference is generated from the same
 definitions the server is built from, so it cannot describe an endpoint that is not
-there, and a check in CI refuses an endpoint that ships without a route.
-
-## If something is wrong
-
-Live updates arriving nowhere is almost always a reverse proxy buffering the event
-stream — [the proxy page](/docs/reverse-proxy) has the headers that fix it. Anything
-else is worth [raising as an issue](https://github.com/hoshomoh/nooks/issues): a
-self-hosted app that fails quietly on somebody's machine is a bug report nobody can
-write without help.
+there, and a check in CI refuses an endpoint that ships to the browser only.

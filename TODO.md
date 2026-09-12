@@ -282,7 +282,8 @@ drag-to-reorder was never wired up, though the RPC and the store's float positio
 `apps/website`, Next.js + Fumadocs. Part of v1 — a self-hosted app nobody can read about does not
 ship. It reuses `DESIGN.md`, so the site looks like the product rather than like a template.
 
-- [ ] Next.js app in `apps/website` with Tailwind and the Nooks tokens
+- [x] Next.js app in `apps/website` with Tailwind and the Nooks tokens — the tokens are
+      `packages/tokens`, read by both apps, so a colour changed in DESIGN.md changes both
 - [ ] Landing page: what Nooks is, the printed page, one screenshot, how to run it
 - [ ] Docs with Fumadocs MDX: install, configure, back up, upgrade, reverse proxy
 - [ ] API docs generated from the OpenAPI spec via `fumadocs-openapi` — **needs buf's

@@ -6,7 +6,17 @@ import { cn, NOOKS_COLORS, NOOKS_CONTAINERS, NOOKS_SPACING, NOOKS_TEXT_SIZES } f
 
 // Read rather than imported: Vitest stubs CSS imports, so `?raw` would hand back an
 // empty string and the check would pass without checking anything.
-const stylesheet = readFileSync(fileURLToPath(new URL("../index.css", import.meta.url)), "utf8")
+/*
+ * The foundations, not the app's own stylesheet.
+ *
+ * The tokens live in @nooks/tokens because the website has to look like the app, and
+ * two copies of a palette are two palettes. This test follows them there: what it is
+ * guarding is that every token the scale declares is one `cn` knows how to merge.
+ */
+const stylesheet = readFileSync(
+  fileURLToPath(new URL("../../../../packages/tokens/foundations.css", import.meta.url)),
+  "utf8",
+)
 
 /** tokensNamed lists every token declared under a namespace in the stylesheet. */
 function tokensNamed(namespace: string): string[] {

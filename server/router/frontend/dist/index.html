@@ -25,10 +25,16 @@
         }
       })()
     </script>
-    <script type="module" crossorigin src="/assets/index-7a3metlG.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BysH9IdD.css">
+    <script type="module" crossorigin src="/assets/index-DOsqeIuI.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-De8o6855.css">
   </head>
   <body>
     <div id="root"></div>
+    <!--
+      Where the printed List is rendered. A sibling of the app rather than a part of it:
+      printing hides #root so the sidebar and the chrome do not come with the sheet, and
+      anything inside #root would be hidden along with them.
+    -->
+    <div id="print-root"></div>
   </body>
 </html>

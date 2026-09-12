@@ -64,6 +64,9 @@ pnpm --filter @nooks/web lint
 step "web test"
 pnpm --filter @nooks/web test
 
+step "website typecheck and build"
+pnpm --filter @nooks/website build
+
 step "web build, landing where go:embed reads"
 # One build, not two: `release` is the same Vite build as `build` with the output
 # pointed at the binary, so running both proved the same thing twice and was the

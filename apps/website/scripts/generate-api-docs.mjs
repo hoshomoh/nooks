@@ -12,7 +12,7 @@ import { createOpenAPI } from "fumadocs-openapi/server"
  * Nobody writes down an endpoint twice, which is the only way the docs and the server
  * stay in step.
  */
-const OUT = "content/docs/reference"
+const OUT = "content/docs/api"
 
 /**
  * What each service is called in the sidebar.
@@ -33,7 +33,11 @@ const GROUPS = [
   ["requestservice", "Joining and resets"],
 ]
 
-await rm(OUT, { recursive: true, force: true })
+// Only what this script wrote. The overview beside it is prose somebody wrote, and
+// clearing the whole directory would take it with them every build.
+for (const [folder] of GROUPS) {
+  await rm(`${OUT}/${folder}`, { recursive: true, force: true })
+}
 
 await generateFiles({
   input: createOpenAPI({ input: ["../../proto/gen/openapi.yaml"] }),
@@ -72,12 +76,22 @@ function groupMeta() {
   }))
 }
 
-/** referenceMeta orders the groups themselves, so the sidebar is not alphabetical. */
+/**
+ * referenceMeta makes the API its own section, and orders the groups within it.
+ *
+ * `root` is what gives it a sidebar of its own rather than a branch of the docs tree:
+ * somebody reading the reference is doing a different job from somebody installing the
+ * thing, and one sidebar holding both is a sidebar neither of them can scan.
+ */
 function referenceMeta() {
   return {
     path: "meta.json",
     content: JSON.stringify(
-      { title: "API reference", pages: GROUPS.map(([folder]) => folder) },
+      {
+        title: "API",
+        root: true,
+        pages: ["index", ...GROUPS.map(([folder]) => folder)],
+      },
       null,
       2,
     ),

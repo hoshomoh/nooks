@@ -137,7 +137,7 @@ export default function Home() {
               definitions the server is built from, so it cannot describe an endpoint that
               is not there.
             </p>
-            <Link href="/docs/reference" className="w-fit text-meta text-shared hover:underline">
+            <Link href="/docs/api" className="w-fit text-meta text-shared hover:underline">
               API reference →
             </Link>
           </div>

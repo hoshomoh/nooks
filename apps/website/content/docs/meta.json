@@ -7,8 +7,6 @@
     "reverse-proxy",
     "back-up",
     "upgrade",
-    "api",
-    "mcp",
-    "reference"
+    "mcp"
   ]
 }

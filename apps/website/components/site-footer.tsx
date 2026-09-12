@@ -28,7 +28,7 @@ const COLUMNS: FooterColumn[] = [
   {
     name: "Developers",
     links: [
-      { label: "API reference", href: "/docs/reference" },
+      { label: "API reference", href: "/docs/api" },
       { label: "MCP server", href: "/docs/mcp" },
       { label: "Upgrading", href: "/docs/upgrade" },
     ],

@@ -46,4 +46,6 @@ next-env.d.ts
 
 # Generated from proto/gen/openapi.yaml at build time. The spec is generated from the
 # protos, so committing these would be committing the same API description three times.
-/content/docs/reference
+# The overview beside them is prose, and is committed.
+/content/docs/api/*service/
+/content/docs/api/meta.json

@@ -93,3 +93,23 @@ describe("showing an item before it is sent", () => {
     expect(isProvisional("item_milk")).toBe(false)
   })
 })
+
+describe("a change that outlived the tab", () => {
+  it("is written out with the cache, so it can be sent later", async () => {
+    const { QueryClient, dehydrate } = await import("@tanstack/react-query")
+    const queryClient = new QueryClient()
+    queryClient.setMutationDefaults(["item", "set-done"], { mutationFn: () => Promise.resolve() })
+
+    // Paused rather than failed is the whole point: TanStack writes a paused change
+    // out with the cache, and a failed one is gone.
+    const cache = queryClient.getMutationCache()
+    const mutation = cache.build(queryClient, {
+      mutationKey: ["item", "set-done"],
+      mutationFn: () => Promise.resolve(),
+    })
+    mutation.state.isPaused = true
+    mutation.state.variables = { itemUid: "item_milk", done: true }
+
+    expect(dehydrate(queryClient).mutations).toHaveLength(1)
+  })
+})

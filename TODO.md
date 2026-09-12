@@ -335,7 +335,15 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       became one shared pair of hooks on the way: four screens had written the same
       two mutations out separately, which is four places for the offline behaviour to
       disagree
-- [ ] Sync on reconnect
+- [x] Sync on reconnect — reconnecting while the app is open needs no help, but a
+      change made offline and then closed does: what is written out with the cache is a
+      record of the intention, not the code that sends it. Ticking and adding are
+      registered on the client by key, so a restored change runs the same code as one
+      made a second ago
+- Images in a Note are deliberately out. DESIGN.md draws none, and a remote one would
+  have the Note fetch from somebody else's server when it opens — telling that server
+  the Note was read, from which address, on an app whose whole claim is that nothing
+  leaves the machine. A URL stays a link. Decided 2026-09-12
 - [ ] **Ticks never conflict** — last write wins, whoever made it
 - [ ] Competing text prompts, on the row it affects only: Keep mine / Keep both
 - [ ] Error on save keeps the Member's text and offers real options

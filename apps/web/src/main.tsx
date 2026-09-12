@@ -8,6 +8,7 @@ import "./i18n"
 import { buildRouter } from "./router"
 import { browserCacheDeps, persistCache, restoreCache } from "./lib/cache-store"
 import { connectionStore } from "./lib/connection-store"
+import { registerItemChanges, resumeQueuedChanges } from "./lib/item-changes"
 import { wireLiveUpdates } from "./lib/live-wiring"
 import { wireOnline } from "./lib/online-wiring"
 import "./index.css"
@@ -31,8 +32,17 @@ wireOnline(connectionStore)
 // Put back what this browser already knew, then keep it up to date. Restoring happens
 // before the router is built: its loaders read with `ensureQueryData`, and a loader
 // that finds an answer never reaches for the network at all.
+// What ticking and adding do, registered before the cache is read: a change restored
+// from a previous visit has to find the code that sends it, or it is a record of an
+// intention nobody can act on.
+registerItemChanges(queryClient)
+
 restoreCache(queryClient, browserCacheDeps)
 persistCache(queryClient, browserCacheDeps)
+
+// Anything that was still waiting when the tab was last closed. Reconnecting while the
+// app is open needs no help; being reopened does.
+resumeQueuedChanges(queryClient)
 
 const router = buildRouter(queryClient)
 

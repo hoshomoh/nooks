@@ -1,5 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query"
 
+import { browserCacheDeps, forgetCache } from "./cache-store"
+
 /**
  * Forgets everything the cache learned before the session changed.
  *
@@ -11,7 +13,11 @@ import type { QueryClient } from "@tanstack/react-query"
  * Called after anything that changes who the browser is: first run, signing in,
  * joining, and setting a new password. One function so that the next screen to do it
  * does not have to rediscover why invalidating is not enough.
+ *
+ * The copy on disk goes with it. It holds what somebody was shown while they were
+ * signed in, and the next person at this browser is not necessarily them.
  */
 export function startNewSession(queryClient: QueryClient): void {
   queryClient.clear()
+  forgetCache(browserCacheDeps)
 }

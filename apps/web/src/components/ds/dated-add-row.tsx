@@ -1,11 +1,9 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import type { List } from "@nooks/api"
 
-import { AddRow, type AddRowSubmission } from "./add-row"
-import { listClient } from "@/lib/api"
+import { AddRow } from "./add-row"
 import type { DueDate } from "@/lib/dates"
-import { refreshLists } from "@/lib/refresh"
+import { useAddItem } from "@/lib/use-item-changes"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useLastList } from "@/lib/use-last-list"
 
@@ -30,15 +28,10 @@ export interface DatedAddRowProps {
  */
 export function DatedAddRow({ lists, defaultDue, divided }: DatedAddRowProps) {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
   const due = useDueLabel()
   const { target, remember } = useLastList(lists)
 
-  const addItem = useMutation({
-    mutationFn: ({ label, quantity, dueOn }: AddRowSubmission) =>
-      listClient.createItem({ listUid: target?.uid ?? "", label, quantity, dueOn }),
-    onSuccess: () => refreshLists(queryClient),
-  })
+  const addItem = useAddItem()
 
   if (!target) {
     return null
@@ -55,7 +48,7 @@ export function DatedAddRow({ lists, defaultDue, divided }: DatedAddRowProps) {
       disabled={addItem.isPending}
       onAdd={(item) => {
         remember(target.uid)
-        addItem.mutate(item)
+        addItem.mutate({ listUid: target.uid, ...item })
       }}
     />
   )

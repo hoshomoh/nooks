@@ -328,7 +328,13 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       useSyncExternalStore, fed by an interceptor on the transport rather than by the
       browser's guess, so a refusal counts as contact and a request that never arrived
       does not. AppShell places the banner once, so no screen can forget it
-- [ ] Reading, ticking and adding all work offline; queued changes carry `not synced`
+- [x] Reading, ticking and adding all work offline; queued changes carry `not synced` —
+      the query cache is kept across reloads, TanStack is told what Nooks means by
+      offline rather than what the browser guesses, and a change made with no
+      connection is paused and shown rather than failed and lost. Ticking and adding
+      became one shared pair of hooks on the way: four screens had written the same
+      two mutations out separately, which is four places for the offline behaviour to
+      disagree
 - [ ] Sync on reconnect
 - [ ] **Ticks never conflict** — last write wins, whoever made it
 - [ ] Competing text prompts, on the row it affects only: Keep mine / Keep both

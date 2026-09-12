@@ -12,10 +12,12 @@ import { SectionHeading } from "@/components/ds/section-heading"
 import { ViewSwitch } from "@/components/ds/view-switch"
 import { listClient } from "@/lib/api"
 import { todayQuery } from "@/lib/dated-queries"
-import type { RenameItemVariables, SetDoneVariables } from "@/lib/item-mutations"
+import type { RenameItemVariables } from "@/lib/item-mutations"
 import type { DatedItem } from "@nooks/api"
 import { dayFullHeading, isDueToday, isOverdue, today, toStored } from "@/lib/dates"
 import { refreshLists } from "@/lib/refresh"
+import { useQueuedChanges } from "@/lib/use-queued-changes"
+import { useSetDone } from "@/lib/use-item-changes"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useLocale } from "@/lib/use-locale"
@@ -38,11 +40,7 @@ export function TodayScreen() {
   const from = today()
   const dated = useSuspenseQuery(todayQuery(from)).data
 
-  const setDone = useMutation({
-    mutationFn: ({ itemUid, done }: SetDoneVariables) =>
-      listClient.setItemDone({ itemUid, done }),
-    onSuccess: () => refreshLists(queryClient),
-  })
+  const setDone = useSetDone()
 
   const rename = useMutation({
     mutationFn: ({ itemUid, label }: RenameItemVariables) =>
@@ -55,6 +53,7 @@ export function TodayScreen() {
     open: t("list.openItem"),
     quantity: t("note.quantity"),
     due: t("note.addDate"),
+    notSynced: t("list.notSynced"),
   }
 
   const overdue = dated.items.filter((entry) => isOverdue(entry.item?.dueOn ?? "", from))
@@ -170,6 +169,7 @@ export interface DatedRowProps {
  */
 export function DatedRow({ entry, dueLabel, overdue, onToggle, onRename, labels }: DatedRowProps) {
   const navigate = useNavigate()
+  const queued = useQueuedChanges()
   const item = entry.item
   if (!item) {
     return null
@@ -183,6 +183,7 @@ export function DatedRow({ entry, dueLabel, overdue, onToggle, onRename, labels 
       addedByName={item.addedByName}
       dueLabel={dueLabel}
       overdue={overdue}
+      notSynced={queued.itemUids.has(item.uid)}
       onToggle={onToggle}
       onRename={onRename}
       onOpen={() =>

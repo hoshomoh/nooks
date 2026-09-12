@@ -6,7 +6,10 @@ import { RouterProvider } from "@tanstack/react-router"
 import "./i18n"
 
 import { buildRouter } from "./router"
+import { browserCacheDeps, persistCache, restoreCache } from "./lib/cache-store"
+import { connectionStore } from "./lib/connection-store"
 import { wireLiveUpdates } from "./lib/live-wiring"
+import { wireOnline } from "./lib/online-wiring"
 import "./index.css"
 
 const queryClient = new QueryClient({
@@ -19,6 +22,17 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+// What Nooks means by offline, rather than what the browser guesses. Wired before
+// anything can be mutated, so a change made on a dead connection is paused and kept
+// instead of failing and being lost.
+wireOnline(connectionStore)
+
+// Put back what this browser already knew, then keep it up to date. Restoring happens
+// before the router is built: its loaders read with `ensureQueryData`, and a loader
+// that finds an answer never reaches for the network at all.
+restoreCache(queryClient, browserCacheDeps)
+persistCache(queryClient, browserCacheDeps)
 
 const router = buildRouter(queryClient)
 

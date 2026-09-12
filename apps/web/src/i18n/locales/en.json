@@ -127,7 +127,8 @@
     "doneEarlier": "{{count}} done",
     "allDoneTitle": "Nothing left on this list",
     "allDoneBody": "Everything on it is ticked. What is done is at the foot of the list, and anything new goes below.",
-    "addedVia": "via {{name}}"
+    "addedVia": "via {{name}}",
+    "notSynced": "not synced"
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",

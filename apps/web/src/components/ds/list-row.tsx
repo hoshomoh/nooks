@@ -39,6 +39,14 @@ export type ListRowProps = {
   done?: boolean
   /** Someone else ticked it a moment ago. */
   justTicked?: boolean
+  /**
+   * The change to this row has not reached the Instance yet.
+   *
+   * A tick made with no connection looks exactly like a saved one, which would be the
+   * app claiming something it has not done. The row says so instead, and keeps saying
+   * so until the change lands.
+   */
+  notSynced?: boolean
   /** The Note attached to the Item, previewed under the row. */
   note?: ListRowNote
   /** How "+N lines" reads in the Member's language. */
@@ -69,6 +77,8 @@ export interface ListRowLabels {
   quantity: string
   /** What an Item with no date offers, e.g. "Add a date". */
   due: string
+  /** What a change that has not reached the Instance is called, e.g. "not synced". */
+  notSynced: string
 }
 
 /**
@@ -88,6 +98,7 @@ export function ListRow({
   overdue,
   done,
   justTicked,
+  notSynced,
   note,
   moreLinesLabel,
   onToggle,
@@ -136,6 +147,12 @@ export function ListRow({
 
           {listName && (
             <span className="shrink-0 text-micro text-secondary-foreground">{listName}</span>
+          )}
+
+          {notSynced && (
+            <span className="shrink-0 rounded-sm border border-offline-line bg-offline-bg px-1.5 py-px text-micro text-offline-text">
+              {labels.notSynced}
+            </span>
           )}
         </span>
 

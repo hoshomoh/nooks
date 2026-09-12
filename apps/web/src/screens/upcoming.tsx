@@ -10,9 +10,10 @@ import { EmptyState } from "@/components/ds/empty-state"
 import { SectionHeading } from "@/components/ds/section-heading"
 import { listClient } from "@/lib/api"
 import { groupByDay, upcomingQuery } from "@/lib/dated-queries"
-import type { RenameItemVariables, SetDoneVariables } from "@/lib/item-mutations"
+import type { RenameItemVariables } from "@/lib/item-mutations"
 import { shift, today, toStored } from "@/lib/dates"
 import { refreshLists } from "@/lib/refresh"
+import { useSetDone } from "@/lib/use-item-changes"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useSignedInData } from "@/lib/use-signed-in-data"
@@ -32,11 +33,7 @@ export function UpcomingScreen() {
   const due = useDueLabel()
   const dated = useSuspenseQuery(upcomingQuery(today())).data
 
-  const setDone = useMutation({
-    mutationFn: ({ itemUid, done }: SetDoneVariables) =>
-      listClient.setItemDone({ itemUid, done }),
-    onSuccess: () => refreshLists(queryClient),
-  })
+  const setDone = useSetDone()
 
   const rename = useMutation({
     mutationFn: ({ itemUid, label }: RenameItemVariables) =>
@@ -49,6 +46,7 @@ export function UpcomingScreen() {
     open: t("list.openItem"),
     quantity: t("note.quantity"),
     due: t("note.addDate"),
+    notSynced: t("list.notSynced"),
   }
 
   const days = groupByDay(dated.items)

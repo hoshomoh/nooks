@@ -13,7 +13,7 @@ const labels: ListRowLabels = {
   name: "Item name",
   open: "Open item",
   quantity: "Quantity",
-  due: "Add a date",
+  due: "Add a date", notSynced: "not synced",
 }
 
 describe("the list row", () => {

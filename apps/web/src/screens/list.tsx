@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 
 import { ActivityControl } from "@/components/ds/activity-control"
 import { Presence } from "@/components/ds/presence"
-import { AddRow, type AddRowSubmission } from "@/components/ds/add-row"
+import { AddRow } from "@/components/ds/add-row"
 import { DoneSection } from "@/components/ds/done-section"
 import { ItemMenu } from "@/components/ds/item-menu"
 import { ListActions } from "@/components/ds/list-actions"
@@ -17,11 +17,13 @@ import { PrintSheet } from "@/components/ds/print-sheet"
 import { NoteSheet } from "@/components/ds/note-sheet"
 import { listClient } from "@/lib/api"
 import { listQuery } from "@/lib/list-queries"
-import { lastListStore } from "@/lib/last-list-store"
 import { refreshLists } from "@/lib/refresh"
+import { useAddItem, useSetDone } from "@/lib/use-item-changes"
+import { isProvisional } from "@/lib/queued-changes"
+import { useQueuedChanges } from "@/lib/use-queued-changes"
 import type { Translate } from "@/lib/translate"
 import { debounce } from "@/lib/debounce"
-import type { RenameItemVariables, SaveNoteVariables, SetDoneVariables } from "@/lib/item-mutations"
+import type { RenameItemVariables, SaveNoteVariables } from "@/lib/item-mutations"
 import { dayFullHeading, happenedToday, isOverdue, justHappened, today } from "@/lib/dates"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useLocale } from "@/lib/use-locale"
@@ -73,15 +75,7 @@ export function ListScreen() {
 
   const refresh = () => refreshLists(queryClient)
 
-  const addItem = useMutation({
-    mutationFn: ({ label, quantity, dueOn }: AddRowSubmission) =>
-      listClient.createItem({ listUid, label, quantity, dueOn }),
-    onSuccess: () => {
-      // Adding here is what makes this the List Today and Upcoming will add to next.
-      lastListStore.remember(listUid)
-      return refresh()
-    },
-  })
+  const addItem = useAddItem()
 
   const saveNote = useMutation({
     mutationFn: ({ itemUid, note }: SaveNoteVariables) => listClient.updateItem({ itemUid, note }),
@@ -108,10 +102,8 @@ export function ListScreen() {
     [autosave, openItemUid],
   )
 
-  const setDone = useMutation({
-    mutationFn: ({ itemUid, done }: SetDoneVariables) => listClient.setItemDone({ itemUid, done }),
-    onSuccess: refresh,
-  })
+  const setDone = useSetDone()
+  const queued = useQueuedChanges()
 
   const rename = useMutation({
     mutationFn: ({ itemUid, label }: RenameItemVariables) =>
@@ -141,6 +133,7 @@ export function ListScreen() {
     open: t("list.openItem"),
     quantity: t("note.quantity"),
     due: t("note.addDate"),
+    notSynced: t("list.notSynced"),
   }
 
   const openItem = list.items.find((item) => item.uid === openItemUid)
@@ -221,6 +214,7 @@ export function ListScreen() {
                   key={item.uid}
                   label={item.label}
                   quantity={item.quantity}
+                  notSynced={queued.itemUids.has(item.uid) || isProvisional(item.uid)}
                   addedByName={item.addedByName}
                   addedVia={viaLabel(t, item.addedViaToken)}
                   dueLabel={due.label(item.dueOn)}
@@ -246,6 +240,7 @@ export function ListScreen() {
                             editItem.mutate({ itemUid: item.uid, quantity }),
                           onDuplicate: () =>
                             addItem.mutate({
+                              listUid,
                               label: item.label,
                               quantity: item.quantity,
                               dueOn: item.dueOn,
@@ -263,7 +258,7 @@ export function ListScreen() {
           {canEdit && (
             <AddRow
               placeholder={t("list.addItem")}
-              onAdd={(item) => addItem.mutate(item)}
+              onAdd={(item) => addItem.mutate({ listUid, ...item })}
               disabled={addItem.isPending}
               divided={open.length > 0}
               hint={t("addRow.hint")}

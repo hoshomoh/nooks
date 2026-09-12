@@ -398,7 +398,11 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       `1.0.0 (91835d2)`, arm64 really is aarch64, and the checksums round-trip. The
       workflows themselves are first run by GitHub
 - [x] `README.md`: what it is, how to run it, how to back it up
-- [ ] `CONTRIBUTING.md` pointing at `STANDARDS.md`, `CONTEXT.md`, `DESIGN.md`
+- [x] `CONTRIBUTING.md` pointing at `STANDARDS.md`, `CONTEXT.md`, `DESIGN.md` — how to
+      get it running, what `./scripts/ci.sh` covers, and what a change is expected to do.
+      Checking its claims turned up three wrong commands in `AGENTS.md`: a `--port` flag
+      that does not exist, a `golangci-lint` nobody runs, and a tokens path that moved
+      when the design package was split out
 - [x] Licence — AGPL-3.0
 - [ ] Accessibility pass: focus order, labels, contrast, 44px hit areas
 - [ ] Seed data for a believable first run

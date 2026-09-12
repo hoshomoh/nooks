@@ -37,8 +37,8 @@ Nooks is a self-hosted household todo app. See `CONTEXT.md` for the domain gloss
   JSON file plus one entry in `i18n/locales.ts`.
 - `useEffect` is a last resort. Prefer `useSyncExternalStore`, render-time computation,
   event handlers, or TanStack Query. See `STANDARDS.md` §5.
-- UI work follows `DESIGN.md`, not improvisation. Tokens live in `web/src/styles/tokens.css`; do not
-  introduce a colour, radius or size that is not in there.
+- UI work follows `DESIGN.md`, not improvisation. Tokens live in `packages/design/foundations.css`,
+  shared by the app and the website; do not introduce a colour, radius or size that is not in there.
 - One verb for creating things, everywhere: **Add**. Never New, Create, Issue, or Generate.
 - Ask before adding heavy dependencies, changing auth or token behaviour, or altering the Docker and
   release workflows.
@@ -52,10 +52,10 @@ Run from the repository root unless a command starts with `cd`.
 ./scripts/ci.sh
 
 # Backend
-go run ./cmd/nooks --port 8081    # Start backend dev server
+go run ./cmd/nooks --addr :8081   # Start backend dev server
 go test ./...                    # Run all Go tests
 go test -v -race ./server/...    # Server tests with race detector
-golangci-lint run                # Go lint
+gofmt -l cmd internal server store  # Formatting; CI fails on any output
 
 # Frontend
 cd apps/web && pnpm install           # Install dependencies

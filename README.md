@@ -78,8 +78,10 @@ go build -o nooks ./cmd/nooks         # go:embed picks it up
 
 ## Before you contribute
 
-Four documents, each with one job. They are short, and reading them first will save you a review
-round.
+[`CONTRIBUTING.md`](CONTRIBUTING.md) is how to get it running and what a change is expected to do.
+
+Behind it are four documents, each with one job. They are short, and reading them first will save
+you a review round.
 
 | File | Job |
 | --- | --- |

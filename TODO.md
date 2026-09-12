@@ -294,6 +294,10 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       can reach, FAQ, footer. Every factual claim audited against the repo first — the
       licence, the port, and a page of features that do not exist were all wrong
 - [x] Features and Use cases pages — only what runs, with the one in-flight item badged
+- [x] Docs and API shell on the site's own chrome: one header rather than Fumadocs'
+      stacked under ours, its search borrowed into it, and the reference grouped and
+      named for a reader — "Lists and items" and "Get list" rather than the folder the
+      generator chose and the operation id it was built from
 - [x] A picture of the app on the landing page — the design answers this with a drawn
       mock rather than a capture, so it is built from the same tokens the app is and
       follows the reader's theme. Nothing to photograph, and nothing to retake

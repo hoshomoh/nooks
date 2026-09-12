@@ -404,7 +404,14 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       that does not exist, a `golangci-lint` nobody runs, and a tokens path that moved
       when the design package was split out
 - [x] Licence — AGPL-3.0
-- [ ] Accessibility pass: focus order, labels, contrast, 44px hit areas
+- [x] Accessibility pass: focus order, labels, contrast, 44px hit areas — two real
+      findings, both about focus. The add row and the editable title each suppressed
+      the one focus treatment DESIGN.md §7 gives everything focusable, so a keyboard
+      arriving at either was invisible. `focus.test.ts` now requires a written reason
+      for every suppression, and `contrast.test.ts` measures the palette the way WCAG
+      defines it — OKLCH converted to sRGB, both themes, twelve pairs, all clearing AA.
+      Hit areas and names were already right by construction: the checkbox carries a
+      44px wrapper, and IconButton cannot be built without a label
 - [ ] Seed data for a believable first run
 
 ---

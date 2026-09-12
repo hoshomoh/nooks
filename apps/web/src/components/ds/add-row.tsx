@@ -160,6 +160,11 @@ export function AddRow({
         className={cn(
           "grid min-h-row grid-cols-[20px_1fr_auto] items-center gap-3.5 px-2 py-1.5 -mx-2",
           divided && "border-t border-hair",
+          // DESIGN.md §7: one focus treatment, on every focusable thing. The field
+          // inside is drawn as part of the row rather than as a box of its own, so the
+          // row is what takes the ring — around the bare input it would outline half a
+          // sentence and leave the chips beside it looking like something else.
+          "rounded-md focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring",
         )}
       >
         <span className="text-center text-[15px] text-muted-foreground">+</span>

@@ -121,7 +121,11 @@ export function EditableTitle({
       // No border until it is being worked on: a title is text first and a field
       // second.
       className={cn(
-        "w-full rounded-md bg-transparent px-1 -mx-1 outline-none",
+        // No outline-none here. DESIGN.md §7 gives one focus treatment for everything
+        // focusable, and a title that is also a field is focusable — the background
+        // fill below says "you are editing this", which is not the same as saying
+        // "the keyboard is here".
+        "w-full rounded-md bg-transparent px-1 -mx-1",
         "transition-colors placeholder:text-muted-foreground hover:bg-secondary focus:bg-secondary",
         // A single click opens the row, so the pointer says so. An I-beam over
         // something that does not take the caret is the control lying about itself.

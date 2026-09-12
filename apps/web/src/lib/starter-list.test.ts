@@ -35,4 +35,20 @@ describe("what a new Instance opens onto", () => {
   it("is short enough to read at a glance", () => {
     expect(starterItems(t, now).length).toBeLessThanOrEqual(6)
   })
+
+  // The completed section collapses at the foot of a List, and a Member cannot discover
+  // a section that is not there. It also answers the question people ask first: no,
+  // ticking something off does not take it away.
+  it("arrives with one thing already ticked", () => {
+    const items = starterItems(t, now)
+
+    expect(items.filter((item) => item.done)).toHaveLength(1)
+    expect(items.filter((item) => !item.done).length).toBeGreaterThan(3)
+  })
+
+  it("puts the ticked one last, where the List will collapse it", () => {
+    const items = starterItems(t, now)
+
+    expect(items.at(-1)?.done).toBe(true)
+  })
 })

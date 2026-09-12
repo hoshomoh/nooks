@@ -23,8 +23,12 @@ export async function createStarterList(t: Translate, now: Date = new Date()): P
     return
   }
 
-  for (const item of starterItems(t, now)) {
-    await listClient.createItem({ listUid, ...item })
+  for (const { done, ...item } of starterItems(t, now)) {
+    const added = await listClient.createItem({ listUid, ...item })
+    const itemUid = added.item?.uid
+    if (done && itemUid) {
+      await listClient.setItemDone({ itemUid, done: true })
+    }
   }
 
   await publish(listUid)
@@ -65,14 +69,22 @@ interface StarterItem {
   quantity: string
   dueOn: string
   note: string
+  /**
+   * Already ticked.
+   *
+   * One of them is, because the completed section collapses at the foot of a List and a
+   * Member cannot discover a section that is not there. It also shows that ticking
+   * something off does not take it away, which is the question people ask first.
+   */
+  done?: boolean
 }
 
 /**
  * starterItems is what the first List holds.
  *
- * Between them they show a quantity, a date, and a Note with every block type in it —
- * each feature once, and nothing that looks like filler. Pure, so what a new Instance
- * opens onto can be read here rather than run.
+ * Between them they show a quantity, a date, a Note with every block type in it, and
+ * one thing already ticked — each feature once, and nothing that looks like filler.
+ * Pure, so what a new Instance opens onto can be read here rather than run.
  */
 export function starterItems(t: Translate, now: Date): StarterItem[] {
   const plain = { quantity: "", dueOn: "", note: "" }
@@ -87,5 +99,6 @@ export function starterItems(t: Translate, now: Date): StarterItem[] {
     },
     { ...plain, label: t("starter.coffee"), note: t("starter.coffeeNote") },
     { ...plain, label: t("starter.bakingPaper") },
+    { ...plain, label: t("starter.bread"), done: true },
   ]
 }

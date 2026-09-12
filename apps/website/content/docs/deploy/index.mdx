@@ -18,6 +18,20 @@ Open [localhost:8081](http://localhost:8081). The first person to arrive creates
 the instance. Everybody else asks to join, and an admin approves — there is no public
 signup unless you turn it on.
 
+## The first list
+
+A new instance is made with one list on it, in your language, carrying a quantity, a
+date, a note and one thing already ticked — so the first screen shows what an item can
+hold rather than being empty and explaining nothing.
+
+That list is also **published as a read-only page**, so the instance's address answers
+with something rather than a sign-in form. It was written by Nooks rather than by
+anybody, which is what makes it safe to publish before an admin has decided anything.
+Contributor names are off, as they are everywhere by default.
+
+Delete the list, or unpublish it in **Settings → General**, and the front door goes back
+to asking who you are. See [the public page](/docs/admin/instance).
+
 ## What it writes
 
 Everything lives under `--data`: one SQLite file, and nothing else. Copy that directory

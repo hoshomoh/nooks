@@ -410,7 +410,7 @@
     "clearDate": "No date"
   },
   "starter": {
-    "listName": "Todo list",
+    "listName": "Saturday shop",
     "milk": "Milk",
     "milkQuantity": "2",
     "tomatoes": "Tomatoes",
@@ -418,7 +418,8 @@
     "coffee": "Coffee — the good beans from the market",
     "coffeeNote": "### Where\nSaturday market, second row.\n\n- [ ] Ethiopian, whole bean\n\n> They pack up around two.",
     "bakingPaper": "Baking paper",
-    "washingUp": "Washing-up liquid"
+    "washingUp": "Washing-up liquid",
+    "bread": "Sourdough"
   },
   "print": {
     "eyebrow": "{{instance}} · shopping list",

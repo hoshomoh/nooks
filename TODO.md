@@ -412,7 +412,13 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       defines it — OKLCH converted to sRGB, both themes, twelve pairs, all clearing AA.
       Hit areas and names were already right by construction: the checkbox carries a
       44px wrapper, and IconButton cannot be built without a label
-- [ ] Seed data for a believable first run
+- [x] Seed data for a believable first run — mostly already built. What was wrong was
+      the name: a shopping list called "Todo list", which is the weakest name a first
+      impression could carry and the opposite of what the docs tell a reader to do. It
+      is "Saturday shop" now, and arrives with one item already ticked, because the
+      completed section collapses at the foot of a List and nobody can discover a
+      section that is not there. The install page now says the first List is published
+      as a read-only page, which a self-hoster should be told rather than discover
 
 ---
 

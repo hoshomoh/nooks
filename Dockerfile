@@ -70,12 +70,23 @@ RUN --mount=type=cache,target=/go/pkg/mod \
       -X github.com/hoshomoh/nooks/internal/version.Commit=${COMMIT}" \
     -o /out/nooks ./cmd/nooks
 
+# An empty directory to carry across. VOLUME on a path that does not exist creates it
+# at container start owned by root, and the process does not run as root — so the very
+# first thing it does is fail to open its own database. Made here because the runtime
+# image has no shell to make it with.
+RUN mkdir -p /out/data
+
 # What ships.
 FROM gcr.io/distroless/static-debian12:nonroot
 
-COPY --from=build --chown=nonroot:nonroot /out/nooks /usr/local/bin/nooks
+COPY --from=build --chown=65532:65532 /out/nooks /usr/local/bin/nooks
 
 # One directory, and everything is in it. Copy it and you have copied the instance.
+#
+# Copied in already owned by the runtime user rather than declared and left to Docker.
+# The uid is written as a number: --chown resolves a name against the target image's
+# passwd file, and depending on distroless shipping one is a dependency worth not having.
+COPY --from=build --chown=65532:65532 /out/data /var/lib/nooks
 VOLUME ["/var/lib/nooks"]
 ENV NOOKS_DATA=/var/lib/nooks
 EXPOSE 8081

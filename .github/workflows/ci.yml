@@ -131,19 +131,37 @@ jobs:
       - name: It runs, and says it is well
         run: |
           docker run -d --name nooks-ci -p 8081:8081 nooks:ci
+
+          # A container that has already exited will never answer, and waiting thirty
+          # seconds to say so buries the reason it exited under thirty failed probes.
+          # This is what the first run of this job spent half a minute not telling
+          # anybody: the image could not write its own data directory.
           for attempt in $(seq 1 30); do
+            if [ "$(docker inspect -f '{{.State.Running}}' nooks-ci)" != "true" ]; then
+              echo "the instance exited after ${attempt}s, before it could answer:" >&2
+              docker logs nooks-ci
+              exit 1
+            fi
             if docker exec nooks-ci /usr/local/bin/nooks --health; then
               echo "answered after ${attempt}s"
               break
             fi
             if [ "$attempt" -eq 30 ]; then
+              echo "the instance stayed up and never answered:" >&2
               docker logs nooks-ci
-              echo "the instance never answered" >&2
               exit 1
             fi
             sleep 1
           done
+
+          # It serves, not just answers. A health check that passes while the app is
+          # missing would be a health check about the wrong thing.
           test "$(curl -fsS -o /dev/null -w '%{http_code}' http://localhost:8081/healthz)" = 200
+          test "$(curl -fsS -o /dev/null -w '%{http_code}' http://localhost:8081/)" = 200
+
+          # The volume is the point of the image: an instance that cannot keep anything
+          # is not one somebody can run.
+          docker exec nooks-ci /usr/local/bin/nooks --version
           docker rm -f nooks-ci
 
   website:

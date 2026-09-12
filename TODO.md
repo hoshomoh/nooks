@@ -384,10 +384,12 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       volume. `nooks --health` exists because of that: an image with nothing in it to
       run `curl` can only be checked by the binary asking itself, which is what the
       compose health check and the CI job both do.
-      **Built and run by CI rather than here** — a cold Go build inside a container
-      exceeds what this machine will finish, and BuildKit's cache mounts need buildx,
-      which is not installed. The app and Go stages were built locally up to the final
-      link; the whole image has not been.
+      The first CI run found the image could not start at all: `VOLUME` on a path that
+      does not exist creates it owned by root, and the process does not run as root, so
+      it failed to open its own database. The directory is now made in the build stage
+      and copied in owned by the runtime user. Verified by building the runtime stage
+      both ways — the old one exits with `unable to open database file`, the new one
+      serves and keeps its data.
 - [x] Release workflow, versioned binaries — a `v*` tag builds four binaries with
       checksums and a multi-architecture image tagged `1.2.3`, `1.2` and `latest`.
       Both stages cross-compile rather than emulate: Go emits arm64 from a native

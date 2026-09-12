@@ -305,6 +305,9 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       re-themed onto the app's tokens rather than shipping Fumadocs' own palette
 - [x] API docs generated from the OpenAPI spec via `fumadocs-openapi` — 45 reference
       pages, all derived from the protos, none of them written by hand
+- [x] A front door for the reference — base URL, how a token authenticates and what
+      narrows it, the error shape with real codes, and what Nooks deliberately does not
+      do. 45 generated pages were reachable with nowhere saying how to get a token
 - [x] MCP docs: what a token reaches, how to point a client at `/mcp`
 - [x] Dark mode, sharing the app's `.dark` contract — the provider is pinned to
       `attribute: "class"` because the palette in @nooks/design hangs off that selector

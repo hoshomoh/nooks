@@ -1,0 +1,102 @@
+---
+title: Using the API
+description: The base URL, how a token authenticates, and what comes back when something goes wrong.
+---
+
+Everything the app does, Nooks does over REST. There is no endpoint the browser has that
+a script does not, and a check in CI refuses one that ships without a route — so if you
+can do it in the interface, you can do it from a shell.
+
+The [reference](/docs/reference) has a page per endpoint, generated from the same
+definitions the server is built from. This page is what you need before any of them.
+
+## The base URL
+
+Everything lives under `/api/v1` on your own instance:
+
+```bash
+https://nooks.example.com/api/v1
+```
+
+There is no hosted API, and no account anywhere but yours. The instance you point at is
+the one you run.
+
+## Authenticating
+
+Every request carries an access token as a bearer token:
+
+```bash
+curl https://nooks.example.com/api/v1/lists \
+  -H "Authorization: Bearer $NOOKS_TOKEN"
+```
+
+Make one in **Settings → Access tokens**. The secret is shown once, when it is created,
+and never again — Nooks stores only a hash of it, so a token that is lost is replaced
+rather than recovered.
+
+### What a token can reach
+
+A token is somebody's access, narrowed. It never has more than the member who made it,
+and three things narrow it further:
+
+- **The lists you pick.** A list a token was not given is invisible to it — not
+  forbidden, invisible. It cannot be read, and it cannot be discovered to exist.
+- **Read, write and delete**, as separate abilities. A token that may write but not
+  delete can tick an item off and cannot remove it.
+- **An expiry**, which you choose when you make it.
+
+Admin work — adding a member, deciding a join request, changing instance settings,
+making another token — needs a signed-in browser. No access token can do it, over REST
+or anywhere else. That is why those endpoints appear in the reference but refuse a
+bearer token.
+
+### Clients that are not scripts
+
+A client holding a person's password rather than a token signs in for a pair of tokens:
+a refresh token that only ever moves in an `HttpOnly` cookie, and a short-lived access
+token returned in the body. `POST /api/v1/auth/refresh` exchanges the first for a fresh
+second. A browser app uses this; a script should use an access token instead and skip it.
+
+## When something goes wrong
+
+Errors come back as JSON with the status on the response:
+
+```json
+{
+  "code": 7,
+  "message": "only an admin can do that",
+  "details": []
+}
+```
+
+The message is written to be read by a person — the same sentence the app shows.
+
+| Status | Means |
+| --- | --- |
+| `400` | A field is missing or malformed, or the instance is in a state where this cannot be done yet |
+| `401` | No token, or one that has expired or been revoked |
+| `403` | A valid token that is not allowed to do this — the wrong ability, or a list it was not given |
+| `404` | No such thing, or none this token is allowed to see |
+| `409` | It already exists |
+| `500` | Nooks failed. This is a bug — the message says what it was doing |
+
+A `403` and a `404` can both mean "not yours". Which one you get depends on whether the
+thing would be visible at all: a list outside a token's scope answers `404`, because
+telling you it exists is itself something the token is not allowed to know.
+
+## What Nooks does not do
+
+Worth knowing before you write against it:
+
+- **No pagination.** A household's lists fit in one response, and inventing cursors for
+  a hundred rows would be a protocol nobody needs.
+- **No rate limiting.** It is your server. If you want limits, your reverse proxy is a
+  better place for them than the application.
+- **No webhooks.** Changes stream to the app over server-sent events; there is no
+  outbound delivery to a URL you register.
+
+## Pointing an assistant at it
+
+An assistant does not need any of this. Nooks speaks the Model Context Protocol at
+`/mcp`, authenticated with the same access token, reaching exactly what the token
+reaches. See [the MCP page](/docs/mcp).

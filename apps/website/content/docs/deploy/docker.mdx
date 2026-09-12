@@ -14,10 +14,13 @@ Open [localhost:8081](http://localhost:8081). The first person to arrive creates
 account and names the instance.
 
 <Callout type="warn">
-  No image is published yet — the release workflow that pushes one is still being
-  built. Until it lands, build it from a checkout: `docker build -t nooks .` and use
-  `nooks` in place of `ghcr.io/hoshomoh/nooks` above.
+  The image is published by the first tagged release, and there has not been one yet.
+  Until then, build it from a checkout — `docker build -t nooks .` — and use `nooks` in
+  place of `ghcr.io/hoshomoh/nooks` above.
 </Callout>
+
+Images are tagged `1.2.3`, `1.2` and `latest`. Pin the major and minor if you want
+patches without surprises; pin the full version if you want exactly what you tested.
 
 ## What is in the image
 

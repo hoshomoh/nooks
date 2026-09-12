@@ -7,7 +7,11 @@
 
 # The app. Pinned to the same Node the repository pins, so a container build and a
 # contributor's build are the same build.
-FROM node:24.21.0-alpine AS app
+#
+# Built on whatever architecture is doing the building, never emulated: the output is
+# JavaScript, which is the same bytes either way, and emulating a Node build to produce
+# identical files is minutes spent for nothing.
+FROM --platform=$BUILDPLATFORM node:24.21.0-alpine AS app
 WORKDIR /src
 
 RUN corepack enable
@@ -31,7 +35,11 @@ COPY . .
 RUN pnpm --filter @nooks/web release
 
 # The binary, with the app inside it.
-FROM golang:1.27.1-alpine AS build
+#
+# Also on the building architecture. Go cross-compiles, so an arm64 image is built by a
+# native toolchain told to emit arm64 rather than by an emulated one — the difference
+# between a minute and most of an hour on a release that builds both.
+FROM --platform=$BUILDPLATFORM golang:1.27.1-alpine AS build
 WORKDIR /src
 
 COPY go.mod go.sum ./
@@ -46,12 +54,16 @@ COPY --from=app /src/server/router/frontend/dist ./server/router/frontend/dist
 # stripped binary is still a stack trace, and this halves the image.
 ARG VERSION=dev
 ARG COMMIT=""
+# Set by buildx for whatever platform is being produced. Defaulted so that a plain
+# `docker build` with no buildx still works and simply builds for the host.
+ARG TARGETOS=linux
+ARG TARGETARCH
 # The module and build caches are mounted rather than copied, so a rebuild compiles
 # what changed instead of the whole dependency tree. Without them every build is a cold
 # one, which on a small machine is the difference between a minute and ten.
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
-    CGO_ENABLED=0 GOOS=linux go build \
+    CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
     -trimpath \
     -ldflags="-s -w \
       -X github.com/hoshomoh/nooks/internal/version.Version=${VERSION} \

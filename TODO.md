@@ -388,7 +388,15 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       exceeds what this machine will finish, and BuildKit's cache mounts need buildx,
       which is not installed. The app and Go stages were built locally up to the final
       link; the whole image has not been.
-- [ ] Release workflow, versioned binaries
+- [x] Release workflow, versioned binaries — a `v*` tag builds four binaries with
+      checksums and a multi-architecture image tagged `1.2.3`, `1.2` and `latest`.
+      Both stages cross-compile rather than emulate: Go emits arm64 from a native
+      toolchain, which on a release that builds both is the difference between a minute
+      and most of an hour. A step asserts the binary reports the version it was tagged
+      with, because a build that cannot say what it is cannot be reported against.
+      Verified locally as far as this machine allows — the ldflags produce
+      `1.0.0 (91835d2)`, arm64 really is aarch64, and the checksums round-trip. The
+      workflows themselves are first run by GitHub
 - [x] `README.md`: what it is, how to run it, how to back it up
 - [ ] `CONTRIBUTING.md` pointing at `STANDARDS.md`, `CONTEXT.md`, `DESIGN.md`
 - [x] Licence — AGPL-3.0

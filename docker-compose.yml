@@ -5,9 +5,10 @@
 # Then open http://localhost:8081. The first person to arrive creates their account and
 # names the instance.
 #
-# It builds from this checkout rather than pulling an image, because no image is
-# published yet. When one is, `build: .` below becomes `image: ghcr.io/hoshomoh/nooks`
-# and this file stops needing the source at all.
+# It builds from this checkout rather than pulling an image, because the image is
+# published by the first tagged release and there has not been one yet. After that,
+# `build: .` below becomes `image: ghcr.io/hoshomoh/nooks` and this file stops needing
+# the source at all.
 
 services:
   nooks:

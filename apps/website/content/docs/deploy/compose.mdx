@@ -14,8 +14,9 @@ Open [localhost:8081](http://localhost:8081).
 ## What it does
 
 One service, one named volume, and a health check the binary answers itself. It builds
-from the checkout, because no image is published yet — when one is, `build: .` becomes
-`image: ghcr.io/hoshomoh/nooks` and the file stops needing the source at all.
+from the checkout, because the image is published by the first tagged release and there
+has not been one yet — after that, `build: .` becomes `image: ghcr.io/hoshomoh/nooks`
+and the file stops needing the source at all.
 
 ```yaml
 services:

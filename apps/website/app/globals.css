@@ -38,3 +38,39 @@
   --color-fd-accent-foreground: var(--foreground);
   --color-fd-ring: var(--shared);
 }
+
+/*
+ * The website's own measurements.
+ *
+ * Not in @nooks/design, because they are not the app's. A marketing page is read at
+ * arm's length on a wide screen and the app is read a foot from a sidebar, so the
+ * headline step and the page width belong to the site rather than to the shared
+ * foundations — putting them there would mean the app carried a 52px step it never uses.
+ */
+@theme {
+  --container-site: 1240px; /* the header and footer rule */
+  --container-band: 1160px; /* content within a section, inset from the rule */
+
+  --text-hero: 52px; /* the one headline per page */
+  --text-hero--line-height: 1.04;
+  --text-hero--letter-spacing: -0.03em;
+  --text-hero--font-weight: 600;
+
+  --text-band: 33px; /* a section heading on a marketing page */
+  --text-band--line-height: 1.15;
+  --text-band--letter-spacing: -0.025em;
+  --text-band--font-weight: 600;
+
+  --text-lede: 17.5px; /* the paragraph under a headline */
+  --text-lede--line-height: 1.6;
+}
+
+/*
+ * The docs sidebar sticks under the site header rather than under one of its own.
+ *
+ * Fumadocs measures its sticky offsets from this variable. With its own nav turned off
+ * it would otherwise assume there is nothing above it and slide the tree under our bar.
+ */
+:root {
+  --fd-nav-height: 3.5rem;
+}

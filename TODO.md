@@ -290,9 +290,13 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
 - [x] Next.js app in `apps/website` with Tailwind and the Nooks tokens — the tokens are
       `packages/tokens`, read by both apps, so a colour changed in DESIGN.md changes both
 - [x] Landing page: what Nooks is, the printed page, how to run it
-- [ ] One screenshot on the landing page — a real capture of the app, not a drawing of
-      it. **Blocked:** this machine has no browser, and no Playwright or Puppeteer.
-      Either install a headless Chromium (a system install) or take the capture by hand
+- [x] Rebuilt to the page design: header, hero, the four claims, install, what a script
+      can reach, FAQ, footer. Every factual claim audited against the repo first — the
+      licence, the port, and a page of features that do not exist were all wrong
+- [x] Features and Use cases pages — only what runs, with the one in-flight item badged
+- [x] A picture of the app on the landing page — the design answers this with a drawn
+      mock rather than a capture, so it is built from the same tokens the app is and
+      follows the reader's theme. Nothing to photograph, and nothing to retake
 - [x] Docs with Fumadocs MDX: install, configure, back up, upgrade, reverse proxy —
       re-themed onto the app's tokens rather than shipping Fumadocs' own palette
 - [x] API docs generated from the OpenAPI spec via `fumadocs-openapi` — 45 reference

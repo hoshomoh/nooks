@@ -2,6 +2,9 @@ import type { Metadata } from "next"
 
 import { RootProvider } from "fumadocs-ui/provider/next"
 
+import { SiteFooter } from "@/components/site-footer"
+import { SiteHeader } from "@/components/site-header"
+
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -29,7 +32,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             root element and the palette in @nooks/design hangs off that exact selector.
             A provider switched to data-theme would leave the site light forever. */}
         <RootProvider theme={{ attribute: "class", defaultTheme: "system" }}>
+          <SiteHeader />
           {children}
+          <SiteFooter />
         </RootProvider>
       </body>
     </html>

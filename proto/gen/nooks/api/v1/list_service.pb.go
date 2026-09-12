@@ -1340,7 +1340,17 @@ type UpdateItemRequest struct {
 	Quantity *string `protobuf:"bytes,3,opt,name=quantity,proto3,oneof" json:"quantity,omitempty"`
 	DueOn    *string `protobuf:"bytes,4,opt,name=due_on,json=dueOn,proto3,oneof" json:"due_on,omitempty"`
 	// The Note, as markdown. Sending an empty string removes it.
-	Note          *string `protobuf:"bytes,5,opt,name=note,proto3,oneof" json:"note,omitempty"`
+	Note *string `protobuf:"bytes,5,opt,name=note,proto3,oneof" json:"note,omitempty"`
+	// What the caller believed the text was when they started changing it.
+	//
+	// Set one of these and the change is refused when the stored text is something else,
+	// with ABORTED. That is the whole of conflict detection in Nooks, and it is only
+	// offered for text: a tick says what an Item should be rather than what it was, so
+	// there is nothing to compare and nothing to refuse.
+	//
+	// Leave them unset and the write is unconditional, which is what a script wants.
+	ExpectedLabel *string `protobuf:"bytes,6,opt,name=expected_label,json=expectedLabel,proto3,oneof" json:"expected_label,omitempty"`
+	ExpectedNote  *string `protobuf:"bytes,7,opt,name=expected_note,json=expectedNote,proto3,oneof" json:"expected_note,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1406,6 +1416,20 @@ func (x *UpdateItemRequest) GetDueOn() string {
 func (x *UpdateItemRequest) GetNote() string {
 	if x != nil && x.Note != nil {
 		return *x.Note
+	}
+	return ""
+}
+
+func (x *UpdateItemRequest) GetExpectedLabel() string {
+	if x != nil && x.ExpectedLabel != nil {
+		return *x.ExpectedLabel
+	}
+	return ""
+}
+
+func (x *UpdateItemRequest) GetExpectedNote() string {
+	if x != nil && x.ExpectedNote != nil {
+		return *x.ExpectedNote
 	}
 	return ""
 }
@@ -2130,17 +2154,21 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\bquantity\x18\x03 \x01(\tR\bquantity\x12\x15\n" +
 	"\x06due_on\x18\x04 \x01(\tR\x05dueOn\"<\n" +
 	"\x12CreateItemResponse\x12&\n" +
-	"\x04item\x18\x01 \x01(\v2\x12.nooks.api.v1.ItemR\x04item\"\xca\x01\n" +
+	"\x04item\x18\x01 \x01(\v2\x12.nooks.api.v1.ItemR\x04item\"\xc5\x02\n" +
 	"\x11UpdateItemRequest\x12\x19\n" +
 	"\bitem_uid\x18\x01 \x01(\tR\aitemUid\x12\x19\n" +
 	"\x05label\x18\x02 \x01(\tH\x00R\x05label\x88\x01\x01\x12\x1f\n" +
 	"\bquantity\x18\x03 \x01(\tH\x01R\bquantity\x88\x01\x01\x12\x1a\n" +
 	"\x06due_on\x18\x04 \x01(\tH\x02R\x05dueOn\x88\x01\x01\x12\x17\n" +
-	"\x04note\x18\x05 \x01(\tH\x03R\x04note\x88\x01\x01B\b\n" +
+	"\x04note\x18\x05 \x01(\tH\x03R\x04note\x88\x01\x01\x12*\n" +
+	"\x0eexpected_label\x18\x06 \x01(\tH\x04R\rexpectedLabel\x88\x01\x01\x12(\n" +
+	"\rexpected_note\x18\a \x01(\tH\x05R\fexpectedNote\x88\x01\x01B\b\n" +
 	"\x06_labelB\v\n" +
 	"\t_quantityB\t\n" +
 	"\a_due_onB\a\n" +
-	"\x05_note\"<\n" +
+	"\x05_noteB\x11\n" +
+	"\x0f_expected_labelB\x10\n" +
+	"\x0e_expected_note\"<\n" +
 	"\x12UpdateItemResponse\x12&\n" +
 	"\x04item\x18\x01 \x01(\v2\x12.nooks.api.v1.ItemR\x04item\"C\n" +
 	"\x12SetItemDoneRequest\x12\x19\n" +

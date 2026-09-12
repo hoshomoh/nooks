@@ -76,6 +76,9 @@ func (s *ListService) UpdateItem(
 			return nil, err
 		}
 	}
+	if err := textUnchanged(req.Msg, item); err != nil {
+		return nil, err
+	}
 
 	params := store.UpdateItemParams{
 		Label:    req.Msg.Label,
@@ -341,4 +344,28 @@ func itemToProto(item store.Item, names rowNames) *apiv1.Item {
 		out.DoneAt = item.DoneAt.Format(time.RFC3339)
 	}
 	return out
+}
+
+/*
+textUnchanged refuses a change whose text somebody else has already rewritten.
+
+Only what the caller asked to be checked. A client that sends what it believed the text
+was is asking to be told when that is no longer true; one that sends nothing is writing
+unconditionally, which is what a script wants and what every caller did before this
+existed.
+
+ABORTED rather than FAILED_PRECONDITION: the caller is not wrong and nothing needs
+fixing before retrying — somebody else simply got there first, and the two versions have
+to be put to a person. DESIGN.md §11 says only competing text asks a question.
+*/
+func textUnchanged(msg *apiv1.UpdateItemRequest, item store.Item) error {
+	if msg.ExpectedLabel != nil && msg.GetExpectedLabel() != item.Label {
+		return connect.NewError(connect.CodeAborted,
+			errors.New("somebody else renamed this while you were writing"))
+	}
+	if msg.ExpectedNote != nil && msg.GetExpectedNote() != item.Note {
+		return connect.NewError(connect.CodeAborted,
+			errors.New("somebody else wrote in this note while you were writing"))
+	}
+	return nil
 }

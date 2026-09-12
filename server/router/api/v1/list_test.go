@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"google.golang.org/protobuf/proto"
 
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/server/auth"
@@ -906,5 +907,95 @@ func TestTheLastTickWinsWhoeverMadeIt(t *testing.T) {
 	}
 	if got := back.GetDoneByName(); got != "Jonas" {
 		t.Errorf("DoneByName = %q, want the last caller", got)
+	}
+}
+
+/*
+Competing text is refused rather than silently overwritten.
+
+DESIGN.md §11: only competing text asks a question. The question is asked in the app,
+but it can only be asked if the write is refused, which is what these fields are for.
+*/
+func TestAConditionalUpdateIsRefusedOnceTheTextHasMoved(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+	f.share(t, f.anna, uid, true)
+
+	added, err := f.svc.CreateItem(f.as(t, f.anna), connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: uid, Label: "Milk",
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+	itemUID := added.Msg.GetItem().GetUid()
+
+	// Jonas rewrites it while Anna is still typing.
+	if _, err := f.svc.UpdateItem(f.as(t, f.jonas), connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid: itemUID, Label: proto.String("Oat milk"),
+	})); err != nil {
+		t.Fatalf("UpdateItem: %v", err)
+	}
+
+	// Anna's change says what she believed it was, so it is refused rather than landing
+	// on top of his.
+	_, err = f.svc.UpdateItem(f.as(t, f.anna), connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid: itemUID, Label: proto.String("Whole milk"), ExpectedLabel: proto.String("Milk"),
+	}))
+	if connect.CodeOf(err) != connect.CodeAborted {
+		t.Fatalf("UpdateItem = %v, want aborted", err)
+	}
+
+	// And his text is still there: a refused write changes nothing.
+	read, err := f.svc.GetList(f.as(t, f.anna), connect.NewRequest(&apiv1.GetListRequest{ListUid: uid}))
+	if err != nil {
+		t.Fatalf("GetList: %v", err)
+	}
+	if got := read.Msg.GetItems()[0].GetLabel(); got != "Oat milk" {
+		t.Errorf("Label = %q, want the text that was already there", got)
+	}
+}
+
+// A caller that says nothing about what it expected is writing unconditionally, which
+// is what every script and every earlier client does.
+func TestAnUnconditionalUpdateStillWins(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+
+	added, err := f.svc.CreateItem(f.as(t, f.anna), connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: uid, Label: "Milk",
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+
+	if _, err := f.svc.UpdateItem(f.as(t, f.anna), connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid: added.Msg.GetItem().GetUid(), Label: proto.String("Oat milk"),
+	})); err != nil {
+		t.Fatalf("UpdateItem: %v", err)
+	}
+}
+
+// The expected text matching is the ordinary case: the change lands.
+func TestAConditionalUpdateLandsWhenNobodyElseMovedIt(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+
+	added, err := f.svc.CreateItem(f.as(t, f.anna), connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: uid, Label: "Milk",
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+
+	updated, err := f.svc.UpdateItem(f.as(t, f.anna), connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid:       added.Msg.GetItem().GetUid(),
+		Label:         proto.String("Oat milk"),
+		ExpectedLabel: proto.String("Milk"),
+	}))
+	if err != nil {
+		t.Fatalf("UpdateItem: %v", err)
+	}
+	if got := updated.Msg.GetItem().GetLabel(); got != "Oat milk" {
+		t.Errorf("Label = %q, want the new text", got)
 	}
 }

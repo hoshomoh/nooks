@@ -1,0 +1,23 @@
+---
+title: Upgrade
+description: Replace the binary and restart. Migrations run on the way up.
+---
+
+Nooks brings its schema up to date when it starts, so an upgrade is the binary and
+nothing else.
+
+```bash
+# with the instance stopped
+go build -o nooks ./cmd/nooks
+./nooks --data ./data
+```
+
+Take a backup first. Migrations only run forwards, so the way back from a version you
+did not want is the file you copied before starting.
+
+## What a migration will not do
+
+Nooks will not silently take an ability away from something that is working. When access
+tokens gained three separate permissions, tokens that already existed kept everything
+they had — a migration that quietly narrows a key in use is a key that stops working for
+reasons nobody can see.

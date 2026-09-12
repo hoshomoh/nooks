@@ -7,6 +7,11 @@ packages:
 # pnpm treats as an error.
 allowBuilds:
   '@bufbuild/buf': false
+  # esbuild ships its platform binary as an optional dependency, which pnpm has already
+  # installed by the time the script would run — so the script has nothing left to do.
+  # Denied rather than left unreviewed, which pnpm treats as an error. If MDX ever fails
+  # to compile with a missing-binary error, this is the line to revisit.
+  esbuild: false
 
 minimumReleaseAgeExclude:
   - '@rolldown/binding-openharmony-arm64@1.2.8'

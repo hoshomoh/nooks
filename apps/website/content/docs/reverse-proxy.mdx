@@ -1,0 +1,43 @@
+---
+title: Reverse proxy
+description: What Nooks needs from a proxy in front of it, and the one setting that breaks live updates.
+---
+
+Nooks speaks plain HTTP and expects something else to terminate TLS. Any proxy will do;
+what matters is that two things survive the trip.
+
+## Do not buffer the event stream
+
+Live updates are server-sent events on `/api/v1/events`. A proxy that buffers responses
+will hold them until the connection closes, which looks exactly like updates being
+broken — ticks from other people simply never arrive.
+
+```nginx
+location /api/v1/events {
+    proxy_pass http://127.0.0.1:8081;
+    proxy_http_version 1.1;
+    proxy_set_header Connection "";
+    proxy_buffering off;
+    proxy_read_timeout 1h;
+}
+
+location / {
+    proxy_pass http://127.0.0.1:8081;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+Caddy does the right thing without being told:
+
+```text
+nooks.example {
+    reverse_proxy 127.0.0.1:8081
+}
+```
+
+## Tell Nooks it is behind TLS
+
+Session cookies are marked `Secure` when the instance knows it is served over HTTPS.
+Pass `X-Forwarded-Proto` so it can tell — without it the cookie is issued for a scheme
+the browser is not using, and signing in appears to do nothing.

@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Generated from content/docs by the fumadocs-mdx CLI on postinstall. Derived from the
+# MDX beside it, so committing it would be committing the same words twice.
+/.source

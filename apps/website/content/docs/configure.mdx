@@ -1,0 +1,27 @@
+---
+title: Configure
+description: Every flag, what it does, and the environment variable that sets it instead.
+---
+
+Every option is a flag, and every flag has an environment variable. The flag wins when
+both are set.
+
+| Flag | Environment | Default | Meaning |
+| --- | --- | --- | --- |
+| `--addr` | `NOOKS_ADDR` | `:8081` | Host and port to listen on |
+| `--data` | `NOOKS_DATA` | `./data` | Directory holding the SQLite file |
+| `--driver` | `NOOKS_DRIVER` | `sqlite` | `sqlite` or `postgres` |
+| `--dsn` | `NOOKS_DSN` | — | Connection string, when the driver is postgres |
+| `--mode` | `NOOKS_MODE` | `prod` | `prod` or `dev` |
+| `--log-level` | `NOOKS_LOG_LEVEL` | `info` | `debug`, `info`, `warn` or `error` |
+
+## Postgres instead of SQLite
+
+A flag, not a rewrite. The same schema runs on both, and the same binary serves either.
+
+```bash
+./nooks --driver postgres --dsn "postgres://nooks:nooks@localhost:5432/nooks?sslmode=disable"
+```
+
+Postgres is worth it when more than a household is using the instance, or when the
+machine already runs one. For a flat, SQLite is the better answer: one file, no server.

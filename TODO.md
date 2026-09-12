@@ -286,8 +286,10 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       `packages/tokens`, read by both apps, so a colour changed in DESIGN.md changes both
 - [x] Landing page: what Nooks is, the printed page, how to run it
 - [ ] One screenshot on the landing page — a real capture of the app, not a drawing of
-      it. Needs the binary running with the starter list, and the image committed
-- [ ] Docs with Fumadocs MDX: install, configure, back up, upgrade, reverse proxy
+      it. **Blocked:** this machine has no browser, and no Playwright or Puppeteer.
+      Either install a headless Chromium (a system install) or take the capture by hand
+- [x] Docs with Fumadocs MDX: install, configure, back up, upgrade, reverse proxy —
+      re-themed onto the app's tokens rather than shipping Fumadocs' own palette
 - [ ] API docs generated from the OpenAPI spec via `fumadocs-openapi` — **needs buf's
       gnostic-openapi plugin, pulled forward from M10**
 - [ ] MCP docs: what a token reaches, how to point a client at `/mcp`

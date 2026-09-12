@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { createMDX } from "fumadocs-mdx/next";
 
 const nextConfig: NextConfig = {
   // The design package ships TypeScript source rather than a build: one mark, shared
@@ -7,4 +8,6 @@ const nextConfig: NextConfig = {
   /* config options here */
 };
 
-export default nextConfig;
+const withMDX = createMDX();
+
+export default withMDX(nextConfig);

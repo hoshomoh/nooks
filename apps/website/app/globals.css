@@ -6,3 +6,35 @@
  * looks nothing like it — the near miss is what people notice.
  */
 @import "@nooks/design/foundations.css";
+
+/*
+ * Fumadocs brings its own look, and the docs have to look like the rest of Nooks.
+ *
+ * Its colour file comes first because the preset builds utilities from those variables
+ * and will not compile without them. Every one that decides how the docs read is then
+ * pointed at ours below, so what survives from the import is the plumbing rather than
+ * the palette — a docs page whose blue is almost the app's blue is worse than one that
+ * is obviously different.
+ */
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+
+:root,
+.dark {
+  --color-fd-background: var(--background);
+  --color-fd-foreground: var(--foreground);
+  --color-fd-muted: var(--secondary);
+  --color-fd-muted-foreground: var(--muted-foreground);
+  --color-fd-popover: var(--background);
+  --color-fd-popover-foreground: var(--foreground);
+  --color-fd-card: var(--background);
+  --color-fd-card-foreground: var(--foreground);
+  --color-fd-border: var(--border);
+  --color-fd-primary: var(--shared);
+  --color-fd-primary-foreground: var(--background);
+  --color-fd-secondary: var(--secondary);
+  --color-fd-secondary-foreground: var(--secondary-foreground);
+  --color-fd-accent: var(--secondary);
+  --color-fd-accent-foreground: var(--foreground);
+  --color-fd-ring: var(--shared);
+}

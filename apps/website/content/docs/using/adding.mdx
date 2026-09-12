@@ -8,25 +8,32 @@ so ten things go on in ten lines without reaching for the mouse.
 
 ## One line does it
 
-Type what you would say:
+Type what you would say, and put the quantity and the date at the end:
 
 ```
-2 oat milk saturday
+oat milk 2 saturday
 ```
 
-That becomes one item: **oat milk**, quantity `2`, due Saturday. The quantity and the
-date come out of the line and the rest becomes the label.
+That becomes one item: **oat milk**, quantity `2`, due Saturday.
 
 | You type | You get |
 | --- | --- |
-| `1kg rye flour` | rye flour · `1 kg` |
-| `x3 tins tomatoes` | tins tomatoes · `3` |
+| `rye flour 1kg` | rye flour · `1 kg` |
+| `tomatoes 250 g` | tomatoes · `250 g` |
 | `call the plumber tomorrow` | call the plumber · due tomorrow |
 | `bins thursday` | bins · due Thursday |
+| `oat milk 2 saturday` | oat milk · `2` · due Saturday |
 
-Dates are read in your own language, and so are weekday and month names. What was
-understood is shown as you type, and a control beside it corrects it — Nooks never
-silently decides you meant next Saturday.
+**Only the end of the line is read**, and the scan stops at the first word it does not
+recognise. That is what keeps `Call 2 plumbers` a list item called *Call 2 plumbers*
+rather than two plumbers due never. It also means `2 oat milk` is an item called "2 oat
+milk" — the number has to go at the end to be read as a quantity.
+
+Dates are read in your own language, and so are weekday and month names. A bare weekday
+means the **next** one, not today. What was understood is shown as a chip as you type,
+and backspace immediately after a chip turns it back into the words you wrote.
+
+Quote anything you want left alone: `Buy "2kg" bag` keeps its words.
 
 ## Quantities are words
 

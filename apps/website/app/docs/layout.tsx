@@ -14,7 +14,15 @@ import { source } from "@/lib/source"
  */
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <DocsLayout tree={source.pageTree} {...baseOptions} nav={{ enabled: false }}>
+    <DocsLayout
+      tree={source.pageTree}
+      {...baseOptions}
+      // The tree is the navigation here. A control that folds it away is a control
+      // whose only outcome is a reader who cannot find the page they came for, and the
+      // footer it would carry is a theme control and a GitHub link the header already
+      // has.
+      sidebar={{ collapsible: false, footer: null }}
+    >
       {children}
     </DocsLayout>
   )

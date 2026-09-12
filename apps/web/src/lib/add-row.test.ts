@@ -124,3 +124,38 @@ describe("leaving text alone", () => {
     expect(parse("Tomatoes sat", ["due"]).name).toBe("Tomatoes sat")
   })
 })
+
+/*
+The examples the docs give a Member, held to what the parser does.
+
+These were wrong once. The website design showed "2 oat milk saturday" becoming three
+things, the docs repeated it, and the parser had never done that — DESIGN.md says only
+the trailing words are read, which is what keeps "Call 2 plumbers" a name. A promise
+made to a reader is worth a test, so the next person to change either finds out here.
+*/
+describe("what the docs promise", () => {
+  it("reads a quantity and a date off the end of the line", () => {
+    expect(parse("oat milk 2 saturday")).toMatchObject({ name: "oat milk", quantity: "2" })
+    expect(parse("oat milk 2 saturday").due).not.toBe("")
+  })
+
+  it("normalises a number and its unit", () => {
+    expect(parse("rye flour 1kg")).toMatchObject({ name: "rye flour", quantity: "1 kg" })
+    expect(parse("tomatoes 250 g")).toMatchObject({ name: "tomatoes", quantity: "250 g" })
+  })
+
+  it("reads a date on its own", () => {
+    expect(parse("call the plumber tomorrow").name).toBe("call the plumber")
+    expect(parse("bins thursday").name).toBe("bins")
+  })
+
+  it("leaves a number that is not at the end alone", () => {
+    // The rule that earns the trailing-only scan. Two plumbers is not a quantity.
+    expect(parse("Call 2 plumbers")).toMatchObject({ name: "Call 2 plumbers", quantity: "" })
+    expect(parse("2 oat milk")).toMatchObject({ name: "2 oat milk", quantity: "" })
+  })
+
+  it("leaves a quoted token alone", () => {
+    expect(parse('Buy "2kg" bag').quantity).toBe("")
+  })
+})

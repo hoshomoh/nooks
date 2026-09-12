@@ -4,6 +4,17 @@ import { describe, expect, it, vi } from "vitest"
 import { registerItemChanges } from "./item-changes"
 import { ADD_MUTATION, TICK_MUTATION } from "./queued-changes"
 
+/**
+ * The surroundings the query layer hands every callback.
+ *
+ * Built here rather than taken from a running mutation: these tests call the registered
+ * callbacks directly, which is the point — what is being checked is what the client
+ * will do, not whether TanStack calls it.
+ */
+function surroundings(queryClient: QueryClient) {
+  return { client: queryClient, meta: undefined }
+}
+
 /** registered is what the client will run for a change with that key. */
 function registered(queryClient: QueryClient, key: readonly string[]) {
   const defaults = queryClient.getMutationDefaults([...key])
@@ -44,7 +55,7 @@ describe("what the client will run for a queued change", () => {
     const queryClient = withMilk()
     const { onMutate } = registered(queryClient, TICK_MUTATION)
 
-    await onMutate?.({ itemUid: "item_milk", done: true })
+    await onMutate?.({ itemUid: "item_milk", done: true }, surroundings(queryClient))
 
     expect(itemsOf(queryClient)[0]?.done).toBe(true)
   })
@@ -53,7 +64,10 @@ describe("what the client will run for a queued change", () => {
     const queryClient = withMilk()
     const { onMutate } = registered(queryClient, ADD_MUTATION)
 
-    await onMutate?.({ listUid: "list_groceries", label: "Rye flour", quantity: "", dueOn: "" })
+    await onMutate?.(
+      { listUid: "list_groceries", label: "Rye flour", quantity: "", dueOn: "" },
+      surroundings(queryClient),
+    )
 
     expect(itemsOf(queryClient)).toHaveLength(2)
   })
@@ -66,7 +80,12 @@ describe("what the client will run for a queued change", () => {
     const asked = vi.spyOn(queryClient, "invalidateQueries")
     const { onError } = registered(queryClient, TICK_MUTATION)
 
-    await onError?.(new Error("no such item"), { itemUid: "item_milk", done: true }, undefined)
+    await onError?.(
+      new Error("no such item"),
+      { itemUid: "item_milk", done: true },
+      undefined,
+      surroundings(queryClient),
+    )
 
     expect(asked).toHaveBeenCalled()
   })

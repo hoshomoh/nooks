@@ -15,7 +15,7 @@ const CLAIMS = [
   },
   {
     title: "One way in",
-    body: "Type the line. A quantity and a date are read out of what you wrote, so “2 oat milk saturday” becomes one item with two chips attached.",
+    body: "Type the line. A quantity and a date are read off the end of it, so “oat milk 2 saturday” becomes one item with two chips attached — and “Call 2 plumbers” stays exactly what you wrote.",
   },
   {
     title: "Made to be shared",

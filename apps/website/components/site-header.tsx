@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-import { DocsSearch } from "./docs-search"
 import { ThemeToggle } from "./theme-toggle"
 import { SOURCE } from "@/lib/site"
 
@@ -52,9 +51,6 @@ export function SiteHeader() {
 
         <span className="flex-1" />
 
-        {/* Only where there is something to search. On the marketing pages it would be a
-            control that opens a dialog listing pages the reader is already looking at. */}
-        {pathname.startsWith("/docs") && <DocsSearch />}
         <ThemeToggle />
         <a href={SOURCE} className="text-meta text-muted-foreground hover:text-foreground">
           GitHub

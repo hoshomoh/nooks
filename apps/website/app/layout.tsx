@@ -31,7 +31,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             contract rather than a preference: the app toggles a `.dark` class on the
             root element and the palette in @nooks/design hangs off that exact selector.
             A provider switched to data-theme would leave the site light forever. */}
-        <RootProvider theme={{ attribute: "class", defaultTheme: "system" }}>
+        <RootProvider
+          theme={{ attribute: "class", defaultTheme: "system" }}
+          // Off rather than broken. Fumadocs' search wants an API route to answer it,
+          // and without one every trigger it draws is a control that 404s. The docs are
+          // fifteen pages with a tree beside them; the browser's own find is a better
+          // answer than a search box that does nothing.
+          search={{ enabled: false }}
+        >
           <SiteHeader />
           {children}
           <SiteFooter />

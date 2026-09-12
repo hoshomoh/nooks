@@ -152,6 +152,24 @@ describe("the list row", () => {
       expect(field).toHaveFocus()
     })
 
+    it("does not select the whole line on a double click", async () => {
+      // Somebody who double-clicked a word wants to edit at that word. Selecting
+      // everything means their next keystroke replaces the lot.
+      render(<ListRow label="Milk and bread" labels={labels} onOpen={() => {}} onRename={() => {}} />)
+      const field = screen.getByRole("textbox", { name: labels.name }) as HTMLInputElement
+
+      await userEvent.dblClick(field)
+
+      expect(field.selectionStart === 0 && field.selectionEnd === field.value.length).toBe(false)
+    })
+
+    it("says with the pointer that a click opens the row", () => {
+      // An I-beam over something that does not take the caret is the control lying.
+      render(<ListRow label="Milk" labels={labels} onOpen={() => {}} onRename={() => {}} />)
+
+      expect(screen.getByRole("textbox", { name: labels.name })).toHaveClass("cursor-pointer")
+    })
+
     it("still edits on a single click where there is nothing to open", async () => {
       // A List title is the only thing on its line, so a click there means edit.
       render(<ListRow label="Milk" labels={labels} onRename={() => {}} />)

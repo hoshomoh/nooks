@@ -62,7 +62,13 @@ export function EditableTitle({
 
   if (readOnly || !onCommit) {
     const Text = as
-    return <Text className={className}>{value || placeholder}</Text>
+    // Inert where the row has a job of its own: text that answers nothing is text in
+    // the way of the covering element behind it. See covering.tsx.
+    return (
+      <Text className={cn(className, clickTo === "open" && "pointer-events-none")}>
+        {value || placeholder}
+      </Text>
+    )
   }
 
   const commit = () => {
@@ -78,19 +84,24 @@ export function EditableTitle({
       ref={inputRef}
       autoFocus={autoFocus}
       aria-label={label}
-      // Preventing the mousedown is what stops the caret landing here, so the click
-      // reaches the row behind. The second click of a double still arrives, which is
-      // what puts the field in hand.
+      // Three separate jobs, and they are separate on purpose. The mousedown stops the
+      // caret landing here so a single click means the row. The click is what actually
+      // does the row's job. The double click hands the field over — and does not select
+      // anything, because somebody who double-clicked a word wants to edit at that
+      // word, not to replace the whole line.
       onMouseDown={(event) => {
         if (clickTo === "open" && event.detail === 1) {
           event.preventDefault()
+        }
+      }}
+      onClick={(event) => {
+        if (clickTo === "open" && event.detail === 1) {
           onOpen?.()
         }
       }}
       onDoubleClick={() => {
         if (clickTo === "open") {
           inputRef.current?.focus()
-          inputRef.current?.select()
         }
       }}
       placeholder={placeholder}
@@ -112,6 +123,9 @@ export function EditableTitle({
       className={cn(
         "w-full rounded-md bg-transparent px-1 -mx-1 outline-none",
         "transition-colors placeholder:text-muted-foreground hover:bg-secondary focus:bg-secondary",
+        // A single click opens the row, so the pointer says so. An I-beam over
+        // something that does not take the caret is the control lying about itself.
+        clickTo === "open" && "cursor-pointer focus:cursor-text",
         className,
       )}
     />

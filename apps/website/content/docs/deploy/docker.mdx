@@ -1,0 +1,80 @@
+---
+title: Docker
+description: One command, one volume, and an instance running.
+---
+
+```bash
+docker run -d --name nooks \
+  -p 8081:8081 \
+  -v nooks-data:/var/lib/nooks \
+  ghcr.io/hoshomoh/nooks
+```
+
+Open [localhost:8081](http://localhost:8081). The first person to arrive creates their
+account and names the instance.
+
+<Callout type="warn">
+  No image is published yet — the release workflow that pushes one is still being
+  built. Until it lands, build it from a checkout: `docker build -t nooks .` and use
+  `nooks` in place of `ghcr.io/hoshomoh/nooks` above.
+</Callout>
+
+## What is in the image
+
+A static binary and a CA bundle. No shell, no package manager, nothing else — so there
+is nothing in it to keep patched, and nothing to exec into either.
+
+It runs as an unprivileged user. Nooks never needs root, and an app that reads a
+shopping list has no business asking for it.
+
+## The volume
+
+Everything the instance has lives in `/var/lib/nooks`: one SQLite file, and nothing
+else. Copy that directory and you have copied the instance — see
+[Back up](/docs/operations/back-up).
+
+A named volume as above, or a bind mount if you would rather see the file:
+
+```bash
+-v ~/nooks:/var/lib/nooks
+```
+
+With a bind mount, the directory has to be writable by the image's unprivileged user:
+
+```bash
+mkdir -p ~/nooks && sudo chown 65532:65532 ~/nooks
+```
+
+## Configuration
+
+Every [flag](/docs/configure) has an environment variable, which is what a container
+wants:
+
+```bash
+docker run -d --name nooks \
+  -p 8081:8081 \
+  -v nooks-data:/var/lib/nooks \
+  -e NOOKS_SECURE_COOKIES=true \
+  -e NOOKS_LOG_LEVEL=debug \
+  ghcr.io/hoshomoh/nooks
+```
+
+`NOOKS_DATA` is already set to the volume, so leave it alone unless you are mounting
+somewhere else.
+
+## Is it well?
+
+The binary can ask itself, which is how a health check works in an image with no shell
+in it to run `curl`:
+
+```bash
+docker exec nooks /usr/local/bin/nooks --health
+```
+
+Exit 0 means the instance answered.
+
+## Behind a domain
+
+TLS and the headers live updates need are on [the reverse proxy
+page](/docs/deploy/reverse-proxy). Turn on `NOOKS_SECURE_COOKIES` once TLS is
+terminating in front of it.

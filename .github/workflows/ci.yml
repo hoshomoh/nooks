@@ -102,6 +102,50 @@ jobs:
       - name: What a first visit costs
         run: pnpm --filter @nooks/web check-bundle ../../server/router/frontend/dist/assets
 
+  image:
+    name: Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+
+      # Built, not just linted. A Dockerfile that has never produced an image is a
+      # Dockerfile nobody knows the state of, and the one in this repository is how
+      # most people will run Nooks.
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: nooks:ci
+          build-args: |
+            VERSION=ci
+            COMMIT=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Started, not just built. The image is distroless with no shell in it, so the
+      # only thing that can say whether it works is the binary answering its own health
+      # check — which is also exactly what the compose file asks it.
+      - name: It runs, and says it is well
+        run: |
+          docker run -d --name nooks-ci -p 8081:8081 nooks:ci
+          for attempt in $(seq 1 30); do
+            if docker exec nooks-ci /usr/local/bin/nooks --health; then
+              echo "answered after ${attempt}s"
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              docker logs nooks-ci
+              echo "the instance never answered" >&2
+              exit 1
+            fi
+            sleep 1
+          done
+          test "$(curl -fsS -o /dev/null -w '%{http_code}' http://localhost:8081/healthz)" = 200
+          docker rm -f nooks-ci
+
   website:
     name: Website
     runs-on: ubuntu-latest

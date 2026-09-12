@@ -13,6 +13,14 @@ than a fallback. No email server to configure, no telemetry, no account anywhere
 Nooks is one binary. It serves the API and the app from the same process and keeps everything in one
 SQLite file you can copy.
 
+With Docker:
+
+```bash
+docker compose up -d
+```
+
+Or from source:
+
 ```bash
 go build -o nooks ./cmd/nooks
 ./nooks --data ./data

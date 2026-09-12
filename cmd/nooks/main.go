@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -36,6 +37,16 @@ func run(ctx context.Context, args []string, env func(string) string, stdout, st
 	if len(args) > 0 && (args[0] == "--version" || args[0] == "version") {
 		fmt.Fprintln(stdout, version.String())
 		return nil
+	}
+
+	// Before the flags are parsed for a server, because this is not one: it asks a
+	// server that is already running and says what it found.
+	if healthRequested(args) {
+		cfg, err := profile.Parse(args[1:], env, stderr)
+		if err != nil {
+			return err
+		}
+		return checkHealth(ctx, cfg.Addr, http.DefaultClient)
 	}
 
 	cfg, err := profile.Parse(args, env, stderr)

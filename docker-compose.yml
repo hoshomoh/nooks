@@ -1,0 +1,35 @@
+# One service, one volume, and nothing else to stand up.
+#
+#   docker compose up -d
+#
+# Then open http://localhost:8081. The first person to arrive creates their account and
+# names the instance.
+#
+# It builds from this checkout rather than pulling an image, because no image is
+# published yet. When one is, `build: .` below becomes `image: ghcr.io/hoshomoh/nooks`
+# and this file stops needing the source at all.
+
+services:
+  nooks:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    volumes:
+      # Everything the instance has, in one place. Back it up by copying this.
+      - nooks-data:/var/lib/nooks
+    environment:
+      # Behind a reverse proxy terminating TLS, turn this on: it marks the session
+      # cookie Secure, and a cookie without it can be read off a plain-HTTP request.
+      NOOKS_SECURE_COOKIES: "false"
+    healthcheck:
+      # The binary answers its own health check, so the image needs no shell or curl in
+      # it to be checkable.
+      test: ["CMD", "/usr/local/bin/nooks", "--health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+volumes:
+  nooks-data:

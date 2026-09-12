@@ -1,0 +1,26 @@
+# What the build does not need, and what it must not pick up.
+#
+# node_modules especially: the image installs its own, and copying a host tree in would
+# bring another platform's binaries with it.
+node_modules
+**/node_modules
+.git
+.github
+
+# Build output. The image builds its own, and a stale local copy baked into a release
+# is a class of bug nobody enjoys finding.
+apps/web/dist
+apps/website/.next
+apps/website/.source
+server/router/frontend/dist
+/nooks
+
+# Local data and machine-specific settings.
+data
+*.db
+*.db-shm
+*.db-wal
+.claude
+.preflight
+reference
+.local

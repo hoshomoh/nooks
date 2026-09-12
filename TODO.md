@@ -379,7 +379,15 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       key that opens it. `scripts/check-bundle.mjs` holds the entry chunk to a budget
       measured against the regression it exists to catch, so one static import in the
       wrong file cannot quietly undo it
-- [ ] Docker image, `docker-compose.yml`, and a one-line run command
+- [x] Docker image, `docker-compose.yml`, and a one-line run command — three stages
+      onto distroless: a static binary and a CA bundle, no shell, unprivileged, one
+      volume. `nooks --health` exists because of that: an image with nothing in it to
+      run `curl` can only be checked by the binary asking itself, which is what the
+      compose health check and the CI job both do.
+      **Built and run by CI rather than here** — a cold Go build inside a container
+      exceeds what this machine will finish, and BuildKit's cache mounts need buildx,
+      which is not installed. The app and Go stages were built locally up to the final
+      link; the whole image has not been.
 - [ ] Release workflow, versioned binaries
 - [x] `README.md`: what it is, how to run it, how to back it up
 - [ ] `CONTRIBUTING.md` pointing at `STANDARDS.md`, `CONTEXT.md`, `DESIGN.md`

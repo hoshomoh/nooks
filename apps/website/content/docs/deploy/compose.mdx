@@ -1,0 +1,94 @@
+---
+title: Docker Compose
+description: A file you check in, so the deployment is written down rather than remembered.
+---
+
+The repository ships a `docker-compose.yml`:
+
+```bash
+docker compose up -d
+```
+
+Open [localhost:8081](http://localhost:8081).
+
+## What it does
+
+One service, one named volume, and a health check the binary answers itself. It builds
+from the checkout, because no image is published yet — when one is, `build: .` becomes
+`image: ghcr.io/hoshomoh/nooks` and the file stops needing the source at all.
+
+```yaml
+services:
+  nooks:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    volumes:
+      - nooks-data:/var/lib/nooks
+    environment:
+      NOOKS_SECURE_COOKIES: "false"
+
+volumes:
+  nooks-data:
+```
+
+## Behind a proxy
+
+Turn on `NOOKS_SECURE_COOKIES` once something in front is terminating TLS, and drop the
+published port so only the proxy can reach it:
+
+```yaml
+services:
+  nooks:
+    environment:
+      NOOKS_SECURE_COOKIES: "true"
+    # No `ports:` — the proxy reaches it over the compose network by name.
+    expose:
+      - "8081"
+```
+
+## Postgres instead of SQLite
+
+Worth it when more than a household is writing at once, or when the machine already
+runs one. SQLite is the better answer for a flat: one file, no server, nothing to tune.
+
+```yaml
+services:
+  nooks:
+    environment:
+      NOOKS_DRIVER: postgres
+      NOOKS_DSN: postgres://nooks:nooks@db:5432/nooks?sslmode=disable
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nooks
+      POSTGRES_PASSWORD: nooks
+      POSTGRES_DB: nooks
+    volumes:
+      - nooks-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nooks"]
+      interval: 10s
+      retries: 5
+
+volumes:
+  nooks-db:
+```
+
+Change the password. It is on this page because a page without one does not run, not
+because `nooks` is a password.
+
+## Upgrading
+
+```bash
+docker compose pull && docker compose up -d
+```
+
+Back up first. [Upgrade](/docs/operations/upgrade) says what that means and why it is
+worth the thirty seconds.

@@ -96,6 +96,12 @@ jobs:
           test -d server/router/frontend/dist/assets
           test ! -e apps/server
 
+      # Measured against the build above rather than a second one. The app shipped as a
+      # single 1.4MB chunk once, so every screen paid for the editor whether or not it
+      # opened one; one static import in the wrong file is all it takes to go back.
+      - name: What a first visit costs
+        run: pnpm --filter @nooks/web check-bundle ../../server/router/frontend/dist/assets
+
   website:
     name: Website
     runs-on: ubuntu-latest

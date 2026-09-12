@@ -1,6 +1,5 @@
-import { createRoute, redirect } from "@tanstack/react-router"
+import { createRoute, lazyRouteComponent, redirect } from "@tanstack/react-router"
 
-import { ListScreen } from "@/screens/list"
 import { currentMemberQuery, instanceQuery } from "@/lib/queries"
 import { listQuery, listsQuery } from "@/lib/list-queries"
 import { rootRoute } from "./root"
@@ -24,5 +23,5 @@ export const listRoute = createRoute({
     ])
     return { member, instance, lists, list }
   },
-  component: ListScreen,
+  component: lazyRouteComponent(() => import("@/screens/list"), "ListScreen"),
 })

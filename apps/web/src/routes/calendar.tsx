@@ -1,6 +1,5 @@
-import { createRoute, redirect } from "@tanstack/react-router"
+import { createRoute, lazyRouteComponent, redirect } from "@tanstack/react-router"
 
-import { CalendarScreen } from "@/screens/calendar"
 import { currentMemberQuery, instanceQuery } from "@/lib/queries"
 import { listsQuery } from "@/lib/list-queries"
 import { datedRangeQuery } from "@/lib/dated-queries"
@@ -26,5 +25,5 @@ export const calendarRoute = createRoute({
     ])
     return { member, instance, lists, dated }
   },
-  component: CalendarScreen,
+  component: lazyRouteComponent(() => import("@/screens/calendar"), "CalendarScreen"),
 })

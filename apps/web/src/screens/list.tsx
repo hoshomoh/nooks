@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react"
+import { Suspense, useCallback, useMemo, useState } from "react"
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
 import { getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
@@ -14,7 +14,8 @@ import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
 import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
 import { PrintSheet } from "@/components/ds/print-sheet"
-import { NoteSheet } from "@/components/ds/note-sheet"
+import { lazyNamed } from "@/components/ds/lazy"
+import type { NoteSheetProps } from "@/components/ds/note-sheet"
 import { listClient } from "@/lib/api"
 import { listQuery } from "@/lib/list-queries"
 import { refreshLists } from "@/lib/refresh"
@@ -45,6 +46,18 @@ interface EditItemVariables {
 
 /** How long the typing has to settle before a Note is saved. */
 const AUTOSAVE_DELAY_MS = 800
+
+/*
+ * The Note editor, fetched when a Note is opened rather than when a List is.
+ *
+ * ProseMirror and its schema are the largest thing the app ships, and most of the time
+ * a Member opens a List to tick something off and never opens a Note at all. Split here
+ * rather than at the route, because the route is the List and the List is not what costs.
+ */
+const NoteSheet = lazyNamed<NoteSheetProps>(
+  () => import("@/components/ds/note-sheet"),
+  "NoteSheet",
+)
 
 export function ListScreen() {
   const { listUid } = route.useParams()
@@ -320,30 +333,32 @@ export function ListScreen() {
         </div>
 
         {openItem && (
-          <NoteSheet
-            item={openItem}
-            crumbs={[list.list?.name ?? "", t("note.crumb")]}
-            listName={list.list?.name ?? ""}
-            canEdit={Boolean(canEdit)}
-            status={saveNote.isPending ? t("note.saving") : undefined}
-            onNoteChange={onNoteChange}
-            onToggleDone={(done) => setDone.mutate({ itemUid: openItem.uid, done })}
-            onRename={(label) =>
-              rename.rename({ itemUid: openItem.uid, label, expected: openItem.label })
-            }
-            onQuantityChange={(quantity) =>
-              editItem.mutate({ itemUid: openItem.uid, quantity })
-            }
-            onDueChange={(dueOn) => editItem.mutate({ itemUid: openItem.uid, dueOn })}
-            onClose={closeSheet}
-            onOpenFull={() => {
-              autosave.flush()
-              void navigate({
-                to: "/lists/$listUid/items/$itemUid",
-                params: { listUid, itemUid: openItem.uid },
-              })
-            }}
-          />
+          <Suspense fallback={null}>
+            <NoteSheet
+              item={openItem}
+              crumbs={[list.list?.name ?? "", t("note.crumb")]}
+              listName={list.list?.name ?? ""}
+              canEdit={Boolean(canEdit)}
+              status={saveNote.isPending ? t("note.saving") : undefined}
+              onNoteChange={onNoteChange}
+              onToggleDone={(done) => setDone.mutate({ itemUid: openItem.uid, done })}
+              onRename={(label) =>
+                rename.rename({ itemUid: openItem.uid, label, expected: openItem.label })
+              }
+              onQuantityChange={(quantity) =>
+                editItem.mutate({ itemUid: openItem.uid, quantity })
+              }
+              onDueChange={(dueOn) => editItem.mutate({ itemUid: openItem.uid, dueOn })}
+              onClose={closeSheet}
+              onOpenFull={() => {
+                autosave.flush()
+                void navigate({
+                  to: "/lists/$listUid/items/$itemUid",
+                  params: { listUid, itemUid: openItem.uid },
+                })
+              }}
+            />
+          </Suspense>
         )}
       </div>
     </AppShell>

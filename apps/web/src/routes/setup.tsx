@@ -1,6 +1,5 @@
-import { createRoute, redirect } from "@tanstack/react-router"
+import { createRoute, lazyRouteComponent, redirect } from "@tanstack/react-router"
 
-import { Setup } from "@/screens/setup"
 import { instanceQuery } from "@/lib/queries"
 import { rootRoute } from "./root"
 
@@ -19,5 +18,5 @@ export const setupRoute = createRoute({
       throw redirect({ to: "/" })
     }
   },
-  component: Setup,
+  component: lazyRouteComponent(() => import("@/screens/setup"), "Setup"),
 })

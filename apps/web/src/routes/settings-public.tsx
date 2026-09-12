@@ -1,6 +1,5 @@
-import { createRoute, redirect } from "@tanstack/react-router"
+import { createRoute, lazyRouteComponent, redirect } from "@tanstack/react-router"
 
-import { SettingsPublicScreen } from "@/screens/settings-public"
 import { currentMemberQuery } from "@/lib/queries"
 import { instanceSettingsQuery } from "@/lib/instance-queries"
 import { listsQuery } from "@/lib/list-queries"
@@ -22,5 +21,5 @@ export const settingsPublicRoute = createRoute({
     ])
     return null
   },
-  component: SettingsPublicScreen,
+  component: lazyRouteComponent(() => import("@/screens/settings-public"), "SettingsPublicScreen"),
 })

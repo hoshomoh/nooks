@@ -373,8 +373,12 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
 
 ## M14 · Ship
 
-- [ ] Split the bundle. It is 1.47 MB minified and every screen pays for the calendar,
-      the command menu and the editor whether or not it opens one
+- [x] Split the bundle — 1,449 kB to 371 kB, or 440 kB to 112 kB gzipped. Every screen
+      behind a lazy route, the editor split at the sheet rather than at the route
+      (opening a List is not what costs; opening a Note is), and the palette behind the
+      key that opens it. `scripts/check-bundle.mjs` holds the entry chunk to a budget
+      measured against the regression it exists to catch, so one static import in the
+      wrong file cannot quietly undo it
 - [ ] Docker image, `docker-compose.yml`, and a one-line run command
 - [ ] Release workflow, versioned binaries
 - [x] `README.md`: what it is, how to run it, how to back it up

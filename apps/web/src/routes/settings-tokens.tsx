@@ -1,6 +1,5 @@
-import { createRoute, redirect } from "@tanstack/react-router"
+import { createRoute, lazyRouteComponent, redirect } from "@tanstack/react-router"
 
-import { SettingsTokensScreen } from "@/screens/settings-tokens"
 import { currentMemberQuery } from "@/lib/queries"
 import { tokensQuery } from "@/lib/token-queries"
 import { rootRoute } from "./root"
@@ -18,5 +17,5 @@ export const settingsTokensRoute = createRoute({
     await context.queryClient.ensureQueryData(tokensQuery)
     return null
   },
-  component: SettingsTokensScreen,
+  component: lazyRouteComponent(() => import("@/screens/settings-tokens"), "SettingsTokensScreen"),
 })

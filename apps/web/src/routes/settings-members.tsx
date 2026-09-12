@@ -1,6 +1,5 @@
-import { createRoute, redirect } from "@tanstack/react-router"
+import { createRoute, lazyRouteComponent, redirect } from "@tanstack/react-router"
 
-import { SettingsMembersScreen } from "@/screens/settings-members"
 import { currentMemberQuery, instanceQuery } from "@/lib/queries"
 import { pendingRequestsQuery } from "@/lib/member-queries"
 import { groupsQuery, membersQuery } from "@/lib/sharing-queries"
@@ -25,5 +24,5 @@ export const settingsMembersRoute = createRoute({
     ])
     return null
   },
-  component: SettingsMembersScreen,
+  component: lazyRouteComponent(() => import("@/screens/settings-members"), "SettingsMembersScreen"),
 })

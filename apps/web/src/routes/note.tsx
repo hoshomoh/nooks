@@ -1,6 +1,5 @@
-import { createRoute, notFound, redirect } from "@tanstack/react-router"
+import { createRoute, lazyRouteComponent, notFound, redirect } from "@tanstack/react-router"
 
-import { NoteScreen } from "@/screens/note"
 import { currentMemberQuery } from "@/lib/queries"
 import { listQuery } from "@/lib/list-queries"
 import { rootRoute } from "./root"
@@ -22,5 +21,5 @@ export const noteRoute = createRoute({
     }
     return { member, list: list.list, item }
   },
-  component: NoteScreen,
+  component: lazyRouteComponent(() => import("@/screens/note"), "NoteScreen"),
 })

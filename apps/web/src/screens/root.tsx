@@ -1,6 +1,19 @@
+import { Suspense } from "react"
 import { Outlet } from "@tanstack/react-router"
 
-import { CommandPalette } from "@/components/ds/command-palette"
+import { lazyNamed } from "@/components/ds/lazy"
+
+/**
+ * The palette, fetched when somebody presses the key that opens it.
+ *
+ * It is on every screen and reached from none of them until ⌘K, so a static import
+ * here would put its list, its matching and its dialog in the chunk that loads before
+ * anything is on screen.
+ */
+const CommandPalette = lazyNamed(
+  () => import("@/components/ds/command-palette"),
+  "CommandPalette",
+)
 
 /**
  * Every screen, with ⌘K over it.
@@ -13,7 +26,9 @@ export function Root() {
   return (
     <>
       <Outlet />
-      <CommandPalette />
+      <Suspense fallback={null}>
+        <CommandPalette />
+      </Suspense>
     </>
   )
 }

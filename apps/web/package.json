@@ -10,7 +10,8 @@
     "lint:fix": "oxlint --fix",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "check-bundle": "node scripts/check-bundle.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

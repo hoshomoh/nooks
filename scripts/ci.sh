@@ -76,4 +76,7 @@ pnpm --filter @nooks/web release
 test -d server/router/frontend/dist/assets
 test ! -e apps/server
 
+step "what a first visit costs"
+pnpm --filter @nooks/web check-bundle ../../server/router/frontend/dist/assets
+
 printf '\n\033[1;32m✓ everything CI runs passes\033[0m\n'

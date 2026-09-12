@@ -1,6 +1,5 @@
-import { createRoute, redirect } from "@tanstack/react-router"
+import { createRoute, lazyRouteComponent, redirect } from "@tanstack/react-router"
 
-import { ReplacePassword } from "@/screens/replace-password"
 import { currentMemberQuery } from "@/lib/queries"
 import { rootRoute } from "./root"
 
@@ -21,5 +20,5 @@ export const replacePasswordRoute = createRoute({
     }
     return { member }
   },
-  component: ReplacePassword,
+  component: lazyRouteComponent(() => import("@/screens/replace-password"), "ReplacePassword"),
 })

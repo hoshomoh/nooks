@@ -1,6 +1,5 @@
-import { createRoute, redirect } from "@tanstack/react-router"
+import { createRoute, lazyRouteComponent, redirect } from "@tanstack/react-router"
 
-import { SettingsAboutScreen } from "@/screens/settings-about"
 import { aboutQuery } from "@/lib/about-queries"
 import { currentMemberQuery } from "@/lib/queries"
 import { rootRoute } from "./root"
@@ -17,5 +16,5 @@ export const settingsAboutRoute = createRoute({
     await context.queryClient.ensureQueryData(aboutQuery)
     return null
   },
-  component: SettingsAboutScreen,
+  component: lazyRouteComponent(() => import("@/screens/settings-about"), "SettingsAboutScreen"),
 })

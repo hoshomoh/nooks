@@ -1,6 +1,5 @@
-import { createRoute, redirect } from "@tanstack/react-router"
+import { createRoute, lazyRouteComponent, redirect } from "@tanstack/react-router"
 
-import { TodayScreen } from "@/screens/today"
 import { currentMemberQuery, instanceQuery } from "@/lib/queries"
 import { listsQuery } from "@/lib/list-queries"
 import { todayQuery } from "@/lib/dated-queries"
@@ -24,5 +23,5 @@ export const todayRoute = createRoute({
     ])
     return { member, instance, lists, dated }
   },
-  component: TodayScreen,
+  component: lazyRouteComponent(() => import("@/screens/today"), "TodayScreen"),
 })

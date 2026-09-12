@@ -43,3 +43,7 @@ next-env.d.ts
 # Generated from content/docs by the fumadocs-mdx CLI on postinstall. Derived from the
 # MDX beside it, so committing it would be committing the same words twice.
 /.source
+
+# Generated from proto/gen/openapi.yaml at build time. The spec is generated from the
+# protos, so committing these would be committing the same API description three times.
+/content/docs/reference

@@ -290,8 +290,8 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       Either install a headless Chromium (a system install) or take the capture by hand
 - [x] Docs with Fumadocs MDX: install, configure, back up, upgrade, reverse proxy —
       re-themed onto the app's tokens rather than shipping Fumadocs' own palette
-- [ ] API docs generated from the OpenAPI spec via `fumadocs-openapi` — **needs buf's
-      gnostic-openapi plugin, pulled forward from M10**
+- [x] API docs generated from the OpenAPI spec via `fumadocs-openapi` — 45 reference
+      pages, all derived from the protos, none of them written by hand
 - [ ] MCP docs: what a token reaches, how to point a client at `/mcp`
 - [ ] Dark mode, sharing the app's `.dark` contract
 - [ ] Deploy target and a preview build in CI

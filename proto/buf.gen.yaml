@@ -29,7 +29,14 @@ plugins:
   # cannot describe an API that no longer exists.
   - remote: buf.build/community/google-gnostic-openapi
     out: gen
-    opt: enum_type=string
+    opt:
+      # Named here because several services contribute paths, so the generator has no
+      # single service to take a title from and leaves it empty.
+      # The option parser splits on punctuation, so a sentence here becomes a flag it
+      # does not recognise. The description belongs on the docs page instead.
+      - title=Nooks
+      - version=v1
+      - enum_type=string
   - remote: buf.build/bufbuild/es
     out: ../packages/api/src/gen
     opt: target=ts

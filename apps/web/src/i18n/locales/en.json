@@ -228,7 +228,8 @@
     "bold": "Bold",
     "italic": "Italic",
     "strike": "Strikethrough",
-    "code": "Code"
+    "code": "Code",
+    "struck": "Strikethrough"
   },
   "addRow": {
     "todayWords": [

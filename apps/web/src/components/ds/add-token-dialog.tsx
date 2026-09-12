@@ -4,7 +4,7 @@ import { cn } from "cn"
 import type { List, TokenAbilities } from "@nooks/api"
 
 import { Button } from "./button"
-import { DIALOG_SURFACE } from "./dialog-surface"
+import { DIALOG_BODY, DIALOG_SURFACE } from "./dialog-surface"
 import { Field } from "./field"
 import { SecretOnce } from "./secret-once"
 import { TickBox } from "./tick-box"
@@ -129,6 +129,7 @@ function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
 
   return (
     <form
+      className="flex min-h-0 flex-1 flex-col"
       onSubmit={(event) => {
         event.preventDefault()
         if (!ready) {
@@ -143,12 +144,12 @@ function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
         })
       }}
     >
-      <header className="flex flex-col gap-2 px-6.5 pt-6">
+      <header className="flex flex-none flex-col gap-2 px-6.5 pt-6">
         <h2 className="text-dialog">{t("tokens.addTitle")}</h2>
         <p className="text-field text-secondary-foreground">{t("tokens.addBlurb")}</p>
       </header>
 
-      <div className="flex max-h-[56vh] flex-col gap-5 overflow-y-auto px-6.5 pt-5 pb-6">
+      <div className={`flex flex-col gap-5 px-6.5 pt-5 pb-6 ${DIALOG_BODY}`}>
         <Field
           label={t("tokens.name")}
           value={name}
@@ -243,7 +244,7 @@ function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
         )}
       </div>
 
-      <footer className="flex items-center gap-3 border-t border-hair px-6.5 py-3.5">
+      <footer className="flex flex-none items-center gap-3 border-t border-hair px-6.5 py-3.5">
         <span className="text-micro text-muted-foreground">{t("tokens.shownOnce")}</span>
         <span className="flex-1" />
         <Button tone="secondary" type="button" onClick={onCancel}>

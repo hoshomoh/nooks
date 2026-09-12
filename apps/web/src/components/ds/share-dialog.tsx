@@ -6,7 +6,7 @@ import { Sharing, type Group, type List, type Member } from "@nooks/api"
 
 import { Button } from "./button"
 import { COVERING, INERT, RAISED } from "./covering"
-import { DIALOG_SURFACE } from "./dialog-surface"
+import { DIALOG_BODY, DIALOG_SURFACE } from "./dialog-surface"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { groupsQuery, listSharesQuery, membersQuery } from "@/lib/sharing-queries"
 import { TickBox } from "./tick-box"
@@ -329,7 +329,7 @@ function PeopleStep({ chosen, onChange, onBack }: PeopleStepProps) {
         <p className="text-field text-secondary-foreground">{t("share.peopleBlurb")}</p>
       </header>
 
-      <div className="flex max-h-[46vh] flex-col gap-0.5 overflow-y-auto px-6.5 pt-5 pb-1">
+      <div className={`flex flex-col gap-0.5 px-6.5 pt-5 pb-1 ${DIALOG_BODY}`}>
         {(groups.data?.groups ?? []).map((group) => (
           <PickRow
             key={group.uid}

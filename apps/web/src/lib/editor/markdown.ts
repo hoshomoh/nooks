@@ -1,5 +1,7 @@
 import type { JSONContent } from "@tiptap/react"
 
+import { inlineFrom, inlineTo } from "./marks"
+
 import { markerOf, type BlockKind } from "./markers"
 
 /**
@@ -119,9 +121,14 @@ function paragraph(text: string): JSONContent {
   return textNode(NODE.paragraph, text)
 }
 
-/** textNode is a block holding a single run of text, or nothing at all. */
+/**
+ * textNode is a block holding the runs its line describes, or nothing at all.
+ *
+ * The line is read for inline markup on the way in, so `**bold**` arrives as bold text
+ * rather than as four stars the Member has to look at.
+ */
 function textNode(type: string, text: string): JSONContent {
-  return text ? { type, content: [{ type: NODE.text, text }] } : { type }
+  return text ? { type, content: inlineFrom(text) } : { type }
 }
 
 /**
@@ -139,22 +146,35 @@ export function markdownFrom(document: JSONContent): string {
 function linesOf(node: JSONContent): string[] {
   switch (node.type) {
     case NODE.heading:
-      return [`${"#".repeat(HEADING_LEVEL)} ${plainText(node)}`]
+      return [`${"#".repeat(HEADING_LEVEL)} ${markedText(node)}`]
     case NODE.quote:
-      return (node.content ?? []).map((child) => `> ${plainText(child)}`)
+      return (node.content ?? []).map((child) => `> ${markedText(child)}`)
     case NODE.code:
       return [FENCE, ...plainText(node).split("\n"), FENCE]
     case NODE.taskList:
       return (node.content ?? []).map(taskLine)
     default:
-      return [plainText(node)]
+      return [markedText(node)]
   }
 }
 
 /** taskLine writes one checklist item, ticked or not. */
 function taskLine(item: JSONContent): string {
   const box = item.attrs?.checked === true ? "x" : " "
-  return `- [${box}] ${(item.content ?? []).map(plainText).join(" ")}`
+  return `- [${box}] ${(item.content ?? []).map(markedText).join(" ")}`
+}
+
+/**
+ * markedText is everything written inside a node, with its inline markup put back.
+ *
+ * Used everywhere except a code block, where the contents are literal: markup inside a
+ * code span is text, which is the whole point of writing something in one.
+ */
+function markedText(node: JSONContent): string {
+  if (node.type === NODE.text) {
+    return inlineTo([node])
+  }
+  return inlineTo(node.content ?? [])
 }
 
 /** plainText is everything written inside a node, with its marks left off. */

@@ -1,4 +1,5 @@
 import {
+  Bold,
   CalendarDays,
   Check,
   ChevronDown,
@@ -7,7 +8,9 @@ import {
   Ellipsis,
   Maximize2,
   Plus,
+  Italic,
   Search,
+  Strikethrough,
   X,
 } from "lucide-react"
 import { cn } from "cn"
@@ -31,6 +34,9 @@ const GLYPHS = {
   more: Ellipsis,
   search: Search,
   add: Plus,
+  bold: Bold,
+  italic: Italic,
+  struck: Strikethrough,
 } as const
 
 export type IconName = keyof typeof GLYPHS

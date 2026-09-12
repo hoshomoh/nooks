@@ -30,7 +30,16 @@ export function noteExtensions(options: NoteExtensionOptions): (Extension | Node
       listItem: false,
       // Nothing in the design draws a rule across a Note.
       horizontalRule: false,
-      link: false,
+      // Links are named in DESIGN.md §10 alongside the other inline markup, drawn as
+      // what they mean with the address taken away. They open in a new tab rather than
+      // navigating the app out from under an unsaved Note, and never on a click inside
+      // the editor, where a click means "put the caret here".
+      link: {
+        openOnClick: false,
+        autolink: true,
+        defaultProtocol: "https",
+        HTMLAttributes: { rel: "noopener noreferrer", target: "_blank" },
+      },
     }),
     TaskList,
     TaskItem.configure({ nested: false }),

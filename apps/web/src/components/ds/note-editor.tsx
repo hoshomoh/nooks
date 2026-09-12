@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import { EditorContent, useEditor, type JSONContent } from "@tiptap/react"
 import { cn } from "cn"
 
+import { NoteFormatMenu } from "./note-format-menu"
 import { SlashMenu } from "./slash-menu"
 import { noteExtensions } from "@/lib/editor/extensions"
 import { documentFrom, markdownFrom } from "@/lib/editor/markdown"
@@ -100,6 +101,8 @@ export function NoteEditor({
       }}
     >
       <EditorContent editor={editor} className="flex-1" />
+
+      <NoteFormatMenu editor={editor} />
 
       {slash && visible.length > 0 && (
         <div

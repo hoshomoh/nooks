@@ -114,4 +114,58 @@ describe("the list row", () => {
     expect(screen.getByText("Saturday market, second row.")).toBeInTheDocument()
     expect(screen.getByText("+3 lines")).toBeInTheDocument()
   })
+
+  describe("aiming at a row", () => {
+    it("opens the Item when the label itself is clicked", async () => {
+      // The label is most of a 44px row. Asking a Member to find the gap beside it
+      // wastes the target and is the thing that made rows hard to hit.
+      let opened = 0
+      render(
+        <ListRow
+          label="Milk"
+          labels={labels}
+          onOpen={() => (opened += 1)}
+          onRename={() => {}}
+        />,
+      )
+
+      await userEvent.click(screen.getByRole("textbox", { name: labels.name }))
+
+      expect(opened).toBe(1)
+    })
+
+    it("does not take the caret on a single click", async () => {
+      render(<ListRow label="Milk" labels={labels} onOpen={() => {}} onRename={() => {}} />)
+      const field = screen.getByRole("textbox", { name: labels.name })
+
+      await userEvent.click(field)
+
+      expect(field).not.toHaveFocus()
+    })
+
+    it("hands over the field on a double click", async () => {
+      render(<ListRow label="Milk" labels={labels} onOpen={() => {}} onRename={() => {}} />)
+      const field = screen.getByRole("textbox", { name: labels.name })
+
+      await userEvent.dblClick(field)
+
+      expect(field).toHaveFocus()
+    })
+
+    it("still edits on a single click where there is nothing to open", async () => {
+      // A List title is the only thing on its line, so a click there means edit.
+      render(<ListRow label="Milk" labels={labels} onRename={() => {}} />)
+      const field = screen.getByRole("textbox", { name: labels.name })
+
+      await userEvent.click(field)
+
+      expect(field).toHaveFocus()
+    })
+  })
+
+  it("says when a change has not reached the Instance", () => {
+    render(<ListRow label="Milk" labels={labels} notSynced />)
+
+    expect(screen.getByText(labels.notSynced)).toBeInTheDocument()
+  })
 })

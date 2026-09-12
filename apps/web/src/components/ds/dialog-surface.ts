@@ -8,5 +8,22 @@
  *
  * Padding is zero because a Nooks dialog lays out its own header, body and footer
  * against its own edges.
+ *
+ * It is also a column with a ceiling. A dialog whose content decides its height stops
+ * being a dialog the moment somebody picks enough things: it grows past the viewport,
+ * the footer with the confirm button in it goes off the bottom, and what was a
+ * question becomes a page. The ceiling is here rather than in each dialog so that the
+ * next one written gets it without anybody remembering — the body inside claims the
+ * space with DIALOG_BODY.
  */
-export const DIALOG_SURFACE = "w-full max-w-dialog gap-0 rounded-2xl p-0 sm:max-w-dialog"
+export const DIALOG_SURFACE =
+  "flex max-h-[min(85vh,40rem)] w-full max-w-dialog flex-col gap-0 rounded-2xl p-0 sm:max-w-dialog"
+
+/**
+ * The scrolling middle of a dialog, between a pinned header and a pinned footer.
+ *
+ * `min-h-0` is what makes it scroll rather than push: a flex child's floor is its
+ * content unless it is told otherwise, so without it the column grows and the ceiling
+ * above does nothing.
+ */
+export const DIALOG_BODY = "min-h-0 flex-1 overflow-y-auto"

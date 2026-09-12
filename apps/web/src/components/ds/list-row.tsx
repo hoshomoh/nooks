@@ -133,6 +133,12 @@ export function ListRow({
             onCommit={onRename}
             label={labels.name}
             as="span"
+            // Where the row opens the Item, the first click does that and rewriting
+            // the name is the second: asking a Member to find the gap beside the label
+            // wastes most of a 44px target. Where there is nothing to open, a click
+            // means what it always did.
+            clickTo={onOpen ? "open" : "edit"}
+            onOpen={onOpen}
             className={cn(
               "min-w-0 truncate text-body",
               done && "text-muted-foreground line-through decoration-[#C4C4BE]",

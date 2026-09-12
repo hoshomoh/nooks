@@ -21,6 +21,17 @@ export interface EditableTitleProps {
   placeholder?: string
   /** Takes the caret on mount, for a field something else asked to open. */
   autoFocus?: boolean
+  /**
+   * What a single click on the text does.
+   *
+   * "edit" puts the caret in it, which is right for a page title: the title is the
+   * only thing there. "open" is for a title inside a row that does something — a
+   * single click does the row's job and a double click rewrites the title, because a
+   * row somebody has to aim at the gaps of is a row with no target.
+   */
+  clickTo?: "edit" | "open"
+  /** What "open" means. Required when clickTo is "open", ignored otherwise. */
+  onOpen?: () => void
 }
 
 /**
@@ -43,6 +54,8 @@ export function EditableTitle({
   label,
   placeholder,
   autoFocus,
+  clickTo = "edit",
+  onOpen,
 }: EditableTitleProps) {
   const [draft, setDraft] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -65,6 +78,21 @@ export function EditableTitle({
       ref={inputRef}
       autoFocus={autoFocus}
       aria-label={label}
+      // Preventing the mousedown is what stops the caret landing here, so the click
+      // reaches the row behind. The second click of a double still arrives, which is
+      // what puts the field in hand.
+      onMouseDown={(event) => {
+        if (clickTo === "open" && event.detail === 1) {
+          event.preventDefault()
+          onOpen?.()
+        }
+      }}
+      onDoubleClick={() => {
+        if (clickTo === "open") {
+          inputRef.current?.focus()
+          inputRef.current?.select()
+        }
+      }}
       placeholder={placeholder}
       value={draft ?? value}
       onChange={(event) => setDraft(event.target.value)}

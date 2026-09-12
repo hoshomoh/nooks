@@ -1,7 +1,9 @@
 {
   "app": {
     "name": "nooks",
-    "stillWaiting": "Still waiting on the server. It's probably just waking up."
+    "stillWaiting": "Still waiting on the server. It's probably just waking up.",
+    "offline": "Offline. What you change is kept and sent when you are back.",
+    "offlineSince": "Offline since {{seen}}. What you change is kept and sent when you are back."
   },
   "action": {
     "add": "Add",
@@ -10,7 +12,8 @@
     "signIn": "Sign in",
     "search": "Search",
     "saving": "Saving…",
-    "saved": "Saved"
+    "saved": "Saved",
+    "retry": "Retry"
   },
   "auth": {
     "setup": {

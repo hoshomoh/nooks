@@ -310,7 +310,10 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
 
 ## M13 · Offline and conflicts
 
-- [ ] Offline banner, retry, last-seen time
+- [x] Offline banner, retry, last-seen time — a connection store read through
+      useSyncExternalStore, fed by an interceptor on the transport rather than by the
+      browser's guess, so a refusal counts as contact and a request that never arrived
+      does not. AppShell places the banner once, so no screen can forget it
 - [ ] Reading, ticking and adding all work offline; queued changes carry `not synced`
 - [ ] Sync on reconnect
 - [ ] **Ticks never conflict** — last write wins, whoever made it

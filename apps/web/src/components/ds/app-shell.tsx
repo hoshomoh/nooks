@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 
+import { OfflineBanner } from "./offline-banner"
 import { Sidebar, type SidebarViewCounts } from "./sidebar"
 import type { List } from "@nooks/api"
 
@@ -40,7 +41,10 @@ export function AppShell({
         onSearch={onSearch}
         onAddList={onAddList}
       />
-      <main className="flex min-w-0 flex-1 flex-col">{children}</main>
+      <main className="flex min-w-0 flex-1 flex-col">
+        <OfflineBanner />
+        {children}
+      </main>
     </div>
   )
 }

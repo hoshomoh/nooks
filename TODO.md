@@ -297,8 +297,9 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       `attribute: "class"` because the palette in @nooks/design hangs off that selector
 - [x] Preview build in CI — the site is built from cold on every push and uploaded, so a
       change to the docs can be read rather than diffed
-- [ ] Deploy target — a hosting decision, and one that needs an account. Nothing is
-      recorded anywhere yet
+- [x] Deploy target — Vercel, one project rooted at `apps/website`. `vercel.json` carries
+      what the repository can carry, and `apps/website/README.md` records the project
+      settings it cannot, so a setting nobody wrote down is not a setting nobody can check
 
 ---
 

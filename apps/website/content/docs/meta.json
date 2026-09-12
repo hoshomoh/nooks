@@ -2,12 +2,13 @@
   "title": "Docs",
   "pages": [
     "index",
+    "install",
     "configure",
+    "reverse-proxy",
     "back-up",
     "upgrade",
-    "reverse-proxy",
-    "mcp",
     "api",
+    "mcp",
     "reference"
   ]
 }

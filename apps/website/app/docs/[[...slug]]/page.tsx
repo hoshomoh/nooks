@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import { Card, Cards } from "fumadocs-ui/components/card"
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/page"
 
 import type { GeneratedPageProps } from "fumadocs-openapi"
@@ -28,6 +29,10 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
             through this component; the hand-written pages never reach for it. */}
         <MDX
           components={{
+            // The docs landing is a grid of cards rather than a list of links, so the
+            // two components it needs are in scope for every page that wants them.
+            Card,
+            Cards,
             OpenAPIPage: (props: GeneratedPageProps) => (
               <OpenAPIPage {...props} {...preloaded} />
             ),

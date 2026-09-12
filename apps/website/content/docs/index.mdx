@@ -1,24 +1,40 @@
 ---
-title: Install
-description: Nooks is one binary and one file. This is everything needed to have it running.
+title: Documentation
+description: Install Nooks, configure it, hand out access tokens, and run an instance a household can depend on.
 ---
 
-Nooks serves the API and the app from the same process, and keeps everything in one
-SQLite file you can copy. There is no separate database to stand up, no queue, and no
-mail server.
+Nooks is one binary. It serves the API and the app from the same process and keeps
+everything in one SQLite file you can copy — no separate database to stand up, no queue,
+and no mail server.
 
-## Build and run
+These pages are written for whoever runs the instance. Nothing here assumes a cluster.
 
-```bash
-go build -o nooks ./cmd/nooks
-./nooks --data ./data
-```
+## Start here
 
-Open [localhost:8081](http://localhost:8081). The first person to arrive creates their account and names
-the instance. Everybody else asks to join, and an admin approves — there is no public
-signup unless you turn it on.
+<Cards>
+  <Card title="Install" href="/docs/install" description="Build it, run it, and create the first account. The fastest path to a working instance." />
+  <Card title="Configure" href="/docs/configure" description="Flags and environment: where the data lives, which database, what port." />
+  <Card title="Put it behind your domain" href="/docs/reverse-proxy" description="TLS, and the headers live updates need to survive a proxy." />
+  <Card title="Back it up" href="/docs/back-up" description="A recovery path written down before the day you need it." />
+  <Card title="Using the API" href="/docs/api" description="Base URL, tokens, and what comes back when something goes wrong." />
+  <Card title="Point an assistant at it" href="/docs/mcp" description="The MCP server, and what a token lets an assistant reach." />
+</Cards>
 
-## What it writes
+## How these pages are organised
 
-Everything lives under `--data`: one SQLite file, and nothing else. Copy that directory
-and you have copied the instance.
+**Install**, **Configure** and **Reverse proxy** get an instance up and pointed at the
+right database and domain. **Back up** and **Upgrade** are the two things you will do
+again, so they are written to be re-read rather than read once.
+
+**Using the API** and the **reference** are for anybody automating against an instance —
+a script, a shortcut, or an assistant over MCP. The reference is generated from the same
+definitions the server is built from, so it cannot describe an endpoint that is not
+there, and a check in CI refuses an endpoint that ships without a route.
+
+## If something is wrong
+
+Live updates arriving nowhere is almost always a reverse proxy buffering the event
+stream — [the proxy page](/docs/reverse-proxy) has the headers that fix it. Anything
+else is worth [raising as an issue](https://github.com/hoshomoh/nooks/issues): a
+self-hosted app that fails quietly on somebody's machine is a bug report nobody can
+write without help.

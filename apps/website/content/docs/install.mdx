@@ -1,0 +1,24 @@
+---
+title: Install
+description: Nooks is one binary and one file. This is everything needed to have it running.
+---
+
+Nooks serves the API and the app from the same process, and keeps everything in one
+SQLite file you can copy. There is no separate database to stand up, no queue, and no
+mail server.
+
+## Build and run
+
+```bash
+go build -o nooks ./cmd/nooks
+./nooks --data ./data
+```
+
+Open [localhost:8081](http://localhost:8081). The first person to arrive creates their account and names
+the instance. Everybody else asks to join, and an admin approves — there is no public
+signup unless you turn it on.
+
+## What it writes
+
+Everything lives under `--data`: one SQLite file, and nothing else. Copy that directory
+and you have copied the instance.

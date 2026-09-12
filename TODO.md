@@ -303,6 +303,9 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       follows the reader's theme. Nothing to photograph, and nothing to retake
 - [x] Docs with Fumadocs MDX: install, configure, back up, upgrade, reverse proxy —
       re-themed onto the app's tokens rather than shipping Fumadocs' own palette
+- [x] A docs landing of its own, so `/docs` is a way in rather than the install page
+      doing double duty. Install moved to its own page and the Install button points
+      at it
 - [x] API docs generated from the OpenAPI spec via `fumadocs-openapi` — 45 reference
       pages, all derived from the protos, none of them written by hand
 - [x] A front door for the reference — base URL, how a token authenticates and what

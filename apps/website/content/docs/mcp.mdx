@@ -46,13 +46,37 @@ misconfigured client says "not signed in" once rather than failing on every tool
 | --- | --- |
 | `list_lists` | Every list the token reaches, and how many items are open on each |
 | `get_list` | What is on one list, ticked and unticked |
+| `create_list` | Start a new list |
+| `rename_list` | Rename a list |
+| `duplicate_list` | Copy a list and everything on it, unticked |
+| `pin_list` | Pin a list to the caller's own sidebar, or unpin it |
+| `delete_list` | Delete a list and everything on it |
 | `add_item` | Put something on a list |
+| `update_item` | Change an item's wording, quantity, due date or note |
 | `complete_item` | Tick an item off, or put it back |
+| `move_item` | Reorder an item within its list |
+| `delete_item` | Take an item off a list for good |
 | `search` | Find items by what somebody wrote in them |
+| `list_dated_items` | What is due in a range of days, across every list |
+| `get_list_shares` | Which people and groups a list reaches by name |
+| `set_list_sharing` | Change who a list reaches |
+| `list_members` | Everyone on this instance |
+| `list_groups` | The groups, and who is in them |
+| `whoami` | Who the token belongs to |
+| `list_activity` | What has happened recently |
+| `mark_activity_read` | Clear the unread count |
+| `about_instance` | Version, licence, and how much is stored |
 
-Five, not one per endpoint. A tool for every operation would be a menu an assistant has
-to read before it can do the one thing it was asked, and most of the API is about
-running an instance rather than about somebody's shopping.
+Everything an access token can reach, which is everything the REST API gives one. The
+set is not curated down to what somebody guessed an assistant would want: a household
+that can tick an item off from a script but not from an assistant has been told the
+same instance behaves differently depending on which door it came through.
+
+What is missing is missing from a token everywhere. Minting a token, changing a
+password, adding a member, deciding a join request and every other admin action need a
+signed-in browser, so a token is refused them over REST too. A test checks this list
+against the service definitions, so an endpoint cannot be added without deciding
+whether an assistant can reach it.
 
 ## The rules are the same rules
 

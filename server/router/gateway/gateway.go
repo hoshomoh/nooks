@@ -15,18 +15,6 @@ import (
 	v1 "github.com/hoshomoh/nooks/server/router/api/v1"
 )
 
-// Services is everything the REST API exposes, which is everything the app uses.
-type Services struct {
-	Activity *v1.ActivityService
-	Auth     *v1.AuthService
-	Instance *v1.InstanceService
-	List     *v1.ListService
-	Member   *v1.MemberService
-	Public   *v1.PublicService
-	Request  *v1.RequestService
-	Token    *v1.TokenService
-}
-
 /*
 New builds the REST mux.
 
@@ -35,7 +23,7 @@ who is asking. It is the same function — resolver.Grant — called from a seco
 rather than a second set of rules: the moment those two disagree is the moment a token
 can do something through one door that it cannot through the other.
 */
-func New(services Services, resolver *auth.Resolver) (http.Handler, error) {
+func New(services v1.Services, resolver *auth.Resolver) (http.Handler, error) {
 	mux := runtime.NewServeMux(
 		runtime.WithMiddlewares(attachGrant(resolver)),
 		runtime.WithErrorHandler(runtime.DefaultHTTPErrorHandler),

@@ -53,7 +53,7 @@ func newInstance(t *testing.T) *instance {
 	}
 
 	now := func() time.Time { return testClock }
-	handler, err := New(Services{
+	handler, err := New(v1.Services{
 		Activity: v1.NewActivityService(s, now),
 		Auth:     v1.NewAuthService(s, v1.AuthServiceOptions{Now: now}),
 		Instance: v1.NewInstanceService(s),

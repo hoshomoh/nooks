@@ -15,22 +15,22 @@ import (
 /*
 Handler answers MCP over HTTP at /mcp.
 
-The tools call the same ListService the browser and the REST API call, with the same
+The tools call the same services the browser and the REST API call, with the same
 Grant on the context. There is no separate path through the permission rules and no
 in-process HTTP round trip to fake one: an assistant holding a read-only token is
 refused a write by accessTo, exactly as a script would be.
 
-The set of tools is deliberately small. A tool for every RPC would be a menu an
-assistant has to read before it can do the one thing it was asked to do, and most of
-those RPCs are about running an Instance rather than about somebody's shopping.
+It takes the whole set of services rather than one of them because an Access token
+reaches more than Lists, and a door that reached less would be a second, quieter answer
+to "what may this token do".
 */
-func Handler(lists *v1.ListService, resolver *auth.Resolver) http.Handler {
+func Handler(services v1.Services, resolver *auth.Resolver) http.Handler {
 	server := sdk.NewServer(&sdk.Implementation{
 		Name:    "nooks",
 		Version: version.String(),
 	}, nil)
 
-	addTools(server, lists)
+	addTools(server, services)
 
 	streamable := sdk.NewStreamableHTTPHandler(
 		func(*http.Request) *sdk.Server { return server },

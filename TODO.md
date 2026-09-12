@@ -241,8 +241,13 @@ The single most important milestone; everything else is furniture.
 - [x] Sign in over REST — split-token: a month-long refresh token that only ever moves
       in an HttpOnly cookie, and an hour-long access token handed over in the body for
       callers that are not browsers. `RefreshAccess` exchanges one for the other
-- [x] MCP server at `/mcp`, same token — five tools over the official Go SDK, calling the
-      same ListService with the same Grant. No second path through the permission rules
+- [x] MCP server at `/mcp`, same token — over the official Go SDK, calling the same
+      services with the same Grant. No second path through the permission rules
+- [x] MCP reaches everything an Access token reaches, which is everything REST gives
+      one — 22 tools, with `parity_test.go` checking the set against the service
+      definitions so an RPC cannot be added without deciding whether an assistant can
+      call it. The five-tool set this shipped with made the same instance behave
+      differently depending on which door it came through
 - [x] Changes made by a token are attributed to the token in List history
 
 ---

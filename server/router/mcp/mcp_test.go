@@ -50,7 +50,7 @@ func newInstance(t *testing.T) *instance {
 	}
 
 	now := func() time.Time { return testClock }
-	handler := Handler(v1.NewListService(s, now, nil), auth.NewResolver(s, now))
+	handler := Handler(testServices(s, now), auth.NewResolver(s, now))
 	server := httptest.NewServer(handler)
 	t.Cleanup(server.Close)
 
@@ -106,29 +106,6 @@ func said(res *sdk.CallToolResult) string {
 		}
 	}
 	return out.String()
-}
-
-func TestAnAssistantSeesTheToolsItCanUse(t *testing.T) {
-	i := newInstance(t)
-	session := i.connect(i.tokenFor(store.TokenAbilities{Read: true}))
-
-	tools, err := session.ListTools(t.Context(), nil)
-	if err != nil {
-		t.Fatalf("ListTools: %v", err)
-	}
-
-	want := map[string]bool{
-		"list_lists": false, "get_list": false, "add_item": false,
-		"complete_item": false, "search": false,
-	}
-	for _, tool := range tools.Tools {
-		want[tool.Name] = true
-	}
-	for name, found := range want {
-		if !found {
-			t.Errorf("tool %q was not offered", name)
-		}
-	}
 }
 
 func TestAnAssistantReadsAList(t *testing.T) {
@@ -192,5 +169,119 @@ func TestNoTokenIsRefusedBeforeTheProtocolStarts(t *testing.T) {
 
 	if res.StatusCode != http.StatusUnauthorized {
 		t.Errorf("code = %d, want 401", res.StatusCode)
+	}
+}
+
+// testServices builds the same set server.go does, so a tool that reaches past
+// ListService is exercised here rather than only in production.
+func testServices(s store.Store, now func() time.Time) v1.Services {
+	return v1.Services{
+		Activity: v1.NewActivityService(s, nil),
+		Auth:     v1.NewAuthService(s, v1.AuthServiceOptions{}),
+		Instance: v1.NewInstanceService(s),
+		List:     v1.NewListService(s, now, nil),
+		Member:   v1.NewMemberService(s, now, nil),
+		Public:   v1.NewPublicService(s),
+		Request:  v1.NewRequestService(s, now),
+		Token:    v1.NewTokenService(s, now, nil, nil),
+	}
+}
+
+// addMilk puts one Item on the List and answers its identifier, so a test about
+// changing or removing an Item does not have to reach past the door to set itself up.
+func (i *instance) addMilk(session *sdk.ClientSession) string {
+	i.t.Helper()
+	res, err := session.CallTool(i.t.Context(), &sdk.CallToolParams{
+		Name:      "add_item",
+		Arguments: map[string]any{"list_uid": i.listUID, "label": "Milk"},
+	})
+	if err != nil {
+		i.t.Fatalf("CallTool: %v", err)
+	}
+	if res.IsError {
+		i.t.Fatalf("add_item: %s", said(res))
+	}
+	_, uid, found := strings.Cut(said(res), "— ")
+	if !found {
+		i.t.Fatalf("add_item said %q, want an identifier after an em dash", said(res))
+	}
+	return strings.TrimSpace(uid)
+}
+
+// Deleting is its own ability, so a token that may write is still refused it. The same
+// property as the read-only case, one door further in.
+func TestAWriteTokenCannotDeleteOverMCP(t *testing.T) {
+	i := newInstance(t)
+	session := i.connect(i.tokenFor(store.TokenAbilities{Read: true, Write: true}))
+	itemUID := i.addMilk(session)
+
+	res, err := session.CallTool(t.Context(), &sdk.CallToolParams{
+		Name:      "delete_item",
+		Arguments: map[string]any{"item_uid": itemUID},
+	})
+	if err != nil {
+		t.Fatalf("CallTool: %v", err)
+	}
+	if !res.IsError {
+		t.Fatalf("deleting succeeded without the delete ability: %q", said(res))
+	}
+}
+
+func TestADeleteTokenDeletesOverMCP(t *testing.T) {
+	i := newInstance(t)
+	session := i.connect(i.tokenFor(store.TokenAbilities{Read: true, Write: true, Delete: true}))
+	itemUID := i.addMilk(session)
+
+	res, err := session.CallTool(t.Context(), &sdk.CallToolParams{
+		Name:      "delete_item",
+		Arguments: map[string]any{"item_uid": itemUID},
+	})
+	if err != nil {
+		t.Fatalf("CallTool: %v", err)
+	}
+	if res.IsError {
+		t.Fatalf("delete_item: %s", said(res))
+	}
+}
+
+// An omitted field is not an empty one: changing a quantity must leave the wording
+// where it was, or an assistant has to restate the whole Item to touch any of it.
+func TestUpdateItemLeavesOmittedFieldsAlone(t *testing.T) {
+	i := newInstance(t)
+	session := i.connect(i.tokenFor(store.TokenAbilities{Read: true, Write: true}))
+	itemUID := i.addMilk(session)
+
+	res, err := session.CallTool(t.Context(), &sdk.CallToolParams{
+		Name:      "update_item",
+		Arguments: map[string]any{"item_uid": itemUID, "quantity": "2 pints"},
+	})
+	if err != nil {
+		t.Fatalf("CallTool: %v", err)
+	}
+	if res.IsError {
+		t.Fatalf("update_item: %s", said(res))
+	}
+	if answer := said(res); !strings.Contains(answer, "Milk") || !strings.Contains(answer, "2 pints") {
+		t.Errorf("answer = %q, want the old label and the new quantity", answer)
+	}
+}
+
+// The tools reach past ListService, which is the whole point of handing the package
+// every service rather than one.
+func TestAnAssistantReachesBeyondLists(t *testing.T) {
+	i := newInstance(t)
+	session := i.connect(i.tokenFor(store.TokenAbilities{Read: true}))
+
+	for _, tool := range []string{"whoami", "list_members", "about_instance"} {
+		res, err := session.CallTool(t.Context(), &sdk.CallToolParams{Name: tool})
+		if err != nil {
+			t.Fatalf("CallTool %s: %v", tool, err)
+		}
+		if res.IsError {
+			t.Errorf("%s: %s", tool, said(res))
+		}
+		if !strings.Contains(said(res), "Anna") && tool != "about_instance" {
+			t.Errorf("%s said %q, want the signed-in Member", tool, said(res))
+		}
 	}
 }

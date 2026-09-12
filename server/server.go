@@ -86,7 +86,7 @@ func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
 	// Built once and served twice: the browser reaches them over Connect, a script or an
 	// alternative client over REST. One instance of each, so the two surfaces cannot
 	// drift into behaving differently.
-	services := gateway.Services{
+	services := v1.Services{
 		Activity: v1.NewActivityService(s, nil),
 		Auth:     authService,
 		Instance: v1.NewInstanceService(s),
@@ -118,7 +118,7 @@ func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
 
 	// The same tools an assistant gets, through the same permission rules. A token that
 	// may only read is refused a write here exactly as it is everywhere else.
-	mux.Handle("/mcp", mcp.Handler(services.List, resolver))
+	mux.Handle("/mcp", mcp.Handler(services, resolver))
 
 	mux.Handle("GET /api/v1/backup", backup.NewHandler(s, resolver, nil))
 	mux.HandleFunc("GET /healthz", handleHealthz)

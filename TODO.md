@@ -295,7 +295,10 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
 - [x] MCP docs: what a token reaches, how to point a client at `/mcp`
 - [x] Dark mode, sharing the app's `.dark` contract — the provider is pinned to
       `attribute: "class"` because the palette in @nooks/design hangs off that selector
-- [ ] Deploy target and a preview build in CI
+- [x] Preview build in CI — the site is built from cold on every push and uploaded, so a
+      change to the docs can be read rather than diffed
+- [ ] Deploy target — a hosting decision, and one that needs an account. Nothing is
+      recorded anywhere yet
 
 ---
 

@@ -292,7 +292,7 @@ ship. It reuses `DESIGN.md`, so the site looks like the product rather than like
       re-themed onto the app's tokens rather than shipping Fumadocs' own palette
 - [x] API docs generated from the OpenAPI spec via `fumadocs-openapi` — 45 reference
       pages, all derived from the protos, none of them written by hand
-- [ ] MCP docs: what a token reaches, how to point a client at `/mcp`
+- [x] MCP docs: what a token reaches, how to point a client at `/mcp`
 - [ ] Dark mode, sharing the app's `.dark` contract
 - [ ] Deploy target and a preview build in CI
 

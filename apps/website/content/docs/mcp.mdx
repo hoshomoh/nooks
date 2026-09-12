@@ -1,0 +1,66 @@
+---
+title: Assistants (MCP)
+description: Point an assistant at your instance, and decide exactly how much of it that assistant can see.
+---
+
+An instance serves the Model Context Protocol at `/mcp`. An assistant connected to it
+can read your lists and tick things off — as much of that as you decided when you cut
+the token, and no more.
+
+## Cut a token first
+
+Settings → Access tokens → Add a token. Three things decide what the assistant gets:
+
+- **Which lists.** Either every list you can reach, including ones you make later, or
+  only the ones you pick. A list you do not pick is *invisible* to the token — it cannot
+  see that the list exists, which is different from being told no.
+- **What it may do.** Read items, add and tick off items, delete items and lists. Three
+  separate answers, and delete is off unless you ask for it.
+- **When it expires.** Ninety days by default.
+
+The secret is shown once, as a line of base64 with no prefix or marker. Nooks keeps only
+a hash of it, so nobody — including you — can read it back afterwards. Lose it and the
+answer is to revoke that token and cut another.
+
+## Point a client at it
+
+```json
+{
+  "mcpServers": {
+    "nooks": {
+      "url": "https://nooks.example/mcp",
+      "headers": {
+        "Authorization": "Bearer PASTE_YOUR_TOKEN_HERE"
+      }
+    }
+  }
+}
+```
+
+A request with no usable token is refused before the protocol starts, so a
+misconfigured client says "not signed in" once rather than failing on every tool call.
+
+## What the assistant can do
+
+| Tool | What it does |
+| --- | --- |
+| `list_lists` | Every list the token reaches, and how many items are open on each |
+| `get_list` | What is on one list, ticked and unticked |
+| `add_item` | Put something on a list |
+| `complete_item` | Tick an item off, or put it back |
+| `search` | Find items by what somebody wrote in them |
+
+Five, not one per endpoint. A tool for every operation would be a menu an assistant has
+to read before it can do the one thing it was asked, and most of the API is about
+running an instance rather than about somebody's shopping.
+
+## The rules are the same rules
+
+The tools call the same code the app calls. There is no second path through the
+permission checks and no separate list of what an assistant may do — a token that may
+only read is refused an `add_item` by exactly the check that would refuse it in a
+browser.
+
+Everything the assistant adds is attributed to the token in the list, so a row reads
+*Anna · via Kitchen tablet* rather than appearing from nowhere. The first time a token
+is used, it shows up in Activity.

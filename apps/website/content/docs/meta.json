@@ -1,0 +1,12 @@
+{
+  "title": "Docs",
+  "pages": [
+    "index",
+    "configure",
+    "back-up",
+    "upgrade",
+    "reverse-proxy",
+    "mcp",
+    "reference"
+  ]
+}

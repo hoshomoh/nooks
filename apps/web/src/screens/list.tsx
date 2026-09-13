@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useMemo, useState } from "react"
+import { Suspense, useCallback, useMemo } from "react"
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
 import { getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
@@ -18,6 +18,7 @@ import { lazyNamed } from "@/components/ds/lazy"
 import type { NoteSheetProps } from "@/components/ds/note-sheet"
 import { listClient } from "@/lib/api"
 import { listQuery } from "@/lib/list-queries"
+import { listRoute } from "@/routes/list"
 import { refreshLists } from "@/lib/refresh"
 import { useAddItem, useSetDone } from "@/lib/use-item-changes"
 import { previewOf } from "@/lib/editor/preview"
@@ -98,9 +99,24 @@ export function ListScreen() {
   const justTickedByAnother = (item: Item) =>
     item.done && item.doneByUid !== member?.uid && justHappened(item.doneAt, settled)
 
-  // Which Item's sheet is open. The List keeps its place behind it, so this is the
-  // screen's own state rather than a route.
-  const [openItemUid, setOpenItemUid] = useState<string | null>(null)
+  /*
+   * Which Item's sheet is open, read from the address.
+   *
+   * It was the screen's own state, which meant nothing outside the screen could ask
+   * for it — a search result could only drop the Member on the List and leave them to
+   * find the Item again. It also meant Back left the List rather than closing the
+   * sheet, and a refresh lost it.
+   */
+  const { item: openItemUid } = listRoute.useSearch()
+
+  const showItem = useCallback(
+    (itemUid: string | undefined) => {
+      // Replacing rather than pushing while the sheet is already open: opening one Item
+      // after another should leave one step back to the List, not one per Item.
+      void navigate({ to: ".", search: itemUid ? { item: itemUid } : {}, replace: Boolean(openItemUid) })
+    },
+    [navigate, openItemUid],
+  )
 
 
   const refresh = () => refreshLists(queryClient)
@@ -119,8 +135,8 @@ export function ListScreen() {
   // Closing flushes, so the last sentence is never lost to a timer that never ran.
   const closeSheet = useCallback(() => {
     autosave.flush()
-    setOpenItemUid(null)
-  }, [autosave])
+    showItem(undefined)
+  }, [autosave, showItem])
 
   // Stable, so the editor is built once rather than on every render.
   const onNoteChange = useCallback(
@@ -261,7 +277,7 @@ export function ListScreen() {
                   note={noteOf(item.note)}
                   moreLinesLabel={(count) => t("note.moreLines", { count })}
                   onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
-                  onOpen={() => setOpenItemUid(item.uid)}
+                  onOpen={() => showItem(item.uid)}
                   onRename={
                     canEdit
                       ? (label) =>
@@ -291,7 +307,7 @@ export function ListScreen() {
                         quantity={item.quantity}
                         dueOn={item.dueOn}
                         actions={{
-                          onView: () => setOpenItemUid(item.uid),
+                          onView: () => showItem(item.uid),
                           onSetDate: (dueOn) => editItem.mutate({ itemUid: item.uid, dueOn }),
                           onSetQuantity: (quantity) =>
                             editItem.mutate({ itemUid: item.uid, quantity }),
@@ -333,7 +349,7 @@ export function ListScreen() {
                   done
                   justTicked={justTickedByAnother(item)}
                   onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
-                  onOpen={() => setOpenItemUid(item.uid)}
+                  onOpen={() => showItem(item.uid)}
                   onRename={
                     canEdit
                       ? (label) =>

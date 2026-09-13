@@ -4,10 +4,26 @@ import { currentMemberQuery, instanceQuery } from "@/lib/queries"
 import { listQuery, listsQuery } from "@/lib/list-queries"
 import { rootRoute } from "./root"
 
+/** What a List screen can be asked to show, beyond the List itself. */
+export interface ListSearch {
+  /**
+   * The Item whose sheet is open, if one is.
+   *
+   * In the address rather than in the screen's own state, because it is a view of
+   * something rather than a preference: a search result can ask for it, a refresh keeps
+   * it, and Back closes the sheet instead of leaving the List.
+   */
+  item?: string
+}
+
 /** One List, with its Items. */
 export const listRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/lists/$listUid",
+  validateSearch: (search: Record<string, unknown>): ListSearch => {
+    const item = search.item
+    return typeof item === "string" && item !== "" ? { item } : {}
+  },
   loader: async ({ context, params }) => {
     const member = await context.queryClient.ensureQueryData(currentMemberQuery)
     if (!member) {

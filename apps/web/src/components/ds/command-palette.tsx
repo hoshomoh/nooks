@@ -6,6 +6,7 @@ import { SearchHitKind, type SearchHit } from "@nooks/api"
 
 import { NotePreview } from "./note-preview"
 import { previewOf } from "@/lib/editor/preview"
+import { destinationOf } from "@/lib/search-destination"
 
 import { cn } from "cn"
 
@@ -102,6 +103,17 @@ function SearchPanel() {
     await navigate({ to: "/lists/$listUid", params: { listUid } })
   }
 
+  /** openHit goes where the result points — see destinationOf. */
+  const openHit = async (hit: SearchHit) => {
+    const { listUid, itemUid } = destinationOf(hit)
+    palette.close()
+    await navigate({
+      to: "/lists/$listUid",
+      params: { listUid },
+      search: itemUid ? { item: itemUid } : {},
+    })
+  }
+
   return (
     // The server decides which content matches; destinations and Lists are matched
     // here. One of the two has to be turned off, and it is easier to read when both
@@ -142,7 +154,7 @@ function SearchPanel() {
             {hits.map((hit) => (
               <CommandItem
                 key={`${hit.kind}-${hit.itemUid || hit.listUid}`}
-                onSelect={() => void openList(hit.listUid)}
+                onSelect={() => void openHit(hit)}
               >
                 <HitText hit={hit} />
                 {namesItsList(hit) && <CommandShortcut>{hit.listName}</CommandShortcut>}

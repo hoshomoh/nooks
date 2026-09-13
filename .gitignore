@@ -22,6 +22,7 @@ server/router/frontend/dist/*
 
 # Machine-specific editor and tooling settings
 .claude/
+.agents/
 
 # Downloaded toolchain archives
 go*.linux-amd64.tar.gz

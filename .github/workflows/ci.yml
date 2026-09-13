@@ -66,9 +66,30 @@ jobs:
         run: test -z "$(pnpm exec buf format -d)"
       # The protos are the contract every client is built against. A change that would
       # break one stops here rather than in somebody's build.
+      # Against what the change was made from, which is not the same ref in both cases.
+      #
+      # On a pull request that is main. On a push to main it is the commit before the
+      # push: `origin/main` there is the commit being checked, and comparing a commit
+      # with itself finds no changes — which is what this step did on every push to main
+      # until somebody noticed it had never once failed.
       - name: No breaking changes
         working-directory: proto
-        run: pnpm exec buf breaking --against "../.git#branch=origin/main,subdir=proto"
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            baseline="branch=origin/main"
+          elif [ -n "${BEFORE:-}" ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            baseline="ref=$BEFORE"
+          else
+            # A first push, or a force-push whose predecessor is gone. Nothing to
+            # compare with, and a check that cannot run says so rather than passing.
+            echo "no previous commit to compare against; skipping"
+            exit 0
+          fi
+          echo "comparing against $baseline"
+          pnpm exec buf breaking --against "../.git#${baseline},subdir=proto"
 
   web:
     name: Web

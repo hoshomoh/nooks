@@ -1,5 +1,7 @@
 import { useState } from "react"
 import type { ReactNode } from "react"
+import { cn } from "cn"
+
 import { Icon } from "./icon"
 
 export interface DoneSectionProps {
@@ -26,7 +28,14 @@ export function DoneSection({ label, children }: DoneSectionProps) {
         type="button"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
-        className="flex items-center gap-2 self-start text-meta text-secondary-foreground"
+        // The whole line, not the words on it. Sized to its label the control was a
+        // target somebody had to aim at, with no hover to say it was one at all — and
+        // it sits under rows that are each clickable across their full width.
+        className={cn(
+          "flex min-h-row items-center gap-2 rounded-md px-2 py-1.5 -mx-2",
+          "text-left text-meta text-secondary-foreground",
+          "transition-colors hover:bg-secondary",
+        )}
       >
         <Icon
           name={open ? "collapse" : "expand"}

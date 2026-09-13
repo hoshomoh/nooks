@@ -93,7 +93,6 @@ function readStored(storage: Pick<Storage, "getItem">): LocaleCode | null {
   }
 }
 
-/** The application's store. */
 export const localeStore: LocaleStore =
   typeof window === "undefined"
     ? {

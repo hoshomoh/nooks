@@ -141,7 +141,6 @@ function parseEvent(data: string): LiveEvent | null {
 /** LIVE_ENDPOINT is where the Instance streams changes from. */
 export const LIVE_ENDPOINT = "/api/v1/events"
 
-/** The application's store. */
 export const liveStore: LiveStore =
   typeof window === "undefined"
     ? {

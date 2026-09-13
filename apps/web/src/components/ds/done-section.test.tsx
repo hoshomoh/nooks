@@ -36,4 +36,38 @@ describe("the completed items", () => {
 
     expect(screen.getByText("Washing-up liquid")).toBeInTheDocument()
   })
+
+  describe("aiming at it", () => {
+    it("is the whole line, not the words on it", () => {
+      // Sized to its label it was a target somebody had to find, sitting under rows
+      // that are each clickable across their full width.
+      render(
+        <DoneSection label="3 done today">
+          <span>Washing-up liquid</span>
+        </DoneSection>,
+      )
+
+      expect(screen.getByRole("button", { name: /3 done today/ })).not.toHaveClass("self-start")
+    })
+
+    it("says it can be pressed before it is", () => {
+      render(
+        <DoneSection label="3 done today">
+          <span>Washing-up liquid</span>
+        </DoneSection>,
+      )
+
+      expect(screen.getByRole("button", { name: /3 done today/ })).toHaveClass("hover:bg-secondary")
+    })
+
+    it("is as tall as the rows above it", () => {
+      render(
+        <DoneSection label="3 done today">
+          <span>Washing-up liquid</span>
+        </DoneSection>,
+      )
+
+      expect(screen.getByRole("button", { name: /3 done today/ })).toHaveClass("min-h-row")
+    })
+  })
 })

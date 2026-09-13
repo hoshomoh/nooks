@@ -59,7 +59,6 @@ function read(storage: Pick<Storage, "getItem">): string {
   }
 }
 
-/** The application's store. */
 export const lastListStore: LastListStore =
   typeof window === "undefined"
     ? { subscribe: () => () => {}, getUid: () => "", remember: () => {} }

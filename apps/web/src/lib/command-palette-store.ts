@@ -71,7 +71,6 @@ export function createCommandPaletteStore(deps: CommandPaletteDeps): CommandPale
   }
 }
 
-/** The application's store, created once. */
 export const commandPaletteStore: CommandPaletteStore =
   typeof window === "undefined"
     ? {

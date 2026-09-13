@@ -49,7 +49,6 @@ export function createPendingTickStore(deps: PendingTickStoreDeps): PendingTickS
   }
 }
 
-/** The application's store. */
 export const pendingTickStore: PendingTickStore =
   typeof window === "undefined"
     ? { remember: () => {}, take: () => "" }

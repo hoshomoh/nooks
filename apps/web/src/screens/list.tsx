@@ -75,10 +75,22 @@ function noteOf(markdown: string): ListRowNote {
   return { runs: preview.runs, remainingLines: preview.remaining }
 }
 
+/**
+ * previews reads every Note on the List once per change, rather than once per render.
+ *
+ * Reading a Note means parsing it, and a List re-renders for reasons that have nothing
+ * to do with its Notes — a tick landing, somebody else's change arriving, a keystroke
+ * in the composer. Parsing forty Notes on each of those is work nobody asked for.
+ */
+function usePreviews(items: readonly Item[]): Map<string, ListRowNote> {
+  return useMemo(() => new Map(items.map((item) => [item.uid, noteOf(item.note)])), [items])
+}
+
 export function ListScreen() {
   const { listUid } = route.useParams()
   const { instanceName, member, lists } = useSignedInData()
   const list = useSuspenseQuery(listQuery(listUid)).data
+  const previews = usePreviews(list.items)
   const live = useLive()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -274,7 +286,7 @@ export function ListScreen() {
                   dueLabel={due.label(item.dueOn)}
                   overdue={isOverdue(item.dueOn, from)}
                   justTicked={justTickedByAnother(item)}
-                  note={noteOf(item.note)}
+                  note={previews.get(item.uid)}
                   moreLinesLabel={(count) => t("note.moreLines", { count })}
                   onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
                   onOpen={() => showItem(item.uid)}

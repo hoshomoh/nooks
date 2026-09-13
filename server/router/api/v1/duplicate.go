@@ -78,6 +78,9 @@ func (s *ListService) copyOpenItems(
 		return internalError("read items", err)
 	}
 
+	// Built first and written once. One insert per Item meant one transaction per Item,
+	// and a List worth copying is a List with enough on it for that to be felt.
+	copies := make([]store.CreateItemParams, 0, len(items))
 	for _, item := range items {
 		if item.Done() {
 			continue
@@ -88,14 +91,15 @@ func (s *ListService) copyOpenItems(
 		}
 		// Whoever makes the copy is who added everything on it: the Items are new, and
 		// attributing them to somebody who never touched this List would be a lie.
-		_, err = s.store.CreateItem(ctx, store.CreateItemParams{
+		copies = append(copies, store.CreateItemParams{
 			UID: uid, ListID: copied.ID, Label: item.Label,
 			Quantity: item.Quantity, DueOn: item.DueOn, Note: item.Note,
 			AddedByID: member.ID, At: s.now(),
 		})
-		if err != nil {
-			return internalError("copy item", err)
-		}
+	}
+
+	if _, err := s.store.CreateItems(ctx, copies); err != nil {
+		return internalError("copy items", err)
 	}
 	return nil
 }

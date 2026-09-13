@@ -86,18 +86,34 @@ you a review round.
 | [`DESIGN.md`](DESIGN.md) | The design system. Exact values, not approximate |
 | [`STANDARDS.md`](STANDARDS.md) | Code standards |
 
-## Deliberately not in Nooks
+## Not in v1
 
-Named so nobody wonders whether they were forgotten. None of them appear in the design.
+Named so nobody wonders whether they were forgotten. None of them appear in the design,
+and none of them are ruled out later:
 
-- Recurring Items · Reminders and push notifications · File attachments · Sub-lists or nesting beyond
-  Note checklists · Multiple Instances behind one deployment · Email, of any kind
-- **Images in a Note.** A remote one would have the Note fetch from somebody else's server when it
-  opens, telling that server the Note was read and from which address, on an app whose whole claim is
-  that nothing leaves the machine. A URL stays a link.
+- **Reminders and push.** Reminders are push with a time on them, so they are one
+  feature rather than two. Browser push can be added on its own, and the planned mobile
+  app brings the obvious way to deliver them.
+- **File attachments.**
+- **Sub-lists**, or nesting beyond a Note's checklists.
+- **Multiple Instances behind one deployment.**
 
-A **mobile app is planned**: Expo, in `apps/mobile`, sharing `@nooks/api` and the design tokens. The
-layout already has room for it.
+## Two standing decisions
+
+These are not scheduling. They shape what Nooks is, and changing either would change
+the app rather than extend it:
+
+- **No email, of any kind.** No mail server to configure on a machine in a hallway, and
+  nothing to intercept: an account is created by an Admin handing over a temporary
+  password, and a forgotten one is reset the same way. The whole joining and reset flow
+  is built on its absence.
+- **No remote images in a Note.** One fetched from somebody else's server would tell
+  that server the Note was read, and from which address, on an app whose claim is that
+  nothing leaves the machine. An image uploaded to your own Instance would not have that
+  problem, and is in the first list rather than this one.
+
+A **mobile app is planned**: Expo, in `apps/mobile`, sharing `@nooks/api` and the design
+tokens. The layout already has room for it.
 
 ## Licence
 

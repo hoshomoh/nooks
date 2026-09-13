@@ -89,7 +89,6 @@ export function createConnectionStore(deps: ConnectionStoreDeps): ConnectionStor
 /** OFFLINE is the state a machine with no window reports: nothing has been seen. */
 const OFFLINE: ConnectionState = { online: true, lastSeenAt: null }
 
-/** The application's store. */
 export const connectionStore: ConnectionStore =
   typeof window === "undefined"
     ? {

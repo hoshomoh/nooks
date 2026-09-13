@@ -106,6 +106,81 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 	return item, nil
 }
 
+/*
+CreateItems adds several Items to one List at once.
+
+One position read for the batch rather than one per Item, one insert for all of them,
+and one transaction around the lot — so copying a List is a commit rather than a commit
+per row. The Items keep the order they arrive in, which is the order they were read off
+the List being copied.
+*/
+func (s *sqlStore) CreateItems(ctx context.Context, params []CreateItemParams) ([]Item, error) {
+	if len(params) == 0 {
+		return nil, nil
+	}
+	for _, p := range params {
+		if p.Label == "" {
+			return nil, errors.New("store: item label is required")
+		}
+	}
+
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, fmt.Errorf("begin create items: %w", err)
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	var last sql.NullFloat64
+	err = tx.NewSelect().
+		Model((*itemModel)(nil)).
+		ColumnExpr("MAX(position)").
+		Where("list_id = ? AND deleted_at = ''", params[0].ListID).
+		Scan(ctx, &last)
+	if err != nil {
+		return nil, fmt.Errorf("read last position: %w", err)
+	}
+
+	rows := make([]itemModel, 0, len(params))
+	for i, p := range params {
+		row := itemModel{
+			UID:       p.UID,
+			ListID:    p.ListID,
+			Label:     p.Label,
+			Quantity:  p.Quantity,
+			DueOn:     p.DueOn,
+			Note:      p.Note,
+			Position:  last.Float64 + positionGap*float64(i+1),
+			AddedByID: p.AddedByID,
+			CreatedAt: formatTime(p.At),
+			UpdatedAt: formatTime(p.At),
+		}
+		if p.AddedByTokenID != 0 {
+			row.AddedByTokenID = &p.AddedByTokenID
+		}
+		rows = append(rows, row)
+	}
+
+	if _, err := tx.NewInsert().Model(&rows).Returning("*").Exec(ctx); err != nil {
+		return nil, fmt.Errorf("create items: %w", err)
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("commit create items: %w", err)
+	}
+
+	items, err := toItems(rows)
+	if err != nil {
+		return nil, err
+	}
+	// Indexed after the commit: a Note that fails to index is a Note that cannot be
+	// searched for, which is worth reporting and is not worth losing the Items over.
+	for _, item := range items {
+		if err := s.indexItem(ctx, item); err != nil {
+			return nil, err
+		}
+	}
+	return items, nil
+}
+
 // ItemsOnList returns a List's live Items in their manual order.
 func (s *sqlStore) ItemsOnList(ctx context.Context, listID int64) ([]Item, error) {
 	var rows []itemModel

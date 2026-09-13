@@ -247,3 +247,103 @@ func TestDatedItemsForMember(t *testing.T) {
 		})
 	}
 }
+
+/*
+Copying a List writes once, not once per Item.
+
+It used to be a CreateItem per row, and each of those read the next position, inserted,
+and committed on its own — a hundred Items meant a hundred commits, which on the kind of
+machine Nooks is meant to run on is felt rather than measured.
+*/
+func TestCreateItemsKeepsTheOrderItIsGiven(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			list, owner := newList(t, s, "Groceries", SharingPrivate)
+
+			made, err := s.CreateItems(t.Context(), []CreateItemParams{
+				{UID: "item_rye", ListID: list.ID, Label: "Rye flour", AddedByID: owner.ID, At: createdAt},
+				{UID: "item_oat", ListID: list.ID, Label: "Oat milk", AddedByID: owner.ID, At: createdAt},
+				{UID: "item_tom", ListID: list.ID, Label: "Tomatoes", AddedByID: owner.ID, At: createdAt},
+			})
+			if err != nil {
+				t.Fatalf("CreateItems: %v", err)
+			}
+			if len(made) != 3 {
+				t.Fatalf("created %d Items, want 3", len(made))
+			}
+
+			onList, err := s.ItemsOnList(t.Context(), list.ID)
+			if err != nil {
+				t.Fatalf("ItemsOnList: %v", err)
+			}
+			for i, want := range []string{"Rye flour", "Oat milk", "Tomatoes"} {
+				if onList[i].Label != want {
+					t.Errorf("item %d = %q, want %q", i, onList[i].Label, want)
+				}
+			}
+		})
+	}
+}
+
+func TestCreateItemsGoesAfterWhatIsAlreadyThere(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			list, owner := newList(t, s, "Groceries", SharingPrivate)
+			addItem(t, s, list, owner, "item_milk", "Milk")
+
+			if _, err := s.CreateItems(t.Context(), []CreateItemParams{
+				{UID: "item_bread", ListID: list.ID, Label: "Bread", AddedByID: owner.ID, At: createdAt},
+			}); err != nil {
+				t.Fatalf("CreateItems: %v", err)
+			}
+
+			onList, err := s.ItemsOnList(t.Context(), list.ID)
+			if err != nil {
+				t.Fatalf("ItemsOnList: %v", err)
+			}
+			if onList[0].Label != "Milk" || onList[1].Label != "Bread" {
+				t.Errorf("order = %q then %q, want Milk then Bread", onList[0].Label, onList[1].Label)
+			}
+		})
+	}
+}
+
+// One transaction: a batch with a bad row in it leaves the List as it was, rather than
+// half copied.
+func TestCreateItemsWritesNothingWhenOneIsUnusable(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			list, owner := newList(t, s, "Groceries", SharingPrivate)
+
+			_, err := s.CreateItems(t.Context(), []CreateItemParams{
+				{UID: "item_rye", ListID: list.ID, Label: "Rye flour", AddedByID: owner.ID, At: createdAt},
+				{UID: "item_bad", ListID: list.ID, Label: "", AddedByID: owner.ID, At: createdAt},
+			})
+			if err == nil {
+				t.Fatal("CreateItems with an empty label = nil, want an error")
+			}
+
+			onList, err := s.ItemsOnList(t.Context(), list.ID)
+			if err != nil {
+				t.Fatalf("ItemsOnList: %v", err)
+			}
+			if len(onList) != 0 {
+				t.Errorf("wrote %d Items, want none", len(onList))
+			}
+		})
+	}
+}
+
+func TestCreateItemsOfNothingIsNothing(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			if made, err := s.CreateItems(t.Context(), nil); err != nil || made != nil {
+				t.Errorf("CreateItems(nil) = %v, %v; want nil, nil", made, err)
+			}
+		})
+	}
+}

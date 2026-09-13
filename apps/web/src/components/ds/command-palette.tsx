@@ -4,6 +4,9 @@ import { useTranslation } from "react-i18next"
 import { useNavigate } from "@tanstack/react-router"
 import { SearchHitKind, type SearchHit } from "@nooks/api"
 
+import { NotePreview } from "./note-preview"
+import { previewOf } from "@/lib/editor/preview"
+
 import { cn } from "cn"
 
 import { Button } from "./button"
@@ -141,7 +144,7 @@ function SearchPanel() {
                 key={`${hit.kind}-${hit.itemUid || hit.listUid}`}
                 onSelect={() => void openList(hit.listUid)}
               >
-                <span className="truncate">{hit.text}</span>
+                <HitText hit={hit} />
                 {namesItsList(hit) && <CommandShortcut>{hit.listName}</CommandShortcut>}
               </CommandItem>
             ))}
@@ -162,6 +165,24 @@ function matches(name: string, query: string): boolean {
 }
 
 /** namesItsList reports whether a hit needs to say which List it came from. */
+/*
+HitText draws a result the way the thing it found is drawn.
+
+A Note is indexed as the markdown it is stored as, so a hit inside one arrives here as
+source text — which is how "- [ ] sample content" ended up in the results. A List or an
+Item is a plain label and has nothing to render.
+*/
+interface HitTextProps {
+  hit: SearchHit
+}
+
+function HitText({ hit }: HitTextProps) {
+  if (hit.kind !== SearchHitKind.NOTE) {
+    return <span className="truncate">{hit.text}</span>
+  }
+  return <NotePreview runs={previewOf(hit.text).runs} />
+}
+
 function namesItsList(hit: SearchHit): boolean {
   return hit.kind !== SearchHitKind.LIST
 }

@@ -105,7 +105,10 @@ describe("the list row", () => {
     render(
       <ListRow
         label="Coffee"
-        note={{ firstLine: "Saturday market, second row.", remainingLines: 3 }}
+        note={{
+          runs: [{ text: "Saturday market, second row.", marks: [] }],
+          remainingLines: 3,
+        }}
         moreLinesLabel={(count) => `+${count} lines`}
         labels={labels}
       />,

@@ -23,33 +23,48 @@ type Preview struct {
 // Empty reports whether there is no Note at all.
 func (p Preview) Empty() bool { return p.FirstLine == "" && p.RemainingLines == 0 }
 
-// PreviewOf reads a Note's first line and counts the rest.
+/*
+PreviewOf reads a Note's first line and counts the rest.
+
+A line is counted once its shorthand is off, not before. An empty checklist item is a
+real line in the document and says nothing at all — shown in a row it reads as "[ ]",
+which is the Member's own syntax handed back to them with no words attached.
+*/
 func PreviewOf(markdown string) Preview {
-	lines := meaningfulLines(markdown)
+	lines := saidLines(markdown)
 	if len(lines) == 0 {
 		return Preview{}
 	}
 	return Preview{
-		FirstLine:      stripMarker(lines[0]),
+		FirstLine:      lines[0],
 		RemainingLines: len(lines) - 1,
 	}
 }
 
-// markers are the shorthands a line can begin with, longest first so that "- [ ] " is
-// matched before "- ".
+/*
+markers are the shorthands a line can begin with, longest first.
+
+The tickable ones come in two lengths. An item with words after it is written "- [ ] milk";
+an empty one is written "- [ ]" and the trailing space is gone by the time this sees it.
+Without the shorter form the line falls through to the plain bullet and is stripped to
+"[ ]", which is how an empty checkbox ended up in a row.
+*/
 var markers = []string{
 	"- [ ] ", "- [x] ", "- [X] ",
+	"- [ ]", "- [x]", "- [X]",
 	"###### ", "##### ", "#### ", "### ", "## ", "# ",
 	"> ", "- ", "* ",
 }
 
-// meaningfulLines is every line with something on it.
-func meaningfulLines(markdown string) []string {
+// saidLines is every line that says something, with its shorthand already off.
+//
+// Stripping before filtering is what makes an empty checklist item disappear: it has a
+// marker and nothing else, so once the marker is off there is no line left.
+func saidLines(markdown string) []string {
 	var lines []string
 	for _, line := range strings.Split(markdown, "\n") {
-		trimmed := strings.TrimSpace(line)
-		if trimmed != "" {
-			lines = append(lines, trimmed)
+		if said := stripMarker(strings.TrimSpace(line)); said != "" {
+			lines = append(lines, said)
 		}
 	}
 	return lines

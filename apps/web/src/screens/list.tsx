@@ -12,7 +12,7 @@ import { ListActions } from "@/components/ds/list-actions"
 import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
-import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
+import { ListRow, type ListRowLabels, type ListRowNote } from "@/components/ds/list-row"
 import { PrintSheet } from "@/components/ds/print-sheet"
 import { lazyNamed } from "@/components/ds/lazy"
 import type { NoteSheetProps } from "@/components/ds/note-sheet"
@@ -20,6 +20,7 @@ import { listClient } from "@/lib/api"
 import { listQuery } from "@/lib/list-queries"
 import { refreshLists } from "@/lib/refresh"
 import { useAddItem, useSetDone } from "@/lib/use-item-changes"
+import { previewOf } from "@/lib/editor/preview"
 import { isProvisional } from "@/lib/queued-changes"
 import { useQueuedChanges } from "@/lib/use-queued-changes"
 import { useRenameItem } from "@/lib/use-rename-item"
@@ -58,6 +59,20 @@ const NoteSheet = lazyNamed<NoteSheetProps>(
   () => import("@/components/ds/note-sheet"),
   "NoteSheet",
 )
+
+/*
+noteOf is what a row shows of an Item's Note.
+
+Read from the Note itself rather than from the two fields the Instance derives beside
+it: those are produced by taking the shorthand off the front of the markdown, which
+guesses, and guessed wrong often enough to put "[ ]" on a row. This goes through the
+same parser the editor renders from, so a row and the Note it belongs to cannot
+disagree about what the Note says.
+*/
+function noteOf(markdown: string): ListRowNote {
+  const preview = previewOf(markdown)
+  return { runs: preview.runs, remainingLines: preview.remaining }
+}
 
 export function ListScreen() {
   const { listUid } = route.useParams()
@@ -243,7 +258,7 @@ export function ListScreen() {
                   dueLabel={due.label(item.dueOn)}
                   overdue={isOverdue(item.dueOn, from)}
                   justTicked={justTickedByAnother(item)}
-                  note={{ firstLine: item.noteFirstLine, remainingLines: item.noteRemainingLines }}
+                  note={noteOf(item.note)}
                   moreLinesLabel={(count) => t("note.moreLines", { count })}
                   onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
                   onOpen={() => setOpenItemUid(item.uid)}

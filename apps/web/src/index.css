@@ -249,7 +249,6 @@
 .nooks-note ul[data-type="taskList"] li {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
   padding: 3px 0;
 }
 
@@ -257,6 +256,10 @@
   flex: none;
   display: flex;
   align-items: center;
+  /* DESIGN.md §10: a 15px box in a 26px gutter. Written as a gutter rather than as a
+     box plus a gap, because the gutter is the thing the design names and the gap was
+     one pixel short of it. */
+  width: 26px;
   /* Exactly one line of the text beside it, so the box centres on that first line
      whatever the type is set to. The nudge this replaces was a fixed 4px, which is
      right at one font size and wrong at every other — and wrong is what it looked. */
@@ -266,6 +269,18 @@
 .nooks-note ul[data-type="taskList"] li > div {
   flex: 1;
   min-width: 0;
+}
+
+/*
+ * A checklist row is not a paragraph, whatever it is made of.
+ *
+ * ProseMirror puts a <p> inside each item, so the paragraph rule above lands on it and
+ * pads it 5px — which pushes the words down while the box stays where it was, and makes
+ * every checklist look a little broken. DESIGN.md gives the row its own padding of
+ * 3px 0, and the row is what owns it.
+ */
+.nooks-note ul[data-type="taskList"] li > div > p {
+  padding: 0;
 }
 
 .nooks-note input[type="checkbox"] {

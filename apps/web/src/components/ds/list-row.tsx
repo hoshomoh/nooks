@@ -1,13 +1,21 @@
 import type { ReactNode } from "react"
 import { cn } from "cn"
 
+import { NotePreview } from "./note-preview"
+import type { PreviewRun } from "@/lib/editor/preview"
+
 import { Checkbox } from "./checkbox"
 import { COVERING, INERT, RAISED } from "./covering"
 import { EditableTitle } from "./editable-title"
 
 export type ListRowNote = {
-  /** The Note's own first line — never a summary. */
-  firstLine: string
+  /**
+   * The Note's own first block, as the runs it is made of — never a summary.
+   *
+   * Runs rather than a string, because the line is drawn the way the Note draws it:
+   * bold reads as bold instead of as a pair of asterisks the Member never typed.
+   */
+  runs: PreviewRun[]
   /** How many further lines it has, for the "+N lines" after it. */
   remainingLines: number
 }
@@ -202,13 +210,11 @@ export function ListRow({
       </div>
 
       {/* The row shows the Note's own first line, truncated, and how much is left. */}
-      {note && note.firstLine && (
+      {note && note.runs.length > 0 && (
         <div className="-mt-0.5 grid grid-cols-[20px_1fr] gap-3.5 px-2 pb-2 -mx-2">
           <span />
           <span className="flex min-w-0 items-baseline gap-2 border-l-2 border-border pl-2.5">
-            <span className="truncate text-meta text-secondary-foreground">
-              {note.firstLine}
-            </span>
+            <NotePreview runs={note.runs} className="text-meta text-secondary-foreground" />
             {note.remainingLines > 0 && moreLinesLabel && (
               <span className="shrink-0 text-micro text-muted-foreground">
                 {moreLinesLabel(note.remainingLines)}

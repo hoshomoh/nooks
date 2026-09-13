@@ -35,11 +35,32 @@ const MARKERS: ReadonlyArray<{ prefix: string; kind: BlockKind }> = [
   { prefix: "> ", kind: "quote" },
 ]
 
+/**
+ * BARE is a checklist marker with nothing after it.
+ *
+ * The marker is written with a trailing space, so an item whose words are deleted is
+ * "- [ ] " and still reads as one. Anything that trims trailing whitespace on the way
+ * past — a store, a script writing markdown by hand — leaves "- [ ]", which then reads
+ * as an ordinary line and shows the Member the box they typed as text.
+ */
+const BARE: ReadonlyArray<{ line: string; kind: BlockKind }> = [
+  { line: "- [ ]", kind: "todo" },
+  { line: "- [x]", kind: "todo-done" },
+  { line: "- [X]", kind: "todo-done" },
+]
+
 /** markerOf reads the shorthand at the start of a line. */
 export function markerOf(line: string): LineMarker {
   for (const { prefix, kind } of MARKERS) {
     if (line.startsWith(prefix)) {
       return { kind, length: prefix.length }
+    }
+  }
+  // Only when it is the whole line: "- [ ]x" is not an empty checklist item, it is a
+  // line somebody typed that happens to start the same way.
+  for (const { line: bare, kind } of BARE) {
+    if (line.trimEnd() === bare) {
+      return { kind, length: line.length }
     }
   }
   // A fence opens and closes a code block; the line itself carries no text.

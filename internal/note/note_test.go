@@ -1,6 +1,9 @@
 package note
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestPreviewOfAnEmptyNote(t *testing.T) {
 	for _, markdown := range []string{"", "   ", "\n\n\n"} {
@@ -63,5 +66,58 @@ func TestPreviewLeavesTextAlone(t *testing.T) {
 func TestPreviewPrefersTheLongerMarker(t *testing.T) {
 	if got := PreviewOf("- [ ] Whole bean").FirstLine; got != "Whole bean" {
 		t.Errorf("FirstLine = %q, want the checklist marker stripped whole", got)
+	}
+}
+
+/*
+An empty checklist item says nothing, so a row shows nothing of it.
+
+Reported from a real Note: a ticked-off list with one blank item on it showed "[ ]" on
+the row. The line has a marker and no words, and the marker for an empty item has no
+trailing space — so it missed the checklist shorthand, matched the plain bullet, and
+what was left was the syntax with the words removed.
+*/
+func TestAnEmptyChecklistItemIsNotAPreview(t *testing.T) {
+	for _, markdown := range []string{
+		"- [ ]",
+		"- [ ] ",
+		"- [x]",
+		"- [ ]\n- [ ] tomatoes",
+		"- [ ]\n\n- [x] tomatoes",
+	} {
+		got := PreviewOf(markdown)
+		if strings.Contains(got.FirstLine, "[") {
+			t.Errorf("PreviewOf(%q).FirstLine = %q, want no leftover shorthand", markdown, got.FirstLine)
+		}
+	}
+}
+
+func TestAnEmptyChecklistItemIsNotCounted(t *testing.T) {
+	// "+1 line" against a line with nothing on it is a count of the Member's blank rows.
+	got := PreviewOf("- [ ] tomatoes\n- [ ]\n- [ ]")
+
+	if got.FirstLine != "tomatoes" {
+		t.Errorf("FirstLine = %q, want tomatoes", got.FirstLine)
+	}
+	if got.RemainingLines != 0 {
+		t.Errorf("RemainingLines = %d, want 0", got.RemainingLines)
+	}
+}
+
+func TestAChecklistWithWordsStillReads(t *testing.T) {
+	got := PreviewOf("- [ ] tomatoes\n- [x] milk")
+
+	if got.FirstLine != "tomatoes" {
+		t.Errorf("FirstLine = %q, want tomatoes", got.FirstLine)
+	}
+	if got.RemainingLines != 1 {
+		t.Errorf("RemainingLines = %d, want 1", got.RemainingLines)
+	}
+}
+
+// A Note of nothing but empty items is a Note with nothing to preview.
+func TestAChecklistOfBlanksPreviewsAsEmpty(t *testing.T) {
+	if got := PreviewOf("- [ ]\n- [ ]\n- [x]"); !got.Empty() {
+		t.Errorf("PreviewOf(blanks) = %+v, want empty", got)
 	}
 }

@@ -1,5 +1,6 @@
 {
   "title": "Running an instance",
+  "defaultOpen": true,
   "pages": [
     "people",
     "groups",

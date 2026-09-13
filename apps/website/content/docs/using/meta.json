@@ -1,5 +1,6 @@
 {
   "title": "Using Nooks",
+  "defaultOpen": true,
   "pages": [
     "lists",
     "adding",

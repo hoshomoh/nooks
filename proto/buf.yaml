@@ -7,5 +7,13 @@ lint:
   use:
     - STANDARD
 breaking:
+  # WIRE_JSON rather than FILE: what Nooks promises is the wire and the JSON, which is
+  # what a script, a shortcut or somebody else's client is built against. The generated
+  # Go and TypeScript are compiled in this repository, so a source-level break is caught
+  # by the build rather than needing a category of its own.
+  #
+  # The difference that matters: FILE refuses to delete a field at all, while WIRE_JSON
+  # refuses unless its number and name are reserved. Reserving is the mechanism protobuf
+  # gives for exactly this, and the check still fails on a deletion that skips it.
   use:
-    - FILE
+    - WIRE_JSON

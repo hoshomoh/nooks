@@ -250,11 +250,6 @@ type Item struct {
 	DoneByUid string `protobuf:"bytes,12,opt,name=done_by_uid,json=doneByUid,proto3" json:"done_by_uid,omitempty"`
 	// The Note attached to the Item, as markdown. Empty when there is none.
 	Note string `protobuf:"bytes,8,opt,name=note,proto3" json:"note,omitempty"`
-	// The Note's own first line, for the row. Nooks never summarises a Member, so this
-	// is what they wrote rather than anything generated.
-	NoteFirstLine string `protobuf:"bytes,9,opt,name=note_first_line,json=noteFirstLine,proto3" json:"note_first_line,omitempty"`
-	// How many further lines the Note has, for the "+N lines" after the first.
-	NoteRemainingLines int32 `protobuf:"varint,10,opt,name=note_remaining_lines,json=noteRemainingLines,proto3" json:"note_remaining_lines,omitempty"`
 	// The Access token it came through, by name, or empty when a browser added it. The
 	// Member in added_by_name is still the one who did it: a token is somebody's access
 	// narrowed, never an identity of its own.
@@ -361,20 +356,6 @@ func (x *Item) GetNote() string {
 		return x.Note
 	}
 	return ""
-}
-
-func (x *Item) GetNoteFirstLine() string {
-	if x != nil {
-		return x.NoteFirstLine
-	}
-	return ""
-}
-
-func (x *Item) GetNoteRemainingLines() int32 {
-	if x != nil {
-		return x.NoteRemainingLines
-	}
-	return 0
 }
 
 func (x *Item) GetAddedViaToken() string {
@@ -2086,7 +2067,7 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\bis_owner\x18\x05 \x01(\bR\aisOwner\x12\x1b\n" +
 	"\tis_pinned\x18\x06 \x01(\bR\bisPinned\x12\x1d\n" +
 	"\n" +
-	"open_count\x18\a \x01(\x05R\topenCount\"\x8a\x03\n" +
+	"open_count\x18\a \x01(\x05R\topenCount\"\xe3\x02\n" +
 	"\x04Item\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x14\n" +
 	"\x05label\x18\x02 \x01(\tR\x05label\x12\x1a\n" +
@@ -2099,10 +2080,9 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\adone_at\x18\v \x01(\tR\x06doneAt\x12\x1e\n" +
 	"\vdone_by_uid\x18\f \x01(\tR\tdoneByUid\x12\x12\n" +
 	"\x04note\x18\b \x01(\tR\x04note\x12&\n" +
-	"\x0fnote_first_line\x18\t \x01(\tR\rnoteFirstLine\x120\n" +
-	"\x14note_remaining_lines\x18\n" +
-	" \x01(\x05R\x12noteRemainingLines\x12&\n" +
-	"\x0fadded_via_token\x18\r \x01(\tR\raddedViaToken\"\x12\n" +
+	"\x0fadded_via_token\x18\r \x01(\tR\raddedViaTokenJ\x04\b\t\x10\n" +
+	"J\x04\b\n" +
+	"\x10\vR\x0fnote_first_lineR\x14note_remaining_lines\"\x12\n" +
 	"\x10ListListsRequest\"=\n" +
 	"\x11ListListsResponse\x12(\n" +
 	"\x05lists\x18\x01 \x03(\v2\x12.nooks.api.v1.ListR\x05lists\"+\n" +

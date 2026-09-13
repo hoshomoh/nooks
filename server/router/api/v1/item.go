@@ -7,7 +7,6 @@ import (
 
 	"connectrpc.com/connect"
 
-	"github.com/hoshomoh/nooks/internal/note"
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/store"
 )
@@ -325,20 +324,17 @@ func (s *ListService) nameToken(ctx context.Context, into map[int64]string, id i
 
 // itemToProto converts an Item for the wire.
 func itemToProto(item store.Item, names rowNames) *apiv1.Item {
-	preview := note.PreviewOf(item.Note)
 	out := &apiv1.Item{
-		Uid:                item.UID,
-		Label:              item.Label,
-		Quantity:           item.Quantity,
-		DueOn:              item.DueOn,
-		Done:               item.Done(),
-		AddedByName:        names.nameOf(item.AddedByID).Name,
-		AddedViaToken:      names.tokens[item.AddedByTokenID],
-		DoneByName:         names.nameOf(item.DoneByID).Name,
-		DoneByUid:          names.nameOf(item.DoneByID).UID,
-		Note:               item.Note,
-		NoteFirstLine:      preview.FirstLine,
-		NoteRemainingLines: int32(preview.RemainingLines),
+		Uid:           item.UID,
+		Label:         item.Label,
+		Quantity:      item.Quantity,
+		DueOn:         item.DueOn,
+		Done:          item.Done(),
+		AddedByName:   names.nameOf(item.AddedByID).Name,
+		AddedViaToken: names.tokens[item.AddedByTokenID],
+		DoneByName:    names.nameOf(item.DoneByID).Name,
+		DoneByUid:     names.nameOf(item.DoneByID).UID,
+		Note:          item.Note,
 	}
 	if !item.DoneAt.IsZero() {
 		out.DoneAt = item.DoneAt.Format(time.RFC3339)

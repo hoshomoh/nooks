@@ -19,8 +19,6 @@ const milk = {
   done: false,
   addedByName: "Anna",
   note: "",
-  noteFirstLine: "",
-  noteRemainingLines: 0,
 } as Item
 
 /** show renders the sheet, returning what it was asked to do. */

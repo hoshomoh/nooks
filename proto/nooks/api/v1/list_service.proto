@@ -187,12 +187,16 @@ message Item {
   // The Note attached to the Item, as markdown. Empty when there is none.
   string note = 8;
 
-  // The Note's own first line, for the row. Nooks never summarises a Member, so this
-  // is what they wrote rather than anything generated.
-  string note_first_line = 9;
-
-  // How many further lines the Note has, for the "+N lines" after the first.
-  int32 note_remaining_lines = 10;
+  // 9 and 10 held note_first_line and note_remaining_lines: the Note's first line and a
+  // count of the rest, worked out by taking the markdown shorthand off the front of it.
+  // That guesses, and guessed wrong — an empty checklist item reached a row as "[ ]".
+  // A client has the Note itself and can read it with the same parser that renders it,
+  // so there is nothing here worth deriving.
+  //
+  // Reserved rather than freed: a number reused for something else is read by an older
+  // client as whatever used to be there.
+  reserved 9, 10;
+  reserved "note_first_line", "note_remaining_lines";
 
   // The Access token it came through, by name, or empty when a browser added it. The
   // Member in added_by_name is still the one who did it: a token is somebody's access

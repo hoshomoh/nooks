@@ -1644,15 +1644,6 @@ components:
                 note:
                     type: string
                     description: The Note attached to the Item, as markdown. Empty when there is none.
-                noteFirstLine:
-                    type: string
-                    description: |-
-                        The Note's own first line, for the row. Nooks never summarises a Member, so this
-                         is what they wrote rather than anything generated.
-                noteRemainingLines:
-                    type: integer
-                    description: How many further lines the Note has, for the "+N lines" after the first.
-                    format: int32
                 addedViaToken:
                     type: string
                     description: |-

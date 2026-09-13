@@ -111,8 +111,6 @@ export function provisionalItem(fields: Pick<Item, "label" | "quantity" | "dueOn
     doneAt: "",
     doneByUid: "",
     note: "",
-    noteFirstLine: "",
-    noteRemainingLines: 0,
     addedViaToken: "",
   }
 }

@@ -595,7 +595,15 @@ func TestANoteIsStoredAndReturnedAsWritten(t *testing.T) {
 }
 
 // The row shows the Note's own first line and a count of the rest — never a summary.
-func TestANoteGivesTheRowItsPreview(t *testing.T) {
+/*
+The Note reaches a client whole, so the client can show what it says.
+
+There used to be a first line and a line count here, worked out by taking the shorthand
+off the front of the markdown. That guessed: an empty checklist item arrived as "[ ]".
+What is sent now is the Note, and a client reads it with the same parser that renders
+it — see previewOf in the web app.
+*/
+func TestANoteIsSentWhole(t *testing.T) {
 	f := newListFixture(t)
 	uid := f.createList(t, f.anna, "Groceries")
 	ctx := f.as(t, f.anna)
@@ -615,12 +623,10 @@ func TestANoteGivesTheRowItsPreview(t *testing.T) {
 		t.Fatalf("UpdateItem: %v", err)
 	}
 
-	item := updated.Msg.GetItem()
-	if item.GetNoteFirstLine() != "Where" {
-		t.Errorf("NoteFirstLine = %q, want the heading with its marker stripped", item.GetNoteFirstLine())
-	}
-	if item.GetNoteRemainingLines() != 2 {
-		t.Errorf("NoteRemainingLines = %d, want 2", item.GetNoteRemainingLines())
+	// Byte for byte, markers and all. Anything less is the Instance deciding what a
+	// Member meant.
+	if got := updated.Msg.GetItem().GetNote(); got != markdown {
+		t.Errorf("Note = %q, want it unchanged", got)
 	}
 }
 

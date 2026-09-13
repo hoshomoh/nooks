@@ -94,6 +94,14 @@
   --text-micro: 12.5px; /* breadcrumbs, attribution, counts */
   --text-micro--line-height: 1.5;
 
+  --text-badge: 11.5px; /* quantity badges, sidebar counts — the same size as a head
+                           without a head's weight or tracking, which is why it is its
+                           own step rather than a use of --text-label.
+                           Not named "chip": --chip is already a colour, and a name that
+                           is both makes `text-chip` one class with two meanings — the
+                           colour wins and the size silently does nothing. */
+  --text-badge--line-height: 1.4;
+
   --text-label: 11.5px; /* uppercase section and column heads */
   --text-label--line-height: 1.4;
   --text-label--font-weight: 600;
@@ -228,6 +236,7 @@
   --color-shared-line: var(--shared-line);
   --color-done: var(--done);
   --color-done-bg: var(--done-bg);
+  --color-done-strike: var(--done-strike);
   --color-offline: var(--offline);
   --color-offline-bg: var(--offline-bg);
   --color-offline-line: var(--offline-line);
@@ -287,6 +296,12 @@
   --shared-bg: oklch(0.9708 0.0086 247.91); /* #F1F6FB */
   --shared-line: oklch(0.8811 0.0309 249.71); /* #C9DAEC */
   --done: oklch(0.5314 0.0946 161.86); /* #2E7D5B */
+  /* The line through a ticked Item. DESIGN.md §225 gives #C4C4BE, which sits about two
+     thirds of the way from the done label toward the paper — subtler than the words it
+     crosses, which is the whole job. The dark value is the same position measured
+     against the dark ground, not the same colour: kept literally it would come out
+     lighter than the text and shout over what it is meant to quieten. */
+  --done-strike: oklch(0.8186 0.0083 106.58); /* #C4C4BE */
   --done-bg: oklch(0.975 0.0068 145.52); /* #F4F8F4 */
   --offline: oklch(0.5629 0.1115 76.44); /* #9A6B14 */
   --offline-bg: oklch(0.9735 0.018 89.36); /* #FBF6E9 */
@@ -343,6 +358,7 @@
   --shared-bg: oklch(0.2454 0.0177 255.69); /* #1B2129 */
   --shared-line: oklch(0.3878 0.0448 252.57); /* #33465C */
   --done: oklch(0.6776 0.0882 165.01); /* #5FA98A */
+  --done-strike: oklch(0.3789 0.0083 106.58);
   --done-bg: oklch(0.2472 0.0193 167.23); /* #18241F */
   --offline: oklch(0.76 0.1343 84.13); /* #D9A93C */
   --offline-bg: oklch(0.2621 0.0301 90.72); /* #2A2413 */

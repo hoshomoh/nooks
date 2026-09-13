@@ -143,10 +143,10 @@ That is why the 15px step is `field` and the 13.5px step is `meta`.
 | Chrome | `text-chrome` | 14 / 500 | Sidebar items, buttons, field labels |
 | Meta | `text-meta` | 13.5 / 400 | Explanations, sidebar rows, hints |
 | Small | `text-small` | 13 / 400 | Table cells, meta values |
-| Micro | `text-micro` | 12.5 / 400 | Breadcrumbs, attribution, counts |
+| Micro | `text-micro` | 12.5 / 400 | Breadcrumbs, attribution |
 | Section head | `text-label` | 11.5 / 600 / 0.08em / uppercase | Page section labels |
 | Column head | `text-label` | 11.5 / 600 / 0.04em / uppercase | Table columns |
-| Mono badge | `font-mono text-label` | 11.5 | Quantities |
+| Mono badge | `font-mono text-badge` | 11.5 / 400 | Quantities, sidebar counts |
 | Mono keycap | `font-mono text-keycap` | 10.5 | ⌘K, ↵ |
 | Mono secret | `font-mono text-meta` | 13.5 / break-all | Access tokens |
 

@@ -156,12 +156,12 @@ export function ListRow({
             onOpen={onOpen}
             className={cn(
               "min-w-0 truncate text-body",
-              done && "text-muted-foreground line-through decoration-[#C4C4BE]",
+              done && "text-muted-foreground line-through decoration-done-strike",
             )}
           />
 
           {quantity && (
-            <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[11.5px] text-muted-foreground">
+            <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-badge text-muted-foreground">
               {quantity}
             </span>
           )}

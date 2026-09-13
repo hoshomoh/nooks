@@ -23,6 +23,7 @@ export const NOOKS_COLORS = [
   "shared-bg",
   "shared-line",
   "done",
+  "done-strike",
   "done-bg",
   "offline",
   "offline-bg",
@@ -53,6 +54,7 @@ export const NOOKS_TEXT_SIZES = [
   "meta",
   "small",
   "micro",
+  "badge",
   "label",
   "keycap",
 ]

@@ -176,7 +176,7 @@ function ViewLink({ to, label, count, active, accent }: ViewLinkProps) {
     >
       {label}
       {count !== undefined && count > 0 && (
-        <span className={accent ? "ml-auto text-[11.5px] text-shared" : "ml-auto text-[11.5px] text-muted-foreground"}>
+        <span className={accent ? "ml-auto text-badge text-shared" : "ml-auto text-badge text-muted-foreground"}>
           {count}
         </span>
       )}
@@ -200,7 +200,7 @@ function ListGroup({ label, lists, activeListUid, instanceName }: ListGroupProps
 
   return (
     <div className="flex flex-col gap-0.5">
-      <div className="flex h-6.5 items-center px-2 text-[11.5px] font-semibold tracking-[0.03em] text-muted-foreground">
+      <div className="flex h-6.5 items-center px-2 text-badge font-semibold tracking-[0.03em] text-muted-foreground">
         {label}
       </div>
       {lists.map((list) => (
@@ -226,7 +226,7 @@ function ListGroup({ label, lists, activeListUid, instanceName }: ListGroupProps
           <span className={cn(INERT, "truncate text-chrome")}>{list.name}</span>
 
           {list.openCount > 0 && (
-            <span className={cn(INERT, "ml-auto text-[11.5px] text-muted-foreground")}>
+            <span className={cn(INERT, "ml-auto text-badge text-muted-foreground")}>
               {list.openCount}
             </span>
           )}

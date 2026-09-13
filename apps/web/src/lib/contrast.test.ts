@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { describe, expect, it } from "vitest"
 
-import { contrastRatio, parseOklch, toRgb, type Rgb } from "./contrast"
+import { contrastRatio, luminance, parseOklch, toRgb, type Rgb } from "./contrast"
 
 /*
 Whether the palette can be read.
@@ -54,6 +54,16 @@ function colour(theme: keyof typeof THEMES, token: string): Rgb {
   return toRgb(parsed)
 }
 
+/** lightnessOf is a token's OKLCH lightness, which is what the palette is picked in. */
+function lightnessOf(theme: keyof typeof THEMES, token: string): number {
+  const found = new RegExp(`--${token}:\\s*([^;]+);`).exec(THEMES[theme])
+  const parsed = found?.[1] ? parseOklch(found[1]) : null
+  if (!parsed) {
+    throw new Error(`no --${token} in the ${theme} palette`)
+  }
+  return parsed.l
+}
+
 /** Text, the ground it is read on, and what it has to clear. */
 const PAIRS: [ink: string, ground: string, floor: number][] = [
   ["foreground", "background", BODY],
@@ -80,6 +90,41 @@ describe("the palette, measured the way it is read", () => {
           expect(Number(ratio.toFixed(2))).toBeGreaterThanOrEqual(floor)
         })
       }
+    })
+  }
+})
+
+/*
+The strike through a ticked Item has to be quieter than the Item.
+
+DESIGN.md §225 gives one value, for the light palette. Kept literally in the dark one it
+would come out lighter than the label it crosses and shout over what it is there to
+quieten — so what is held here is the relationship rather than the number.
+*/
+describe("the line through a done item", () => {
+  for (const theme of ["light", "dark"] as const) {
+    it(`is between the label and the paper in ${theme}`, () => {
+      const label = luminance(colour(theme, "muted-foreground"))
+      const strike = luminance(colour(theme, "done-strike"))
+      const paper = luminance(colour(theme, "background"))
+
+      const [near, far] = label < paper ? [label, paper] : [paper, label]
+      expect(strike).toBeGreaterThan(near)
+      expect(strike).toBeLessThan(far)
+    })
+
+    it(`is closer to the paper than to the label in ${theme}`, () => {
+      // Subtler than the words, not merely different from them.
+      //
+      // Measured in OKLCH lightness rather than in luminance, because that is the space
+      // the palette is chosen in and the two do not agree: relative luminance is heavily
+      // non-linear, and by that measure the design's own light value comes out nearer
+      // the label than the paper while plainly reading as the fainter of the two.
+      const label = lightnessOf(theme, "muted-foreground")
+      const strike = lightnessOf(theme, "done-strike")
+      const paper = lightnessOf(theme, "background")
+
+      expect(Math.abs(strike - paper)).toBeLessThan(Math.abs(strike - label))
     })
   }
 })

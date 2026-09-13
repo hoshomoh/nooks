@@ -16,6 +16,28 @@ both are set.
 | `--secure-cookies` | `NOOKS_SECURE_COOKIES` | off | Marks session cookies `Secure`. Turn it on behind TLS |
 | `--log-level` | `NOOKS_LOG_LEVEL` | `info` | `debug`, `info`, `warn` or `error` |
 
+## Changing the port
+
+`--addr` is host and port together, so the port lives there rather than in a flag of its
+own:
+
+```bash
+./nooks --addr :9090
+```
+
+Give it a host to stop it listening on every interface, which is worth doing when
+something else is already handling the outside world:
+
+```bash
+./nooks --addr 127.0.0.1:9090
+```
+
+In Docker the container keeps 8081 and the host side of `-p` is what you change:
+
+```bash
+docker run -d -p 9090:8081 -v nooks-data:/var/lib/nooks ghcr.io/hoshomoh/nooks
+```
+
 ## Postgres instead of SQLite
 
 A flag, not a rewrite. The same schema runs on both, and the same binary serves either.

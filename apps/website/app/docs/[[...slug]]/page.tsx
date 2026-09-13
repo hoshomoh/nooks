@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import defaultMdxComponents from "fumadocs-ui/mdx"
 import { Callout } from "fumadocs-ui/components/callout"
 import { Card, Cards } from "fumadocs-ui/components/card"
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/page"
@@ -30,6 +31,10 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
             through this component; the hand-written pages never reach for it. */}
         <MDX
           components={{
+            // Fumadocs' own first, then ours. Passing only ours replaces the whole set,
+            // which quietly costs every code fence its copy button and its title bar —
+            // the components a reader actually uses on a page full of commands.
+            ...defaultMdxComponents,
             // The docs landing is a grid of cards rather than a list of links, so the
             // two components it needs are in scope for every page that wants them.
             Callout,

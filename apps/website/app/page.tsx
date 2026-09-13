@@ -39,7 +39,7 @@ const FAQS = [
   },
   {
     q: "What happens when the connection drops?",
-    a: "The app says so, keeps showing what it last read, and tells you when it last had contact. Queuing changes made while offline is the piece being built now.",
+    a: "The app says so, keeps showing what it last read, and tells you when it last had contact. Ticking and adding still work; what you change is marked as unsent and goes when the connection comes back.",
   },
   {
     q: "Where does my data live?",

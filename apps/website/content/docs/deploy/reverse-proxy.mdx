@@ -39,5 +39,5 @@ nooks.example {
 ## Tell Nooks it is behind TLS
 
 Session cookies are marked `Secure` when the instance knows it is served over HTTPS.
-Pass `X-Forwarded-Proto` so it can tell — without it the cookie is issued for a scheme
+Pass `X-Forwarded-Proto` so it can tell. Without it the cookie is issued for a scheme
 the browser is not using, and signing in appears to do nothing.

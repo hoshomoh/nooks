@@ -5,11 +5,10 @@ export const metadata: Metadata = {
   description: "Everything Nooks does today, grouped by what it is for.",
 }
 
-/** One thing Nooks does. `building` marks what is in flight rather than shipped. */
+/** One thing Nooks does. Everything on this page is shipped; nothing here is a plan. */
 interface Feature {
   name: string
   text: string
-  building?: boolean
 }
 
 interface FeatureGroup {
@@ -23,9 +22,9 @@ interface FeatureGroup {
 /*
  * What is on this page is what runs.
  *
- * Nothing here is a plan. The one exception carries a badge saying so, because a
- * features page that quietly lists intentions is the thing a self-hoster finds out
- * about after they have moved their household onto it.
+ * Nothing here is a plan. A features page that quietly lists intentions is the thing a
+ * self-hoster finds out about after they have moved their household onto it, so when
+ * something is in flight it stays off this page until it ships.
  */
 const GROUPS: FeatureGroup[] = [
   {
@@ -55,9 +54,8 @@ const GROUPS: FeatureGroup[] = [
         text: "Everything reachable from the keyboard, including jumping to a list by name.",
       },
       {
-        name: "Offline queue",
-        text: "Adds and ticks made with no signal land when it returns.",
-        building: true,
+        name: "Works with no signal",
+        text: "Reading, ticking and adding all work offline. What you change is shown, marked as unsent, and goes when the connection comes back — including after closing the tab.",
       },
     ],
   },
@@ -199,14 +197,7 @@ export default function Features() {
           <div className="grid gap-x-10 gap-y-8 pt-8 sm:grid-cols-2">
             {group.items.map((item) => (
               <div key={item.name} className="flex flex-col gap-1.5">
-                <h3 className="flex items-center gap-2 text-note-heading">
-                  {item.name}
-                  {item.building && (
-                    <span className="rounded border border-offline-line bg-offline-bg px-1.5 py-0.5 text-micro font-normal text-offline-text">
-                      being built
-                    </span>
-                  )}
-                </h3>
+                <h3 className="text-note-heading">{item.name}</h3>
                 <p className="text-field text-secondary-foreground">{item.text}</p>
               </div>
             ))}

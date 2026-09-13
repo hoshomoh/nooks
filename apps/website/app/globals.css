@@ -74,3 +74,15 @@
 :root {
   --fd-nav-height: 3.5rem;
 }
+
+/*
+ * The docs sit in the same column as everything else.
+ *
+ * Fumadocs lays out to 1400px and the site's header and footer rule at 1240, so the
+ * docs ran wider than the bar above them — the tree starting outside the mark, the
+ * page ending past the footer. One width, set here, rather than a docs section that
+ * happens to be a different site.
+ */
+:root {
+  --fd-layout-width: var(--container-site);
+}

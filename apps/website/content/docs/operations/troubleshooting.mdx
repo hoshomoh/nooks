@@ -7,7 +7,7 @@ description: The failures that actually come up, and what each one really is.
 
 Almost always a reverse proxy buffering the event stream. Nooks pushes changes over
 server-sent events on one long-lived connection, and a proxy that buffers responses
-holds every event until the connection closes — which looks exactly like live updates
+holds every event until the connection closes, which looks exactly like live updates
 being broken rather than delayed.
 
 The headers that fix it are on [the reverse proxy page](/docs/deploy/reverse-proxy).
@@ -22,13 +22,13 @@ Something else has the port. Move Nooks:
 ./nooks --addr :9090
 ```
 
-Or find what is holding it — `ss -lptn 'sport = :8081'` on Linux.
+Or find what is holding it with `ss -lptn 'sport = :8081'` on Linux.
 
 ## Signing in says the instance needs setting up
 
 The instance cannot find its database. Usually `--data` is pointing somewhere new: a
 relative path resolves against the working directory, so starting Nooks from a different
-folder finds a different — empty — instance.
+folder finds a different, empty instance.
 
 Give it an absolute path in whatever starts it.
 
@@ -46,7 +46,7 @@ postgres://nooks:...@localhost:5432/nooks?sslmode=disable&pool_max_conns=4
 ## A token gets 404 for a list that exists
 
 Working as intended. A list a token was not scoped to is invisible rather than
-forbidden, so it answers "no such list" — saying "forbidden" would tell the holder the
+forbidden, so it answers "no such list". Saying "forbidden" would tell the holder the
 list exists, which is itself something the token is not allowed to know.
 
 Check the token's scope in **Settings → Access tokens**.

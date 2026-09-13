@@ -4,8 +4,8 @@ description: The base URL, how a token authenticates, and what comes back when s
 ---
 
 Everything the app does, Nooks does over REST. There is no endpoint the browser has that
-a script does not, and a check in CI refuses one that ships without a route — so if you
-can do it in the interface, you can do it from a shell.
+a script does not, and a check in CI refuses one that ships without a route. If you can
+do it in the interface, you can do it from a shell.
 
 The [reference](/docs/api) has a page per endpoint, generated from the same
 definitions the server is built from. This page is what you need before any of them.
@@ -31,7 +31,7 @@ curl https://nooks.example.com/api/v1/lists \
 ```
 
 Make one in **Settings → Access tokens**. The secret is shown once, when it is created,
-and never again — Nooks stores only a hash of it, so a token that is lost is replaced
+and never again. Nooks stores only a hash of it, so a token that is lost is replaced
 rather than recovered.
 
 ### What a token can reach
@@ -39,8 +39,8 @@ rather than recovered.
 A token is somebody's access, narrowed. It never has more than the member who made it,
 and three things narrow it further:
 
-- **The lists you pick.** A list a token was not given is invisible to it — not
-  forbidden, invisible. It cannot be read, and it cannot be discovered to exist.
+- **The lists you pick.** A list a token was not given is invisible to it. Not
+  forbidden: invisible. It cannot be read, and it cannot be discovered to exist.
 - **Read, write and delete**, as separate abilities. A token that may write but not
   delete can tick an item off and cannot remove it.
 - **An expiry**, which you choose when you make it.
@@ -69,16 +69,16 @@ Errors come back as JSON with the status on the response:
 }
 ```
 
-The message is written to be read by a person — the same sentence the app shows.
+The message is written to be read by a person: the same sentence the app shows.
 
 | Status | Means |
 | --- | --- |
 | `400` | A field is missing or malformed, or the instance is in a state where this cannot be done yet |
 | `401` | No token, or one that has expired or been revoked |
-| `403` | A valid token that is not allowed to do this — the wrong ability, or a list it was not given |
+| `403` | A valid token that is not allowed to do this: the wrong ability, or a list it was not given |
 | `404` | No such thing, or none this token is allowed to see |
 | `409` | It already exists |
-| `500` | Nooks failed. This is a bug — the message says what it was doing |
+| `500` | Nooks failed. This is a bug, and the message says what it was doing |
 
 A `403` and a `404` can both mean "not yours". Which one you get depends on whether the
 thing would be visible at all: a list outside a token's scope answers `404`, because

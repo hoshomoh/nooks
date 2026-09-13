@@ -98,6 +98,21 @@ docs(website): explain the api before listing it
 
 The subject says what changed for somebody using Nooks, not which files moved.
 
+That subject is not only for the log. release-please reads these commits to decide the
+next version and to write the changelog the docs publish, so the line you write here is
+the line somebody reads when they are working out whether to upgrade. `feat` and `fix`
+appear there; `chore`, `ci`, `test` and `build` do not.
+
+## Releases
+
+Nobody tags by hand. release-please keeps a pull request open against `main` with the
+version it would cut and the changelog it would write. Merging that pull request is the
+release: it makes the tag, publishes the notes, and the same workflow builds the
+binaries and the multi-architecture image from it.
+
+So a release is a review of what is about to be published, and the decision about when
+to make one is separate from the decision to merge any particular change.
+
 ## Ask first
 
 Some changes are cheaper to discuss than to review:

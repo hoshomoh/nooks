@@ -1,29 +1,48 @@
-# What happens when a version is tagged.
+# What happens when a release lands on main.
 #
-# Binaries for the four machines people actually self-host on, and a multi-architecture
-# image. Both carry the version and the commit they were built from, so an instance can
-# say what it is running and a bug report can name a build.
+# Nobody tags by hand. release-please reads the Conventional Commits since the last
+# release, keeps a pull request open with the version and the changelog it would write,
+# and cuts the tag when somebody merges it. Releasing is then a review of what is about
+# to be published rather than a command somebody has to remember the shape of.
 #
-#   git tag -a v1.0.0 -m "..." && git push origin v1.0.0
-#
-# Nothing here runs on a branch. A release is a tag, and a tag is the only thing that
-# should be able to publish one.
+# The binaries and the image are built from that tag, in this file rather than in one
+# triggered by it: a tag pushed with GITHUB_TOKEN does not start a workflow, so a build
+# listening for `push: tags` would never run and the release would arrive empty.
 name: Release
 
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
 
 permissions:
   contents: write
+  pull-requests: write
   packages: write
 
 jobs:
+  please:
+    name: Release PR
+    runs-on: ubuntu-latest
+    outputs:
+      # Only true on the push that merged the release pull request.
+      released: ${{ steps.release.outputs.release_created }}
+      tag: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
   binaries:
     name: Binaries
+    needs: please
+    if: needs.please.outputs.released == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.please.outputs.tag }}
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -43,7 +62,7 @@ jobs:
 
       - name: Build the binaries
         env:
-          VERSION: ${{ github.ref_name }}
+          VERSION: ${{ needs.please.outputs.tag }}
           COMMIT: ${{ github.sha }}
         run: |
           set -euo pipefail
@@ -70,28 +89,36 @@ jobs:
 
       # A build that cannot say what it is is a build nobody can file a bug against.
       - name: The binary knows its own version
+        env:
+          TAG: ${{ needs.please.outputs.tag }}
         run: |
           set -euo pipefail
-          tar -xzf "out/nooks-${{ github.ref_name }}-linux-amd64.tar.gz" -C out
-          reported="$(./out/nooks-${{ github.ref_name }}-linux-amd64 --version)"
+          tar -xzf "out/nooks-${TAG}-linux-amd64.tar.gz" -C out
+          reported="$(./out/nooks-${TAG}-linux-amd64 --version)"
           echo "reports: ${reported}"
           case "$reported" in
-            "${GITHUB_REF_NAME#v}"*) ;;
-            *) echo "reported ${reported}, expected ${GITHUB_REF_NAME#v}" >&2; exit 1 ;;
+            "${TAG#v}"*) ;;
+            *) echo "reported ${reported}, expected ${TAG#v}" >&2; exit 1 ;;
           esac
-          rm "out/nooks-${{ github.ref_name }}-linux-amd64"
+          rm "out/nooks-${TAG}-linux-amd64"
 
-      - name: Publish
-        uses: softprops/action-gh-release@v2
-        with:
-          files: out/*
-          generate_release_notes: true
+      # Uploaded to the release release-please has already written, rather than
+      # published as a new one: the notes on it are the changelog, and a second
+      # publish would replace them with a generated list of commits.
+      - name: Attach them to the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ needs.please.outputs.tag }}" out/* --clobber
 
   image:
     name: Image
+    needs: please
+    if: needs.please.outputs.released == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.please.outputs.tag }}
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
 
@@ -108,8 +135,8 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{version}},value=${{ needs.please.outputs.tag }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.please.outputs.tag }}
             type=raw,value=latest
 
       - uses: docker/build-push-action@v6
@@ -120,7 +147,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            VERSION=${{ github.ref_name }}
+            VERSION=${{ needs.please.outputs.tag }}
             COMMIT=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

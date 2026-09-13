@@ -7,6 +7,7 @@
     "using",
     "admin",
     "operations",
-    "mcp"
+    "mcp",
+    "changelog"
   ]
 }

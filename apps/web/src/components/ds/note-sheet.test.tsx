@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import { beforeAll, describe, expect, it, vi } from "vitest"
-import { render, screen } from "@testing-library/react"
+import { fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import type { Item } from "@nooks/api"
 
@@ -47,6 +47,51 @@ describe("the item sheet", () => {
     expect(close.querySelector("svg")).not.toBeNull()
     expect(screen.getByRole("button", { name: /Open full/ })).toBeInTheDocument()
     void actions
+  })
+
+  describe("leaving", () => {
+    it("goes back the way it came rather than vanishing", async () => {
+      const actions = show()
+
+      await userEvent.click(screen.getByRole("button", { name: "Close" }))
+
+      const sheet = screen.getByRole("complementary")
+      expect(sheet).toHaveClass("animate-sheet-out")
+      expect(sheet).not.toHaveClass("animate-sheet-in")
+      // Still there: a panel that took 180ms to arrive cannot leave between frames.
+      expect(actions.onClose).not.toHaveBeenCalled()
+    })
+
+    it("tells the List it has gone once the movement is over", async () => {
+      const actions = show()
+
+      await userEvent.click(screen.getByRole("button", { name: "Close" }))
+      // A real animationend bubbles, and React listens at the root.
+      fireEvent.animationEnd(screen.getByRole("complementary"), { bubbles: true })
+
+      expect(actions.onClose).toHaveBeenCalled()
+    })
+
+    it("is not the editor settling, or anything else inside it", async () => {
+      const actions = show()
+
+      await userEvent.click(screen.getByRole("button", { name: "Close" }))
+      // Animation events bubble. The sheet closing on one raised by a control inside
+      // it would close under a Member who was still using it.
+      fireEvent.animationEnd(screen.getByRole("button", { name: /Open full/ }), {
+        bubbles: true,
+      })
+
+      expect(actions.onClose).not.toHaveBeenCalled()
+    })
+
+    it("stops answering while it is on its way out", async () => {
+      show()
+
+      await userEvent.click(screen.getByRole("button", { name: "Close" }))
+
+      expect(screen.getByRole("complementary")).toHaveClass("pointer-events-none")
+    })
   })
 
   // Every field here is the control that changes it: there is no edit mode.

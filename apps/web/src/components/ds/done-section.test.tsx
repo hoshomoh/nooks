@@ -37,6 +37,37 @@ describe("the completed items", () => {
     expect(screen.getByText("Washing-up liquid")).toBeInTheDocument()
   })
 
+  it("opens by pushing the foot of the List down rather than by appearing", async () => {
+    const { container } = render(
+      <DoneSection label="3 done today">
+        <span>Washing-up liquid</span>
+      </DoneSection>,
+    )
+
+    const opening = container.querySelector(".transition-\\[grid-template-rows\\]")
+    expect(opening).toHaveClass("grid-rows-[0fr]")
+
+    await userEvent.click(screen.getByRole("button", { name: /3 done today/ }))
+
+    expect(opening).toHaveClass("grid-rows-[1fr]")
+  })
+
+  it("keeps what it has closed over out of the keyboard's way", async () => {
+    render(
+      <DoneSection label="3 done today">
+        <button type="button">Washing-up liquid</button>
+      </DoneSection>,
+    )
+
+    const toggle = screen.getByRole("button", { name: /3 done today/ })
+    await userEvent.click(toggle)
+    await userEvent.click(toggle)
+
+    // Built once and kept, so the second opening has nothing left to build — which
+    // means a row nobody can see is still in the page, and must not be reachable.
+    expect(screen.getByText("Washing-up liquid").closest("[inert]")).not.toBeNull()
+  })
+
   describe("aiming at it", () => {
     it("is the whole line, not the words on it", () => {
       // Sized to its label it was a target somebody had to find, sitting under rows

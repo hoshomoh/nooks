@@ -1,5 +1,7 @@
+import { useCallback, useState } from "react"
 import type { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
+import { cn } from "cn"
 import type { Item } from "@nooks/api"
 
 import { Checkbox } from "./checkbox"
@@ -48,6 +50,12 @@ export interface NoteSheetProps {
  *
  * Every field here is the control that changes it. There is no edit mode: the sheet is
  * where an Item is read and where it is rewritten.
+ *
+ * It leaves the way it came. Closing is the one dismissal the sheet owns, so it plays
+ * the entrance backwards and tells the List it has gone once the movement is over —
+ * anything less and a panel that took 180ms to arrive would vanish between frames.
+ * Browser Back is not this: the address is what holds the sheet open, and by the time
+ * the address has changed there is nothing left to move.
  */
 export function NoteSheet({
   item,
@@ -65,9 +73,43 @@ export function NoteSheet({
 }: NoteSheetProps) {
   const { t } = useTranslation()
   const due = useDueLabel()
+  const [leaving, setLeaving] = useState(false)
+
+  /*
+   * Tells the List the sheet has gone, once the exit has actually played.
+   *
+   * A listener put on the element rather than an `onAnimationEnd` prop. React works
+   * out what an animation event is called by asking the browser's style object which
+   * vendor prefixes it owns up to — a question jsdom has no answer to, so the prop
+   * fires in a browser and is silent in a test. The one thing worth proving about a
+   * panel that waits for an animation is that it does eventually go away.
+   */
+  const leaveWhenDone = useCallback(
+    (node: HTMLElement | null) => {
+      if (!node || !leaving) {
+        return
+      }
+      // Only the sheet's own movement ends the sheet. Everything inside it animates
+      // too, and an editor settling a caret must not close the panel around it.
+      const done = (event: AnimationEvent) => {
+        if (event.target === node) {
+          onClose()
+        }
+      }
+      node.addEventListener("animationend", done)
+      return () => node.removeEventListener("animationend", done)
+    },
+    [leaving, onClose],
+  )
 
   return (
-    <aside className="absolute inset-y-0 right-0 z-20 flex w-sheet animate-sheet-in flex-col border-l border-border bg-background">
+    <aside
+      ref={leaveWhenDone}
+      className={cn(
+        "absolute inset-y-0 right-0 z-20 flex w-sheet flex-col border-l border-border bg-background",
+        leaving ? "pointer-events-none animate-sheet-out" : "animate-sheet-in",
+      )}
+    >
       <div className="flex h-chrome items-center gap-2.5 border-b border-hair pr-4 pl-5.5 text-micro text-muted-foreground">
         <span className="text-secondary-foreground">{crumbs.join(" / ")}</span>
         <span className="flex-1" />
@@ -83,7 +125,12 @@ export function NoteSheet({
 
         {/* An icon, not a word: the crumb already says where this is, and a second
             label beside "Open full" would read as a second destination. */}
-        <IconButton name="close" label={t("note.close")} onClick={onClose} className="ml-1" />
+        <IconButton
+          name="close"
+          label={t("note.close")}
+          onClick={() => setLeaving(true)}
+          className="ml-1"
+        />
       </div>
 
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-7.5 pt-7.5">

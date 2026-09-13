@@ -496,20 +496,34 @@ of the Member's text, then real options. Their text is never discarded.
 conflict** — a tick is a tick whoever made it. The two versions are shown as stacked options, the
 Member's outlined in accent, with `Keep mine` and `Keep both`.
 
-**Motion** — movement explains where something came from, and is used nowhere else. There
-are four:
+**Motion** — movement explains where something came from, and is used nowhere else:
 
 | Token | Where | Duration |
 | --- | --- | --- |
 | `animate-sheet-in` | The side sheet, from the edge it is anchored to | 180ms |
-| `animate-panel-in` | ⌘K and dialogs, a short drop with the scrim | 160ms |
-| `animate-scrim-in` | The ground behind an overlay | 120ms |
+| `animate-sheet-out` | The same sheet, closed — the entrance reversed | 160ms |
 | `animate-settle` | Somebody else's tick, holding then settling | 1s |
+| `--duration-push` | Anything that opens by changing the height of the page | 200ms |
 
-Hover and focus changes are `transition-colors` at 150ms. Nothing bounces, nothing
-springs, and nothing waits for an animation before it responds — every one of these is
-decoration on a state that has already changed. A Member whose machine asks for reduced
-motion gets none of it.
+Two rules decide whether a thing moves at all.
+
+Something that **pushes** moves: the offline strip and the completed Items both change
+the height of what a Member is already reading, so the height is what travels, over
+`--duration-push`. Something that **arrives without being asked for** moves: the
+presence line, and the panel a Visitor gets when they reach for a row they cannot tick.
+These fade up over 120–160ms with `@starting-style`, so the entrance costs no state.
+
+Everything else does not. A change a Member just caused, at the place they caused it —
+ticking an Item, adding one, opening ⌘K — is already explained by their own hand, and
+motion on the actions somebody performs a hundred times a day only makes the app feel
+slower than it is. Dialogs, menus and ⌘K keep the 100ms fade the generated overlays
+arrive with, which is short enough to be felt rather than watched, and which they
+already leave by.
+
+What moves out moves out the way it came in. Hover and focus changes are
+`transition-colors` at 150ms. Nothing bounces, nothing springs, and nothing waits for an
+animation before it responds — every one of these is decoration on a state that has
+already changed. A Member whose machine asks for reduced motion gets none of it.
 
 ---
 

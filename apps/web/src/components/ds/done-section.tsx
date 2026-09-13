@@ -21,12 +21,25 @@ export interface DoneSectionProps {
  */
 export function DoneSection({ label, children }: DoneSectionProps) {
   const [open, setOpen] = useState(false)
+  /*
+   * Whether the rows have ever been asked for.
+   *
+   * The section opens by growing to the height of its contents, which means the
+   * contents have to be there to be grown to — but a week of ticked Items is a real
+   * cost to render behind a line nobody has pressed. So they are built on the first
+   * press and kept from then on: the opening that matters is every one after the
+   * first, and by then there is nothing left to build.
+   */
+  const [everOpened, setEverOpened] = useState(false)
 
   return (
-    <div className="mt-8.5 flex flex-col gap-1.5 border-t border-hair pt-4.5">
+    <div className="mt-8.5 flex flex-col border-t border-hair pt-4.5">
       <button
         type="button"
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          setOpen(!open)
+          setEverOpened(true)
+        }}
         aria-expanded={open}
         // The whole line, not the words on it. Sized to its label the control was a
         // target somebody had to aim at, with no hover to say it was one at all — and
@@ -45,7 +58,19 @@ export function DoneSection({ label, children }: DoneSectionProps) {
         <span>{label}</span>
       </button>
 
-      {open && children}
+      {/* The rows arrive by pushing the foot of the List down rather than by being
+          there. The clip is inset by the same 8px the rows bleed out by, so their
+          hover ground is not shaved off at both ends on the way. */}
+      <div
+        className={cn(
+          "grid transition-[grid-template-rows] duration-(--duration-push) ease-sheet",
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+        )}
+      >
+        <div className="overflow-hidden px-2 -mx-2" inert={!open}>
+          <div className="flex flex-col gap-1.5 pt-1.5">{everOpened ? children : null}</div>
+        </div>
+      </div>
     </div>
   )
 }

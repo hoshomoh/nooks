@@ -174,12 +174,16 @@ interface SignInPromptProps {
  *
  * Under the row they touched, not across the page: it answers the thing they just
  * tried, and leaves everything else readable.
+ *
+ * It arrives rather than appears. This is a stranger's first minute with Nooks, and
+ * the rows below it are about to move: the one thing worth spending motion on here is
+ * saying that the panel is what moved them.
  */
 function SignInPrompt({ label, allowJoin, instanceName, onDismiss }: SignInPromptProps) {
   const { t } = useTranslation()
 
   return (
-    <div className="mt-2.5 mb-4.5 flex flex-col gap-3.5 rounded-lg border border-border bg-sidebar px-5 py-4.5 -mx-2">
+    <div className="mt-2.5 mb-4.5 flex flex-col gap-3.5 rounded-lg border border-border bg-sidebar px-5 py-4.5 -mx-2 translate-y-0 transition-[opacity,translate] duration-160 ease-sheet starting:-translate-y-1 starting:opacity-0">
       <div className="flex flex-col gap-1">
         <span className="text-field font-medium">{t("public.signInToTick", { label })}</span>
         <span className="text-meta leading-[1.6] text-secondary-foreground">

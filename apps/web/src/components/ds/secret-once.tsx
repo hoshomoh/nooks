@@ -19,6 +19,10 @@ export interface SecretOnceProps {
  * An accent panel, the secret in mono, a Copy, and a plain sentence saying it cannot be
  * shown again. **Never a warning triangle**: nothing has gone wrong, and dressing a
  * normal step as a hazard teaches a Member to ignore the ones that are.
+ *
+ * It takes the place of the form that asked for it, so it arrives the way a dialog
+ * does rather than by the box changing under the Member's hand: the same short drop
+ * the dialog itself came in on.
  */
 export function SecretOnce({ secret, title, blurb, onDone }: SecretOnceProps) {
   const { t } = useTranslation()
@@ -30,7 +34,7 @@ export function SecretOnce({ secret, title, blurb, onDone }: SecretOnceProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4 px-6.5 py-6">
+    <div className="flex flex-col gap-4 px-6.5 py-6 translate-y-0 transition-[opacity,translate] duration-160 ease-sheet starting:-translate-y-1.5 starting:opacity-0">
       <div className="flex flex-col gap-2">
         <h2 className="text-dialog">{title}</h2>
         <p className="text-field text-secondary-foreground">{blurb}</p>

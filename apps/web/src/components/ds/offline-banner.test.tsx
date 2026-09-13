@@ -28,7 +28,11 @@ describe("the offline banner", () => {
     connectionStore.markSeen()
     show()
 
-    expect(screen.queryByRole("status")).not.toBeInTheDocument()
+    // The strip is in the page so that it can open by pushing rather than by arriving,
+    // and so that the live region is there to change. Closed, it says nothing and the
+    // keyboard cannot reach into it.
+    expect(screen.getByRole("status")).toHaveTextContent("")
+    expect(screen.queryByRole("button", { name: /retry/i })?.closest("[inert]")).not.toBeNull()
   })
 
   it("appears when a request does not arrive, with a way to ask again", async () => {
@@ -37,6 +41,18 @@ describe("the offline banner", () => {
 
     expect(screen.getByRole("status")).toHaveTextContent(/offline/i)
     expect(screen.getByRole("button", { name: /retry/i })).toBeInTheDocument()
+  })
+
+  it("opens by pushing the screen down rather than by appearing in front of it", () => {
+    connectionStore.markUnreachable()
+    const { container } = show()
+
+    // The height is what travels. A strip that is simply put there moves everything
+    // below it by its own height between two frames, under whatever the Member was
+    // reading or typing at the time.
+    const strip = container.firstElementChild
+    expect(strip).toHaveClass("transition-[grid-template-rows]")
+    expect(strip).toHaveClass("grid-rows-[1fr]")
   })
 
   it("says when contact was last good", () => {
@@ -55,7 +71,7 @@ describe("the offline banner", () => {
 
     connectionStore.markSeen()
 
-    await expect.poll(() => screen.queryByRole("status")).toBeNull()
+    await expect.poll(() => screen.getByRole("status").textContent).toBe("")
   })
 
   it("is a strip rather than a barrier, so the screen underneath still works", async () => {
@@ -65,6 +81,6 @@ describe("the offline banner", () => {
     // Retry asks again; it does not block, confirm, or take the Member anywhere.
     await userEvent.click(screen.getByRole("button", { name: /retry/i }))
 
-    expect(screen.getByRole("status")).toBeInTheDocument()
+    expect(screen.getByRole("status")).toHaveTextContent(/offline/i)
   })
 })

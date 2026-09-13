@@ -17,6 +17,10 @@ export interface PresenceProps {
  *
  * The colour is `--done`, the same green a tick lands in — it means "somebody else is
  * doing something", which is exactly what it is.
+ *
+ * It fades up rather than replacing the sharing line between frames. This is the one
+ * line on the List that changes without the Member having done anything, and a word
+ * that was not there a moment ago is worth a moment to notice.
  */
 export function Presence({ watchers }: PresenceProps) {
   const { t } = useTranslation()
@@ -26,7 +30,7 @@ export function Presence({ watchers }: PresenceProps) {
   }
 
   return (
-    <span className="text-done">
+    <span className="text-done transition-opacity duration-120 ease-out starting:opacity-0">
       {watchers.length === 1
         ? t("list.isHere", { name: watchers[0] })
         : t("list.areHere", { names: formatList(watchers, code) })}

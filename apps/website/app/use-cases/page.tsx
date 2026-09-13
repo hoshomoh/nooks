@@ -69,7 +69,7 @@ export default function UseCases() {
     <main className="mx-auto max-w-band px-7 pt-19">
       <div className="flex flex-col gap-5">
         <span className="text-label text-muted-foreground uppercase">Use cases</span>
-        <h1 className="text-hero max-w-[18ch] text-pretty">Four households, one primitive.</h1>
+        <h1 className="text-page max-w-[18ch] text-pretty">Four households, one primitive.</h1>
         <p className="max-w-[54ch] text-lede text-pretty text-secondary-foreground">
           Nooks is one list, shared four ways. The shape of the work changes; the thing you are
           looking at does not.

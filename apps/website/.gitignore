@@ -49,7 +49,3 @@ next-env.d.ts
 # The overview beside them is prose, and is committed.
 /content/docs/api/*service/
 /content/docs/api/meta.json
-
-# Generated from the repository's CHANGELOG.md at build time, which release-please
-# writes from the commits. Committing it would be committing the same list twice.
-/content/docs/changelog.md

@@ -162,7 +162,7 @@ export default function Features() {
     <main className="mx-auto max-w-band px-7 pt-19">
       <div className="flex flex-col gap-5">
         <span className="text-label text-muted-foreground uppercase">Features</span>
-        <h1 className="text-hero max-w-[18ch] text-pretty">Everything hangs off the list.</h1>
+        <h1 className="text-page max-w-[18ch] text-pretty">Everything hangs off the list.</h1>
         <p className="max-w-[54ch] text-lede text-pretty text-secondary-foreground">
           Each of these exists because a household hit the wall without it. What is not here is
           not here — there is no roadmap wearing a product’s clothes on this page.

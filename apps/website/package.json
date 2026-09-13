@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node scripts/generate-api-docs.mjs && node scripts/generate-changelog.mjs && fumadocs-mdx && next dev",
-    "build": "node scripts/generate-api-docs.mjs && node scripts/generate-changelog.mjs && fumadocs-mdx && next build",
+    "dev": "node scripts/generate-api-docs.mjs && fumadocs-mdx && next dev",
+    "build": "node scripts/generate-api-docs.mjs && fumadocs-mdx && next build",
     "start": "next start",
     "check-links": "node scripts/check-links.mjs",
     "test": "vitest run"

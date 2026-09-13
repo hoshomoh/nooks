@@ -56,6 +56,11 @@
   --text-hero--letter-spacing: -0.03em;
   --text-hero--font-weight: 600;
 
+  --text-page: 44px; /* the headline on a section page: features, use cases, changelog */
+  --text-page--line-height: 1.06;
+  --text-page--letter-spacing: -0.03em;
+  --text-page--font-weight: 600;
+
   --text-band: 33px; /* a section heading on a marketing page */
   --text-band--line-height: 1.15;
   --text-band--letter-spacing: -0.025em;

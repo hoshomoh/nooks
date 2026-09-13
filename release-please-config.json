@@ -8,17 +8,50 @@
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": false,
       "changelog-sections": [
-        { "type": "feat", "section": "Added" },
-        { "type": "fix", "section": "Fixed" },
-        { "type": "perf", "section": "Faster" },
-        { "type": "refactor", "section": "Changed" },
-        { "type": "docs", "section": "Documentation" },
-        { "type": "revert", "section": "Reverted" },
-        { "type": "ci", "hidden": true },
-        { "type": "test", "hidden": true },
-        { "type": "build", "hidden": true },
-        { "type": "chore", "hidden": true },
-        { "type": "style", "hidden": true }
+        {
+          "type": "feat",
+          "section": "New"
+        },
+        {
+          "type": "fix",
+          "section": "Fixed"
+        },
+        {
+          "type": "perf",
+          "section": "Changed"
+        },
+        {
+          "type": "refactor",
+          "section": "Changed"
+        },
+        {
+          "type": "docs",
+          "hidden": true
+        },
+        {
+          "type": "revert",
+          "section": "Changed"
+        },
+        {
+          "type": "ci",
+          "hidden": true
+        },
+        {
+          "type": "test",
+          "hidden": true
+        },
+        {
+          "type": "build",
+          "hidden": true
+        },
+        {
+          "type": "chore",
+          "hidden": true
+        },
+        {
+          "type": "style",
+          "hidden": true
+        }
       ]
     }
   }

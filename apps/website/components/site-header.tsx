@@ -12,6 +12,7 @@ const NAV = [
   { label: "Use cases", href: "/use-cases" },
   { label: "Docs", href: "/docs" },
   { label: "API", href: "/docs/api" },
+  { label: "Changelog", href: "/changelog" },
 ] as const
 
 /**

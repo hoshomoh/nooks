@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react"
+import { useCallback } from "react"
 import type { ReactNode } from "react"
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
 import { getRouteApi, useNavigate } from "@tanstack/react-router"
@@ -11,9 +11,9 @@ import { DateField } from "@/components/ds/date-field"
 import { EditableTitle } from "@/components/ds/editable-title"
 import { NoteEditor } from "@/components/ds/note-editor"
 import { listClient } from "@/lib/api"
-import { debounce } from "@/lib/debounce"
 import { listQuery } from "@/lib/list-queries"
 import { refreshLists } from "@/lib/refresh"
+import { useNoteAutosave } from "@/lib/use-note-autosave"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useEscape } from "@/lib/use-escape"
 
@@ -26,7 +26,6 @@ interface ItemFields {
 }
 
 /** How long the typing has to settle before a Note is saved. */
-const AUTOSAVE_DELAY_MS = 800
 
 /**
  * The Note at full width.
@@ -46,11 +45,7 @@ export function NoteScreen() {
 
   const refresh = useCallback(() => refreshLists(queryClient), [queryClient])
 
-  const save = useMutation({
-    mutationFn: (note: string) => listClient.updateItem({ itemUid, note }),
-    onSuccess: refresh,
-  })
-  const autosave = useMemo(() => debounce(save.mutate, AUTOSAVE_DELAY_MS), [save.mutate])
+  const autosave = useNoteAutosave()
 
   const setDone = useMutation({
     mutationFn: (done: boolean) => listClient.setItemDone({ itemUid, done }),
@@ -91,7 +86,7 @@ export function NoteScreen() {
         actions={
           <>
             <span className="text-micro text-muted-foreground">
-              {save.isPending ? t("note.saving") : t("note.saved")}
+              {autosave.isSaving ? t("note.saving") : t("note.saved")}
             </span>
             <Button tone="secondary" scale="toolbar" onClick={back}>
               {t("note.backToList")}
@@ -159,7 +154,7 @@ export function NoteScreen() {
             <NoteEditor
               key={item.uid}
               initialValue={item.note}
-              onChange={autosave.call}
+              onChange={(note) => autosave.save({ itemUid, note })}
               readOnly={!canEdit}
               scale="full"
             />

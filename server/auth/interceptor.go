@@ -143,6 +143,8 @@ func (r *Resolver) accessMember(ctx context.Context, token string) (store.Member
 		return store.Member{}, false
 	}
 	if session.Expired(r.now()) {
+		// Best effort: the session is refused either way, and a tidy-up that failed is
+		// not a reason to tell the caller something different.
 		_ = r.store.DeleteSession(ctx, session.TokenHash)
 		return store.Member{}, false
 	}
@@ -170,6 +172,8 @@ func (r *Resolver) Member(ctx context.Context, token string) (store.Member, bool
 		return store.Member{}, false
 	}
 	if session.Expired(r.now()) {
+		// Best effort: the session is refused either way, and a tidy-up that failed is
+		// not a reason to tell the caller something different.
 		_ = r.store.DeleteSession(ctx, session.TokenHash)
 		return store.Member{}, false
 	}

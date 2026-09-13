@@ -27,9 +27,8 @@ import { useQueuedChanges } from "@/lib/use-queued-changes"
 import { useRenameItem } from "@/lib/use-rename-item"
 import { RowTrouble, type RowTroubleLabels } from "@/components/ds/row-trouble"
 import type { Translate } from "@/lib/translate"
-import { debounce } from "@/lib/debounce"
-import type { SaveNoteVariables } from "@/lib/item-mutations"
 import { dayFullHeading, happenedToday, isOverdue, justHappened, today } from "@/lib/dates"
+import { useNoteAutosave } from "@/lib/use-note-autosave"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useLocale } from "@/lib/use-locale"
 import { useCommandPalette } from "@/lib/use-command-palette"
@@ -47,7 +46,6 @@ interface EditItemVariables {
 }
 
 /** How long the typing has to settle before a Note is saved. */
-const AUTOSAVE_DELAY_MS = 800
 
 /*
  * The Note editor, fetched when a Note is opened rather than when a List is.
@@ -130,19 +128,11 @@ export function ListScreen() {
     [navigate, openItemUid],
   )
 
-
   const refresh = () => refreshLists(queryClient)
 
   const addItem = useAddItem()
 
-  const saveNote = useMutation({
-    mutationFn: ({ itemUid, note }: SaveNoteVariables) => listClient.updateItem({ itemUid, note }),
-    onSuccess: refresh,
-  })
-
-  // Autosave waits for the typing to settle rather than firing per keystroke.
-  // `mutate` is referentially stable, so the debounce is built once.
-  const autosave = useMemo(() => debounce(saveNote.mutate, AUTOSAVE_DELAY_MS), [saveNote.mutate])
+  const autosave = useNoteAutosave()
 
   // Closing flushes, so the last sentence is never lost to a timer that never ran.
   const closeSheet = useCallback(() => {
@@ -154,7 +144,7 @@ export function ListScreen() {
   const onNoteChange = useCallback(
     (note: string) => {
       if (openItemUid) {
-        autosave.call({ itemUid: openItemUid, note })
+        autosave.save({ itemUid: openItemUid, note })
       }
     },
     [autosave, openItemUid],
@@ -176,11 +166,6 @@ export function ListScreen() {
     mutationFn: (itemUid: string) => listClient.deleteItem({ itemUid }),
     onSuccess: refresh,
   })
-
-
-
-
-
 
   const troubleLabels: RowTroubleLabels = {
     conflict: t("list.conflictTitle"),
@@ -243,8 +228,6 @@ export function ListScreen() {
           </>
         }
       />
-
-
 
       <div className="relative flex flex-1 justify-center px-5.5 pt-14 pb-22">
         <div className="w-full max-w-content">
@@ -382,7 +365,7 @@ export function ListScreen() {
               crumbs={[list.list?.name ?? "", t("note.crumb")]}
               listName={list.list?.name ?? ""}
               canEdit={Boolean(canEdit)}
-              status={saveNote.isPending ? t("note.saving") : undefined}
+              status={autosave.isSaving ? t("note.saving") : undefined}
               onNoteChange={onNoteChange}
               onToggleDone={(done) => setDone.mutate({ itemUid: openItem.uid, done })}
               onRename={(label) =>

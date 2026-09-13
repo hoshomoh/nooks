@@ -81,7 +81,6 @@ describe("month names", () => {
   })
 })
 
-
 describe("dayHeading", () => {
   it("names the near days and uses a weekday beyond them", () => {
     expect(dayHeading("2026-08-25", labels)).toBe("Today")

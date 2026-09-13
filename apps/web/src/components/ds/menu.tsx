@@ -34,7 +34,7 @@ export function Menu({ trigger, children }: MenuProps) {
       <DropdownMenuTrigger render={trigger} />
       <DropdownMenuContent
         align="end"
-        className="w-62 rounded-menu border border-border p-1.5 shadow-[0_12px_32px_rgba(0,0,0,0.14)]"
+        className="w-62 rounded-menu border border-border p-1.5 shadow-floating"
       >
         {children}
       </DropdownMenuContent>

@@ -71,7 +71,7 @@ export function ItemMenu({ quantity, dueOn, actions }: ItemMenuProps) {
       <PopoverContent
         align="end"
         sideOffset={6}
-        className="w-62 gap-0 rounded-menu border border-border p-1.5 shadow-[0_12px_32px_rgba(0,0,0,0.14)]"
+        className="w-62 gap-0 rounded-menu border border-border p-1.5 shadow-floating"
       >
         {panel === "actions" && (
           <ActionsPanel

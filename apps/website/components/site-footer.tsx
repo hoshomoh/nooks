@@ -73,7 +73,7 @@ export function SiteFooter() {
 }
 
 /** A footer link, internal or out to the repository. */
-function FooterLink({ label, href }: { label: string; href: string }) {
+function FooterLink({ label, href }: FooterColumn["links"][number]) {
   const className = "text-meta text-secondary-foreground hover:text-foreground w-fit"
   if (href.startsWith("http")) {
     return (

@@ -193,7 +193,12 @@ export default function Home() {
 }
 
 /** One band of the page: a heading on a rule, and whatever it introduces. */
-function Band({ title, children }: { title: string; children: React.ReactNode }) {
+interface BandProps {
+  title: string
+  children: React.ReactNode
+}
+
+function Band({ title, children }: BandProps) {
   return (
     <section className="mx-auto mt-22 max-w-band px-7">
       <div className="mb-8 flex items-center gap-5">
@@ -206,7 +211,11 @@ function Band({ title, children }: { title: string; children: React.ReactNode })
 }
 
 /** An inline path or flag, at the weight the rest of the sentence reads at. */
-function Code({ children }: { children: React.ReactNode }) {
+interface CodeProps {
+  children: React.ReactNode
+}
+
+function Code({ children }: CodeProps) {
   return (
     <span className="rounded border border-hair bg-sidebar px-1 py-0.5 font-mono text-meta">
       {children}

@@ -24,7 +24,7 @@ export function SlashMenu({ items, selected, onChoose }: SlashMenuProps) {
   }
 
   return (
-    <div className="w-75 rounded-menu border border-border bg-popover p-1.5 shadow-[0_12px_32px_rgba(0,0,0,0.14)]">
+    <div className="w-75 rounded-menu border border-border bg-popover p-1.5 shadow-floating">
       <p className="px-2.5 pt-1.5 pb-2 text-label text-muted-foreground uppercase">
         {t("note.addToNote")}
       </p>

@@ -1,13 +1,11 @@
 import {
-  eachDayOfInterval,
-  endOfMonth,
-  endOfWeek,
-  isSameMonth,
-  startOfMonth,
-  startOfWeek,
-} from "date-fns"
-
-import { toStored, type DueDate } from "./dates"
+  daysIn,
+  firstOfMonth,
+  monthGrid,
+  sameMonth,
+  toStored,
+  type DueDate,
+} from "./dates"
 
 /** One cell in the month grid. */
 export type CalendarDay = {
@@ -41,14 +39,12 @@ export type CalendarMonth = {
  * Sunday, one ending on a Monday — can be tested directly.
  */
 export function buildMonth(month: Date): CalendarMonth {
-  const first = startOfMonth(month)
-  const start = startOfWeek(first, { weekStartsOn: 1 })
-  const end = endOfWeek(endOfMonth(first), { weekStartsOn: 1 })
+  const first = firstOfMonth(month)
 
-  const days = eachDayOfInterval({ start, end }).map((date) => ({
+  const days = daysIn(monthGrid(first)).map((date) => ({
     date: toStored(date),
     dayOfMonth: date.getDate(),
-    inMonth: isSameMonth(date, first),
+    inMonth: sameMonth(date, first),
   }))
 
   const weeks: CalendarWeek[] = []

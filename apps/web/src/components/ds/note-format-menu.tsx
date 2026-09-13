@@ -44,7 +44,7 @@ export function NoteFormatMenu({ editor }: NoteFormatMenuProps) {
         current.isEditable && from !== to && !current.isActive("code")
       }
     >
-      <div className="flex items-center gap-0.5 rounded-lg border border-border bg-background p-1 shadow-[0_12px_32px_rgba(0,0,0,0.14)]">
+      <div className="flex items-center gap-0.5 rounded-lg border border-border bg-background p-1 shadow-floating">
         {MARKS.map((mark) => {
           const active = editor.isActive(mark.name)
           return (

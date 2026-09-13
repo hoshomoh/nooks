@@ -101,7 +101,7 @@ export function ActivityControl() {
       <PopoverContent
         align="end"
         sideOffset={6}
-        className="w-95 gap-0 rounded-2xl border border-border p-2 shadow-[0_12px_32px_rgba(0,0,0,0.14)]"
+        className="w-95 gap-0 rounded-2xl border border-border p-2 shadow-floating"
       >
         <ActivityPanel
           activity={activity.data?.activity ?? []}

@@ -114,6 +114,11 @@
   --spacing-chrome-auth: 52px; /* the signed-out chrome bar */
   --spacing-sheet-footer: 42px;
 
+  /* The shadow under anything that floats over the page — menus, the / menu, the
+     format bar. DESIGN.md gives one value and it was written out at each of them,
+     which is five places to change it and five chances to get it wrong. */
+  --shadow-floating: 0 12px 32px rgb(0 0 0 / 0.14);
+
   /* Column widths — DESIGN.md §5. */
   --container-content: 660px; /* the centred content column */
   --container-calendar: 1060px;

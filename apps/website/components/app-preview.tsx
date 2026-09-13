@@ -50,7 +50,15 @@ function Dot() {
   return <span className="size-2 rounded-full bg-border" />
 }
 
-function SidebarRow({ name, active, shared }: { name: string; active?: boolean; shared?: boolean }) {
+interface SidebarRowProps {
+  name: string
+  /** The List being read, which the sidebar fills. */
+  active?: boolean
+  /** Shared with somebody, which the sidebar marks with a dot. */
+  shared?: boolean
+}
+
+function SidebarRow({ name, active, shared }: SidebarRowProps) {
   return (
     <span
       className={`flex items-center gap-1.5 rounded-md px-1.5 py-1 text-small ${
@@ -64,7 +72,13 @@ function SidebarRow({ name, active, shared }: { name: string; active?: boolean; 
 }
 
 /** One row, at the proportions DESIGN.md §6 gives a real one. */
-function PreviewItem({ label, quantity }: { label: string; quantity?: string }) {
+interface PreviewItemProps {
+  label: string
+  /** Free text, as a real quantity is. */
+  quantity?: string
+}
+
+function PreviewItem({ label, quantity }: PreviewItemProps) {
   return (
     <div className="flex items-center gap-2.5 border-b border-hair py-2 text-small">
       <span className="size-[13px] flex-none rounded-[3px] border border-border" />

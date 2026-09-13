@@ -2,16 +2,20 @@ import {
   addDays,
   addYears,
   differenceInCalendarDays,
+  eachDayOfInterval,
   endOfDay,
   endOfMonth,
+  endOfWeek,
   format,
   formatISO,
   getDay,
   isBefore,
+  isSameMonth,
   isValid,
   parseISO,
   startOfDay,
   startOfMonth,
+  startOfWeek,
 } from "date-fns"
 import type { Locale as DateLocale } from "date-fns"
 
@@ -215,6 +219,49 @@ export function atEndOf(day: DueDate): string {
 /** rangeFrom returns the stored dates bounding a window of days starting at from. */
 export function rangeFrom(from: Date, days: number): DueRange {
   return { start: toStored(from), end: toStored(addDays(from, days)) }
+}
+
+/**
+ * WEEK_STARTS_ON_MONDAY is the only week Nooks draws.
+ *
+ * DESIGN.md §8: a week does not begin on Sunday. date-fns defaults to Sunday, so every
+ * call that cares has to say otherwise — which is why they all live in this file.
+ */
+const WEEK_STARTS_ON_MONDAY = { weekStartsOn: 1 } as const
+
+/** The first and last day a month's grid covers: whole weeks, Monday first. */
+export interface DaySpan {
+  start: Date
+  end: Date
+}
+
+/**
+ * monthGrid is the span a month's grid covers.
+ *
+ * Wider than the month: the grid is whole weeks, so it reaches back into the previous
+ * month and forward into the next to fill the first and last rows.
+ */
+export function monthGrid(month: Date): DaySpan {
+  const first = startOfMonth(month)
+  return {
+    start: startOfWeek(first, WEEK_STARTS_ON_MONDAY),
+    end: endOfWeek(endOfMonth(first), WEEK_STARTS_ON_MONDAY),
+  }
+}
+
+/** daysIn is every day the span covers, in order. */
+export function daysIn(span: DaySpan): Date[] {
+  return eachDayOfInterval(span)
+}
+
+/** firstOfMonth is the month a day belongs to, as its first day. */
+export function firstOfMonth(date: Date): Date {
+  return startOfMonth(date)
+}
+
+/** sameMonth reports whether a day belongs to the month being drawn. */
+export function sameMonth(date: Date, month: Date): boolean {
+  return isSameMonth(date, month)
 }
 
 /** monthWindow is the stored dates bounding the month a day falls in. */

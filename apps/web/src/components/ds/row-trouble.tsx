@@ -102,8 +102,17 @@ export function RowTrouble({
   )
 }
 
+/** One of the two versions, as the panel stacks them. */
+interface VersionProps {
+  /** What this version is called: whose it is, or where it came from. */
+  label: string
+  text: string
+  /** The Member's own, which the design outlines in accent. */
+  mine?: boolean
+}
+
 /** One of the two versions, stacked. The Member's own is outlined in accent. */
-function Version({ label, text, mine }: { label: string; text: string; mine?: boolean }) {
+function Version({ label, text, mine }: VersionProps) {
   return (
     <div
       className={cn(

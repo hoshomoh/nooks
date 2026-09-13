@@ -13,14 +13,9 @@ docker run -d --name nooks \
 Open [localhost:8081](http://localhost:8081). The first person to arrive creates their
 account and names the instance.
 
-<Callout type="warn">
-  The image is published by the first tagged release, and there has not been one yet.
-  Until then, build it from a checkout — `docker build -t nooks .` — and use `nooks` in
-  place of `ghcr.io/hoshomoh/nooks` above.
-</Callout>
-
 Images are tagged `1.2.3`, `1.2` and `latest`. Pin the major and minor if you want
-patches without surprises; pin the full version if you want exactly what you tested.
+patches without surprises; pin the full version if you want exactly what you tested —
+the [changelog](/docs/changelog) says what is in each.
 
 ## What is in the image
 

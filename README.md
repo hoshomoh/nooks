@@ -13,6 +13,12 @@ SQLite file you can copy.
 With Docker:
 
 ```bash
+docker run -d --name nooks -p 8081:8081 -v nooks-data:/var/lib/nooks ghcr.io/hoshomoh/nooks
+```
+
+Or with the `docker-compose.yml` in this repository:
+
+```bash
 docker compose up -d
 ```
 

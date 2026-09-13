@@ -13,15 +13,14 @@ Open [localhost:8081](http://localhost:8081).
 
 ## What it does
 
-One service, one named volume, and a health check the binary answers itself. It builds
-from the checkout, because the image is published by the first tagged release and there
-has not been one yet — after that, `build: .` becomes `image: ghcr.io/hoshomoh/nooks`
-and the file stops needing the source at all.
+One service, one named volume, and a health check the binary answers itself. It pulls
+the published image rather than building one, so the file is the whole deployment —
+nothing on the machine running it but Docker and these few lines.
 
 ```yaml
 services:
   nooks:
-    build: .
+    image: ghcr.io/hoshomoh/nooks:latest
     restart: unless-stopped
     ports:
       - "8081:8081"

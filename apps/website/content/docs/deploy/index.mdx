@@ -7,7 +7,17 @@ Nooks serves the API and the app from the same process, and keeps everything in 
 SQLite file you can copy. There is no separate database to stand up, no queue, and no
 mail server.
 
-## Build and run
+## Run it
+
+```bash
+docker run -d --name nooks -p 8081:8081 -v nooks-data:/var/lib/nooks ghcr.io/hoshomoh/nooks
+```
+
+That is the whole install — see [Docker](/docs/deploy/docker) for the volume, the
+configuration and the health check, or [Docker Compose](/docs/deploy/compose) for a file
+you check in instead.
+
+From source, if you would rather build it yourself:
 
 ```bash
 go build -o nooks ./cmd/nooks

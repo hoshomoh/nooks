@@ -5,14 +5,13 @@
 # Then open http://localhost:8081. The first person to arrive creates their account and
 # names the instance.
 #
-# It builds from this checkout rather than pulling an image, because the image is
-# published by the first tagged release and there has not been one yet. After that,
-# `build: .` below becomes `image: ghcr.io/hoshomoh/nooks` and this file stops needing
-# the source at all.
+# It pulls the published image, so this file is the only thing you need — no checkout,
+# no toolchain. `latest` is the most recent release; pin a version from the changelog
+# if you would rather decide when you move.
 
 services:
   nooks:
-    build: .
+    image: ghcr.io/hoshomoh/nooks:latest
     restart: unless-stopped
     ports:
       - "8081:8081"

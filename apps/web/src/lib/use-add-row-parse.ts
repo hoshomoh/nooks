@@ -20,6 +20,10 @@ export function useAddRowParse(now: Date = new Date()): ParseAddRowLine {
   const vocabulary: AddRowVocabulary = {
     todayWords: wordList(t("addRow.todayWords", { returnObjects: true })),
     tomorrowWords: wordList(t("addRow.tomorrowWords", { returnObjects: true })),
+    comingWords: wordList(t("addRow.comingWords", { returnObjects: true })),
+    inWords: wordList(t("addRow.inWords", { returnObjects: true })),
+    dayWords: wordList(t("addRow.dayWords", { returnObjects: true })),
+    weekWords: wordList(t("addRow.weekWords", { returnObjects: true })),
     units: wordList(t("addRow.units", { returnObjects: true })),
   }
 

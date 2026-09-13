@@ -9,6 +9,7 @@ import {
   toStored,
   weekdayNames,
   type DueDate,
+  type Weekday,
 } from "./dates"
 
 /**
@@ -41,6 +42,24 @@ export interface AddRowVocabulary {
   todayWords: readonly string[]
   /** Words meaning the next day. */
   tomorrowWords: readonly string[]
+  /**
+   * Words that may stand before a weekday without moving it, such as "next".
+   *
+   * They name the day the bare weekday already names. A weekday on its own is always
+   * the one still to come — "saturday" on a Saturday is the Saturday after this one —
+   * so there is no earlier Saturday for "next saturday" to distinguish itself from.
+   * Giving the word a week of its own would make two sentences a Member reads as the
+   * same thing differ by seven days, and which one they mean is genuinely a coin flip.
+   * Anybody who wants the later one writes "saturday in 2 weeks", which cannot be
+   * misread.
+   */
+  comingWords: readonly string[]
+  /** Words introducing a distance, such as the "in" of "in 2 weeks". */
+  inWords: readonly string[]
+  /** What a day is called, singular and plural. */
+  dayWords: readonly string[]
+  /** What a week is called, singular and plural. */
+  weekWords: readonly string[]
   /** Units a quantity may carry. A number needs none. */
   units: readonly string[]
 }
@@ -107,6 +126,15 @@ export function parseAddRow(text: string, options: AddRowParseOptions): AddRowPa
   }
 }
 
+/**
+ * The most words one value can be written in: "saturday in 2 weeks".
+ *
+ * The window is what keeps the scan honest. Every word it widens by is another way for
+ * a name to be mistaken for a date, so it is the length of the longest form the grammar
+ * actually has rather than a number with room to spare.
+ */
+const LONGEST_VALUE = 4
+
 /** One recognised value, and how many words it was written in. */
 interface TakenValue {
   chip: AddRowChip
@@ -115,7 +143,10 @@ interface TakenValue {
 
 /**
  * takeTrailingValue recognises the value at the end of the words, longest form first so
- * `250 g` is one quantity rather than a stray `g`.
+ * `250 g` is one quantity rather than a stray `g`, and `saturday in 2 weeks` is one date
+ * rather than a Saturday with some words after it.
+ *
+ * Never the whole line: a value needs a name in front of it to belong to.
  */
 function takeTrailingValue(
   words: string[],
@@ -123,14 +154,9 @@ function takeTrailingValue(
   taken: ReadonlySet<ChipKind>,
   options: AddRowParseOptions,
 ): TakenValue | null {
-  const one = words[end - 1] ?? ""
-  const two = end > 2 ? `${words[end - 2]} ${one}` : ""
-
-  for (const [source, length] of [
-    [two, 2],
-    [one, 1],
-  ] as const) {
-    if (!source || isProtected(source)) {
+  for (let length = Math.min(LONGEST_VALUE, end - 1); length >= 1; length -= 1) {
+    const source = words.slice(end - length, end).join(" ")
+    if (isProtected(source)) {
       continue
     }
     const chip = recognise(source, options)
@@ -192,13 +218,95 @@ function readDue(source: string, options: AddRowParseOptions): DueDate {
     return toStored(shift(from, 1))
   }
 
-  const weekday = weekdayNames(locale).get(folded)
+  const weekdays = weekdayNames(locale)
+  const weekday = weekdays.get(folded)
   if (weekday !== undefined) {
     return toStored(nextWeekday(from, weekday))
   }
 
+  const relative = readRelative(folded, weekdays, options)
+  if (relative) {
+    return toStored(relative)
+  }
+
   const written = readWrittenDate(folded, options)
   return written ? toStored(written) : ""
+}
+
+/**
+ * readRelative reads the forms that say how far away a day is rather than naming it.
+ *
+ * Three, and they are the ones people type: `next saturday`, `in 3 days`, and
+ * `saturday in 2 weeks`.
+ */
+function readRelative(
+  folded: string,
+  weekdays: ReadonlyMap<string, Weekday>,
+  options: AddRowParseOptions,
+): Date | null {
+  const { from, vocabulary } = options
+  const words = folded.split(" ")
+
+  if (words.length === 2 && says(vocabulary.comingWords, words[0])) {
+    const weekday = weekdays.get(words[1] ?? "")
+    return weekday === undefined ? null : nextWeekday(from, weekday)
+  }
+
+  const distance = readDistance(words, vocabulary)
+  if (!distance) {
+    return null
+  }
+
+  // "in 2 weeks", counted from today.
+  if (distance.before === 0) {
+    return shift(from, distance.days)
+  }
+
+  // "saturday in 2 weeks", counted from the Saturday that was coming anyway.
+  if (distance.before === 1) {
+    const weekday = weekdays.get(words[0] ?? "")
+    return weekday === undefined ? null : shift(nextWeekday(from, weekday), distance.days)
+  }
+  return null
+}
+
+/** How far away a day was said to be, and how many words came before the saying. */
+interface Distance {
+  /** Words before the `in`. None for "in 2 weeks", one for "saturday in 2 weeks". */
+  before: number
+  days: number
+}
+
+/**
+ * readDistance reads a trailing `in <number> <days|weeks>`.
+ *
+ * Whole numbers of at least one only. "in 0 days" is today said the hard way, and a
+ * fractional week is not a day anybody means.
+ */
+function readDistance(words: string[], vocabulary: AddRowVocabulary): Distance | null {
+  const before = words.length - 3
+  if (before < 0 || !says(vocabulary.inWords, words[before])) {
+    return null
+  }
+
+  const count = Number(words[before + 1])
+  if (!Number.isInteger(count) || count < 1) {
+    return null
+  }
+
+  const unit = words[before + 2]
+  if (says(vocabulary.dayWords, unit)) {
+    return { before, days: count }
+  }
+  if (says(vocabulary.weekWords, unit)) {
+    return { before, days: count * 7 }
+  }
+  return null
+}
+
+/** says reports whether a word is one a language uses for something. */
+function says(words: readonly string[], word: string | undefined): boolean {
+  return word !== undefined && words.some((candidate) => fold(candidate) === fold(word))
 }
 
 /**

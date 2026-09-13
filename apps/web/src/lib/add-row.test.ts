@@ -6,6 +6,10 @@ import { parseAddRow, type AddRowParseOptions, type AddRowVocabulary } from "./a
 const vocabulary: AddRowVocabulary = {
   todayWords: ["today", "tonight"],
   tomorrowWords: ["tomorrow"],
+  comingWords: ["next", "this", "coming"],
+  inWords: ["in"],
+  dayWords: ["day", "days"],
+  weekWords: ["week", "weeks"],
   units: ["kg", "g", "l", "ml", "x"],
 }
 
@@ -91,6 +95,81 @@ describe("dates", () => {
 
   it("ignores a day the month never has", () => {
     expect(parse("Ferry 31/9").name).toBe("Ferry 31/9")
+  })
+})
+
+describe("saying how far away a day is", () => {
+  // Tuesday 25 August 2026 is the day every one of these is read from.
+  it("reads a weekday with a word in front of it", () => {
+    // Saturday 29 August, the same day the bare weekday names.
+    expect(parse("milk next saturday")).toMatchObject({ name: "milk", due: "2026-08-29" })
+    expect(parse("milk this saturday").due).toBe("2026-08-29")
+    expect(parse("milk coming saturday").due).toBe("2026-08-29")
+  })
+
+  it("puts next saturday on the same day as saturday", () => {
+    // The word adds emphasis, not a week. Two sentences a Member reads as the same
+    // thing must not land seven days apart.
+    expect(parse("milk next saturday").due).toBe(parse("milk saturday").due)
+  })
+
+  it("counts days forward", () => {
+    expect(parse("bins in 3 days")).toMatchObject({ name: "bins", due: "2026-08-28" })
+  })
+
+  it("counts weeks forward", () => {
+    expect(parse("rent in 2 weeks")).toMatchObject({ name: "rent", due: "2026-09-08" })
+  })
+
+  it("reads the singular as well as the plural", () => {
+    expect(parse("bins in 1 week").due).toBe("2026-09-01")
+    expect(parse("bins in 1 day").due).toBe("2026-08-26")
+  })
+
+  it("counts weeks from the weekday that was coming anyway", () => {
+    // Saturday 29 August is the coming one; two weeks past it is 12 September.
+    expect(parse("oat milk saturday in 2 weeks")).toMatchObject({
+      name: "oat milk",
+      due: "2026-09-12",
+    })
+  })
+
+  it("refuses a distance that is not a whole number of at least one", () => {
+    expect(parse("milk in 0 days").due).toBe("")
+    expect(parse("milk in 1.5 weeks").due).toBe("")
+    expect(parse("milk in some days").due).toBe("")
+  })
+
+  it("refuses a unit it does not know", () => {
+    // Nooks has no time of day, so an hour is not something an Item can be due in.
+    expect(parse("milk in 2 hours").due).toBe("")
+    expect(parse("milk in 2 months").due).toBe("")
+  })
+
+  it("keeps a word in front of something that is not a weekday", () => {
+    expect(parse("pick up the next parcel").name).toBe("pick up the next parcel")
+  })
+
+  it("still needs a name in front of it", () => {
+    expect(parse("bins in 2 weeks").name).toBe("bins")
+  })
+
+  it("falls back to a shorter reading rather than taking the whole line", () => {
+    // Four words, and the four-word form would leave nothing to call the Item. So the
+    // three-word one is read instead and "saturday" becomes the name — which is what
+    // typing "saturday" on its own does too.
+    expect(parse("saturday in 2 weeks")).toMatchObject({
+      name: "saturday",
+      due: "2026-09-08",
+    })
+  })
+
+  it("reads a quantity that was typed before the distance", () => {
+    expect(parse("oat milk 2 in 2 weeks")).toMatchObject({
+      name: "oat milk",
+      quantity: "2",
+      due: "2026-09-08",
+    })
   })
 })
 

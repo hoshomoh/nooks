@@ -316,13 +316,28 @@ export function nextDayOfMonth(from: Date, day: number, month: Month): Date | nu
 export type Month = number
 
 /**
+ * The spellings already worked out for a language.
+ *
+ * The add row parses on every keystroke and asks for these several times a line, and
+ * answering means formatting twenty-six dates. A date-fns locale is a module object
+ * that never changes, so each answer is worked out once and kept against it.
+ */
+const weekdaysByLocale = new WeakMap<DateLocale, Map<string, Weekday>>()
+const monthsByLocale = new WeakMap<DateLocale, Map<string, Month>>()
+
+/**
  * weekdayNames maps every spelling of a weekday in a language to its number.
  *
  * Taken from the date-fns locale rather than a table in each locale file: a language
  * already names its own days, and asking translators to repeat them is how the two
  * drift apart.
  */
-export function weekdayNames(locale: DateLocale): Map<string, Weekday> {
+export function weekdayNames(locale: DateLocale): ReadonlyMap<string, Weekday> {
+  const known = weekdaysByLocale.get(locale)
+  if (known) {
+    return known
+  }
+
   const names = new Map<string, Weekday>()
   for (let weekday = 0; weekday < 7; weekday += 1) {
     const day = new Date(2024, 0, 7 + weekday)
@@ -331,11 +346,17 @@ export function weekdayNames(locale: DateLocale): Map<string, Weekday> {
       format(day, "EEE", { locale }),
     ])
   }
+  weekdaysByLocale.set(locale, names)
   return names
 }
 
 /** monthNames maps every spelling of a month in a language to its number. */
-export function monthNames(locale: DateLocale): Map<string, Month> {
+export function monthNames(locale: DateLocale): ReadonlyMap<string, Month> {
+  const known = monthsByLocale.get(locale)
+  if (known) {
+    return known
+  }
+
   const names = new Map<string, Month>()
   for (let month = 0; month < 12; month += 1) {
     const day = new Date(2024, month, 1)
@@ -344,6 +365,7 @@ export function monthNames(locale: DateLocale): Map<string, Month> {
       format(day, "MMM", { locale }),
     ])
   }
+  monthsByLocale.set(locale, names)
   return names
 }
 

@@ -248,6 +248,22 @@
     "tomorrowWords": [
       "tomorrow"
     ],
+    "comingWords": [
+      "next",
+      "this",
+      "coming"
+    ],
+    "inWords": [
+      "in"
+    ],
+    "dayWords": [
+      "day",
+      "days"
+    ],
+    "weekWords": [
+      "week",
+      "weeks"
+    ],
     "units": [
       "kg",
       "g",

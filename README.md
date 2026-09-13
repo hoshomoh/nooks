@@ -5,9 +5,6 @@ A household todo app you run on your own machine.
 One list primitive, one action to add something, and a printed page that is a real deliverable rather
 than a fallback. No email server to configure, no telemetry, no account anywhere but yours.
 
-> Nooks is in early development. Nothing here is releasable yet — see [`TODO.md`](TODO.md) for where it
-> is up to.
-
 ## Running it
 
 Nooks is one binary. It serves the API and the app from the same process and keeps everything in one
@@ -88,7 +85,19 @@ you a review round.
 | [`CONTEXT.md`](CONTEXT.md) | The language. Every term has one name and a list of what not to call it |
 | [`DESIGN.md`](DESIGN.md) | The design system. Exact values, not approximate |
 | [`STANDARDS.md`](STANDARDS.md) | Code standards |
-| [`TODO.md`](TODO.md) | The plan and the current status |
+
+## Deliberately not in Nooks
+
+Named so nobody wonders whether they were forgotten. None of them appear in the design.
+
+- Recurring Items · Reminders and push notifications · File attachments · Sub-lists or nesting beyond
+  Note checklists · Multiple Instances behind one deployment · Email, of any kind
+- **Images in a Note.** A remote one would have the Note fetch from somebody else's server when it
+  opens, telling that server the Note was read and from which address, on an app whose whole claim is
+  that nothing leaves the machine. A URL stays a link.
+
+A **mobile app is planned**: Expo, in `apps/mobile`, sharing `@nooks/api` and the design tokens. The
+layout already has room for it.
 
 ## Licence
 

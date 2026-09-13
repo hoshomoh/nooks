@@ -77,7 +77,6 @@ cd proto && buf format -w        # Format proto files
 | `CONTEXT.md` | Domain glossary. Every term has one name and a list of what not to call it |
 | `DESIGN.md` | The design system spec the UI is built to. Exact values, not approximate |
 | `STANDARDS.md` | Code standards. Binding on contributors and agents alike |
-| `TODO.md` | Plan and status. Update the checkbox in the same commit as the work |
 | `cmd/nooks/` | CLI setup and server startup |
 | `server/` | HTTP server, router wiring, graceful shutdown |
 | `server/auth/` | Sessions, passwords, access tokens |

@@ -190,6 +190,9 @@ jobs:
       # A build that succeeds while the navigation is broken is a build that cannot be
       # trusted. This caught nothing when it was written because it was written after
       # the header spent a release pointing at a folder rather than a page.
+      - name: Test
+        run: pnpm --filter @nooks/website test
+
       - name: Every internal link reaches a page
         run: pnpm --filter @nooks/website check-links
       # Somebody reviewing a change to the docs or the landing page can read the built

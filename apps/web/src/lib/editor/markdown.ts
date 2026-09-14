@@ -12,9 +12,9 @@ import { markerOf, type BlockKind } from "./markers"
  * Nooks being uninstalled — while a document tree is what an editor can render without
  * ever showing the markup. So the two meet here, at the save boundary, and nowhere else.
  *
- * Only the five block types the design names are represented. Anything else in the
- * markdown becomes a paragraph rather than being dropped: a Member's words matter more
- * than the shape they arrived in.
+ * Only the block types the design names are represented. Anything else in the markdown
+ * becomes a paragraph rather than being dropped: a Member's words matter more than the
+ * shape they arrived in.
  */
 
 /** TASK_LIST and friends are the node names the editor's extensions register. */
@@ -26,6 +26,11 @@ const NODE = {
   taskItem: "taskItem",
   quote: "blockquote",
   code: "codeBlock",
+  rule: "horizontalRule",
+  table: "table",
+  tableRow: "tableRow",
+  tableHeader: "tableHeader",
+  tableCell: "tableCell",
   text: "text",
 } as const
 
@@ -34,6 +39,19 @@ const HEADING_LEVEL = 3
 
 /** FENCE is the shorthand that opens and closes a code block. */
 const FENCE = "```"
+
+/** RULE is what a divider is written as. */
+const RULE = "---"
+
+/**
+ * SEPARATOR is the row that makes the line above it a table's heading.
+ *
+ * Alignment colons are accepted and then forgotten: DESIGN.md §10 aligns the first
+ * column left and every other one right, because the later columns hold quantities.
+ * A note that stored its own alignment would be storing an answer the design has
+ * already given.
+ */
+const SEPARATOR = /^\|?(?:\s*:?-{3,}:?\s*\|)+\s*:?-{3,}:?\s*\|?$|^\|\s*:?-{3,}:?\s*\|$/
 
 /** documentFrom parses stored markdown into what the editor renders. */
 export function documentFrom(markdown: string): JSONContent {
@@ -51,7 +69,19 @@ export function documentFrom(markdown: string): JSONContent {
       continue
     }
 
+    if (startsTable(lines, index)) {
+      const [node, next] = readTable(lines, index)
+      content.push(node)
+      index = next
+      continue
+    }
+
     const marker = markerOf(line)
+    if (marker.kind === "rule") {
+      content.push({ type: NODE.rule })
+      index += 1
+      continue
+    }
     if (marker.kind === "todo" || marker.kind === "todo-done") {
       const [node, next] = readTasks(lines, index)
       content.push(node)
@@ -80,6 +110,54 @@ function readFence(lines: string[], start: number): [JSONContent, number] {
 
   // An unclosed fence still ends the document; the text inside it is not lost.
   return [textNode(NODE.code, body.join("\n")), index + 1]
+}
+
+/**
+ * startsTable reports whether a table begins on this line.
+ *
+ * A row on its own is not one. `| not a table` is a sentence somebody started with a
+ * pipe, and the line under it is what says otherwise — which is the same rule every
+ * markdown reader uses, and the reason a table cannot be typed one row at a time.
+ */
+function startsTable(lines: string[], index: number): boolean {
+  const row = (lines[index] ?? "").trim()
+  const under = (lines[index + 1] ?? "").trim()
+  return row.startsWith("|") && SEPARATOR.test(under)
+}
+
+/** readTable reads a pipe table, and where the document carries on. */
+function readTable(lines: string[], start: number): [JSONContent, number] {
+  const heading = cellsOf(lines[start] ?? "")
+  const rows: JSONContent[] = [
+    { type: NODE.tableRow, content: heading.map((text) => cell(NODE.tableHeader, text)) },
+  ]
+
+  // The separator is consumed with the heading; the body is everything after it that
+  // still looks like a row.
+  let index = start + 2
+  while (index < lines.length && (lines[index] ?? "").trim().startsWith("|")) {
+    const texts = cellsOf(lines[index] ?? "")
+    // Ragged rows are padded rather than refused. A table somebody typed by hand, or an
+    // assistant wrote, is still their words.
+    const padded = heading.map((_, column) => texts[column] ?? "")
+    rows.push({ type: NODE.tableRow, content: padded.map((text) => cell(NODE.tableCell, text)) })
+    index += 1
+  }
+
+  return [{ type: NODE.table, content: rows }, index]
+}
+
+/** cellsOf splits one row on its unescaped pipes. */
+function cellsOf(line: string): string[] {
+  const trimmed = line.trim().replace(/^\|/, "").replace(/\|$/, "")
+  return trimmed
+    .split(/(?<!\\)\|/)
+    .map((text) => text.trim().replace(/\\\|/g, "|"))
+}
+
+/** cell is one box in a table, holding a paragraph as the editor expects. */
+function cell(type: string, text: string): JSONContent {
+  return { type, content: [paragraph(text)] }
 }
 
 /** readTasks reads a run of checklist lines as one list, and where it ends. */
@@ -153,9 +231,37 @@ function linesOf(node: JSONContent): string[] {
       return [FENCE, ...plainText(node).split("\n"), FENCE]
     case NODE.taskList:
       return (node.content ?? []).map(taskLine)
+    case NODE.rule:
+      return [RULE]
+    case NODE.table:
+      return tableLines(node)
     default:
       return [markedText(node)]
   }
+}
+
+/**
+ * tableLines writes a table back as a pipe table.
+ *
+ * The separator is always written plain. Alignment is the design's answer rather than
+ * the Member's, so there is nothing here to remember.
+ */
+function tableLines(table: JSONContent): string[] {
+  const rows = table.content ?? []
+  const written = rows.map((row) =>
+    `| ${(row.content ?? []).map(cellText).join(" | ")} |`,
+  )
+  if (written.length === 0) {
+    return []
+  }
+  const columns = (rows[0]?.content ?? []).length
+  const separator = `|${" --- |".repeat(columns)}`
+  return [written[0] ?? "", separator, ...written.slice(1)]
+}
+
+/** cellText is one box's words, with any pipe in them kept as words. */
+function cellText(box: JSONContent): string {
+  return (box.content ?? []).map(markedText).join(" ").replace(/\|/g, "\\|")
 }
 
 /** taskLine writes one checklist item, ticked or not. */

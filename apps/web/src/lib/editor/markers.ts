@@ -7,7 +7,7 @@
  */
 
 /** The block types a Note line can be. */
-export type BlockKind = "paragraph" | "heading" | "todo" | "todo-done" | "quote" | "code"
+export type BlockKind = "paragraph" | "heading" | "todo" | "todo-done" | "quote" | "code" | "rule"
 
 /** What was found at the start of a line. */
 export type LineMarker = {
@@ -47,6 +47,9 @@ const BARE: ReadonlyArray<{ line: string; kind: BlockKind }> = [
   { line: "- [ ]", kind: "todo" },
   { line: "- [x]", kind: "todo-done" },
   { line: "- [X]", kind: "todo-done" },
+  // A divider is the whole line and has nothing after it, so it belongs here rather
+  // than among the prefixes — "--- and then some words" is a sentence about dashes.
+  { line: "---", kind: "rule" },
 ]
 
 /** markerOf reads the shorthand at the start of a line. */
@@ -76,6 +79,7 @@ export const SHORTHAND: Record<Exclude<BlockKind, "paragraph" | "todo-done">, st
   todo: "- [ ]",
   quote: ">",
   code: "```",
+  rule: "---",
 }
 
 /** What inserting a block type from the / menu puts at the start of the line. */
@@ -84,6 +88,8 @@ export const INSERTION: Record<Exclude<BlockKind, "paragraph" | "todo-done">, st
   todo: "- [ ] ",
   quote: "> ",
   code: "```\n\n```",
+  // A divider is the whole line, so inserting one leaves the caret on the next.
+  rule: "---\n",
 }
 
 /**

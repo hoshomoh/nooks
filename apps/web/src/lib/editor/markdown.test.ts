@@ -81,3 +81,66 @@ describe("a Note with nothing in it", () => {
     expect(roundTrip("")).toBe("")
   })
 })
+
+describe("dividers", () => {
+  it("reads a line of three dashes as a rule", () => {
+    expect(documentFrom("Above\n---\nBelow").content?.map((node) => node.type)).toEqual([
+      "paragraph",
+      "horizontalRule",
+      "paragraph",
+    ])
+  })
+
+  it("writes one back", () => {
+    expect(markdownFrom(documentFrom("Above\n---\nBelow"))).toBe("Above\n---\nBelow")
+  })
+
+  it("leaves dashes that are part of a sentence alone", () => {
+    // "--- and then some words" is a sentence about dashes, not a rule.
+    expect(documentFrom("--- ish").content?.[0]?.type).toBe("paragraph")
+  })
+})
+
+describe("tables", () => {
+  const markdown = ["| Bean | Grind | Price |", "| --- | --- | --- |", "| House | Filter | 11,00 |"].join("\n")
+
+  it("reads a heading row and a body row", () => {
+    const table = documentFrom(markdown).content?.[0]
+    expect(table?.type).toBe("table")
+    expect(table?.content?.[0]?.content?.map((cell) => cell.type)).toEqual([
+      "tableHeader",
+      "tableHeader",
+      "tableHeader",
+    ])
+    expect(table?.content?.[1]?.content?.[0]?.type).toBe("tableCell")
+  })
+
+  it("writes it back exactly", () => {
+    expect(markdownFrom(documentFrom(markdown))).toBe(markdown)
+  })
+
+  it("needs the separator row before it is a table", () => {
+    // One row on its own is a sentence somebody started with a pipe.
+    expect(documentFrom("| not a table").content?.[0]?.type).toBe("paragraph")
+  })
+
+  it("accepts alignment colons and forgets them", () => {
+    // DESIGN.md §10 decides alignment, so there is nothing here to store.
+    const aligned = ["| A | B |", "| :--- | ---: |", "| 1 | 2 |"].join("\n")
+    expect(markdownFrom(documentFrom(aligned))).toBe(
+      ["| A | B |", "| --- | --- |", "| 1 | 2 |"].join("\n"),
+    )
+  })
+
+  it("pads a row that is short rather than refusing it", () => {
+    const ragged = ["| A | B |", "| --- | --- |", "| 1 |"].join("\n")
+    expect(markdownFrom(documentFrom(ragged))).toBe(
+      ["| A | B |", "| --- | --- |", "| 1 |  |"].join("\n"),
+    )
+  })
+
+  it("keeps a pipe somebody wrote as a pipe", () => {
+    const piped = ["| A |", "| --- |", "| a \\| b |"].join("\n")
+    expect(markdownFrom(documentFrom(piped))).toBe(piped)
+  })
+})

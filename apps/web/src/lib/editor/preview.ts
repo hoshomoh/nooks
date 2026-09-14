@@ -62,8 +62,30 @@ function saying(node: JSONContent): PreviewRun[][] {
     return (node.content ?? []).flatMap(saying)
   }
 
+  // A table is one line here, and it is its heading row — the words that say what the
+  // table is about. Every cell flattened together would read as one jammed sentence,
+  // and a table that said nothing at all would leave a Note that is only a table with
+  // an empty row. A divider says nothing and needs no case: it has no runs.
+  if (node.type === "table") {
+    const heading = node.content?.[0]
+    return heading ? saying({ type: "paragraph", content: spaced(heading) }) : []
+  }
+
   const runs = runsIn(node)
   return runs.length > 0 ? [runs] : []
+}
+
+/**
+ * spaced reads a row as somebody would read it aloud, with a space between the cells.
+ *
+ * The only punctuation a preview is allowed to invent. Anything more — a bullet, a
+ * pipe — would be Nooks writing in the middle of the Member's own words.
+ */
+function spaced(row: JSONContent): JSONContent[] {
+  return (row.content ?? []).flatMap((cell, index) => {
+    const inside = (cell.content ?? []).flatMap((block) => block.content ?? [])
+    return index === 0 ? inside : [{ type: "text", text: " " }, ...inside]
+  })
 }
 
 /** runsIn walks a block for its text, keeping the marks each run carries. */

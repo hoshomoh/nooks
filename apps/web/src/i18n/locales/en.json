@@ -227,6 +227,8 @@
     "blocks": {
       "todo": "Checklist item",
       "heading": "Heading, small",
+      "table": "Table",
+      "rule": "Divider",
       "quote": "Quote",
       "code": "Code block"
     },

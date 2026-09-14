@@ -173,12 +173,20 @@
   --note-body: var(--text-note-sheet);
   --note-heading: var(--text-note-heading-sheet);
   --note-code: var(--text-micro);
+  --note-table-name: var(--text-meta);
+  --note-table-value: var(--text-micro);
 }
 
 .nooks-note-full {
   --note-body: var(--text-note);
   --note-heading: var(--text-note-heading);
   --note-code: var(--text-small);
+  /* A table sits a step under the prose beside it, and its values a step under that:
+     15.5 / 14.5 / 13.5 here, 14.5 / 13.5 / 12.5 in the sheet. The 14.5 step is named
+     after the sheet's paragraph because that is the size it is — the name says where
+     the number came from, not where it is used. */
+  --note-table-name: var(--text-note-sheet);
+  --note-table-value: var(--text-meta);
 }
 
 .nooks-note {
@@ -209,6 +217,71 @@
   padding-left: 13px;
   border-left: 2px solid var(--border);
   color: var(--secondary-foreground);
+}
+
+/* DESIGN.md §10: a divider is a hairline with air either side, and nothing else. It is
+   the one block that carries no words, so it carries no colour of its own either. */
+.nooks-note hr {
+  margin: 12px 0;
+  border: 0;
+  height: 1px;
+  background: var(--border);
+}
+
+/* DESIGN.md §10. A table is a grid of values, and the design reads it as one: the first
+   column names the thing in prose, and every column after it holds a quantity, set in
+   mono and aligned right so the digits line up down the column. */
+.nooks-note table {
+  margin: 10px 0 6px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.nooks-note th {
+  padding: 0 12px 7px 0;
+  border-bottom: 1px solid var(--foreground);
+  font-size: var(--text-label);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  text-align: right;
+  vertical-align: baseline;
+}
+
+.nooks-note td {
+  padding: 9px 12px 9px 0;
+  border-bottom: 1px solid var(--hair);
+  font-family: var(--font-mono);
+  font-size: var(--note-table-value);
+  color: var(--secondary-foreground);
+  text-align: right;
+  vertical-align: baseline;
+}
+
+/* The first column is what the row is about, so it is prose: the body font, the body
+   size, and the foreground colour the rest of the Note is written in. */
+.nooks-note th:first-child,
+.nooks-note td:first-child {
+  text-align: left;
+}
+
+.nooks-note td:first-child {
+  font-family: inherit;
+  font-size: var(--note-table-name);
+  color: var(--foreground);
+}
+
+/* The last row closes the table; a rule under it would be a line under nothing. */
+.nooks-note tr:last-child td {
+  border-bottom: 0;
+}
+
+/* ProseMirror puts a <p> inside every cell, and the paragraph padding above would
+   otherwise fight the cell's own. */
+.nooks-note th p,
+.nooks-note td p {
+  padding: 0;
 }
 
 .nooks-note pre {

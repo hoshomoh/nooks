@@ -2,15 +2,16 @@ import StarterKit from "@tiptap/starter-kit"
 import Placeholder from "@tiptap/extension-placeholder"
 import TaskItem from "@tiptap/extension-task-item"
 import TaskList from "@tiptap/extension-task-list"
+import { Table, TableCell, TableHeader, TableRow } from "@tiptap/extension-table"
 import type { Extension, Node } from "@tiptap/react"
 
 /**
  * The blocks a Note is made of, and nothing else.
  *
- * DESIGN.md §10 names five: paragraph, heading, checklist, quote, code. Every other
- * block StarterKit offers is turned off here rather than styled — a block type a
- * Member can reach but the design has no drawing for is a block type that will look
- * wrong the first time somebody uses it.
+ * DESIGN.md §10 names seven: paragraph, heading, checklist, quote, code, divider and
+ * table. Every other block StarterKit offers is turned off here rather than styled — a
+ * block type a Member can reach but the design has no drawing for is a block type that
+ * will look wrong the first time somebody uses it.
  *
  * Headings have exactly one level, because the design has exactly one heading.
  */
@@ -28,8 +29,7 @@ export function noteExtensions(options: NoteExtensionOptions): (Extension | Node
       bulletList: false,
       orderedList: false,
       listItem: false,
-      // Nothing in the design draws a rule across a Note.
-      horizontalRule: false,
+      // A divider is one of the seven, and StarterKit already draws it.
       // Links are named in DESIGN.md §10 alongside the other inline markup, drawn as
       // what they mean with the address taken away. They open in a new tab rather than
       // navigating the app out from under an unsaved Note, and never on a click inside
@@ -43,6 +43,12 @@ export function noteExtensions(options: NoteExtensionOptions): (Extension | Node
     }),
     TaskList,
     TaskItem.configure({ nested: false }),
+    // A table's shape is the Member's; how it is drawn is the design's, which is why
+    // nothing here sets a width or an alignment. Resizing is off for the same reason.
+    Table.configure({ resizable: false }),
+    TableRow,
+    TableHeader,
+    TableCell,
     Placeholder.configure({ placeholder: options.placeholder }),
   ]
 }

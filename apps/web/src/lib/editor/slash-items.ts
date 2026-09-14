@@ -15,7 +15,7 @@ export interface SlashItem {
 }
 
 /** The block types the `/` menu offers. */
-export type SlashKind = "todo" | "heading" | "quote" | "code"
+export type SlashKind = "todo" | "heading" | "table" | "rule" | "quote" | "code"
 
 /**
  * The blocks a Member can reach from `/`, in the order the design lists them.
@@ -27,6 +27,8 @@ export function slashItems(t: Translate): SlashItem[] {
   return [
     { kind: "todo", label: t("note.blocks.todo"), glyph: "☐", shorthand: "- [ ]" },
     { kind: "heading", label: t("note.blocks.heading"), glyph: "H", shorthand: "###" },
+    { kind: "table", label: t("note.blocks.table"), glyph: "▦", shorthand: "|" },
+    { kind: "rule", label: t("note.blocks.rule"), glyph: "—", shorthand: "---" },
     { kind: "quote", label: t("note.blocks.quote"), glyph: "❝", shorthand: ">" },
     { kind: "code", label: t("note.blocks.code"), glyph: "{}", shorthand: "```" },
   ]
@@ -53,6 +55,14 @@ export function insert(editor: Editor, range: Range, kind: SlashKind): void {
       return
     case "heading":
       chain.setNode("heading", { level: 3 }).run()
+      return
+    case "table":
+      // Three by two, with a heading row: the smallest table that is still a table,
+      // and the shape the design draws.
+      chain.insertTable({ rows: 3, cols: 2, withHeaderRow: true }).run()
+      return
+    case "rule":
+      chain.setHorizontalRule().run()
       return
     case "quote":
       chain.toggleBlockquote().run()

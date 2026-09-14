@@ -458,6 +458,18 @@ converts a block as it is typed but is **never displayed back to the Member**.
 | Checklist | 15.5 | 14.5 | 15px box in a 26px gutter, padding `3px 0` |
 | Quote | 15.5 `--secondary-foreground` | 14.5 | 2px `--border` left rule, 13px indent, padding `10px 0` |
 | Code | mono 13 `--secondary-foreground` | 12.5 | padding `10px 0` |
+| Divider | 1px `--border` | same | padding `12px 0`, no words of its own |
+| Table | see below | see below | padding `10px 0 6px` |
+
+**A table is a grid of values, and is drawn as one.** The first column names the thing, in prose; every
+column after it holds a quantity, set in mono and aligned right so digits line up down the column. The
+heading row is `text-label` — 11.5 / 500 / 0.05em / uppercase / `--muted-foreground` — underlined with
+1px `--foreground`. Rows are separated by 1px `--hair`, and the last row has none: it closes the table.
+A table steps down from the prose beside it, and its values step down again — 15.5 / 14.5 / 13.5 full
+screen, 14.5 / 13.5 / 12.5 in the sheet.
+
+Alignment is decided here, not by the Member: a note stores no alignment, and the colons a markdown
+table may carry are read and forgotten. Columns cannot be resized for the same reason.
 
 **A block's shorthand is never shown**, not even under the caret. `### ` disappears the moment the
 space that made it a heading is typed, and a line inserted from the `/` menu never shows one at all.

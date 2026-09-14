@@ -32,8 +32,12 @@ fi
 # whatever it happened to be on last time.
 target=$(git rev-parse HEAD)
 
+# --force because ci.sh builds inside this checkout, and what it writes is exactly what
+# a later checkout refuses to overwrite. The worktree holds no work of its own, so there
+# is nothing here worth keeping — and without this the script stops on the artefacts of
+# its own previous run.
 if [ -e "$worktree/.git" ]; then
-  git -C "$worktree" checkout -q --detach "$target"
+  git -C "$worktree" checkout -q --detach --force "$target"
 else
   git worktree add --detach "$worktree" "$target"
 fi

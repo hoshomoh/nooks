@@ -5,6 +5,9 @@ A household todo app you run on your own machine.
 One list primitive, one action to add something, and a printed page that is a real deliverable rather
 than a fallback. No email server to configure, no telemetry, no account anywhere but yours.
 
+**[Documentation](https://usenooks.vercel.app/docs)** — installing, configuring, the REST API and the
+MCP server.
+
 ## Running it
 
 Nooks is one binary. It serves the API and the app from the same process and keeps everything in one

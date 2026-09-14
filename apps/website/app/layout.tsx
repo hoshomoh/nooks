@@ -5,9 +5,14 @@ import { RootProvider } from "fumadocs-ui/provider/next"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 
+import { SITE } from "@/lib/site"
+
 import "./globals.css"
 
 export const metadata: Metadata = {
+  // Without a base, every canonical and social URL the pages produce is relative, and a
+  // relative URL in someone else's card is no URL at all.
+  metadataBase: new URL(SITE),
   title: "nooks — a household todo app",
   description:
     "A self-hosted todo app for a household. One list primitive, one way to add something, and a printed page that is a real deliverable.",

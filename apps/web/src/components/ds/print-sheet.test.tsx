@@ -99,3 +99,23 @@ describe("the printed sheet", () => {
     expect(container.textContent).toContain("Tuesday, 25 August")
   })
 })
+
+describe("what the sheet says it is", () => {
+  it("never calls a list something it is not", () => {
+    // The eyebrow used to read "<instance> · shopping list" for every list, so a
+    // packing list printed a header saying it was shopping. The design writes the kind
+    // of list there, and Nooks has no field for one — so it says nothing rather than
+    // guessing. The list's own name is the heading directly below it.
+    render(
+      <PrintSheet
+        instanceName="Brunnen Street"
+        listName="Packing — Norway"
+        printedOn="Tue 25 August"
+        items={[]}
+      />,
+    )
+
+    expect(printRoot.textContent).toContain("Packing — Norway")
+    expect(printRoot.textContent).not.toMatch(/shopping/i)
+  })
+})

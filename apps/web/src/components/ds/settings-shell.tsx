@@ -101,7 +101,7 @@ export function SettingsShell({ active, crumb, counts, children }: SettingsShell
           className="mt-auto flex h-8 items-center gap-2 rounded-md px-2 text-meta text-muted-foreground transition-colors hover:bg-secondary"
         >
           {t("settings.backToLists")}
-          <Keycap>Esc</Keycap>
+          <Keycap className="ml-auto">Esc</Keycap>
         </Link>
       </nav>
 

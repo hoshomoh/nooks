@@ -440,7 +440,7 @@
     "bread": "Sourdough"
   },
   "print": {
-    "eyebrow": "{{instance}} · shopping list",
+    "eyebrow": "{{instance}}",
     "counts": "{{items}} · {{people}}",
     "itemCount": "{{count}} item",
     "itemCount_other": "{{count}} items",

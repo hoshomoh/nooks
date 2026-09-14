@@ -24,7 +24,10 @@ export function ChromeBar({ crumbs, actions }: ChromeBarProps) {
             key={crumb}
             className={index === crumbs.length - 1 ? "text-secondary-foreground" : ""}
           >
-            {index > 0 && <span className="pr-2.5 text-muted-foreground">/</span>}
+            {/* Space on both sides. It used to come from the bar's own gap, when each
+                crumb was a flex child of it — inside one truncating span there is no
+                gap to inherit, and the separator ran into the crumb before it. */}
+            {index > 0 && <span className="px-2.5 text-muted-foreground">/</span>}
             {crumb}
           </span>
         ))}

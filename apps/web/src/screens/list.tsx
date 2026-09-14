@@ -2,6 +2,7 @@ import { Suspense, useCallback, useMemo } from "react"
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
 import { getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
+import { cn } from "cn"
 
 import { ActivityControl } from "@/components/ds/activity-control"
 import { Presence } from "@/components/ds/presence"
@@ -234,7 +235,14 @@ export function ListScreen() {
           child of something that grows with the List is as tall as the List, and travels
           with it. The scrolling belongs to the column inside. */}
       <div className="relative flex min-h-0 flex-1">
-        <div className="flex flex-1 justify-center overflow-y-auto px-5.5 pt-14 pb-22">
+        <div
+          className={cn(
+            "flex flex-1 justify-center overflow-y-auto pt-14 pb-22 pl-5.5",
+            // The sheet is drawn over this pane, so the pane keeps clear of it rather
+            // than being covered by it.
+            openItem ? "pr-sheet-clear" : "pr-5.5",
+          )}
+        >
           <div className="w-full max-w-content">
             <header className="mb-8.5 flex flex-col gap-3.5">
               <h1 className="text-display">{list.list?.name}</h1>

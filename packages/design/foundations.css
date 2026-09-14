@@ -131,6 +131,10 @@
   --container-content: 660px; /* the centred content column */
   --container-calendar: 1060px;
   --container-sheet: 520px; /* the side sheet */
+  /* What the content pane keeps clear when that sheet is open: the sheet itself and
+     the 24px between it and the List — DESIGN.md §5. Without it a 520px panel simply
+     covers the rows, and a List with an Item open cannot be read. */
+  --spacing-sheet-clear: 544px;
   --container-dialog: 560px;
   --container-form: 460px; /* a signed-out form, narrower than content */
   --container-settings: 720px; /* settings pages hold tables, not sentences */

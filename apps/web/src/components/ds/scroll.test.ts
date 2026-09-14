@@ -39,6 +39,25 @@ describe("what scrolls", () => {
     expect(source("./settings-shell.tsx")).toMatch(/h-full[^"]*overflow-y-auto/)
   })
 
+  it("keeps the content clear of the sheet rather than under it", () => {
+    /*
+     * DESIGN.md §5: with the sheet open the pane's right padding becomes 544px.
+     *
+     * Without it a 520px panel is simply drawn over the rows. It reads as ordinary
+     * truncation, which is why it survived so long — the row is still there, it is
+     * just underneath. It only stops overlapping above about 1958px of window, so
+     * every laptop had it.
+     */
+    const list = source("../../screens/list.tsx")
+    expect(list).toMatch(/openItem \? "pr-sheet-clear" : "pr-5\.5"/)
+
+    const tokens = readFileSync(
+      fileURLToPath(new URL("../../../../../packages/design/foundations.css", import.meta.url)),
+      "utf8",
+    )
+    expect(tokens).toMatch(/--spacing-sheet-clear:\s*544px/)
+  })
+
   it("anchors the side sheet to something that does not grow", () => {
     // The sheet is absolute. Its containing block has to be the frame, not the column
     // that scrolls — an absolute child of a scroller scrolls with it.

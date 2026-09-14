@@ -69,7 +69,14 @@ export const NOOKS_CONTAINERS = [
   "settings",
 ]
 
-/** Every height a control is measured in — DESIGN.md §4 and §7. */
+/**
+ * Every named spacing token — DESIGN.md §4 and §7.
+ *
+ * Mostly the heights a control is measured in, and one that is not: the room the
+ * content pane keeps clear of the side sheet. tailwind-merge has to know all of them
+ * or it cannot tell that two classes built from them are the same property, and the
+ * test beside this list fails when a token is added to the design and not to here.
+ */
 export const NOOKS_SPACING = [
   "control",
   "control-compact",
@@ -80,6 +87,7 @@ export const NOOKS_SPACING = [
   "chrome",
   "chrome-auth",
   "sheet-footer",
+  "sheet-clear",
 ]
 
 /** The two together: a spacing token is a valid width as well as a valid height. */

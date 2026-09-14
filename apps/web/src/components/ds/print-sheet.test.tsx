@@ -83,13 +83,11 @@ describe("the printed sheet", () => {
     expect(show(someItems(1)).querySelectorAll(".nooks-print-blank")).toHaveLength(3)
   })
 
-  it("stays one column while it fits on one", () => {
-    expect(show(someItems(4)).querySelector("[data-two-up]")).toBeNull()
-  })
-
-  // Past a page, two-up rather than spilling onto a second sheet to carry as well.
-  it("goes two-up once it would not", () => {
-    expect(show(someItems(30)).querySelector("[data-two-up]")).not.toBeNull()
+  // DESIGN.md §15 overrules the frames here. Two columns fit more on a sheet and are
+  // harder to read walking around a shop holding it, which is the only place this sheet
+  // is ever used.
+  it("stays one column however long the list is", () => {
+    expect(show(someItems(40)).querySelector("[data-two-up]")).toBeNull()
   })
 
   it("names the Instance and the day it was printed", () => {

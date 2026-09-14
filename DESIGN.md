@@ -608,7 +608,10 @@ the tab title and the app icon do not.
 
 The Print sheet is a deliverable, not a screenshot. A4, 210 × 297mm, margins `18mm 18mm 14mm`.
 
-- Eyebrow: mono 8.5pt, 0.14em, uppercase — `<Instance> · shopping list`.
+- Eyebrow: mono 8.5pt, 0.14em, uppercase — the Instance's name, and nothing after it. The frames
+  write the kind of list there (`· shopping list`, `· packing list`), and there is no such field on a
+  List — so a fixed word made every sheet claim to be one kind. The List's own name is the title
+  directly underneath.
 - Title 27pt / 600 / −0.02em, with the date and an `N items · N people` line right-aligned.
 - **A 0.7pt solid ink rule under the header** — the one mark that survives from screen to paper.
 - Items: `11mm 1fr auto` grid, 4.4mm vertical padding, split by 0.4pt `#E2E2DC`. A real **6mm
@@ -619,8 +622,9 @@ The Print sheet is a deliverable, not a screenshot. A4, 210 × 297mm, margins `1
 - **Three blank rows** at the end, for whatever gets remembered in the shop: an empty box and the
   space beside it, and no ruled line. A rule tells somebody how big their handwriting should be,
   which is not the sheet's business.
-- Long lists go two-up: `column-count: 2`, 12mm gap, a 0.4pt column rule, type down one step to 13pt
-  and 5.5mm boxes. **Never below 13pt.**
+- **One column, however long the List is.** The frames show a long List going two-up at 13pt; that is
+  overruled. Two columns fit more on a sheet and are harder to read while walking around a shop
+  holding it, which is the only place this sheet is ever used. A second page is the better trade.
 - Footer: a sentence left, and `nooks · A4 210 × 297 mm` right in mono 8.5pt.
 - **Page numbers are the browser's.** CSS Paged Media counters — `@page { @bottom-right { content:
   counter(page) } }` — are implemented by no browser, and every print dialog already offers headers

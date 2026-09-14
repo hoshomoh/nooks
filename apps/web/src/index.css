@@ -123,29 +123,6 @@
     font-size: 9.5pt;
   }
 
-  /* A long List goes two-up, per DESIGN.md §15: one step down in type, smaller boxes,
-     and a rule between the columns. Never below 13pt — a sheet nobody can read in a
-     shop has failed at the only thing it is for. */
-  .nooks-print-items[data-two-up] {
-    column-count: 2;
-    column-gap: 12mm;
-    column-rule: 0.4pt solid #e2e2dc;
-  }
-
-  .nooks-print-items[data-two-up] .nooks-print-label {
-    font-size: 13pt;
-  }
-
-  .nooks-print-items[data-two-up] .nooks-print-box {
-    width: 5.5mm;
-    height: 5.5mm;
-  }
-
-  .nooks-print-items[data-two-up] .nooks-print-item {
-    grid-template-columns: 9mm 1fr auto;
-    padding: 3.4mm 0;
-  }
-
   /* The spare rows are room to write, not a form to fill in. An empty box and the
      space beside it is the whole of it: a ruled line tells somebody how big their
      handwriting should be, which is not the sheet's business. */

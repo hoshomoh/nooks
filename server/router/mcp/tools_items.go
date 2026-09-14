@@ -25,7 +25,7 @@ type updateItemArgs struct {
 	Label    *string `json:"label,omitempty" jsonschema:"new wording, or omit to leave it"`
 	Quantity *string `json:"quantity,omitempty" jsonschema:"new quantity as free text, empty string to clear it, or omit to leave it"`
 	DueOn    *string `json:"due_on,omitempty" jsonschema:"new day as YYYY-MM-DD, empty string to clear it, or omit to leave it"`
-	Note     *string `json:"note,omitempty" jsonschema:"the note as markdown, empty string to remove it, or omit to leave it"`
+	Note     *string `json:"note,omitempty" jsonschema:"the note as markdown, empty string to remove it, or omit to leave it. Only what the app draws is rendered: paragraphs, one level of heading (### ), checklists (- [ ] and - [x] ), quotes (> ), fenced code blocks, and inline bold, italic, strikethrough, code spans and links. Tables, horizontal rules, bullet and numbered lists are not rendered and survive as the literal characters typed, so do not use them"`
 }
 
 type completeItemArgs struct {
@@ -58,7 +58,7 @@ func addItemTools(server *sdk.Server, lists *v1.ListService) {
 
 	sdk.AddTool(server, &sdk.Tool{
 		Name:        "update_item",
-		Description: "Change an item's wording, quantity, due date or note. Omitted fields are left alone.",
+		Description: "Change an item's wording, quantity, due date or note. Omitted fields are left alone. Notes are markdown, but only the blocks the app draws: paragraphs, ### headings, - [ ] checklists, > quotes and fenced code. Tables and --- rules are not rendered.",
 	}, func(ctx context.Context, _ *sdk.CallToolRequest, args updateItemArgs) (*sdk.CallToolResult, any, error) {
 		return answer(ctx, lists.UpdateItem, &apiv1.UpdateItemRequest{
 			ItemUid: args.ItemUID, Label: args.Label,

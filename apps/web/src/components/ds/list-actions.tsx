@@ -91,7 +91,7 @@ export function ListActions({ list, instanceName, items, withControls }: ListAct
   return (
     <>
       {withControls && list.isOwner && (
-        <Button tone="secondary" scale="toolbar" onClick={() => setSharing(true)}>
+        <Button tone="quiet" scale="toolbar" onClick={() => setSharing(true)}>
           {t("share.action")}
         </Button>
       )}

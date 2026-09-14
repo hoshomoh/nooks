@@ -21,7 +21,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandShortcut,
 } from "@/components/ui/command"
 import { listClient } from "@/lib/api"
 import { listsQuery, searchQuery } from "@/lib/list-queries"
@@ -143,7 +142,13 @@ function SearchPanel() {
             {reachable.map((list) => (
               <CommandItem key={list.uid} onSelect={() => void openList(list.uid)}>
                 {list.name}
-                {list.openCount > 0 && <CommandShortcut>{list.openCount}</CommandShortcut>}
+                {list.openCount > 0 && (
+                  // A count, drawn as DESIGN.md §3 draws counts. CommandShortcut is for
+                  // keycaps and letter-spaces what it is given.
+                  <span className="ml-auto shrink-0 font-mono text-badge text-muted-foreground">
+                    {list.openCount}
+                  </span>
+                )}
               </CommandItem>
             ))}
           </CommandGroup>
@@ -157,7 +162,13 @@ function SearchPanel() {
                 onSelect={() => void openHit(hit)}
               >
                 <HitText hit={hit} />
-                {namesItsList(hit) && <CommandShortcut>{hit.listName}</CommandShortcut>}
+                {namesItsList(hit) && (
+                  // One line, always: a name that wraps makes its row taller than the
+                  // ones around it, and a column of results stops being a column.
+                  <span className="ml-auto max-w-50 shrink-0 truncate text-micro text-muted-foreground">
+                    {hit.listName}
+                  </span>
+                )}
               </CommandItem>
             ))}
           </CommandGroup>
@@ -190,9 +201,9 @@ interface HitTextProps {
 
 function HitText({ hit }: HitTextProps) {
   if (hit.kind !== SearchHitKind.NOTE) {
-    return <span className="truncate">{hit.text}</span>
+    return <span className="min-w-0 flex-1 truncate">{hit.text}</span>
   }
-  return <NotePreview runs={previewOf(hit.text).runs} />
+  return <NotePreview runs={previewOf(hit.text).runs} className="min-w-0 flex-1" />
 }
 
 function namesItsList(hit: SearchHit): boolean {

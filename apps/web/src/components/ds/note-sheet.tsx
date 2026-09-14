@@ -111,13 +111,16 @@ export function NoteSheet({
       )}
     >
       <div className="flex h-chrome items-center gap-2.5 border-b border-hair pr-4 pl-5.5 text-micro text-muted-foreground">
-        <span className="text-secondary-foreground">{crumbs.join(" / ")}</span>
-        <span className="flex-1" />
+        {/* The name truncates; the controls do not. A long List name used to squeeze
+            "Open full" until its two words stacked. */}
+        <span className="min-w-0 flex-1 truncate text-secondary-foreground">
+          {crumbs.join(" / ")}
+        </span>
 
         <button
           type="button"
           onClick={onOpenFull}
-          className="flex h-control-toolbar items-center gap-1 rounded-md bg-secondary px-2 text-micro text-secondary-foreground transition-colors hover:text-foreground"
+          className="flex h-control-toolbar shrink-0 items-center gap-1 rounded-md bg-secondary px-2 text-micro whitespace-nowrap text-secondary-foreground transition-colors hover:text-foreground"
         >
           <Icon name="fullScreen" size="small" className="size-3" />
           <span>{t("note.openFull")}</span>
@@ -129,7 +132,7 @@ export function NoteSheet({
           name="close"
           label={t("note.close")}
           onClick={() => setLeaving(true)}
-          className="ml-1"
+          className="ml-1 shrink-0"
         />
       </div>
 

@@ -62,6 +62,19 @@ export function documentFrom(markdown: string): JSONContent {
   while (index < lines.length) {
     const line = lines[index] ?? ""
 
+    /*
+     * A blank line separates blocks; it is not one.
+     *
+     * This read every line as a block, so the blank line between two paragraphs became
+     * an empty paragraph — a whole line of height on top of the padding the paragraphs
+     * already have. Anything writing ordinary markdown, an assistant most of all, put
+     * a gap between every pair of paragraphs and the Note came out double spaced.
+     */
+    if (!line.trim()) {
+      index += 1
+      continue
+    }
+
     if (line.startsWith(FENCE)) {
       const [node, next] = readFence(lines, index)
       content.push(node)
@@ -216,8 +229,11 @@ function textNode(type: string, text: string): JSONContent {
  * property markdown.test.ts holds it to.
  */
 export function markdownFrom(document: JSONContent): string {
-  const lines = (document.content ?? []).flatMap(linesOf)
-  return lines.join("\n")
+  // A blank line between blocks, which is how markdown says where one ends. Read back
+  // it is a separator again, so what comes out of here goes in unchanged.
+  return (document.content ?? [])
+    .map((node) => linesOf(node).join("\n"))
+    .join("\n\n")
 }
 
 /** linesOf writes one block as the lines it occupies. */

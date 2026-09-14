@@ -36,6 +36,7 @@ describe("markdown survives being edited", () => {
   it("keeps a whole Note with every block in it", () => {
     const note = [
       "### Where",
+      "",
       "Saturday market, second row.",
       "",
       "- [ ] Ethiopian, whole bean",
@@ -52,6 +53,21 @@ describe("markdown survives being edited", () => {
 
   it("keeps the blank lines somebody put between paragraphs", () => {
     expect(roundTrip("One.\n\nTwo.")).toBe("One.\n\nTwo.")
+  })
+
+  it("reads a blank line as a separator, not as an empty paragraph", () => {
+    // Every line used to become a block, so the gap between two paragraphs was an
+    // empty one — a whole line of height on top of the padding they already have.
+    // Anything writing ordinary markdown put a gap between every pair, and the Note
+    // came out double spaced.
+    const blocks = documentFrom("One.\n\nTwo.").content ?? []
+
+    expect(blocks).toHaveLength(2)
+    expect(blocks.every((block) => (block.content ?? []).length > 0)).toBe(true)
+  })
+
+  it("does not care how many blank lines there were", () => {
+    expect(roundTrip("One.\n\n\n\nTwo.")).toBe("One.\n\nTwo.")
   })
 })
 
@@ -92,7 +108,7 @@ describe("dividers", () => {
   })
 
   it("writes one back", () => {
-    expect(markdownFrom(documentFrom("Above\n---\nBelow"))).toBe("Above\n---\nBelow")
+    expect(markdownFrom(documentFrom("Above\n\n---\n\nBelow"))).toBe("Above\n\n---\n\nBelow")
   })
 
   it("leaves dashes that are part of a sentence alone", () => {

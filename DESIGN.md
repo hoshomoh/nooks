@@ -471,6 +471,12 @@ screen, 14.5 / 13.5 / 12.5 in the sheet.
 Alignment is decided here, not by the Member: a note stores no alignment, and the colons a markdown
 table may carry are read and forgotten. Columns cannot be resized for the same reason.
 
+**A blank line separates blocks; it is not one.** Two paragraphs are written with a line between
+them, as markdown has always meant it, and reading one back gives two paragraphs rather than three.
+Every line used to be a block, which made the gap an empty paragraph — a whole line of height on top
+of the padding the paragraphs already carry — so anything writing ordinary markdown produced a Note
+that came out double spaced.
+
 **A block's shorthand is never shown**, not even under the caret. `### ` disappears the moment the
 space that made it a heading is typed, and a line inserted from the `/` menu never shows one at all.
 It stays removable: one Backspace takes the space back, the line stops being a heading, and the `###`

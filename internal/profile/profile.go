@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"net"
 	"path/filepath"
 	"strings"
 )
@@ -170,4 +171,24 @@ func parseLevel(name string) (slog.Level, error) {
 	default:
 		return 0, fmt.Errorf("profile: log level must be debug, info, warn or error, not %q", name)
 	}
+}
+
+/*
+URLFor turns a listen address into one somebody can open.
+
+A listen address is often ":8081", "0.0.0.0:8081" or "[::]:8081", and none of those is
+a host a client can dial — all three mean "every interface on this machine" to the
+process listening, and nothing at all to the person reading the line. Both the startup
+log and `--health` need the same translation, and a second copy of it would be a second
+set of edge cases to get right.
+*/
+func URLFor(addr, path string) string {
+	host, port, err := net.SplitHostPort(strings.TrimSpace(addr))
+	if err != nil || host == "" || host == "0.0.0.0" || host == "::" {
+		host = "127.0.0.1"
+	}
+	if err != nil {
+		port = strings.TrimPrefix(strings.TrimSpace(addr), ":")
+	}
+	return "http://" + net.JoinHostPort(host, port) + path
 }

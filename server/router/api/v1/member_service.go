@@ -107,7 +107,7 @@ func (s *MemberService) CreateGroup(
 		return nil, internalError("make an identifier", err)
 	}
 	// Resolved before the Group exists, so a bad identifier leaves nothing behind.
-	ids, err := s.memberIDs(ctx, req.Msg.GetMemberUids())
+	ids, err := memberIDsOf(ctx, s.store, req.Msg.GetMemberUids())
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (s *MemberService) SetGroupMembers(
 		return nil, internalError("read group", err)
 	}
 
-	ids, err := s.memberIDs(ctx, req.Msg.GetMemberUids())
+	ids, err := memberIDsOf(ctx, s.store, req.Msg.GetMemberUids())
 	if err != nil {
 		return nil, err
 	}
@@ -162,22 +162,6 @@ func (s *MemberService) SetGroupMembers(
 		return nil, err
 	}
 	return connect.NewResponse(&apiv1.SetGroupMembersResponse{Group: filled}), nil
-}
-
-// memberIDs turns the identifiers on the wire into the ones the store uses.
-func (s *MemberService) memberIDs(ctx context.Context, uids []string) ([]int64, error) {
-	ids := make([]int64, 0, len(uids))
-	for _, uid := range uids {
-		member, err := s.store.MemberByUID(ctx, uid)
-		if errors.Is(err, store.ErrNotFound) {
-			return nil, errNoSuchMember
-		}
-		if err != nil {
-			return nil, internalError("read member", err)
-		}
-		ids = append(ids, member.ID)
-	}
-	return ids, nil
 }
 
 // groupToProto converts a Group and fills in who is in it.

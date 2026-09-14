@@ -4,12 +4,32 @@ description: Point an assistant at your instance, and decide exactly how much of
 ---
 
 An instance serves the Model Context Protocol at `/mcp`. An assistant connected to it
-can read your lists and tick things off, as much of that as you decided when you cut
+can read your lists and tick things off — as much of that as you decided when you cut
 the token, and no more.
+
+## It is a remote server
+
+Most MCP servers a client knows about are **local**: the client starts a program on your
+machine and talks to it over a pipe. Nooks is **remote**. It is already running, on your
+own hardware, and a client reaches it over HTTP at the same address you open in a
+browser.
+
+That difference is most of the setup. There is nothing to install, and the client needs
+two things from you: the URL, and a token that says who it is acting for.
+
+<Callout>
+  Every example below uses `https://nooks.example/mcp`. Replace it with your own
+  instance's address — the one the binary is listening on, which is `:8081` unless you
+  changed it with [`--addr`](/docs/configure). It has to be an address the assistant can
+  actually reach, so a client on another machine cannot use `localhost`.
+
+  Working on Nooks itself? The app runs on `:3001` in development and the instance on
+  `:8081`. Point the assistant at **`:8081`**.
+</Callout>
 
 ## Cut a token first
 
-Settings → Access tokens → Add a token. Three things decide what the assistant gets:
+**Settings → Access tokens → Add a token.** Three things decide what the assistant gets:
 
 - **Which lists.** Either every list you can reach, including ones you make later, or
   only the ones you pick. A list you do not pick is *invisible* to the token — it cannot
@@ -22,12 +42,103 @@ The secret is shown once, as a line of base64 with no prefix or marker. Nooks ke
 a hash of it, so nobody — including you — can read it back afterwards. Lose it and the
 answer is to revoke that token and cut another.
 
+<Callout type="warn">
+  The token goes into a configuration file in clear. Do not commit one to a repository.
+  Where a client offers to read it from an environment variable instead, take that
+  offer — Cursor and VS Code both do.
+</Callout>
+
 ## Point a client at it
+
+<Tabs items={["Claude Code", "Claude Desktop", "Cursor", "VS Code", "Anything else"]}>
+
+<Tab value="Claude Code">
+
+One command, no file to find:
+
+```bash
+claude mcp add nooks --transport http https://nooks.example/mcp \
+  --header "Authorization: Bearer PASTE_YOUR_TOKEN_HERE" \
+  --scope user
+```
+
+`--scope user` writes it to `~/.claude.json`, so the instance is there in every project.
+`--scope project` writes `.mcp.json` beside your code instead, which is shared with
+anybody who clones it — so use `user` for a token, and `project` only for a shared
+instance whose token is not yours.
+
+Check it with `claude mcp list`.
+
+</Tab>
+
+<Tab value="Claude Desktop">
+
+Claude Desktop adds remote servers through **Settings → Connectors → Add custom
+connector**, which takes a URL and expects the server to run a sign-in flow. Nooks
+authenticates with a bearer token instead, so there is no field to paste it into.
+
+Bridge it with `mcp-remote`, which speaks the local protocol Claude Desktop knows and
+makes the HTTP request for it. Edit the configuration file:
+
+- **macOS** — `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows** — `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
     "nooks": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://nooks.example/mcp",
+        "--header",
+        "Authorization: Bearer PASTE_YOUR_TOKEN_HERE"
+      ]
+    }
+  }
+}
+```
+
+This needs Node.js on the machine, which the other clients here do not. Quit Claude
+Desktop completely and reopen it — it reads the file only at startup.
+
+</Tab>
+
+<Tab value="Cursor">
+
+Create `~/.cursor/mcp.json` for every project, or `.cursor/mcp.json` inside one:
+
+```json
+{
+  "mcpServers": {
+    "nooks": {
+      "url": "https://nooks.example/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:NOOKS_TOKEN}"
+      }
+    }
+  }
+}
+```
+
+`${env:NOOKS_TOKEN}` reads the token from the environment, so the file can be committed
+and the secret cannot. Paste the token directly instead if you would rather not set a
+variable.
+
+</Tab>
+
+<Tab value="VS Code">
+
+Open the Command Palette, run **MCP: Add Server**, choose **HTTP**, enter
+`https://nooks.example/mcp` and name it `nooks`. That writes `.vscode/mcp.json` with no
+authentication, so add the header yourself:
+
+```json
+{
+  "servers": {
+    "nooks": {
+      "type": "http",
       "url": "https://nooks.example/mcp",
       "headers": {
         "Authorization": "Bearer PASTE_YOUR_TOKEN_HERE"
@@ -37,8 +148,69 @@ answer is to revoke that token and cut another.
 }
 ```
 
-A request with no usable token is refused before the protocol starts, so a
-misconfigured client says "not signed in" once rather than failing on every tool call.
+Note the key is `servers`, not `mcpServers` — VS Code is the odd one out.
+
+</Tab>
+
+<Tab value="Anything else">
+
+Most clients take the same three facts in roughly the same shape. A URL, the HTTP
+transport, and one header:
+
+```json
+{
+  "mcpServers": {
+    "nooks": {
+      "type": "http",
+      "url": "https://nooks.example/mcp",
+      "headers": {
+        "Authorization": "Bearer PASTE_YOUR_TOKEN_HERE"
+      }
+    }
+  }
+}
+```
+
+If a client only speaks the local protocol, put `mcp-remote` in front of it as the
+Claude Desktop tab does. If it offers to sign in with OAuth, it cannot connect: Nooks
+authenticates with a bearer token and nothing else.
+
+</Tab>
+
+</Tabs>
+
+## Check it worked
+
+Before blaming the client, ask the instance directly. This is the same request a client
+makes to list the tools:
+
+```bash
+curl -s -X POST https://nooks.example/mcp \
+  -H "Authorization: Bearer PASTE_YOUR_TOKEN_HERE" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+```
+
+A working token answers with a long list of tool names. `not signed in` means the
+instance was reached and the token was refused, which is the more useful of the two
+failures — the address is right and only the credential is wrong.
+
+## When it does not work
+
+| What you see | What it usually is |
+| --- | --- |
+| `not signed in` | The token is wrong, revoked, or expired. Cut a new one. |
+| Connection refused, or a timeout | The client cannot reach the address. A client on another machine cannot use `localhost`. |
+| `404` on POST, but the URL opens in a browser | Something other than Nooks is on that port, answering every path with the app's HTML. In development that is the dev server on `:3001` — use `:8081`. |
+| A certificate error | The instance is on plain HTTP, or using a certificate the client does not trust. See [Behind a domain](/docs/deploy/reverse-proxy). |
+| The server connects but has no tools | Something is in front of Nooks that does not pass `Authorization` through. Check the reverse proxy. |
+| A tool answers "not found" for a list you can see | The token does not reach that list. Its lists are fixed when it is cut. |
+| A tool is refused | That ability was left off when the token was cut, or the action needs a signed-in browser. |
+
+Tokens are audited. **Settings → Access tokens** shows when each one was last used and
+what it did, which is the quickest way to tell "the client never connected" from "the
+client connected and was refused".
 
 ## What the assistant can do
 
@@ -77,14 +249,3 @@ password, adding a member, deciding a join request and every other admin action 
 signed-in browser, so a token is refused them over REST too. A test checks this list
 against the service definitions, so an endpoint cannot be added without deciding
 whether an assistant can reach it.
-
-## The rules are the same rules
-
-The tools call the same code the app calls. There is no second path through the
-permission checks and no separate list of what an assistant may do — a token that may
-only read is refused an `add_item` by exactly the check that would refuse it in a
-browser.
-
-Everything the assistant adds is attributed to the token in the list, so a row reads
-*Anna · via Kitchen tablet* rather than appearing from nowhere. The first time a token
-is used, it shows up in Activity.

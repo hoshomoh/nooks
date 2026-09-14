@@ -152,9 +152,16 @@ func (s *Server) Serve(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("listen on %s: %w", s.http.Addr, err)
 	}
-	s.log.Info("nooks listening", "addr", listener.Addr().String(), "mode", string(s.mode))
+	// The URL and not only the address: a listener reports "[::]:8081", which is true
+	// and is not something anybody can open.
+	s.log.Info("nooks listening",
+		"url", profile.URLFor(listener.Addr().String(), "/"),
+		"addr", listener.Addr().String(),
+		"mode", string(s.mode),
+	)
 	if s.mode == profile.ModeDev {
-		s.log.Info("serving the api only; the app is served by vite", "app", "http://localhost:3001")
+		s.log.Info("this mode serves the api only; run `cd apps/web && pnpm dev` for the app",
+			"app", "http://localhost:3001")
 	}
 
 	errs := make(chan error, 1)

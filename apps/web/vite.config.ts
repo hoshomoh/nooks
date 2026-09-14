@@ -4,7 +4,16 @@ import react from "@vitejs/plugin-react"
 // vitest's defineConfig, which is Vite's plus the `test` block below.
 import { defineConfig } from "vitest/config"
 
-// The dev server proxies the API to the Go binary on :8081 so that the browser
+/**
+ * Where the Go binary is listening.
+ *
+ * `:8081` is what `nooks` uses unless it is told otherwise, and `--addr` can tell it
+ * otherwise. Anybody who moves it sets NOOKS_DEV_TARGET to match rather than editing a
+ * tracked file, which would then be a change they have to remember not to commit.
+ */
+const INSTANCE = process.env.NOOKS_DEV_TARGET ?? "http://localhost:8081"
+
+// The dev server proxies the API to the Go binary so that the browser
 // talks to one origin and cookies behave as they do in production.
 export default defineConfig({
   plugins: [react(), tailwindcss()],
@@ -46,11 +55,20 @@ export default defineConfig({
   },
   server: {
     port: 3001,
+    /*
+     * Everything the instance owns, forwarded to the binary.
+     *
+     * A path that is not here does not fall through to the instance — it falls through
+     * to the SPA, which answers a GET with index.html and a POST with 404. That makes a
+     * missing entry look like a working endpoint in a browser and a broken one to every
+     * client that speaks the protocol, which is exactly how /mcp was lost.
+     */
     proxy: {
-      "/nooks.api.v1": { target: "http://localhost:8081", changeOrigin: true },
+      "/nooks.api.v1": { target: INSTANCE, changeOrigin: true },
       // The event stream must not be buffered by the dev proxy either.
-      "/api/v1/events": { target: "http://localhost:8081", changeOrigin: true },
-      "/api": { target: "http://localhost:8081", changeOrigin: true },
+      "/api/v1/events": { target: INSTANCE, changeOrigin: true },
+      "/api": { target: INSTANCE, changeOrigin: true },
+      "/mcp": { target: INSTANCE, changeOrigin: true },
     },
   },
 })

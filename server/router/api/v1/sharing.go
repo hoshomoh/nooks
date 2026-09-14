@@ -57,11 +57,11 @@ func (s *ListService) applyNamedShares(
 	sharer store.Member,
 	memberUIDs, groupUIDs []string,
 ) error {
-	memberIDs, err := s.memberIDsOf(ctx, memberUIDs)
+	memberIDs, err := memberIDsOf(ctx, s.store, memberUIDs)
 	if err != nil {
 		return err
 	}
-	groupIDs, err := s.groupIDsOf(ctx, groupUIDs)
+	groupIDs, err := groupIDsOf(ctx, s.store, groupUIDs)
 	if err != nil {
 		return err
 	}
@@ -152,36 +152,46 @@ var errNoSuchMember = connect.NewError(connect.CodeInvalidArgument, errors.New("
 
 var errNoSuchGroup = connect.NewError(connect.CodeInvalidArgument, errors.New("no such group"))
 
-// memberIDsOf resolves public identifiers to internal ones.
-func (s *ListService) memberIDsOf(ctx context.Context, uids []string) ([]int64, error) {
+/*
+idsOf resolves the identifiers on the wire to the ones the store uses.
+
+Both services need it, for both people and groups, and the four versions that spells out
+are the same walk with two words changed. A caller that does not find one of them is
+told which kind was missing, because "no such member" and "no such group" are different
+things to the person reading them.
+*/
+func idsOf[T any](
+	ctx context.Context,
+	uids []string,
+	find func(context.Context, string) (T, error),
+	id func(T) int64,
+	missing *connect.Error,
+	reading string,
+) ([]int64, error) {
 	ids := make([]int64, 0, len(uids))
 	for _, uid := range uids {
-		member, err := s.store.MemberByUID(ctx, uid)
+		found, err := find(ctx, uid)
 		if errors.Is(err, store.ErrNotFound) {
-			return nil, errNoSuchMember
+			return nil, missing
 		}
 		if err != nil {
-			return nil, internalError("read member", err)
+			return nil, internalError(reading, err)
 		}
-		ids = append(ids, member.ID)
+		ids = append(ids, id(found))
 	}
 	return ids, nil
 }
 
-// groupIDsOf resolves public identifiers to internal ones.
-func (s *ListService) groupIDsOf(ctx context.Context, uids []string) ([]int64, error) {
-	ids := make([]int64, 0, len(uids))
-	for _, uid := range uids {
-		group, err := s.store.GroupByUID(ctx, uid)
-		if errors.Is(err, store.ErrNotFound) {
-			return nil, errNoSuchGroup
-		}
-		if err != nil {
-			return nil, internalError("read group", err)
-		}
-		ids = append(ids, group.ID)
-	}
-	return ids, nil
+// memberIDsOf resolves people.
+func memberIDsOf(ctx context.Context, st store.Store, uids []string) ([]int64, error) {
+	return idsOf(ctx, uids, st.MemberByUID,
+		func(m store.Member) int64 { return m.ID }, errNoSuchMember, "read member")
+}
+
+// groupIDsOf resolves groups.
+func groupIDsOf(ctx context.Context, st store.Store, uids []string) ([]int64, error) {
+	return idsOf(ctx, uids, st.GroupByUID,
+		func(g store.Group) int64 { return g.ID }, errNoSuchGroup, "read group")
 }
 
 // groupByID finds a Group by internal identity, which the share rows carry.

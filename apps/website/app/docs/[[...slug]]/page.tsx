@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import defaultMdxComponents from "fumadocs-ui/mdx"
 import { Callout } from "fumadocs-ui/components/callout"
 import { Card, Cards } from "fumadocs-ui/components/card"
+import { Tab, Tabs } from "fumadocs-ui/components/tabs"
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/page"
 
 import type { GeneratedPageProps } from "fumadocs-openapi"
@@ -40,6 +41,11 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
             Callout,
             Card,
             Cards,
+            // Setting an assistant up is the same three facts written five ways, one
+            // per client. Tabs put the reader's own client in front of them instead of
+            // asking them to scroll past four they do not use.
+            Tab,
+            Tabs,
             OpenAPIPage: (props: GeneratedPageProps) => (
               <OpenAPIPage {...props} {...preloaded} />
             ),

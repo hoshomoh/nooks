@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/hoshomoh/nooks/internal/profile"
 )
 
 func TestHealthRequested(t *testing.T) {
@@ -36,8 +38,8 @@ func TestHealthURLIsSomethingDialable(t *testing.T) {
 		"localhost:9090": "http://localhost:9090/healthz",
 		" :8081 ":        "http://127.0.0.1:8081/healthz",
 	} {
-		if got := healthURL(addr); got != want {
-			t.Errorf("healthURL(%q) = %q, want %q", addr, got, want)
+		if got := profile.URLFor(addr, "/healthz"); got != want {
+			t.Errorf("URLFor(%q) = %q, want %q", addr, got, want)
 		}
 	}
 }

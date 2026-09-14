@@ -22,9 +22,12 @@ Or with the `docker-compose.yml` in this repository:
 docker compose up -d
 ```
 
-Or from source:
+Or from a clone. The app is baked into the binary, so it has to be built first —
+`go build` alone gives you a binary that serves nothing:
 
 ```bash
+pnpm install
+pnpm --filter @nooks/web release
 go build -o nooks ./cmd/nooks
 ./nooks --data ./data
 ```

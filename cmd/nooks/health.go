@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
-	"strings"
 	"time"
+
+	"github.com/hoshomoh/nooks/internal/profile"
 )
 
 /*
@@ -43,7 +43,7 @@ func checkHealth(ctx context.Context, addr string, client *http.Client) error {
 	ctx, cancel := context.WithTimeout(ctx, healthTimeout)
 	defer cancel()
 
-	request, err := http.NewRequestWithContext(ctx, http.MethodGet, healthURL(addr), nil)
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, profile.URLFor(addr, "/healthz"), nil)
 	if err != nil {
 		return err
 	}
@@ -61,21 +61,4 @@ func checkHealth(ctx context.Context, addr string, client *http.Client) error {
 		return fmt.Errorf("health: %s", response.Status)
 	}
 	return nil
-}
-
-/*
-healthURL turns a listen address into something to ask.
-
-A listen address is often ":8081" or "0.0.0.0:8081", and neither is a host a client can
-dial. Both mean "this machine" to the process doing the asking.
-*/
-func healthURL(addr string) string {
-	host, port, err := net.SplitHostPort(strings.TrimSpace(addr))
-	if err != nil || host == "" || host == "0.0.0.0" || host == "::" {
-		host = "127.0.0.1"
-	}
-	if err != nil {
-		port = strings.TrimPrefix(strings.TrimSpace(addr), ":")
-	}
-	return fmt.Sprintf("http://%s/healthz", net.JoinHostPort(host, port))
 }

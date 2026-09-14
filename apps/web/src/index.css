@@ -284,6 +284,21 @@
   padding: 0;
 }
 
+/* A pasted URL is one word, and one word can be wider than the Note. It wraps rather
+   than pushing the whole document sideways, which is what turned a long link into a
+   horizontal scrollbar under every line in the note.
+   `anywhere` and not `break-word`: only `anywhere` shrinks the minimum width a table
+   column will accept, which is what stops a long cell widening the table past the page.
+   A code block is the exception below — it scrolls on purpose, because wrapping a line
+   of code changes what the line says. */
+.nooks-note p,
+.nooks-note h3,
+.nooks-note blockquote,
+.nooks-note th,
+.nooks-note td {
+  overflow-wrap: anywhere;
+}
+
 .nooks-note pre {
   margin: 10px 0;
   padding: 10px 12px;

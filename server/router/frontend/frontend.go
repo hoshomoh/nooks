@@ -5,7 +5,9 @@
 // that step says so rather than serving an index.html whose scripts all 404.
 //
 // `all:` so that .gitkeep is embedded too — without it a fresh clone has no matching
-// files and does not compile at all.
+// files and does not compile at all. The release script writes the marker back after
+// the build, because `--emptyOutDir` takes the whole directory with it and a missing
+// marker is a build that fails on a machine that has never built the app.
 package frontend
 
 import (

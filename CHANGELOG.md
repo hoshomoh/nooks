@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.1](https://github.com/hoshomoh/nooks/compare/v1.1.0...v1.1.1) (2026-09-14)
+
+
+### Fixed
+
+* **web:** print in one column, however long the list is ([75b8289](https://github.com/hoshomoh/nooks/commit/75b82894f22ba538a2391da06367523318ab074a))
+* **web:** read a blank line as a separator, not an empty paragraph ([6e87517](https://github.com/hoshomoh/nooks/commit/6e87517b15ae263314d8778d20984e732f9d077e))
+* **web:** scroll the content, not the window ([e6d7ee0](https://github.com/hoshomoh/nooks/commit/e6d7ee0e1e79cf280b821bfdca44bdcec9106d8e))
+* **web:** stop the printed sheet calling every list a shopping list ([02ef127](https://github.com/hoshomoh/nooks/commit/02ef1272cc99897a2155e571bf1cd91254c98f70))
+* **web:** truncate a long list name instead of squeezing the controls ([6fe075b](https://github.com/hoshomoh/nooks/commit/6fe075b5a0be2c820d6bcc88ae6267cd792f1d4b))
+* **web:** wrap a long word instead of widening the note ([07b965d](https://github.com/hoshomoh/nooks/commit/07b965d23a07004b7c76ca7a8cab4f21403fc7fb))
+
 ## [1.1.0](https://github.com/hoshomoh/nooks/compare/v1.0.0...v1.1.0) (2026-09-14)
 
 

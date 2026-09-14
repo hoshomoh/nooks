@@ -39,12 +39,25 @@ func (s *ListService) Search(
 		return nil, err
 	}
 
+	/*
+	 * One result per thing, not per place the word was found.
+	 *
+	 * An Item is indexed twice — once for its label and once for its Note — so a word
+	 * in both came back as two hits with the same UID, which read as two Items that
+	 * were really one. The higher-ranked of the two is kept, so whichever part of the
+	 * Item actually matched is the part the result shows.
+	 */
+	seen := make(map[string]bool, len(hits))
 	out := make([]*apiv1.SearchHit, 0, len(hits))
 	for _, hit := range hits {
 		list, ok := reachable[hit.ListID]
 		if !ok {
 			continue
 		}
+		if seen[found(hit)] {
+			continue
+		}
+		seen[found(hit)] = true
 		out = append(out, searchHitToProto(hit, list))
 	}
 	return connect.NewResponse(&apiv1.SearchResponse{Hits: out}), nil
@@ -75,6 +88,14 @@ func (s *ListService) reachableListsInOrder(
 	grant auth.Grant,
 ) ([]store.List, error) {
 	return listReach(ctx, s.store, grant)
+}
+
+// found names the thing a hit is about, so the two ways of finding one Item agree.
+func found(hit store.SearchHit) string {
+	if hit.Kind == store.KindList {
+		return "list:" + hit.UID
+	}
+	return "item:" + hit.UID
 }
 
 // searchHitToProto converts a hit, naming the List it belongs to so a result reads in

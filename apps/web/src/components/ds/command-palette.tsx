@@ -130,7 +130,7 @@ function SearchPanel() {
         {destinations.length > 0 && (
           <CommandGroup heading={t("palette.goTo")}>
             {destinations.map((place) => (
-              <CommandItem key={place.to} onSelect={() => void go(place.to)}>
+              <CommandItem key={place.to} value={place.to} onSelect={() => void go(place.to)}>
                 {t(place.labelKey)}
               </CommandItem>
             ))}
@@ -140,7 +140,7 @@ function SearchPanel() {
         {reachable.length > 0 && (
           <CommandGroup heading={t("palette.lists")}>
             {reachable.map((list) => (
-              <CommandItem key={list.uid} onSelect={() => void openList(list.uid)}>
+              <CommandItem key={list.uid} value={list.uid} onSelect={() => void openList(list.uid)}>
                 {list.name}
                 {list.openCount > 0 && (
                   // A count, drawn as DESIGN.md §3 draws counts. CommandShortcut is for
@@ -158,7 +158,12 @@ function SearchPanel() {
           <CommandGroup heading={t("palette.results")}>
             {hits.map((hit) => (
               <CommandItem
-                key={`${hit.kind}-${hit.itemUid || hit.listUid}`}
+                key={idOf(hit)}
+                // cmdk identifies a row by the words in it unless it is told otherwise,
+                // so two rows reading the same thing became one row that highlighted in
+                // two places. What a row is about is what tells them apart. Safe only
+                // because this Command does its own filtering — see shouldFilter above.
+                value={idOf(hit)}
                 onSelect={() => void openHit(hit)}
               >
                 <HitText hit={hit} />
@@ -175,7 +180,7 @@ function SearchPanel() {
         )}
 
         <CommandGroup heading={t("palette.actions")}>
-          <CommandItem onSelect={palette.openAddList}>{t("palette.addListTitle")}</CommandItem>
+          <CommandItem value="add-list" onSelect={palette.openAddList}>{t("palette.addListTitle")}</CommandItem>
         </CommandGroup>
       </CommandList>
     </Command>
@@ -185,6 +190,11 @@ function SearchPanel() {
 /** matches is how a destination or a List name is compared with what was typed. */
 function matches(name: string, query: string): boolean {
   return name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())
+}
+
+/** idOf is what a result is about, which is what makes one row not another. */
+function idOf(hit: SearchHit): string {
+  return `${hit.kind}-${hit.itemUid || hit.listUid}`
 }
 
 /** namesItsList reports whether a hit needs to say which List it came from. */

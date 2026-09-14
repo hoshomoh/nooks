@@ -1005,3 +1005,40 @@ func TestAConditionalUpdateLandsWhenNobodyElseMovedIt(t *testing.T) {
 		t.Errorf("Label = %q, want the new text", got)
 	}
 }
+
+// An Item is indexed twice — once for its label and once for its Note — so a word in
+// both used to come back as two hits with the same UID, which read as two Items that
+// were really one.
+func TestSearchReturnsOneHitPerItem(t *testing.T) {
+	f := newListFixture(t)
+	ctx := f.as(t, f.anna)
+	uid := f.createList(t, f.anna, "Groceries")
+
+	added, err := f.svc.CreateItem(ctx, connect.NewRequest(&apiv1.CreateItemRequest{
+		ListUid: uid, Label: "Status",
+	}))
+	if err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+
+	// The same word in the label and in the Note.
+	markdown := "Status: verified, not yet discussed."
+	if _, err := f.svc.UpdateItem(ctx, connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid: added.Msg.GetItem().GetUid(), Note: &markdown,
+	})); err != nil {
+		t.Fatalf("UpdateItem: %v", err)
+	}
+
+	res, err := f.svc.Search(ctx, connect.NewRequest(&apiv1.SearchRequest{Query: "status"}))
+	if err != nil {
+		t.Fatalf("Search: %v", err)
+	}
+
+	seen := map[string]int{}
+	for _, hit := range res.Msg.GetHits() {
+		seen[hit.GetItemUid()]++
+	}
+	if got := seen[added.Msg.GetItem().GetUid()]; got != 1 {
+		t.Errorf("the Item came back %d times, want once — it is one Item", got)
+	}
+}

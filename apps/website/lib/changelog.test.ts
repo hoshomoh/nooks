@@ -70,3 +70,25 @@ describe("reading the changelog", () => {
     expect(readReleases("")).toEqual([])
   })
 })
+
+describe("how much the page carries", () => {
+  /** A changelog with `count` releases in it, newest first. */
+  function many(count: number): string {
+    const entry = (n: number) =>
+      [`## [1.${n}.0](https://x/compare) (2026-09-${String(n + 1).padStart(2, "0")})`, "", "### New", "", `* thing ${n}`, ""].join("\n")
+    return ["# Changelog", ""].concat(
+      Array.from({ length: count }, (_, i) => entry(count - i)),
+    ).join("\n")
+  }
+
+  it("reads every release it is given", () => {
+    // The page decides how many to show; the parser does not get to lose any, because
+    // the count of what is left is what the box at the bottom is for.
+    expect(readReleases(many(9))).toHaveLength(9)
+  })
+
+  it("keeps them newest first", () => {
+    const versions = readReleases(many(3)).map((release) => release.version)
+    expect(versions).toEqual(["v1.3.0", "v1.2.0", "v1.1.0"])
+  })
+})

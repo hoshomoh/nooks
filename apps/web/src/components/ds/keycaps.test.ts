@@ -24,6 +24,27 @@ function users(): { file: string; content: string }[] {
     .filter(({ content }) => /<CommandShortcut>/.test(content))
 }
 
+describe("telling one row from another", () => {
+  it("gives every row in the palette an identity that is not its words", () => {
+    /*
+     * cmdk identifies a row by the words in it unless it is told otherwise.
+     *
+     * A search that matched an Item's label and its Note produced two rows reading the
+     * same thing, and cmdk treated them as one: hovering either highlighted both. The
+     * duplicate itself is fixed in the service, which now returns one hit per Item —
+     * but two Lists may still share a name, so every row says what it is about.
+     *
+     * Checked here rather than by rendering, because the collision needs two rows with
+     * identical words and the palette's rows come from the server.
+     */
+    const palette = readFileSync(DS + "command-palette.tsx", "utf8")
+
+    const rows = [...palette.matchAll(/<CommandItem\b([\s\S]*?)>/g)].map((match) => match[1] ?? "")
+    expect(rows.length).toBeGreaterThan(0)
+    expect(rows.filter((row) => !/\bvalue=/.test(row))).toEqual([])
+  })
+})
+
 describe("what a keycap is for", () => {
   it("is never handed a value that is words or a count", () => {
     const wrong = users().flatMap(({ file, content }) =>

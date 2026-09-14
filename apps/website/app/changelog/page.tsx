@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 
 import { releases, type Release } from "@/lib/changelog"
+import { SOURCE } from "@/lib/site"
 
 export const metadata: Metadata = {
   title: "Changelog — nooks",
@@ -22,8 +23,21 @@ const TONES: Record<string, string> = {
   Fixed: "text-muted-foreground",
 }
 
+/**
+ * How many releases the page carries.
+ *
+ * A project that ships small fixes often has a changelog that is mostly archaeology
+ * within a year, and a page nobody scrolls is a page nobody reads. What somebody
+ * arrives here to answer is "what changed since the version I am on", and that is
+ * always near the top. Everything before it is on the releases page, which is already
+ * paginated and already the canonical record.
+ */
+const SHOWN = 6
+
 export default async function Changelog() {
   const published = await releases()
+  const recent = published.slice(0, SHOWN)
+  const older = published.length - recent.length
 
   return (
     <main className="mx-auto max-w-band px-7 pt-19">
@@ -42,9 +56,29 @@ export default async function Changelog() {
             Nooks has not had a release yet. The first one will appear here.
           </p>
         ) : (
-          published.map((release) => <Entry key={release.version} release={release} />)
+          recent.map((release) => <Entry key={release.version} release={release} />)
         )}
       </div>
+
+      {older > 0 && (
+        <section className="mt-10 flex flex-wrap items-center gap-6 rounded-xl border border-border bg-sidebar px-8 py-9">
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+            <h2 className="text-section">
+              {older} earlier {older === 1 ? "release" : "releases"}
+            </h2>
+            <p className="text-field text-secondary-foreground">
+              This page keeps the most recent {SHOWN}. Every release Nooks has ever made is
+              on GitHub, with the binaries and checksums attached to each one.
+            </p>
+          </div>
+          <a
+            href={`${SOURCE}/releases`}
+            className="flex h-8.5 items-center rounded-md bg-primary px-4 text-chrome font-medium text-primary-foreground"
+          >
+            All releases
+          </a>
+        </section>
+      )}
     </main>
   )
 }

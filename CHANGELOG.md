@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.1.0](https://github.com/hoshomoh/nooks/compare/v1.0.0...v1.1.0) (2026-09-14)
+
+
+### New
+
+* **web:** add dividers and tables to notes ([f73db88](https://github.com/hoshomoh/nooks/commit/f73db88142467e4be2069dcd641db2d819f59b0a))
+
+
+### Fixed
+
+* **build:** keep the embed marker that the app build deletes ([f179ec6](https://github.com/hoshomoh/nooks/commit/f179ec6fa5edb508e402feab9ff4cf28fe1a687b))
+* **ci:** stop preflight tripping over its own build output ([0094463](https://github.com/hoshomoh/nooks/commit/0094463ddd25eec05d7ec33f4ee83e5a3a305d1d))
+* make a clone runnable, and say where the instance is ([fbb194b](https://github.com/hoshomoh/nooks/commit/fbb194bf2585c4cf430a9cc329399475c14a6063))
+* **web:** hold the sidebars still, and let a long name be read ([92a612a](https://github.com/hoshomoh/nooks/commit/92a612aab5f68d000d6bccafc06fabaacc440c1a))
+* **web:** line up a search result with the list it came from ([df59cad](https://github.com/hoshomoh/nooks/commit/df59cad45ff2306e6df240665e0c0747f96b0428))
+
+
+### Changed
+
+* **web:** save a note the same way from both screens ([ea3252a](https://github.com/hoshomoh/nooks/commit/ea3252aa1f662f49b03e0d16922905a676e2cb42))
+
 ## 1.0.0 (2026-09-13)
 
 

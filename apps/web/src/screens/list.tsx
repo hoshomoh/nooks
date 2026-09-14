@@ -229,133 +229,139 @@ export function ListScreen() {
         }
       />
 
-      <div className="relative flex flex-1 justify-center px-5.5 pt-14 pb-22">
-        <div className="w-full max-w-content">
-          <header className="mb-8.5 flex flex-col gap-3.5">
-            <h1 className="text-display">{list.list?.name}</h1>
-            <div className="flex items-center gap-3 text-meta text-secondary-foreground">
-              {/* While somebody else is reading it, that is the more useful of the
-                  two facts, so it takes the line. */}
-              {live.watchers.length > 0 ? (
-                <Presence watchers={live.watchers} />
-              ) : (
-                <span>
-                  {t(sharingKey(list.list?.sharing ?? Sharing.UNSPECIFIED, list.list?.canEdit ?? false))}
-                </span>
-              )}
-              <span className="h-3 w-px bg-border" />
-              <span>{open.length === 0 ? t("list.nothingYet") : t("list.openCount", { count: open.length })}</span>
-            </div>
-          </header>
+      {/* The frame the sheet is pinned inside. It is the height of what is left of the
+          window and never grows, which is what keeps the sheet where it is: an absolute
+          child of something that grows with the List is as tall as the List, and travels
+          with it. The scrolling belongs to the column inside. */}
+      <div className="relative flex min-h-0 flex-1">
+        <div className="flex flex-1 justify-center overflow-y-auto px-5.5 pt-14 pb-22">
+          <div className="w-full max-w-content">
+            <header className="mb-8.5 flex flex-col gap-3.5">
+              <h1 className="text-display">{list.list?.name}</h1>
+              <div className="flex items-center gap-3 text-meta text-secondary-foreground">
+                {/* While somebody else is reading it, that is the more useful of the
+                    two facts, so it takes the line. */}
+                {live.watchers.length > 0 ? (
+                  <Presence watchers={live.watchers} />
+                ) : (
+                  <span>
+                    {t(sharingKey(list.list?.sharing ?? Sharing.UNSPECIFIED, list.list?.canEdit ?? false))}
+                  </span>
+                )}
+                <span className="h-3 w-px bg-border" />
+                <span>{open.length === 0 ? t("list.nothingYet") : t("list.openCount", { count: open.length })}</span>
+              </div>
+            </header>
 
-          {/* Emptiness is about what is left to do, not about what the List holds: a
-              List whose Items are all ticked has nothing on it to read, and without
-              this the add row draws its top border against nothing at all. */}
-          {open.length === 0 ? (
-            <EmptyState
-              title={t(done.length > 0 ? "list.allDoneTitle" : "list.emptyTitle")}
-              body={t(done.length > 0 ? "list.allDoneBody" : "list.emptyBody")}
-            />
-          ) : (
-            <div className="flex flex-col">
-              {open.map((item) => (
-                <ListRow
-                  key={item.uid}
-                  label={item.label}
-                  quantity={item.quantity}
-                  notSynced={queued.itemUids.has(item.uid) || isProvisional(item.uid)}
-                  addedByName={item.addedByName}
-                  addedVia={viaLabel(t, item.addedViaToken)}
-                  dueLabel={due.label(item.dueOn)}
-                  overdue={isOverdue(item.dueOn, from)}
-                  justTicked={justTickedByAnother(item)}
-                  note={previews.get(item.uid)}
-                  moreLinesLabel={(count) => t("note.moreLines", { count })}
-                  onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
-                  onOpen={() => showItem(item.uid)}
-                  onRename={
-                    canEdit
-                      ? (label) =>
-                          rename.rename({ itemUid: item.uid, label, expected: item.label })
-                      : undefined
-                  }
-                  trouble={
-                    rename.trouble?.itemUid === item.uid ? (
-                      <RowTrouble
-                        trouble={rename.trouble}
-                        theirs={item.label}
-                        onKeepMine={rename.keepMine}
-                        onKeepBoth={() => rename.keepBoth(item.label)}
-                        onTryAgain={rename.tryAgain}
-                        onDiscard={rename.discard}
-                        labels={troubleLabels}
-                      />
-                    ) : undefined
-                  }
-                  failed={
-                    rename.trouble?.itemUid === item.uid && rename.trouble.kind === "error"
-                  }
-                  labels={rowLabels}
-                  menu={
-                    canEdit ? (
-                      <ItemMenu
-                        quantity={item.quantity}
-                        dueOn={item.dueOn}
-                        actions={{
-                          onView: () => showItem(item.uid),
-                          onSetDate: (dueOn) => editItem.mutate({ itemUid: item.uid, dueOn }),
-                          onSetQuantity: (quantity) =>
-                            editItem.mutate({ itemUid: item.uid, quantity }),
-                          onDuplicate: () =>
-                            addItem.mutate({
-                              listUid,
-                              label: item.label,
-                              quantity: item.quantity,
-                              dueOn: item.dueOn,
-                            }),
-                          onDelete: () => removeItem.mutate(item.uid),
-                        }}
-                      />
-                    ) : undefined
-                  }
-                />
-              ))}
-            </div>
-          )}
+            {/* Emptiness is about what is left to do, not about what the List holds: a
+                List whose Items are all ticked has nothing on it to read, and without
+                this the add row draws its top border against nothing at all. */}
+            {open.length === 0 ? (
+              <EmptyState
+                title={t(done.length > 0 ? "list.allDoneTitle" : "list.emptyTitle")}
+                body={t(done.length > 0 ? "list.allDoneBody" : "list.emptyBody")}
+              />
+            ) : (
+              <div className="flex flex-col">
+                {open.map((item) => (
+                  <ListRow
+                    key={item.uid}
+                    label={item.label}
+                    quantity={item.quantity}
+                    notSynced={queued.itemUids.has(item.uid) || isProvisional(item.uid)}
+                    addedByName={item.addedByName}
+                    addedVia={viaLabel(t, item.addedViaToken)}
+                    dueLabel={due.label(item.dueOn)}
+                    overdue={isOverdue(item.dueOn, from)}
+                    justTicked={justTickedByAnother(item)}
+                    note={previews.get(item.uid)}
+                    moreLinesLabel={(count) => t("note.moreLines", { count })}
+                    onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
+                    onOpen={() => showItem(item.uid)}
+                    onRename={
+                      canEdit
+                        ? (label) =>
+                            rename.rename({ itemUid: item.uid, label, expected: item.label })
+                        : undefined
+                    }
+                    trouble={
+                      rename.trouble?.itemUid === item.uid ? (
+                        <RowTrouble
+                          trouble={rename.trouble}
+                          theirs={item.label}
+                          onKeepMine={rename.keepMine}
+                          onKeepBoth={() => rename.keepBoth(item.label)}
+                          onTryAgain={rename.tryAgain}
+                          onDiscard={rename.discard}
+                          labels={troubleLabels}
+                        />
+                      ) : undefined
+                    }
+                    failed={
+                      rename.trouble?.itemUid === item.uid && rename.trouble.kind === "error"
+                    }
+                    labels={rowLabels}
+                    menu={
+                      canEdit ? (
+                        <ItemMenu
+                          quantity={item.quantity}
+                          dueOn={item.dueOn}
+                          actions={{
+                            onView: () => showItem(item.uid),
+                            onSetDate: (dueOn) => editItem.mutate({ itemUid: item.uid, dueOn }),
+                            onSetQuantity: (quantity) =>
+                              editItem.mutate({ itemUid: item.uid, quantity }),
+                            onDuplicate: () =>
+                              addItem.mutate({
+                                listUid,
+                                label: item.label,
+                                quantity: item.quantity,
+                                dueOn: item.dueOn,
+                              }),
+                            onDelete: () => removeItem.mutate(item.uid),
+                          }}
+                        />
+                      ) : undefined
+                    }
+                  />
+                ))}
+              </div>
+            )}
 
-          {canEdit && (
-            <AddRow
-              placeholder={t("list.addItem")}
-              onAdd={(item) => addItem.mutate({ listUid, ...item })}
-              disabled={addItem.isPending}
-              divided={open.length > 0}
-              hint={t("addRow.hint")}
-            />
-          )}
+            {canEdit && (
+              <AddRow
+                placeholder={t("list.addItem")}
+                onAdd={(item) => addItem.mutate({ listUid, ...item })}
+                disabled={addItem.isPending}
+                divided={open.length > 0}
+                hint={t("addRow.hint")}
+              />
+            )}
 
-          {done.length > 0 && (
-            <DoneSection label={doneLabel(t, done, from)}>
-              {done.map((item) => (
-                <ListRow
-                  key={item.uid}
-                  label={item.label}
-                  quantity={item.quantity}
-                  addedByName={item.doneByName || item.addedByName}
-                  done
-                  justTicked={justTickedByAnother(item)}
-                  onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
-                  onOpen={() => showItem(item.uid)}
-                  onRename={
-                    canEdit
-                      ? (label) =>
-                          rename.rename({ itemUid: item.uid, label, expected: item.label })
-                      : undefined
-                  }
-                  labels={rowLabels}
-                />
-              ))}
-            </DoneSection>
-          )}
+            {done.length > 0 && (
+              <DoneSection label={doneLabel(t, done, from)}>
+                {done.map((item) => (
+                  <ListRow
+                    key={item.uid}
+                    label={item.label}
+                    quantity={item.quantity}
+                    addedByName={item.doneByName || item.addedByName}
+                    done
+                    justTicked={justTickedByAnother(item)}
+                    onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
+                    onOpen={() => showItem(item.uid)}
+                    onRename={
+                      canEdit
+                        ? (label) =>
+                            rename.rename({ itemUid: item.uid, label, expected: item.label })
+                        : undefined
+                    }
+                    labels={rowLabels}
+                  />
+                ))}
+              </DoneSection>
+            )}
+          </div>
         </div>
 
         {openItem && (

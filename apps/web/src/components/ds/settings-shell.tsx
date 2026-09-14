@@ -57,7 +57,7 @@ export function SettingsShell({ active, crumb, counts, children }: SettingsShell
   useEscape(useCallback(() => void navigate({ to: "/" }), [navigate]))
 
   return (
-    <div className="flex min-h-dvh bg-background">
+    <div className="flex h-dvh overflow-hidden bg-background">
       <Sidebar
         instanceName={instanceName}
         memberName={member?.name ?? ""}
@@ -67,9 +67,9 @@ export function SettingsShell({ active, crumb, counts, children }: SettingsShell
       />
 
       <nav
-        // Its own frame and its own scroller, like the app's sidebar. A settings column
-        // that travels with a long page takes Back to lists off the top of the window.
-        className="sticky top-0 flex h-dvh w-56 shrink-0 flex-col gap-4 self-start overflow-y-auto border-r border-border bg-sidebar px-2.5 pt-3 pb-4"
+        // Like the app's sidebar: a full-height column with its own scroller, so Back
+        // to lists is where it was however long the page beside it runs.
+        className="flex h-full w-56 shrink-0 flex-col gap-4 overflow-y-auto border-r border-border bg-sidebar px-2.5 pt-3 pb-4"
       >
         <span className="px-2 text-label text-muted-foreground uppercase">
           {t("settings.title")}
@@ -105,9 +105,9 @@ export function SettingsShell({ active, crumb, counts, children }: SettingsShell
         </Link>
       </nav>
 
-      <main className="flex min-w-0 flex-1 flex-col">
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col">
         <ChromeBar crumbs={[t("settings.title"), crumb]} />
-        <div className="flex justify-center px-5.5 pt-5 pb-16">
+        <div className="flex min-h-0 flex-1 justify-center overflow-y-auto px-5.5 pt-5 pb-16">
           <div className="flex w-full max-w-settings flex-col gap-3.5">{children}</div>
         </div>
       </main>

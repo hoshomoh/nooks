@@ -55,11 +55,10 @@ export function Sidebar({
 
   return (
     <aside
-      // Its own frame, and its own scroller. As an ordinary flex child it stretched to
-      // the page and travelled with it, so a long list took the lists, the views and
-      // the account out of the top of the window — the three things the sidebar exists
-      // to keep reachable.
-      className="sticky top-0 flex h-dvh w-[258px] shrink-0 flex-col gap-4.5 self-start overflow-y-auto border-r border-border bg-sidebar px-2 pt-3 pb-4"
+      // A full-height column with its own scroller. The shell is the window's height,
+      // so this stays where it is and a long list of Lists scrolls inside it rather
+      // than taking the views and the account off the top of the screen.
+      className="flex h-full w-[258px] shrink-0 flex-col gap-4.5 overflow-y-auto border-r border-border bg-sidebar px-2 pt-3 pb-4"
     >
       <div className="flex h-8.5 items-center gap-2.5 px-2">
         <Mark size={20} />

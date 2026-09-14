@@ -81,7 +81,7 @@ export function NoteScreen() {
   const canEdit = Boolean(list.isOwner || list.canEdit)
 
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className="flex h-dvh flex-col overflow-hidden bg-background">
       <ChromeBar
         crumbs={[list.name, t("note.crumb")]}
         actions={
@@ -97,7 +97,9 @@ export function NoteScreen() {
         }
       />
 
-      <div className="flex flex-1 justify-center px-8 pt-11">
+      {/* The chrome bar above and the footer below stay; the Note scrolls between
+          them, which is what the footer is for. */}
+      <div className="flex min-h-0 flex-1 justify-center overflow-y-auto px-8 pt-11">
         <div className="flex w-full max-w-content flex-col gap-5.5">
           <div className="grid grid-cols-[24px_1fr] items-start gap-3.5">
             <span className="mt-2">

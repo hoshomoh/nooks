@@ -29,7 +29,7 @@ export function Home() {
     >
       <ChromeBar crumbs={[t("list.allLists")]} actions={<ActivityControl />} />
 
-      <div className="flex justify-center px-5.5 pt-14 pb-22">
+      <div className="flex min-h-0 flex-1 justify-center overflow-y-auto px-5.5 pt-14 pb-22">
         <div className="w-full max-w-content">
           <header className="mb-8.5 flex flex-col gap-3.5">
             <h1 className="text-display">{t("list.allLists")}</h1>

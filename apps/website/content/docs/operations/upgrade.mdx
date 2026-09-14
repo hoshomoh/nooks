@@ -1,19 +1,117 @@
 ---
 title: Upgrade
-description: Replace the binary and restart. Migrations run on the way up.
+description: Replace what is running. Migrations run on the way up, and the data stays where it is.
 ---
 
-Nooks brings its schema up to date when it starts, so an upgrade is the binary and
-nothing else.
+Nooks brings its schema up to date when it starts, so an upgrade is whatever replaces
+the running version — and nothing else. The data is never in the thing you replace: it
+is in the volume or the `--data` directory, which an upgrade does not touch.
+
+<Callout type="warn">
+  Back up first. Migrations only run forwards, so the way back from a version you did not
+  want is the copy you took before starting. It is one file — see [Back
+  up](/docs/operations/back-up).
+</Callout>
+
+## Replace what is running
+
+<Tabs items={["Docker", "Docker Compose", "A binary", "From source"]}>
+
+<Tab value="Docker">
+
+Pull the new image, take the old container away, and start it again the way you started
+it the first time:
 
 ```bash
-# with the instance stopped
-go build -o nooks ./cmd/nooks
-./nooks --data ./data
+docker pull ghcr.io/hoshomoh/nooks
+docker stop nooks && docker rm nooks
+docker run -d --name nooks -p 8081:8081 -v nooks-data:/var/lib/nooks ghcr.io/hoshomoh/nooks
 ```
 
-Take a backup first. Migrations only run forwards, so the way back from a version you
-did not want is the file you copied before starting.
+Removing the container does not remove the instance. Everything it has is in the
+`nooks-data` volume, which outlives any number of containers — that is what a named
+volume is for.
+
+<Callout type="warn">
+  The last line has to repeat every flag the original had. Anything you set with `-e`,
+  any different port, a bind mount instead of a volume: all of it has to be typed again,
+  and anything forgotten is silently dropped. If that sounds like something you will get
+  wrong at some point, it is — which is the argument for [Docker
+  Compose](/docs/deploy/compose), where the flags live in a file instead of your shell
+  history.
+</Callout>
+
+</Tab>
+
+<Tab value="Docker Compose">
+
+```bash
+docker compose pull && docker compose up -d
+```
+
+Nothing to retype: the file already says what the flags are, and `up -d` recreates the
+container only because the image under it changed.
+
+</Tab>
+
+<Tab value="A binary">
+
+Download the release you want, stop the instance, put the new binary in place of the old
+one, and start it:
+
+Assets are named for the version they are, so there is no address that always means the
+newest one — take the version you want from the [releases
+page](https://github.com/hoshomoh/nooks/releases) and put it in:
+
+```bash
+VERSION=v1.0.0
+curl -LO "https://github.com/hoshomoh/nooks/releases/download/$VERSION/nooks-$VERSION-linux-amd64.tar.gz"
+tar -xzf "nooks-$VERSION-linux-amd64.tar.gz"
+```
+
+Then stop whatever runs it — `systemctl stop nooks`, or the terminal it is in — move the
+new binary over the old one, and start it again with the same `--data` directory.
+
+Every release also publishes `SHA256SUMS`, so a download over a connection you do not
+control can be checked before you run it:
+
+```bash
+curl -LO "https://github.com/hoshomoh/nooks/releases/download/$VERSION/SHA256SUMS"
+sha256sum -c SHA256SUMS --ignore-missing
+```
+
+</Tab>
+
+<Tab value="From source">
+
+```bash
+git pull
+pnpm install && pnpm --filter @nooks/web release && go build -o nooks ./cmd/nooks
+```
+
+Then stop the running instance and start the new binary against the same `--data`
+directory. The middle step is not optional: the app is baked into the binary, so a
+`go build` on its own produces one that serves nothing.
+
+</Tab>
+
+</Tabs>
+
+## Check what is running
+
+```bash
+docker exec nooks /usr/local/bin/nooks --version
+```
+
+Or `./nooks --version` for a binary. **Settings → About** says the same thing without a
+terminal.
+
+## Which version to move to
+
+Images are tagged `1.2.3`, `1.2` and `latest`. Pinning `1.2` gets you patches and no
+surprises; pinning the full version gets you exactly what you tested. The
+[changelog](/changelog) says what is in each, and marks any release that changes the
+shape of stored data.
 
 ## What a migration will not do
 

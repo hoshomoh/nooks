@@ -26,9 +26,12 @@ Or from a clone. The app is baked into the binary, so it has to be built first â
 `go build` alone gives you a binary that serves nothing:
 
 ```bash
-pnpm install
-pnpm --filter @nooks/web release
-go build -o nooks ./cmd/nooks
+pnpm install && pnpm --filter @nooks/web release && go build -o nooks ./cmd/nooks
+```
+
+Then:
+
+```bash
 ./nooks --data ./data
 ```
 

@@ -19,18 +19,23 @@ you check in instead.
 
 From source, if you would rather build it yourself:
 
+Build it once — three steps, chained so they stop at the first failure:
+
 ```bash
-pnpm install
-pnpm --filter @nooks/web release   # builds the app to where the binary embeds it
-go build -o nooks ./cmd/nooks
+pnpm install && pnpm --filter @nooks/web release && go build -o nooks ./cmd/nooks
+```
+
+Then run it, as often as you like:
+
+```bash
 ./nooks --data ./data
 ```
 
-The middle step is the one that is easy to miss. The app is baked into the binary with
-`go:embed`, and the build output is not committed — so `go build` on its own produces a
-binary that serves nothing and says so. It needs Go, Node and pnpm; the versions are in
-`go.mod` and `.nvmrc`. Docker does exactly these steps for you, which is why the image
-needs none of them on the machine running it.
+The middle step of the build is the one that is easy to miss. The app is baked into the
+binary with `go:embed` and the build output is not committed, so `go build` on its own
+produces a binary that serves nothing and says so. It needs Go, Node and pnpm; the
+versions are in `go.mod` and `.nvmrc`. Docker runs exactly these steps for you, which is
+why the image needs none of them on the machine that runs it.
 
 Open [localhost:8081](http://localhost:8081). The first person to arrive creates their account and names
 the instance. Everybody else asks to join, and an admin approves — there is no public

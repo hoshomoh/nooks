@@ -39,6 +39,18 @@ func Handler() (http.Handler, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open embedded app: %w", err)
 	}
+	return handlerFor(dist), nil
+}
+
+/*
+handlerFor serves one app, from wherever it is.
+
+Taking the files rather than reaching for the embedded ones is what makes the rules
+above testable. The embedded copy is written by the app build and is not committed, so a
+test that read it would pass on a machine that had built the app and fail on one that
+had not — which is what CI is, every time.
+*/
+func handlerFor(dist fs.FS) http.Handler {
 	files := http.FileServer(http.FS(dist))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +61,7 @@ func Handler() (http.Handler, error) {
 		}
 		w.Header().Set("Cache-Control", cacheControlFor(name))
 		files.ServeHTTP(w, r)
-	}), nil
+	})
 }
 
 // serveIndex writes index.html for a client-side route.

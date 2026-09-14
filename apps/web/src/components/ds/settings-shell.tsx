@@ -1,13 +1,16 @@
 import type { ReactNode } from "react"
-import { Link } from "@tanstack/react-router"
+import { useCallback } from "react"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { cn } from "cn"
 import { Role } from "@nooks/api"
 
 import { ChromeBar } from "./chrome-bar"
 import { Sidebar } from "./sidebar"
+import { Keycap } from "./keycap"
 import { SETTINGS_SECTIONS, type SettingsRoute } from "./settings-sections"
 import { useCommandPalette } from "@/lib/use-command-palette"
+import { useEscape } from "@/lib/use-escape"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 
 /** The numbers beside the nav entries, read once by the shell. */
@@ -47,6 +50,11 @@ export function SettingsShell({ active, crumb, counts, children }: SettingsShell
   const { instanceName, member, lists } = useSignedInData()
   const isAdmin = member?.role === Role.ADMIN
   const palette = useCommandPalette()
+  const navigate = useNavigate()
+
+  // Esc leaves Settings the way it leaves a Note. It was the one full-screen view where
+  // the key did nothing, which is worse than never having offered it.
+  useEscape(useCallback(() => void navigate({ to: "/" }), [navigate]))
 
   return (
     <div className="flex min-h-dvh bg-background">
@@ -58,7 +66,11 @@ export function SettingsShell({ active, crumb, counts, children }: SettingsShell
         onAddList={palette.openAddList}
       />
 
-      <nav className="flex w-56 flex-col gap-4 border-r border-border bg-sidebar px-2.5 pt-3 pb-4">
+      <nav
+        // Its own frame and its own scroller, like the app's sidebar. A settings column
+        // that travels with a long page takes Back to lists off the top of the window.
+        className="sticky top-0 flex h-dvh w-56 shrink-0 flex-col gap-4 self-start overflow-y-auto border-r border-border bg-sidebar px-2.5 pt-3 pb-4"
+      >
         <span className="px-2 text-label text-muted-foreground uppercase">
           {t("settings.title")}
         </span>
@@ -86,9 +98,10 @@ export function SettingsShell({ active, crumb, counts, children }: SettingsShell
 
         <Link
           to="/"
-          className="mt-auto flex h-8 items-center rounded-md px-2 text-meta text-muted-foreground transition-colors hover:bg-secondary"
+          className="mt-auto flex h-8 items-center gap-2 rounded-md px-2 text-meta text-muted-foreground transition-colors hover:bg-secondary"
         >
           {t("settings.backToLists")}
+          <Keycap>Esc</Keycap>
         </Link>
       </nav>
 

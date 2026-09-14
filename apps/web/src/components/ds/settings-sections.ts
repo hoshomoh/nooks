@@ -38,3 +38,12 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   { to: "/settings/public", labelKey: "settings.publicList", adminOnly: true },
   { to: "/settings/about", labelKey: "settings.about" },
 ]
+
+/**
+ * Where Settings opens.
+ *
+ * The first section, read from the list rather than written down a second time. The
+ * sidebar used to name a section directly, which sent everybody to Members — a page
+ * only an Admin can use, and not the one anybody was looking for.
+ */
+export const SETTINGS_HOME: SettingsRoute = SETTINGS_SECTIONS[0]!.to

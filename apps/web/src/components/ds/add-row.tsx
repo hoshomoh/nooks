@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import { cn } from "cn"
 
 import { DateField } from "./date-field"
+import { Keycap } from "./keycap"
 import type { AddRowChip, ChipKind } from "@/lib/add-row"
 import type { DueDate } from "@/lib/dates"
 import { useAddRowParse } from "@/lib/use-add-row-parse"
@@ -218,9 +219,7 @@ export function AddRow({
             chosen={Boolean(chosenDue)}
             onChange={(next) => setDraft({ ...draft, picked: next || null, cleared: !next })}
           />
-          <span className="rounded-sm border border-border px-1.5 py-px font-mono text-keycap text-muted-foreground">
-            ↵
-          </span>
+          <Keycap>↵</Keycap>
         </span>
       </form>
 

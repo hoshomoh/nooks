@@ -1,5 +1,9 @@
-import { useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
+import type { ChangeEvent, KeyboardEvent, MouseEvent } from "react"
 import { cn } from "cn"
+
+/** The element a title is edited in: one line for a row, wrapping for a heading. */
+type TitleField = HTMLInputElement | HTMLTextAreaElement
 
 /** Which element the text is drawn as when it cannot be changed. */
 export type TitleElement = "h1" | "h2" | "span"
@@ -58,7 +62,23 @@ export function EditableTitle({
   onOpen,
 }: EditableTitleProps) {
   const [draft, setDraft] = useState<string | null>(null)
-  const inputRef = useRef<HTMLInputElement | null>(null)
+  const fieldRef = useRef<TitleField | null>(null)
+
+  /*
+   * A title wraps; a row's label does not.
+   *
+   * They are the same control doing two jobs. In the sheet and full screen the name is
+   * a heading and has to be readable in full, so it grows down the page. In a list row
+   * it cannot: DESIGN.md §6 says a row never grows and never reflows, because a list
+   * whose rows change height as somebody types is a list nobody can aim at.
+   */
+  const wraps = as !== "span"
+
+  // A callback ref rather than one written into the JSX: the same assignment inline
+  // reads to a linter as touching a ref while rendering, which this is not.
+  const holdField = useCallback((node: TitleField | null) => {
+    fieldRef.current = node
+  }, [])
 
   if (readOnly || !onCommit) {
     const Text = as
@@ -79,59 +99,73 @@ export function EditableTitle({
     }
   }
 
+  const field = {
+    autoFocus,
+    "aria-label": label,
+    placeholder,
+    value: draft ?? value,
+    onBlur: commit,
+    // Three separate jobs, and they are separate on purpose. The mousedown stops the
+    // caret landing here so a single click means the row. The click is what actually
+    // does the row's job. The double click hands the field over — and does not select
+    // anything, because somebody who double-clicked a word wants to edit at that word,
+    // not to replace the whole line.
+    onMouseDown: (event: MouseEvent<TitleField>) => {
+      if (clickTo === "open" && event.detail === 1) {
+        event.preventDefault()
+      }
+    },
+    onClick: (event: MouseEvent<TitleField>) => {
+      if (clickTo === "open" && event.detail === 1) {
+        onOpen?.()
+      }
+    },
+    onDoubleClick: () => {
+      if (clickTo === "open") {
+        fieldRef.current?.focus()
+      }
+    },
+    onChange: (event: ChangeEvent<TitleField>) => setDraft(event.target.value),
+    onKeyDown: (event: KeyboardEvent<TitleField>) => {
+      // Enter commits rather than writing a line: a name is one line however it wraps.
+      if (event.key === "Enter") {
+        event.preventDefault()
+        fieldRef.current?.blur()
+      }
+      if (event.key === "Escape") {
+        setDraft(null)
+        fieldRef.current?.blur()
+      }
+    },
+  }
+
+  // No border until it is being worked on: a title is text first and a field second.
+  const look = cn(
+    // No outline-none here. DESIGN.md §7 gives one focus treatment for everything
+    // focusable, and a title that is also a field is focusable — the background fill
+    // below says "you are editing this", which is not the same as saying "the keyboard
+    // is here".
+    "w-full rounded-md bg-transparent px-1 -mx-1",
+    "transition-colors placeholder:text-muted-foreground hover:bg-secondary focus:bg-secondary",
+    // A single click opens the row, so the pointer says so. An I-beam over something
+    // that does not take the caret is the control lying about itself.
+    clickTo === "open" && "cursor-pointer focus:cursor-text",
+    className,
+  )
+
+  if (!wraps) {
+    return <input ref={holdField} {...field} className={look} />
+  }
+
   return (
-    <input
-      ref={inputRef}
-      autoFocus={autoFocus}
-      aria-label={label}
-      // Three separate jobs, and they are separate on purpose. The mousedown stops the
-      // caret landing here so a single click means the row. The click is what actually
-      // does the row's job. The double click hands the field over — and does not select
-      // anything, because somebody who double-clicked a word wants to edit at that
-      // word, not to replace the whole line.
-      onMouseDown={(event) => {
-        if (clickTo === "open" && event.detail === 1) {
-          event.preventDefault()
-        }
-      }}
-      onClick={(event) => {
-        if (clickTo === "open" && event.detail === 1) {
-          onOpen?.()
-        }
-      }}
-      onDoubleClick={() => {
-        if (clickTo === "open") {
-          inputRef.current?.focus()
-        }
-      }}
-      placeholder={placeholder}
-      value={draft ?? value}
-      onChange={(event) => setDraft(event.target.value)}
-      onBlur={commit}
-      onKeyDown={(event) => {
-        if (event.key === "Enter") {
-          event.preventDefault()
-          inputRef.current?.blur()
-        }
-        if (event.key === "Escape") {
-          setDraft(null)
-          inputRef.current?.blur()
-        }
-      }}
-      // No border until it is being worked on: a title is text first and a field
-      // second.
-      className={cn(
-        // No outline-none here. DESIGN.md §7 gives one focus treatment for everything
-        // focusable, and a title that is also a field is focusable — the background
-        // fill below says "you are editing this", which is not the same as saying
-        // "the keyboard is here".
-        "w-full rounded-md bg-transparent px-1 -mx-1",
-        "transition-colors placeholder:text-muted-foreground hover:bg-secondary focus:bg-secondary",
-        // A single click opens the row, so the pointer says so. An I-beam over
-        // something that does not take the caret is the control lying about itself.
-        clickTo === "open" && "cursor-pointer focus:cursor-text",
-        className,
-      )}
+    <textarea
+      ref={holdField}
+      rows={1}
+      // Grows to its content instead of scrolling it out of sight, so a long name is
+      // read rather than hunted for. `resize-none` because the size is the text's to
+      // decide, not a corner handle's.
+      {...field}
+      className={cn(look, "field-sizing-content resize-none overflow-hidden")}
     />
   )
 }

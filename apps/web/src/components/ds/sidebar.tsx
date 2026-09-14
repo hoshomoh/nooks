@@ -5,6 +5,7 @@ import { Sharing, type List } from "@nooks/api"
 
 import { COVERING, INERT, RAISED } from "./covering"
 import { ListActions } from "./list-actions"
+import { SETTINGS_HOME } from "./settings-sections"
 
 import { Mark } from "@nooks/design/mark"
 
@@ -53,7 +54,13 @@ export function Sidebar({
   const shared = lists.filter((list) => !list.isPinned && !list.isOwner)
 
   return (
-    <aside className="flex w-[258px] flex-col gap-4.5 border-r border-border bg-sidebar px-2 pt-3 pb-4">
+    <aside
+      // Its own frame, and its own scroller. As an ordinary flex child it stretched to
+      // the page and travelled with it, so a long list took the lists, the views and
+      // the account out of the top of the window — the three things the sidebar exists
+      // to keep reachable.
+      className="sticky top-0 flex h-dvh w-[258px] shrink-0 flex-col gap-4.5 self-start overflow-y-auto border-r border-border bg-sidebar px-2 pt-3 pb-4"
+    >
       <div className="flex h-8.5 items-center gap-2.5 px-2">
         <Mark size={20} />
         <span className="truncate text-chrome font-medium">{instanceName}</span>
@@ -123,7 +130,7 @@ export function Sidebar({
       </button>
 
       <Link
-        to="/settings/members"
+        to={SETTINGS_HOME}
         className="mt-auto flex h-8.5 items-center gap-2.5 rounded-md px-2 transition-colors hover:bg-secondary"
       >
         <span className="grid size-5.5 place-items-center rounded-full bg-chip text-[10px] text-secondary-foreground">

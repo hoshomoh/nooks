@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ds/checkbox"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { DateField } from "@/components/ds/date-field"
 import { EditableTitle } from "@/components/ds/editable-title"
+import { Keycap } from "@/components/ds/keycap"
 import { NoteEditor } from "@/components/ds/note-editor"
 import { listClient } from "@/lib/api"
 import { listQuery } from "@/lib/list-queries"
@@ -90,6 +91,7 @@ export function NoteScreen() {
             </span>
             <Button tone="secondary" scale="toolbar" onClick={back}>
               {t("note.backToList")}
+              <Keycap className="ml-1.5">Esc</Keycap>
             </Button>
           </>
         }

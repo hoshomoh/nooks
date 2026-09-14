@@ -131,3 +131,16 @@ describe("the item sheet", () => {
     expect(screen.queryByRole("textbox", { name: "Quantity" })).not.toBeInTheDocument()
   })
 })
+
+describe("a long name", () => {
+  it("wraps in the sheet rather than scrolling out of sight", () => {
+    const long = "Ethiopian whole bean, the light roast from the place on the corner"
+    show({ ...milk, label: long } as Item)
+
+    const title = screen.getByRole("textbox", { name: "Item name" })
+    // A textarea that sizes to its content, not a one-line input that hides the rest.
+    expect(title.tagName).toBe("TEXTAREA")
+    expect(title).toHaveClass("field-sizing-content")
+    expect(title).toHaveValue(long)
+  })
+})

@@ -190,3 +190,20 @@ describe("the list row", () => {
     expect(screen.getByText(labels.notSynced)).toBeInTheDocument()
   })
 })
+
+describe("a long label on a row", () => {
+  it("stays one line, because a row never grows", () => {
+    // DESIGN.md §6. A title in the sheet wraps; a row cannot, or the list changes
+    // height as somebody types and stops being something you can aim at.
+    render(
+      <ListRow
+        label="Ethiopian whole bean, the light roast from the corner shop"
+        onRename={() => {}}
+        labels={labels}
+      />,
+    )
+
+    const label = screen.getByRole("textbox", { name: "Item name" })
+    expect(label.tagName).toBe("INPUT")
+  })
+})

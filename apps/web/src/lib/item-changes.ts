@@ -7,23 +7,19 @@ import { ADD_MUTATION, provisionalItem, TICK_MUTATION, withItem, withTick } from
 import { refreshLists } from "./refresh"
 
 /**
- * The two changes a Member makes most, defined once on the client rather than in a hook.
+ * The two changes a Member makes most, defined on the client rather than in a hook.
  *
- * This is what lets a change survive a reload. A change made offline is paused, and a
- * paused change is written out with the cache — but what comes back is a record of what
- * was asked for, not the function that does it. Registered here by key, the client can
- * pick a restored change back up and send it. Defined in a `useMutation` instead, a
- * tick made in a supermarket basement would be restored, unrunnable, and dropped by the
- * first screen that looked at it.
+ * This is what lets a change survive a reload. A paused change is written out with the
+ * cache as a record of what was asked for, not the function that does it, so the client
+ * needs the function registered under a key to pick it back up. Defined in a
+ * `useMutation` instead, a tick made in a supermarket basement comes back unrunnable.
  *
- * The screens still use hooks — see use-item-changes.ts. They carry the key and
- * nothing else, so there is exactly one description of what ticking an Item does.
+ * The screens still use hooks, in use-item-changes.ts; they carry the key and nothing
+ * else.
  *
- * Both converge rather than roll back when a change is refused. A tick queued offline
- * can come back to an Item somebody deleted in the meantime, and the honest answer is
- * not the value this browser had before — it is whatever the Instance has now. Putting
- * back what was on screen would replace one wrong answer with an older one, and leaving
- * the optimistic row where it is would have the app claiming something it never did.
+ * A refused change converges rather than rolls back. A tick queued offline can return
+ * to an Item somebody has deleted, and the honest answer is what the Instance has now,
+ * not the value this browser held before.
  */
 export function registerItemChanges(queryClient: QueryClient): void {
   queryClient.setMutationDefaults(TICK_MUTATION, {

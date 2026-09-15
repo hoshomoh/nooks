@@ -35,14 +35,12 @@ export interface RowTroubleProps {
 /**
  * What a row says when a change did not land, per DESIGN.md §11.
  *
- * Two different things, and they are drawn differently because they are different. A
- * conflict is not a failure: both versions exist, both are somebody's words, and only a
- * person can say which should survive — so it asks, with the Member's own outlined in
- * accent. A failure is a failure, and takes the destructive treatment.
+ * A conflict is not a failure: both versions are somebody's words and only a person can
+ * say which survives, so it asks, with the Member's own outlined in accent. A failure
+ * takes the destructive treatment.
  *
- * What they share is the rule that matters: the Member's text is on screen in both, and
- * every button here keeps it. Nothing offered discards what somebody wrote without
- * their saying so.
+ * Both keep the Member's text on screen, and every button here keeps it. Nothing
+ * offered discards what somebody wrote without their saying so.
  */
 export function RowTrouble({
   trouble,

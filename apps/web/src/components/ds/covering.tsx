@@ -4,15 +4,13 @@ import { cn } from "cn"
 /**
  * Making a whole row one target, without its contents eating the click.
  *
- * A row that is a single target is drawn as a container with an element stretched over
- * it, and the row's own contents on top. The trap is that a positioned child paints
- * *above* that stretched element even with no z-index of its own — so the label, the
- * count or the description quietly swallows every click that lands on it, and the row
- * appears to work only in the gaps between its own text.
+ * The row is a container with an element stretched over it and the contents on top. The
+ * trap: a positioned child paints above that stretched element even with no z-index, so
+ * the label swallows every click on it and the row works only in the gaps between its
+ * own text.
  *
- * That is one bug, and it has been found three times in three rows. So the three parts
- * are named here rather than written out again: what stretches, what is inert, and what
- * is raised above both.
+ * Found three times in three rows, so the parts are named here: what stretches, what is
+ * inert, and what is raised above both.
  */
 
 /** COVERING stretches an element over its container, behind the container's contents. */

@@ -3,14 +3,12 @@ import { createCn } from "cn/config"
 /**
  * Class merging that knows Nooks' own tokens.
  *
- * `cn` resolves conflicts from a table of Tailwind's built-in names. Nooks adds its own
- * colours and its own type scale, and without them in that table a size and a colour
- * that are both spelled `text-…` look like the same utility: `cn("text-small
- * text-shared")` quietly drops the size. Listing them here is what keeps the design
- * system's names as safe to combine as Tailwind's.
+ * `cn` resolves conflicts from a table of Tailwind's built-in names. Without Nooks'
+ * colours and type scale in that table, a size and a colour both spelled `text-…` look
+ * like the same utility, and `cn("text-small text-shared")` quietly drops the size.
  *
- * The lists are checked against `index.css` by `cn.test.ts`, so a token added there
- * cannot be forgotten here.
+ * cn.test.ts checks the lists against index.css, so a token added there cannot be
+ * forgotten here.
  */
 
 /** Every colour Nooks defines beyond the ones shadcn ships. */

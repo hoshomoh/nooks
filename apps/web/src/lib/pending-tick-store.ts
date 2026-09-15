@@ -1,13 +1,11 @@
 /**
  * The tick a Visitor reached for before they had an account.
  *
- * Somebody opens the public list, taps a box, and is told they need to sign in. What
- * they were trying to do should not be lost on the way: they meant to tick that thing,
- * and making them find it again afterwards is the app forgetting on their behalf.
+ * Somebody taps a box on the public list and is told to sign in. Making them find it
+ * again afterwards is the app forgetting on their behalf.
  *
- * Kept in the browser because that is where the intention was formed, and because the
- * Instance has no idea who they are yet. It survives a sign-in that takes days, which
- * is why it is not simply held in memory.
+ * Kept in the browser, since the Instance has no idea who they are yet, and on disk
+ * rather than in memory because signing in can take days.
  */
 export interface PendingTickStore {
   /** Remembers what they reached for, replacing anything older. */

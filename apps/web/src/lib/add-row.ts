@@ -45,13 +45,10 @@ export interface AddRowVocabulary {
   /**
    * Words that may stand before a weekday without moving it, such as "next".
    *
-   * They name the day the bare weekday already names. A weekday on its own is always
-   * the one still to come — "saturday" on a Saturday is the Saturday after this one —
-   * so there is no earlier Saturday for "next saturday" to distinguish itself from.
-   * Giving the word a week of its own would make two sentences a Member reads as the
-   * same thing differ by seven days, and which one they mean is genuinely a coin flip.
-   * Anybody who wants the later one writes "saturday in 2 weeks", which cannot be
-   * misread.
+   * A bare weekday is always the one still to come, so there is no earlier Saturday for
+   * "next saturday" to distinguish itself from. Giving the word a week of its own would
+   * make two sentences a Member reads as the same differ by seven days. Anybody who
+   * wants the later one writes "saturday in 2 weeks".
    */
   comingWords: readonly string[]
   /** Words introducing a distance, such as the "in" of "in 2 weeks". */

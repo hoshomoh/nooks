@@ -40,22 +40,17 @@ export interface NoteSheetProps {
 /**
  * The side sheet, per DESIGN.md §9: 520px, pinned below the chrome bar.
  *
- * It sits on the sheet layer rather than at the top of the stack: a row's checkbox and
- * label are lifted above the row's own click target, and without a layer of its own the
- * sheet would be covered by the rows it is drawn over.
+ * On the sheet layer rather than the top of the stack: a row lifts its checkbox and
+ * label above its own click target, so a sheet without a layer would sit under the rows
+ * it is drawn over.
  *
- * Same order as full screen — chrome bar, checkbox and title, detail row, hairline,
- * Note, footer bar — so the two read as one thing at two widths. Opening an Item never
- * replaces the List with a page.
+ * Same order as the full screen so the two read as one thing at two widths, and every
+ * field is the control that changes it. There is no edit mode.
  *
- * Every field here is the control that changes it. There is no edit mode: the sheet is
- * where an Item is read and where it is rewritten.
- *
- * It leaves the way it came. Closing is the one dismissal the sheet owns, so it plays
- * the entrance backwards and tells the List it has gone once the movement is over —
- * anything less and a panel that took 180ms to arrive would vanish between frames.
- * Browser Back is not this: the address is what holds the sheet open, and by the time
- * the address has changed there is nothing left to move.
+ * Closing plays the entrance backwards and tells the List once the movement is over,
+ * so a panel that took 180ms to arrive does not vanish between frames. Browser Back is
+ * not this: the address holds the sheet open, and by the time it changes there is
+ * nothing left to move.
  */
 export function NoteSheet({
   item,

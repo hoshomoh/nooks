@@ -33,16 +33,15 @@ type Panel = "actions" | "date" | "quantity"
 /**
  * The `···` on an Item's row.
  *
- * Setting a date or a quantity happens **inside the menu**: the entry that names the
- * field opens the field, rather than sending a Member somewhere else to find it. One
- * gesture, one place, and the row itself is left alone.
+ * Setting a date or a quantity happens inside the menu: the entry that names the field
+ * opens the field. One gesture, one place, and the row is left alone.
  *
- * A popover rather than a menu, because a menu is a list of actions and this holds a
- * calendar and a text field — controls that want the keyboard for themselves.
+ * A popover rather than a menu, because this holds a calendar and a text field, which
+ * want the keyboard for themselves.
  *
- * Three of the entries the design lists are not here: moving between Lists, assigning
- * to somebody, and the note shortcut all wait for the milestones that build them. An
- * entry that does nothing teaches a Member that the menu is decoration.
+ * Moving between Lists, assigning, and the note shortcut are drawn in the design and
+ * wait for the milestones that build them. An entry that does nothing teaches a Member
+ * the menu is decoration.
  */
 export function ItemMenu({ quantity, dueOn, actions }: ItemMenuProps) {
   const { t } = useTranslation()

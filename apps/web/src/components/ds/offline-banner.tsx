@@ -9,19 +9,14 @@ import { useMomentLabel } from "@/lib/use-moment-label"
 /**
  * What the app says when it cannot reach the Instance, per DESIGN.md §11.
  *
- * It reads the connection itself rather than taking it as a prop, so that a screen
- * cannot forget to show it: AppShell places it once and every signed-in view has it.
+ * It reads the connection itself rather than taking a prop, so a screen cannot forget
+ * to show it. Reading, ticking and adding still work while it is up, which is why it is
+ * a strip rather than anything modal.
  *
- * Reading, ticking and adding all still work while this is up. The banner is not a
- * barrier, which is why it is a strip above the content rather than anything modal.
- *
- * The strip is always in the page and opens to its own height, rather than being put
- * there when the connection drops. Two reasons, and they point the same way. A Member
- * mid-sentence should not have the whole app shoved down a row under their cursor, so
- * the height is what moves. And a live region has to exist before it changes to be
- * read aloud: one that arrives already carrying its message is announced by some
- * screen readers and not by others, while a change to a region already there is
- * announced by all of them.
+ * The strip is always in the page and opens to its own height. Moving the height rather
+ * than inserting the element keeps the app from shoving down a row under a Member's
+ * cursor, and a live region that was already there when its text changed is announced
+ * by every screen reader, where one that arrives carrying its message is not.
  */
 export function OfflineBanner() {
   const { online, lastSeenAt } = useConnection()

@@ -3,11 +3,9 @@ import { registerSW } from "virtual:pwa-register"
 /**
  * Whether a newer build of the app is waiting.
  *
- * The service worker holds the app, so a new release does not arrive by itself.
- * Something has to say so.
- *
- * It says so and then waits. A Note is saved when the typing settles, and a reload a
- * second before that takes somebody's words away to give the app a version number.
+ * The service worker holds the app, so a new release does not arrive by itself. This
+ * says one is there and then waits: a Note saves when the typing settles, and reloading
+ * a second before that trades somebody's words for a version number.
  *
  * Outside a secure context there is no service worker, so this never fires.
  */

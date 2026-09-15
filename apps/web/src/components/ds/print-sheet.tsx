@@ -17,17 +17,13 @@ const BLANK_ROWS = 3
 /**
  * The printed List, per DESIGN.md §15.
  *
- * A deliverable, not a screenshot. It is rendered into the page and hidden on screen,
- * so printing takes the List rather than the browser's idea of the app — the sidebar,
- * the chrome bar and the menus are all things a person standing in a shop has no use
- * for.
+ * A deliverable, not a screenshot: rendered into the page and hidden on screen, so what
+ * prints is the List rather than the sidebar, the chrome bar and the menus.
  *
- * It goes through a portal because printing hides the app's root: a sheet rendered
- * inside that root would be hidden along with everything else, and the page would come
- * out blank.
+ * Through a portal, because printing hides the app's root and a sheet inside it would
+ * be hidden too, printing a blank page.
  *
- * It renders **every** Item, ticked ones included: a printed sheet is a snapshot of the
- * List, and somebody who ticked something on the way out still wants to see they did.
+ * Every Item, ticked ones included. A printed sheet is a snapshot of the List.
  */
 export function PrintSheet({ instanceName, listName, printedOn, items }: PrintSheetProps) {
   const { t } = useTranslation()

@@ -7,14 +7,11 @@ import type { Translate } from "./translate"
 /**
  * The List a new Instance opens onto.
  *
- * An empty Instance is a fair description of the truth and a poor way to meet a
- * product: a Member who has never seen Nooks cannot tell that an Item can carry a
- * quantity, a date or a Note, because nothing on screen has one. So the first List
- * shows each of them once, on things somebody might actually buy.
+ * Nothing on an empty Instance shows that an Item can carry a quantity, a date or a
+ * Note, so the first List shows each of them once on things somebody might buy.
  *
- * Written from the browser rather than the server, because the words have to be in the
- * Member's language and only the browser knows which that is. It is one round of calls,
- * once, on the day an Instance is created.
+ * Written from the browser because the words have to be in the Member's language and
+ * only the browser knows which that is.
  */
 export async function createStarterList(t: Translate, now: Date = new Date()): Promise<void> {
   const created = await listClient.createList({ name: t("starter.listName") })

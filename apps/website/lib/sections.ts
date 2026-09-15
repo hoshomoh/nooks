@@ -11,15 +11,13 @@ export function inApi(url: string): boolean {
 /**
  * The two halves of the docs, for the switcher above the tree.
  *
- * Written out rather than derived from the tree, because Fumadocs derives them by
- * looking for folders marked `root` *inside* the tree — and the documentation is the
- * tree itself, not a folder in it. Marking it `root` reads as though it should work and
- * does nothing, which left the switcher offering one destination and no way back from
- * the reference.
+ * Written out rather than derived: Fumadocs finds them by looking for folders marked
+ * `root` inside the tree, and the documentation is the tree itself. Marking it `root`
+ * reads as though it should work and does nothing.
  *
  * Each carries the pages it covers so the right one is marked current. Matching on the
- * URL alone would have `/docs` claim every reference page as its own, since every one
- * of them sits beneath it.
+ * URL alone would have `/docs` claim every reference page, since all of them sit under
+ * it.
  */
 export function sections(urls: readonly string[]): LayoutTab[] {
   return [

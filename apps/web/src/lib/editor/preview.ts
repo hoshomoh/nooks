@@ -3,18 +3,15 @@ import type { JSONContent } from "@tiptap/react"
 import { documentFrom } from "./markdown"
 
 /**
- * What a Note looks like on a row, taken from the Note rather than from its source.
+ * What a Note looks like on a row, read from the document rather than from its markdown.
  *
- * A Note is stored as markdown, and for a while the first line of a row was produced by
- * looking at that markdown and taking the shorthand off the front of it. That is a
- * second, worse parser: it guesses by prefix, so an empty checklist item came out as
- * "[ ]", a search result read "- [ ] sample content", and anything with `**bold**` in it
- * showed the asterisks.
+ * Stripping the shorthand off the source is a second, worse parser: it guesses by
+ * prefix, so an empty checklist item comes out as "[ ]" and `**bold**` shows its
+ * asterisks. This goes through the same function the editor renders from, so a row and
+ * the Note cannot disagree.
  *
- * This reads the document instead — through the same function the editor renders from,
- * so what a row shows and what the Note shows cannot disagree. Nothing is summarised:
- * DESIGN.md §13 is explicit that Nooks never summarises a Member, so this is their own
- * first block, and a count of the blocks after it.
+ * Nothing is summarised, per DESIGN.md §13: the Member's own first block, and a count
+ * of the blocks after it.
  */
 
 /** One run of text in a preview, with whatever was on it. */

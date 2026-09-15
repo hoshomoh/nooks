@@ -2,12 +2,11 @@
  * Which List a Member last added something to, as an external store.
  *
  * Today and Upcoming gather Items from every List, so an Item added there has to land
- * somewhere — and the somewhere a Member means is almost always the one they used last.
+ * somewhere, and that is almost always the List they used last.
  *
- * Remembered in the browser rather than on the Instance: it is a convenience about how
- * one person is working this week, not a fact about the household. It lives outside
- * React because it is written from a mutation and read from a screen, and React reads
- * it with useSyncExternalStore rather than synchronising with an effect.
+ * In the browser rather than on the Instance: it is how one person is working this
+ * week, not a fact about the household. Outside React because it is written from a
+ * mutation and read from a screen.
  */
 export interface LastListStore {
   subscribe: (listener: () => void) => () => void

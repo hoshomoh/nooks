@@ -11,16 +11,12 @@ export interface PresenceProps {
 /**
  * Who else is here, per DESIGN.md §6.
  *
- * It replaces the sharing line rather than sitting beside it: while somebody else is
- * reading the same List, that is the more useful of the two facts, and the design gives
- * the line one job at a time.
+ * It replaces the sharing line rather than sitting beside it: the design gives the line
+ * one job at a time, and while somebody else is reading the List that is the more
+ * useful fact. The colour is `--done`, the green a tick lands in.
  *
- * The colour is `--done`, the same green a tick lands in — it means "somebody else is
- * doing something", which is exactly what it is.
- *
- * It fades up rather than replacing the sharing line between frames. This is the one
- * line on the List that changes without the Member having done anything, and a word
- * that was not there a moment ago is worth a moment to notice.
+ * It fades up rather than swapping between frames. This is the one line that changes
+ * without the Member having done anything, so it is worth a moment to notice.
  */
 export function Presence({ watchers }: PresenceProps) {
   const { t } = useTranslation()

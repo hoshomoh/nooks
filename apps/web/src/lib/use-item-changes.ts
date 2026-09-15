@@ -7,14 +7,13 @@ import { ADD_MUTATION, TICK_MUTATION } from "./queued-changes"
 /**
  * What a screen reaches for to tick or add.
  *
- * The hooks carry a key and nothing else: what ticking an Item actually does is
- * registered on the client in item-changes.ts, so a change restored from disk after a
- * reload runs the same code as one made a second ago.
+ * The hooks carry a key and nothing else. What ticking does is registered on the client
+ * in item-changes.ts, so a change restored from disk runs the same code as one made a
+ * second ago.
  *
- * Ticking happens on a List, in Today, in Upcoming and in the calendar, and adding
- * happens on a List and from a dated view. Written out at each of those, the offline
- * behaviour would be six pieces of code that have to agree — and the first one somebody
- * forgot would be a tick that looked saved and was not.
+ * Ticking happens on a List, in Today, in Upcoming and in the calendar. Written out at
+ * each, the offline behaviour would be six pieces of code that have to agree, and the
+ * one somebody forgot would be a tick that looked saved and was not.
  */
 
 /** Everything a Member does to an Item returns this, so a screen reads one shape. */

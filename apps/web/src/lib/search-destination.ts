@@ -15,11 +15,9 @@ export interface SearchDestination {
 /**
  * destinationOf answers what was found, not merely where it lives.
  *
- * A hit on an Item, or on words inside its Note, is about that Item, so the sheet opens
- * on it. Every result used to land on the List and leave the Member to find the row
- * again, which is making them search twice for something already found.
- *
- * A hit on a List is the List: there is nothing narrower to open.
+ * A hit on an Item, or on words in its Note, is about that Item, so the sheet opens on
+ * it. Landing on the List instead makes a Member search twice for something already
+ * found. A hit on a List is the List: there is nothing narrower to open.
  */
 export function destinationOf(hit: SearchHit): SearchDestination {
   return hit.itemUid ? { listUid: hit.listUid, itemUid: hit.itemUid } : { listUid: hit.listUid }

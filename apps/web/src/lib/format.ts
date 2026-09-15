@@ -11,7 +11,6 @@ import type { LocaleCode } from "@/i18n/locales"
 
 export type FormatNumberOptions = Intl.NumberFormatOptions
 
-/** formatNumber renders a number in the Member's language. */
 export function formatNumber(
   value: number,
   locale: LocaleCode,

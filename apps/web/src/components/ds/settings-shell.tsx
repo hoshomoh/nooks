@@ -52,8 +52,8 @@ export function SettingsShell({ active, crumb, counts, children }: SettingsShell
   const palette = useCommandPalette()
   const navigate = useNavigate()
 
-  // Esc leaves Settings the way it leaves a Note. It was the one full-screen view where
-  // the key did nothing, which is worse than never having offered it.
+  // Esc leaves Settings the way it leaves a Note. A full-screen view where the key does
+  // nothing is worse than never having offered it.
   useEscape(useCallback(() => void navigate({ to: "/" }), [navigate]))
 
   return (

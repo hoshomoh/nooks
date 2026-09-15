@@ -43,8 +43,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
 /**
  * Where Settings opens.
  *
- * The first section, read from the list rather than written down a second time. The
- * sidebar used to name a section directly, which sent everybody to Members — a page
- * only an Admin can use, and not the one anybody was looking for.
+ * The first section, read from the list rather than named a second time in the sidebar,
+ * where it would drift and send everybody to a page only an Admin can use.
  */
 export const SETTINGS_HOME: SettingsRoute = SETTINGS_SECTIONS[0]!.to

@@ -1005,9 +1005,8 @@ func TestAConditionalUpdateLandsWhenNobodyElseMovedIt(t *testing.T) {
 	}
 }
 
-// An Item is indexed twice — once for its label and once for its Note — so a word in
-// both used to come back as two hits with the same UID, which read as two Items that
-// were really one.
+// An Item is indexed twice, once for its label and once for its Note, so a word in both
+// would otherwise come back as two hits with the same UID and read as two Items.
 func TestSearchReturnsOneHitPerItem(t *testing.T) {
 	f := newListFixture(t)
 	ctx := f.as(t, f.anna)

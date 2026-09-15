@@ -98,10 +98,9 @@ describe("the printed sheet", () => {
 
 describe("what the sheet says it is", () => {
   it("never calls a list something it is not", () => {
-    // The eyebrow used to read "<instance> · shopping list" for every list, so a
-    // packing list printed a header saying it was shopping. The design writes the kind
-    // of list there, and Nooks has no field for one — so it says nothing rather than
-    // guessing. The list's own name is the heading directly below it.
+    // The design writes the kind of list in the eyebrow and Nooks has no field for
+    // one, so it says nothing rather than printing "shopping list" over a packing
+    // list. The list's own name is the heading directly below it.
     render(
       <PrintSheet
         instanceName="Brunnen Street"

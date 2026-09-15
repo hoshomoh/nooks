@@ -56,10 +56,9 @@ describe("markdown survives being edited", () => {
   })
 
   it("reads a blank line as a separator, not as an empty paragraph", () => {
-    // Every line used to become a block, so the gap between two paragraphs was an
-    // empty one — a whole line of height on top of the padding they already have.
-    // Anything writing ordinary markdown put a gap between every pair, and the Note
-    // came out double spaced.
+    // Read as a block it is an empty paragraph, a whole line of height on top of the
+    // padding the paragraphs already have, and anything writing ordinary markdown
+    // comes out double spaced.
     const blocks = documentFrom("One.\n\nTwo.").content ?? []
 
     expect(blocks).toHaveLength(2)

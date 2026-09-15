@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.2.0](https://github.com/hoshomoh/nooks/compare/v1.1.1...v1.2.0) (2026-09-15)
+
+
+### New
+
+* **web:** keep the app on the machine that opened it ([77b85ee](https://github.com/hoshomoh/nooks/commit/77b85ee7fd992e028ad5a73f067924ee1a1dbe17))
+* **web:** set an assistant up from settings ([c8e1ddf](https://github.com/hoshomoh/nooks/commit/c8e1ddf750fe02fd9203d8e64cce12633487df4a))
+
+
+### Fixed
+
+* one search result per item, and one identity per row ([1e31473](https://github.com/hoshomoh/nooks/commit/1e31473f0bda713a4b9fe87f4960d2b4582d64e0))
+* **web:** keep the list clear of the side sheet ([d9207df](https://github.com/hoshomoh/nooks/commit/d9207df6cd580ae06d2f2d8e06d87f618b0d3f4c))
+
+
+### Changed
+
+* one source for the assistant setup blocks ([42f55a1](https://github.com/hoshomoh/nooks/commit/42f55a17389ca2a4d7b6726225214adb864f26d2))
+* **web:** reuse test workers between files ([7939b4a](https://github.com/hoshomoh/nooks/commit/7939b4a70aeabf4c8d6174274d74840a1fd43a12))
+* **web:** two test workers, not one per core ([5957b10](https://github.com/hoshomoh/nooks/commit/5957b10c5726c88514200d9daf759c2afaaec986))
+
 ## [1.1.1](https://github.com/hoshomoh/nooks/compare/v1.1.0...v1.1.1) (2026-09-14)
 
 

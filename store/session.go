@@ -28,8 +28,8 @@ type Session struct {
 SessionKind separates the credential that lasts from the credential that travels.
 
 A refresh token lives a month and only ever moves in an HttpOnly cookie, so no script
-can read it. An access token lives an hour and is the only one ever put in a response
-body — which is the only way a caller that is not a browser can hold a credential.
+can read it. An access token lives an hour and is the only one put in a response body,
+which is how a caller that is not a browser holds a credential.
 
 The rule the split buys: the thing that lasts a month is never the thing in a body.
 */

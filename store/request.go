@@ -107,7 +107,6 @@ func (s *sqlStore) PendingJoinRequests(ctx context.Context) ([]JoinRequest, erro
 	return requests, nil
 }
 
-// JoinRequestByUID finds one request.
 func (s *sqlStore) JoinRequestByUID(ctx context.Context, uid string) (JoinRequest, error) {
 	row := new(joinRequestModel)
 	if err := s.db.NewSelect().Model(row).Where("uid = ?", uid).Scan(ctx); err != nil {
@@ -185,7 +184,6 @@ func (s *sqlStore) PendingResetRequests(ctx context.Context) ([]ResetRequest, er
 	return requests, nil
 }
 
-// ResetRequestByUID finds one request.
 func (s *sqlStore) ResetRequestByUID(ctx context.Context, uid string) (ResetRequest, error) {
 	row := new(resetRequestModel)
 	if err := s.db.NewSelect().Model(row).Where("uid = ?", uid).Scan(ctx); err != nil {
@@ -231,7 +229,6 @@ func (s *sqlStore) UseResetRequest(ctx context.Context, uid string) error {
 	return requireOneRow(result, "approved reset request")
 }
 
-// joinRequestModel is the stored shape of a JoinRequest.
 type joinRequestModel struct {
 	bun.BaseModel `bun:"table:join_request,alias:join_request"`
 
@@ -260,7 +257,6 @@ func (m joinRequestModel) toJoinRequest() (JoinRequest, error) {
 	}, nil
 }
 
-// resetRequestModel is the stored shape of a ResetRequest.
 type resetRequestModel struct {
 	bun.BaseModel `bun:"table:reset_request,alias:reset_request"`
 

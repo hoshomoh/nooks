@@ -54,7 +54,6 @@ const (
 	OutcomeIgnored Outcome = "IGNORED"
 )
 
-// Decided reports whether anybody has acted on this yet.
 func (a Activity) Decided() bool { return a.Outcome != "" }
 
 // Unread reports whether the entry still wants attention.
@@ -114,7 +113,6 @@ func (s *sqlStore) ActivityFor(ctx context.Context, memberID int64) ([]Activity,
 	return entries, nil
 }
 
-// MarkActivityRead marks everything a Member has now seen.
 func (s *sqlStore) MarkActivityRead(ctx context.Context, memberID int64, at time.Time) error {
 	_, err := s.db.NewUpdate().
 		Model((*activityModel)(nil)).
@@ -159,7 +157,6 @@ func (s *sqlStore) AdminIDs(ctx context.Context) ([]int64, error) {
 	return ids, nil
 }
 
-// activityModel is the stored shape of an Activity entry.
 type activityModel struct {
 	bun.BaseModel `bun:"table:activity,alias:activity"`
 

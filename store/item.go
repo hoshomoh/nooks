@@ -46,7 +46,6 @@ type Item struct {
 	DeletedAt      time.Time
 }
 
-// Done reports whether the Item has been ticked.
 func (i Item) Done() bool { return !i.DoneAt.IsZero() }
 
 // CreateItemParams is everything needed to add an Item. Position is worked out by the
@@ -109,10 +108,8 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 /*
 CreateItems adds several Items to one List at once.
 
-One position read for the batch rather than one per Item, one insert for all of them,
-and one transaction around the lot — so copying a List is a commit rather than a commit
-per row. The Items keep the order they arrive in, which is the order they were read off
-the List being copied.
+One position read, one insert and one transaction for the batch, so copying a List is a
+commit rather than a commit per row. The Items keep the order they arrive in.
 */
 func (s *sqlStore) CreateItems(ctx context.Context, params []CreateItemParams) ([]Item, error) {
 	if len(params) == 0 {
@@ -305,7 +302,6 @@ func (s *sqlStore) SetItemDone(ctx context.Context, uid string, doneBy int64, at
 	return requireOneRow(result, "item")
 }
 
-// SetItemNotDone unticks an Item.
 func (s *sqlStore) SetItemNotDone(ctx context.Context, uid string, at time.Time) error {
 	result, err := s.db.NewUpdate().
 		Model((*itemModel)(nil)).
@@ -402,7 +398,6 @@ func (s *sqlStore) nextPosition(ctx context.Context, listID int64) (float64, err
 	return last.Float64 + positionGap, nil
 }
 
-// toItems converts a page of rows.
 func toItems(rows []itemModel) ([]Item, error) {
 	items := make([]Item, 0, len(rows))
 	for _, row := range rows {
@@ -415,7 +410,6 @@ func toItems(rows []itemModel) ([]Item, error) {
 	return items, nil
 }
 
-// itemModel is the stored shape of an Item.
 type itemModel struct {
 	bun.BaseModel `bun:"table:item,alias:item"`
 

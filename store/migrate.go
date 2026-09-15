@@ -51,7 +51,6 @@ func ensureMigrationTable(ctx context.Context, db *bun.DB) error {
 	return nil
 }
 
-// appliedMigrations reads the names already recorded in the ledger.
 func appliedMigrations(ctx context.Context, db *bun.DB) (map[string]bool, error) {
 	rows, err := db.QueryContext(ctx, `SELECT name FROM schema_migration`)
 	if err != nil {
@@ -122,7 +121,6 @@ func applyMigration(ctx context.Context, db *bun.DB, driver string, name string)
 	return nil
 }
 
-// migrationRecord is the ledger row saying a migration has run.
 type migrationRecord struct {
 	bun.BaseModel `bun:"table:schema_migration,alias:schema_migration"`
 

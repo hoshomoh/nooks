@@ -8,9 +8,8 @@ import (
 /*
 InstanceStats is what the About page reports: how much this Instance is holding.
 
-Counts rather than a dashboard. Somebody self-hosting wants to know the thing is real
-and roughly how big it is before they decide whether to back it up — not to watch a
-chart.
+Counts rather than a dashboard: somebody self-hosting wants to know roughly how big it
+is before deciding whether to back it up.
 */
 type InstanceStats struct {
 	Members int
@@ -56,9 +55,9 @@ func (s *sqlStore) Stats(ctx context.Context) (InstanceStats, error) {
 /*
 storageBytes asks the database how much room it is taking.
 
-Best effort, and driver-specific: SQLite multiplies its page count by its page size,
-Postgres has a function for it. Anything that goes wrong answers zero, because the size
-of the database is a nice thing to know and never a reason to fail a page.
+Driver-specific and best effort: SQLite multiplies page count by page size, Postgres
+has a function. Anything that goes wrong answers zero, because the size of the database
+is never a reason to fail the page.
 */
 func (s *sqlStore) storageBytes(ctx context.Context) int64 {
 	var size int64

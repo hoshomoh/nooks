@@ -37,7 +37,6 @@ type sqlStore struct {
 	name string
 }
 
-// InstanceSettings reads the Instance's own configuration.
 func (s *sqlStore) InstanceSettings(ctx context.Context) (InstanceSettings, error) {
 	var rows []settingModel
 	if err := s.db.NewSelect().Model(&rows).Scan(ctx); err != nil {
@@ -70,7 +69,6 @@ func (s *sqlStore) SaveInstanceSettings(ctx context.Context, settings InstanceSe
 	return nil
 }
 
-// Close releases the underlying database handle.
 func (s *sqlStore) Close() error {
 	if err := s.db.Close(); err != nil {
 		return fmt.Errorf("close %s store: %w", s.name, err)

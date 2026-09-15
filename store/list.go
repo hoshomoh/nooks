@@ -52,7 +52,6 @@ type CreateListParams struct {
 	At      time.Time
 }
 
-// CreateList adds a List.
 func (s *sqlStore) CreateList(ctx context.Context, params CreateListParams) (List, error) {
 	if params.Name == "" {
 		return List{}, errors.New("store: list name is required")
@@ -147,7 +146,6 @@ func (s *sqlStore) ListsForMember(ctx context.Context, memberID int64) ([]List, 
 	return lists, nil
 }
 
-// RenameList changes a List's name.
 func (s *sqlStore) RenameList(ctx context.Context, uid string, name string, at time.Time) error {
 	if name == "" {
 		return errors.New("store: list name is required")
@@ -165,7 +163,6 @@ func (s *sqlStore) RenameList(ctx context.Context, uid string, name string, at t
 	return s.indexList(ctx, list)
 }
 
-// SetListSharing changes who can reach a List.
 func (s *sqlStore) SetListSharing(ctx context.Context, uid string, sharing Sharing, canEdit bool, at time.Time) error {
 	return s.updateList(ctx, uid, at, func(q *bun.UpdateQuery) *bun.UpdateQuery {
 		return q.Set("sharing = ?", string(sharing)).Set("can_edit = ?", canEdit)
@@ -266,7 +263,6 @@ func (s *sqlStore) PinnedListIDs(ctx context.Context, memberID int64) ([]int64, 
 	return ids, nil
 }
 
-// listModel is the stored shape of a List.
 type listModel struct {
 	bun.BaseModel `bun:"table:list,alias:list"`
 
@@ -301,7 +297,6 @@ func (m listModel) toList() (List, error) {
 	}, nil
 }
 
-// listPinModel is one Member's pin on one List.
 type listPinModel struct {
 	bun.BaseModel `bun:"table:list_pin,alias:list_pin"`
 

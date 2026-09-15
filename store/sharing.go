@@ -31,7 +31,6 @@ type Share struct {
 	GroupID  int64
 }
 
-// CreateGroup adds a Group.
 func (s *sqlStore) CreateGroup(ctx context.Context, uid, name string, at time.Time) (Group, error) {
 	if name == "" {
 		return Group{}, errors.New("store: group name is required")
@@ -43,7 +42,6 @@ func (s *sqlStore) CreateGroup(ctx context.Context, uid, name string, at time.Ti
 	return row.toGroup()
 }
 
-// GroupByUID finds a Group.
 func (s *sqlStore) GroupByUID(ctx context.Context, uid string) (Group, error) {
 	row := new(groupModel)
 	if err := s.db.NewSelect().Model(row).Where("uid = ?", uid).Scan(ctx); err != nil {
@@ -132,7 +130,6 @@ func (s *sqlStore) ReplaceGroupMembers(ctx context.Context, groupID int64, membe
 	return nil
 }
 
-// GroupMemberIDs lists who is in a Group.
 func (s *sqlStore) GroupMemberIDs(ctx context.Context, groupID int64) ([]int64, error) {
 	var ids []int64
 	err := s.db.NewSelect().
@@ -246,7 +243,6 @@ func (s *sqlStore) SharedListIDs(ctx context.Context, memberID int64) ([]int64, 
 	return ids, nil
 }
 
-// groupModel is the stored shape of a Group.
 type groupModel struct {
 	bun.BaseModel `bun:"table:member_group,alias:member_group"`
 
@@ -264,7 +260,6 @@ func (m groupModel) toGroup() (Group, error) {
 	return Group{ID: m.ID, UID: m.UID, Name: m.Name, CreatedAt: createdAt}, nil
 }
 
-// groupMemberModel is one Member's membership of one Group.
 type groupMemberModel struct {
 	bun.BaseModel `bun:"table:group_member,alias:group_member"`
 

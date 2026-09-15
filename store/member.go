@@ -172,7 +172,6 @@ func (s *sqlStore) MemberByUID(ctx context.Context, uid string) (Member, error) 
 	return s.oneMember(ctx, "uid", uid)
 }
 
-// MemberByID finds a Member by internal identity.
 func (s *sqlStore) MemberByID(ctx context.Context, id int64) (Member, error) {
 	return s.oneMember(ctx, "id", id)
 }
@@ -206,7 +205,6 @@ func (s *sqlStore) SetMemberPassword(ctx context.Context, id int64, hash string)
 	return requireOneRow(result, "member")
 }
 
-// MarkMemberSignedIn records that a Member has just signed in.
 func (s *sqlStore) MarkMemberSignedIn(ctx context.Context, id int64, at time.Time) error {
 	result, err := s.db.NewUpdate().
 		Model((*memberModel)(nil)).

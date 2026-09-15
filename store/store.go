@@ -186,12 +186,8 @@ type Store interface {
 
 	// CreateItem appends an Item to a List.
 	CreateItem(ctx context.Context, params CreateItemParams) (Item, error)
-	// CreateItems adds several Items to one List in a single transaction.
-	//
-	// Copying a List used to be one CreateItem per Item, and each of those was a query
-	// for the next position, an insert, and its own transaction — so a hundred Items
-	// meant a hundred commits, which on the kind of machine Nooks is meant to run on is
-	// felt rather than measured.
+	// CreateItems adds several Items to one List in a single transaction, so copying a
+	// List is one commit rather than one per Item.
 	CreateItems(ctx context.Context, params []CreateItemParams) ([]Item, error)
 
 	// ItemsOnList returns a List's live Items in their manual order.

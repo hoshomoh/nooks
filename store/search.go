@@ -160,7 +160,6 @@ func postgresQuery(terms []string) string {
 	return strings.Join(parts, " & ")
 }
 
-// searchIndexModel is one indexed row.
 type searchIndexModel struct {
 	bun.BaseModel `bun:"table:search_index,alias:search_index"`
 

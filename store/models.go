@@ -13,7 +13,6 @@ import (
 // of the types the rest of Nooks passes around. The mapping functions below are the one
 // place those two shapes meet.
 
-// settingModel is one row of Instance configuration.
 type settingModel struct {
 	bun.BaseModel `bun:"table:setting,alias:setting"`
 
@@ -21,8 +20,6 @@ type settingModel struct {
 	Value string `bun:"value,notnull"`
 }
 
-// memberModel is a person with an account.
-//
 // Timestamps are RFC3339 text rather than a native type: SQLite has no date type, and
 // storing the same text in both drivers keeps a database file readable by hand — which
 // matters when the whole Instance is one file the owner can copy.
@@ -40,7 +37,6 @@ type memberModel struct {
 	LastSignedInAt     string `bun:"last_signed_in_at,notnull"`
 }
 
-// sessionModel is one signed-in browser.
 type sessionModel struct {
 	bun.BaseModel `bun:"table:session,alias:session"`
 
@@ -52,7 +48,6 @@ type sessionModel struct {
 	ParentHash string `bun:"parent_hash,notnull"`
 }
 
-// toMember converts a stored row to the domain type.
 func (m memberModel) toMember() (Member, error) {
 	createdAt, err := parseTime(m.CreatedAt)
 	if err != nil {
@@ -75,7 +70,6 @@ func (m memberModel) toMember() (Member, error) {
 	}, nil
 }
 
-// toSession converts a stored row to the domain type.
 func (s sessionModel) toSession() (Session, error) {
 	createdAt, err := parseTime(s.CreatedAt)
 	if err != nil {
@@ -95,7 +89,6 @@ func (s sessionModel) toSession() (Session, error) {
 	}, nil
 }
 
-// newSessionModel converts a domain Session for storage.
 func newSessionModel(s Session) *sessionModel {
 	kind := s.Kind
 	if kind == "" {

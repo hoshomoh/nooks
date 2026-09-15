@@ -15,10 +15,9 @@ var ErrNoBackup = errors.New("store: this driver exports with its own tools")
 /*
 BackupTo writes a consistent copy of the database to a path that does not yet exist.
 
-SQLite's own VACUUM INTO, which is the whole implementation: it takes a copy while the
-Instance keeps running, and what lands is a real database file rather than a format of
-ours. Nothing here describes the schema, so nothing here can fall behind it — which is
-the failure a hand-written exporter has, silently, one table at a time.
+SQLite's own VACUUM INTO is the whole implementation: it copies while the Instance
+keeps running, and what lands is a real database file rather than a format of ours.
+Nothing here describes the schema, so nothing here can fall behind it.
 */
 func (s *sqlStore) BackupTo(ctx context.Context, path string) error {
 	if s.name != "sqlite" {

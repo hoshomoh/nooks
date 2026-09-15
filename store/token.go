@@ -17,13 +17,10 @@ import (
 /*
 TokenAbilities is what a token may do, as three separate answers.
 
-Not a level, because a level forces an order that the real question does not have: a
-recipe importer reads and never writes, a shopping shortcut writes and should never
-delete. Asking three times is asking what the caller is actually for.
+Not a level, because a level forces an order the real question does not have: a recipe
+importer reads and never writes, a shopping shortcut writes and should never delete.
 
-Read is the one that has to be on. A token that cannot read anything is a key that
-opens nothing, and handing somebody a secret that answers nothing is worse than
-refusing to make it.
+Read has to be on. A token that cannot read anything is a key that opens nothing.
 */
 type TokenAbilities struct {
 	Read   bool
@@ -56,7 +53,6 @@ type AccessToken struct {
 	CreatedAt time.Time
 }
 
-// Expired reports whether a token has passed its expiry.
 func (t AccessToken) Expired(now time.Time) bool {
 	return !t.ExpiresAt.IsZero() && now.After(t.ExpiresAt)
 }
@@ -189,7 +185,6 @@ func (s *sqlStore) accessTokens(ctx context.Context, memberID *int64) ([]AccessT
 	return tokens, nil
 }
 
-// AccessTokenByUID finds a token by its public identifier.
 func (s *sqlStore) AccessTokenByUID(ctx context.Context, uid string) (AccessToken, error) {
 	row := new(accessTokenModel)
 	if err := s.db.NewSelect().Model(row).Where("uid = ?", uid).Scan(ctx); err != nil {
@@ -201,7 +196,6 @@ func (s *sqlStore) AccessTokenByUID(ctx context.Context, uid string) (AccessToke
 	return row.toToken()
 }
 
-// TokenListIDs is which Lists a token may reach.
 func (s *sqlStore) TokenListIDs(ctx context.Context, tokenID int64) ([]int64, error) {
 	var ids []int64
 	err := s.db.NewSelect().
@@ -240,7 +234,6 @@ func (s *sqlStore) DeleteAccessToken(ctx context.Context, id int64) error {
 	return requireOneRow(result, "access token")
 }
 
-// accessTokenModel is the stored shape of a token.
 type accessTokenModel struct {
 	bun.BaseModel `bun:"table:access_token,alias:access_token"`
 
@@ -279,7 +272,6 @@ func (m accessTokenModel) toToken() (AccessToken, error) {
 	}, nil
 }
 
-// accessTokenListModel is one List a token may reach.
 type accessTokenListModel struct {
 	bun.BaseModel `bun:"table:access_token_list,alias:access_token_list"`
 

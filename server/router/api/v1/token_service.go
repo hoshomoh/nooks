@@ -127,7 +127,6 @@ var errNoAbilities = connect.NewError(connect.CodeInvalidArgument,
 var errNoLists = connect.NewError(connect.CodeInvalidArgument,
 	errors.New("say which lists the token may reach"))
 
-// CreateAccessToken cuts one.
 func (s *TokenService) CreateAccessToken(
 	ctx context.Context,
 	req *connect.Request[apiv1.CreateAccessTokenRequest],
@@ -184,7 +183,6 @@ func (s *TokenService) CreateAccessToken(
 	}), nil
 }
 
-// RevokeAccessToken stops one working.
 func (s *TokenService) RevokeAccessToken(
 	ctx context.Context,
 	req *connect.Request[apiv1.RevokeAccessTokenRequest],

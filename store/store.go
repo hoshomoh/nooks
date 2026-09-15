@@ -159,7 +159,6 @@ type Store interface {
 	// UseResetRequest spends an approved request, so one approval sets one password.
 	UseResetRequest(ctx context.Context, uid string) error
 
-	// CreateList adds a List.
 	CreateList(ctx context.Context, params CreateListParams) (List, error)
 
 	// ListByUID returns ErrNotFound when there is no such live List.
@@ -238,7 +237,6 @@ type Store interface {
 	AddToGroup(ctx context.Context, groupID, memberID int64) error
 	RemoveFromGroup(ctx context.Context, groupID, memberID int64) error
 
-	// GroupMemberIDs lists who is in a Group.
 	GroupMemberIDs(ctx context.Context, groupID int64) ([]int64, error)
 
 	// ReplaceGroupMembers sets exactly who is in a Group.
@@ -294,7 +292,6 @@ type Store interface {
 	// MarkTokenUsed records that something reached the Instance with this token.
 	MarkTokenUsed(ctx context.Context, id int64, at time.Time) error
 
-	// DeleteAccessToken revokes a token.
 	DeleteAccessToken(ctx context.Context, id int64) error
 
 	// AdminIDs lists the Members who can act on a request.

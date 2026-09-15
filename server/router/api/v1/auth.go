@@ -40,7 +40,6 @@ type AuthServiceOptions struct {
 	NewToken func() (token string, hash string, err error)
 }
 
-// NewAuthService builds the service.
 func NewAuthService(s store.Store, opts AuthServiceOptions) *AuthService {
 	svc := &AuthService{
 		store:   s,

@@ -70,7 +70,6 @@ type watch struct {
 	closed  bool
 }
 
-// NewBroker builds an empty broker.
 func NewBroker() *Broker {
 	return &Broker{watches: make(map[int64]*watch)}
 }

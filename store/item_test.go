@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-// addItem appends an Item to a List.
 func addItem(t *testing.T, s Store, list List, owner Member, uid, label string) Item {
 	t.Helper()
 	item, err := s.CreateItem(t.Context(), CreateItemParams{

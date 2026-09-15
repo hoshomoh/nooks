@@ -182,13 +182,11 @@ func idsOf[T any](
 	return ids, nil
 }
 
-// memberIDsOf resolves people.
 func memberIDsOf(ctx context.Context, st store.Store, uids []string) ([]int64, error) {
 	return idsOf(ctx, uids, st.MemberByUID,
 		func(m store.Member) int64 { return m.ID }, errNoSuchMember, "read member")
 }
 
-// groupIDsOf resolves groups.
 func groupIDsOf(ctx context.Context, st store.Store, uids []string) ([]int64, error) {
 	return idsOf(ctx, uids, st.GroupByUID,
 		func(g store.Group) int64 { return g.ID }, errNoSuchGroup, "read group")

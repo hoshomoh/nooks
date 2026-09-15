@@ -65,7 +65,6 @@ type CreateItemParams struct {
 	At             time.Time
 }
 
-// CreateItem appends an Item to a List.
 func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Item, error) {
 	if params.Label == "" {
 		return Item{}, errors.New("store: item label is required")

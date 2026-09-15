@@ -30,7 +30,6 @@ type Handler struct {
 	resolver *auth.Resolver
 }
 
-// NewHandler builds the endpoint.
 func NewHandler(s store.Store, broker *events.Broker, resolver *auth.Resolver) *Handler {
 	return &Handler{store: s, broker: broker, resolver: resolver}
 }
@@ -166,7 +165,6 @@ type Publisher struct {
 	broker *events.Broker
 }
 
-// NewPublisher builds one.
 func NewPublisher(s store.Store, broker *events.Broker) *Publisher {
 	return &Publisher{store: s, broker: broker}
 }

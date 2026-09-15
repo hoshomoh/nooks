@@ -19,7 +19,6 @@ import (
 	v1 "github.com/hoshomoh/nooks/server/router/api/v1"
 )
 
-// activityService adapts ActivityService for the gateway.
 type activityService struct {
 	apiv1.UnimplementedActivityServiceServer
 	svc *v1.ActivityService
@@ -41,7 +40,6 @@ func (g activityService) MarkActivityRead(ctx context.Context, req *apiv1.MarkAc
 	return res.Msg, nil
 }
 
-// authService adapts AuthService for the gateway.
 type authService struct {
 	apiv1.UnimplementedAuthServiceServer
 	svc *v1.AuthService
@@ -135,7 +133,6 @@ func (g authService) CompletePasswordReset(ctx context.Context, req *apiv1.Compl
 	return res.Msg, nil
 }
 
-// instanceService adapts InstanceService for the gateway.
 type instanceService struct {
 	apiv1.UnimplementedInstanceServiceServer
 	svc *v1.InstanceService
@@ -181,7 +178,6 @@ func (g instanceService) DeleteInstance(ctx context.Context, req *apiv1.DeleteIn
 	return res.Msg, nil
 }
 
-// listService adapts ListService for the gateway.
 type listService struct {
 	apiv1.UnimplementedListServiceServer
 	svc *v1.ListService
@@ -315,7 +311,6 @@ func (g listService) Search(ctx context.Context, req *apiv1.SearchRequest) (*api
 	return res.Msg, nil
 }
 
-// memberService adapts MemberService for the gateway.
 type memberService struct {
 	apiv1.UnimplementedMemberServiceServer
 	svc *v1.MemberService
@@ -385,7 +380,6 @@ func (g memberService) UpdateOwnProfile(ctx context.Context, req *apiv1.UpdateOw
 	return res.Msg, nil
 }
 
-// publicService adapts PublicService for the gateway.
 type publicService struct {
 	apiv1.UnimplementedPublicServiceServer
 	svc *v1.PublicService
@@ -399,7 +393,6 @@ func (g publicService) GetPublicList(ctx context.Context, req *apiv1.GetPublicLi
 	return res.Msg, nil
 }
 
-// requestService adapts RequestService for the gateway.
 type requestService struct {
 	apiv1.UnimplementedRequestServiceServer
 	svc *v1.RequestService
@@ -429,7 +422,6 @@ func (g requestService) DecideResetRequest(ctx context.Context, req *apiv1.Decid
 	return res.Msg, nil
 }
 
-// tokenService adapts TokenService for the gateway.
 type tokenService struct {
 	apiv1.UnimplementedTokenServiceServer
 	svc *v1.TokenService

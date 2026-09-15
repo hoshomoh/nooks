@@ -20,7 +20,6 @@ type PublicService struct {
 	store store.Store
 }
 
-// NewPublicService builds the service.
 func NewPublicService(s store.Store) *PublicService {
 	return &PublicService{store: s}
 }

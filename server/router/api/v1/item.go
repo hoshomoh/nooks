@@ -161,7 +161,6 @@ func (s *ListService) MoveItem(
 	return connect.NewResponse(&apiv1.MoveItemResponse{}), nil
 }
 
-// DeleteItem removes an Item.
 func (s *ListService) DeleteItem(
 	ctx context.Context,
 	req *connect.Request[apiv1.DeleteItemRequest],
@@ -322,7 +321,6 @@ func (s *ListService) nameToken(ctx context.Context, into map[int64]string, id i
 	return nil
 }
 
-// itemToProto converts an Item for the wire.
 func itemToProto(item store.Item, names rowNames) *apiv1.Item {
 	out := &apiv1.Item{
 		Uid:           item.UID,

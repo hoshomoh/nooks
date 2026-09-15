@@ -88,7 +88,6 @@ func (s *MemberService) ListGroups(
 var errGroupNameRequired = connect.NewError(connect.CodeInvalidArgument,
 	errors.New("give the group a name"))
 
-// CreateGroup adds a Group.
 func (s *MemberService) CreateGroup(
 	ctx context.Context,
 	req *connect.Request[apiv1.CreateGroupRequest],

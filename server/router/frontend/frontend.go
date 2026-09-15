@@ -1,13 +1,12 @@
 // Package frontend serves the built app from inside the binary.
 //
 // `pnpm --filter @nooks/web release` writes the build into dist/, which go:embed bakes
-// in. Only .gitkeep is committed: the build output is not, and a binary built without
-// that step says so rather than serving an index.html whose scripts all 404.
+// in. Only .gitkeep is committed, so a binary built without that step says so rather
+// than serving an index.html whose scripts all 404.
 //
-// `all:` so that .gitkeep is embedded too — without it a fresh clone has no matching
-// files and does not compile at all. The release script writes the marker back after
-// the build, because `--emptyOutDir` takes the whole directory with it and a missing
-// marker is a build that fails on a machine that has never built the app.
+// `all:` so .gitkeep is embedded too: without it a fresh clone has no matching files
+// and does not compile. The release script writes the marker back afterwards, because
+// `--emptyOutDir` takes the whole directory with it.
 package frontend
 
 import (

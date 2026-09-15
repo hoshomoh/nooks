@@ -63,11 +63,7 @@ answer is to revoke that token and cut another.
 
 One command, no file to find:
 
-```bash
-claude mcp add nooks --transport http https://nooks.example/mcp \
-  --header "Authorization: Bearer PASTE_YOUR_TOKEN_HERE" \
-  --scope user
-```
+<SetupBlock client="claudeCode" token="PASTE_YOUR_TOKEN_HERE" />
 
 `--scope user` writes it to `~/.claude.json`, so the instance is there in every project.
 `--scope project` writes `.mcp.json` beside your code instead, which is shared with
@@ -90,22 +86,7 @@ makes the HTTP request for it. Edit the configuration file:
 - **macOS** — `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows** — `%APPDATA%\Claude\claude_desktop_config.json`
 
-```json
-{
-  "mcpServers": {
-    "nooks": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "https://nooks.example/mcp",
-        "--header",
-        "Authorization: Bearer PASTE_YOUR_TOKEN_HERE"
-      ]
-    }
-  }
-}
-```
+<SetupBlock client="claudeDesktop" token="PASTE_YOUR_TOKEN_HERE" />
 
 This needs Node.js on the machine, which the other clients here do not. Quit Claude
 Desktop completely and reopen it — it reads the file only at startup.
@@ -116,18 +97,7 @@ Desktop completely and reopen it — it reads the file only at startup.
 
 Create `~/.cursor/mcp.json` for every project, or `.cursor/mcp.json` inside one:
 
-```json
-{
-  "mcpServers": {
-    "nooks": {
-      "url": "https://nooks.example/mcp",
-      "headers": {
-        "Authorization": "Bearer ${env:NOOKS_TOKEN}"
-      }
-    }
-  }
-}
-```
+<SetupBlock client="cursor" token="${env:NOOKS_TOKEN}" />
 
 `${env:NOOKS_TOKEN}` reads the token from the environment, so the file can be committed
 and the secret cannot. Paste the token directly instead if you would rather not set a
@@ -141,19 +111,7 @@ Open the Command Palette, run **MCP: Add Server**, choose **HTTP**, enter
 `https://nooks.example/mcp` and name it `nooks`. That writes `.vscode/mcp.json` with no
 authentication, so add the header yourself:
 
-```json
-{
-  "servers": {
-    "nooks": {
-      "type": "http",
-      "url": "https://nooks.example/mcp",
-      "headers": {
-        "Authorization": "Bearer PASTE_YOUR_TOKEN_HERE"
-      }
-    }
-  }
-}
-```
+<SetupBlock client="vsCode" token="PASTE_YOUR_TOKEN_HERE" />
 
 Note the key is `servers`, not `mcpServers` — VS Code is the odd one out.
 
@@ -164,19 +122,7 @@ Note the key is `servers`, not `mcpServers` — VS Code is the odd one out.
 Most clients take the same three facts in roughly the same shape. A URL, the HTTP
 transport, and one header:
 
-```json
-{
-  "mcpServers": {
-    "nooks": {
-      "type": "http",
-      "url": "https://nooks.example/mcp",
-      "headers": {
-        "Authorization": "Bearer PASTE_YOUR_TOKEN_HERE"
-      }
-    }
-  }
-}
-```
+<SetupBlock client="other" token="PASTE_YOUR_TOKEN_HERE" />
 
 If a client only speaks the local protocol, put `mcp-remote` in front of it as the
 Claude Desktop tab does. If it offers to sign in with OAuth, it cannot connect: Nooks

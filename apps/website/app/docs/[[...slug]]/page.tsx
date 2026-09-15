@@ -8,6 +8,7 @@ import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/page
 import type { GeneratedPageProps } from "fumadocs-openapi"
 
 import { OpenAPIPage } from "@/components/api-page"
+import { SetupBlock } from "@/components/setup-block"
 import { openapi } from "@/lib/openapi"
 import { source } from "@/lib/source"
 
@@ -46,6 +47,9 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
             // asking them to scroll past four they do not use.
             Tab,
             Tabs,
+            // The client configuration blocks are written by @nooks/shared, the same
+            // module the app's Assistants page renders, so the two cannot disagree.
+            SetupBlock,
             OpenAPIPage: (props: GeneratedPageProps) => (
               <OpenAPIPage {...props} {...preloaded} />
             ),

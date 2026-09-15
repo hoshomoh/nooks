@@ -1,5 +1,5 @@
 /**
- * Facts about the project that more than one component needs.
+ * Where the project lives, for anything that has to link to it.
  *
  * A plain module rather than a constant exported from a component file: every export of
  * a "use client" module becomes a client reference when a server component imports it,
@@ -12,8 +12,8 @@ export const SOURCE = "https://github.com/hoshomoh/nooks"
 /**
  * Where the documentation lives.
  *
- * Named here rather than written into the metadata, because it is the same address the
- * README points at and a site that disagrees with its own repository about where it is
- * has told somebody the wrong thing.
+ * Named here rather than written into the metadata, because the site links to it, the
+ * app links to it from Settings, and the README points at it. A site that disagrees
+ * with its own repository about where it is has told somebody the wrong thing.
  */
 export const SITE = "https://usenooks.vercel.app"

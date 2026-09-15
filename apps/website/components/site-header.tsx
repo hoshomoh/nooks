@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { ThemeToggle } from "./theme-toggle"
-import { SOURCE } from "@/lib/site"
+import { SOURCE } from "@nooks/shared"
 
 /** Where the header points, in the order it reads. */
 const NAV = [

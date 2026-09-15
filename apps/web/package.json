@@ -21,6 +21,7 @@
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@nooks/api": "workspace:*",
     "@nooks/design": "workspace:*",
+    "@nooks/shared": "workspace:*",
     "@tanstack/react-query": "^5.100.9",
     "@tanstack/react-router": "^1.135.2",
     "@tiptap/extension-placeholder": "^3.31.3",

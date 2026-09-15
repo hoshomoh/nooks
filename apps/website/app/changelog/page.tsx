@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 
 import { releases, type Release } from "@/lib/changelog"
-import { SOURCE } from "@/lib/site"
+import { SOURCE } from "@nooks/shared"
 
 export const metadata: Metadata = {
   title: "Changelog — nooks",

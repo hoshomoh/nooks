@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    // DOM for the WHATWG globals only — URL is one, and it exists in Node and in a
+    // browser alike. Nothing here may touch a document: these modules are imported by
+    // the app, by a server-rendered documentation page, and by a test under node.
+    "lib": ["ES2023", "DOM"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true
+  },
+  "include": ["src"]
+}

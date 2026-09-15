@@ -1,10 +1,13 @@
 /**
- * What to paste where, to point an assistant at this Instance.
+ * What to paste where, to point an assistant at an Instance.
  *
  * Every client wants the same three facts: the address, the HTTP transport, and one
- * header. Each one wants them in its own shape. Building the block here rather
- * than in the screen keeps the shapes in one file, so a client that changes its format
- * is one edit and one test.
+ * header. Each one wants them in its own shape.
+ *
+ * Shared because those shapes are stated twice: on the Assistants page in the app, and
+ * on the MCP page of the documentation site. They were two hand-written sets of fences
+ * that agreed only as long as somebody remembered both. Now a client that changes its
+ * format is one edit here and one test.
  */
 
 /** The clients the Assistants page knows how to write a block for. */

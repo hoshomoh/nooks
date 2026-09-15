@@ -2,6 +2,15 @@ import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
 import type { TokenAbilities } from "@nooks/api"
+import {
+  ASSISTANT_CLIENTS,
+  BLOCK_KIND,
+  onlyThisMachine,
+  setupBlock,
+  SITE,
+  TOKEN_PLACEHOLDER,
+  type AssistantClient,
+} from "@nooks/shared"
 
 import { Button } from "@/components/ds/button"
 import { CopyButton } from "@/components/ds/copy-button"
@@ -12,14 +21,6 @@ import { SelectField, type SelectOption } from "@/components/ds/select-field"
 import { SettingsRow } from "@/components/ds/settings-row"
 import { SettingsShell } from "@/components/ds/settings-shell"
 import { tokenClient } from "@/lib/api"
-import {
-  ASSISTANT_CLIENTS,
-  BLOCK_KIND,
-  onlyThisMachine,
-  setupBlock,
-  TOKEN_PLACEHOLDER,
-  type AssistantClient,
-} from "@/lib/assistant-setup"
 import { messageFrom } from "@/lib/errors"
 import { tokensQuery } from "@/lib/token-queries"
 import type { Translate } from "@/lib/translate"
@@ -27,7 +28,7 @@ import { useSettingsCounts } from "@/lib/use-settings-counts"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 
 /** DOCS is where the long version lives, for the setup that did not work. */
-const DOCS = "https://usenooks.vercel.app/docs/mcp"
+const DOCS = `${SITE}/docs/mcp`
 
 /** How much of the instance an assistant is being given. */
 type Permission = "read" | "readAndAdd" | "everything"

@@ -2,9 +2,9 @@ import type { NextConfig } from "next";
 import { createMDX } from "fumadocs-mdx/next";
 
 const nextConfig: NextConfig = {
-  // The design package ships TypeScript source rather than a build: one mark, shared
-  // between the app and the site so its geometry cannot drift between them.
-  transpilePackages: ["@nooks/design"],
+  // Both packages ship TypeScript source rather than a build: one mark and one set of
+  // client configuration shapes, shared with the app so neither can drift between them.
+  transpilePackages: ["@nooks/design", "@nooks/shared"],
   /* config options here */
 };
 

@@ -5,7 +5,7 @@ import { RootProvider } from "fumadocs-ui/provider/next"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 
-import { SITE } from "@/lib/site"
+import { SITE } from "@nooks/shared"
 
 import "./globals.css"
 

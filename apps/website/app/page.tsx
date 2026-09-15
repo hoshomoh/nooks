@@ -1,7 +1,7 @@
 import Link from "next/link"
 
 import { AppPreview } from "@/components/app-preview"
-import { SOURCE } from "@/lib/site"
+import { SOURCE } from "@nooks/shared"
 
 /** What somebody has to type to have Nooks running, and nothing more. */
 const RUN = `go build -o nooks ./cmd/nooks

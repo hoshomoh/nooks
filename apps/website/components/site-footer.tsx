@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import { SOURCE } from "@/lib/site"
+import { SOURCE } from "@nooks/shared"
 
 /** One column of the footer. Every link goes somewhere that exists. */
 interface FooterColumn {

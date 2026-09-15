@@ -71,6 +71,10 @@ else
   echo "no main to compare against; skipped"
 fi
 
+step "shared package lint and test"
+pnpm --filter @nooks/shared lint
+pnpm --filter @nooks/shared test
+
 step "web lint and typecheck"
 pnpm --filter @nooks/web lint
 
@@ -79,6 +83,10 @@ pnpm --filter @nooks/web test
 
 step "website typecheck and build"
 pnpm --filter @nooks/website build
+
+step "website test and links"
+pnpm --filter @nooks/website test
+pnpm --filter @nooks/website check-links
 
 step "web build, landing where go:embed reads"
 # One build, not two: `release` is the same Vite build as `build` with the output

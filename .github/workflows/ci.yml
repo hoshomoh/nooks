@@ -102,6 +102,13 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # The shared package is source the app and the site both compile. Checking it here
+      # means a break in it fails as itself rather than as a confusing error inside
+      # whichever app happened to build first.
+      - name: Lint and typecheck the shared package
+        run: pnpm --filter @nooks/shared lint
+      - name: Test the shared package
+        run: pnpm --filter @nooks/shared test
       - name: Lint and typecheck
         run: pnpm --filter @nooks/web lint
       - name: Test

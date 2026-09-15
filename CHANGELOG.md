@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/hoshomoh/nooks/compare/v1.2.0...v1.3.0) (2026-09-15)
+
+
+### New
+
+* **web:** move the list with the sheet, and answer a tick ([4d6ddd1](https://github.com/hoshomoh/nooks/commit/4d6ddd1a88db27884e6d05c1eb18e0a510d888ff))
+
+
+### Fixed
+
+* **web:** space the assistants page into sections ([8284e10](https://github.com/hoshomoh/nooks/commit/8284e109b5dd62c34c460dfe7b44736d8cc90077))
+
 ## [1.2.0](https://github.com/hoshomoh/nooks/compare/v1.1.1...v1.2.0) (2026-09-15)
 
 

@@ -81,20 +81,25 @@ export default defineConfig({
     testTimeout: 20_000,
     hookTimeout: 20_000,
     /*
-     * Threads rather than forked processes, and one worker per core.
+     * Threads rather than forked processes, and two of them.
      *
      * Vitest's default pool forks a Node process per worker, each with its own heap and
      * its own jsdom. Threads share one heap instead, which is the difference between a
-     * suite that runs beside a Go build and a Vite build and one the kernel kills:
-     * three runs of ./scripts/preflight.sh in a row died here before this changed.
+     * suite that runs beside a Go build and a Vite build and one the kernel kills.
+     *
+     * Two, not one per core. Four is faster on an idle machine and was killed twice
+     * inside ./scripts/ci.sh, which is the only place the number matters: a machine
+     * self-hosting this is running other things, and a suite that does not finish is
+     * worth nothing however quick it is when it does.
      */
     pool: "threads",
-    maxWorkers: 4,
+    maxWorkers: 2,
     /*
      * Workers are reused across files rather than replaced between them.
      *
      * Isolation meant re-evaluating the whole dependency graph once per test file, which
-     * was two thirds of a twelve and a half minute run. Reusing them takes it under five.
+     * was two thirds of a twelve and a half minute run. Reusing them takes it to under
+     * three.
      *
      * What isolation was paying for is the cleanup between files, and that is what the
      * two projects below are: the setup file runs per test file either way, so a render

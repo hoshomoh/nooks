@@ -1,8 +1,6 @@
-/** @vitest-environment jsdom */
 import { describe, expect, it } from "vitest"
 import { render, screen } from "@testing-library/react"
 
-import "@/test/dom"
 import { NotePreview } from "./note-preview"
 import { previewOf } from "@/lib/editor/preview"
 

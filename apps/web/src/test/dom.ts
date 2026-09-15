@@ -5,9 +5,10 @@ import { afterEach } from "vitest"
 /**
  * What a test that renders needs.
  *
- * Imported by the files that render components rather than set up globally, so the
- * tests that are pure functions keep starting in milliseconds. Pair it with the
- * `@vitest-environment jsdom` docblock at the top of such a file.
+ * The setup file of the "dom" project in vite.config.ts, which is every *.test.tsx and
+ * nothing else. A setup file rather than an import because workers are reused between
+ * files: an import is evaluated once per worker, so the cleanup below would be
+ * registered for the first file and for none of the ones after it.
  */
 afterEach(cleanup)
 

@@ -1,8 +1,6 @@
-/** @vitest-environment jsdom */
 import { beforeAll, describe, expect, it } from "vitest"
 import { render, screen } from "@testing-library/react"
 
-import "@/test/dom"
 import { readyForEnglish } from "@/test/i18n"
 import { ChromeBar } from "./chrome-bar"
 

@@ -10,7 +10,20 @@ export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 # shellcheck disable=SC1091
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
-step() { printf '\n\033[1m→ %s\033[0m\n' "$1"; }
+# Each step says how long it took, so a slow run can be pointed at rather than guessed
+# about. The total at the end is what anybody waiting actually cares about.
+started=$(date +%s)
+step_at=$started
+step_name=""
+step() {
+  now=$(date +%s)
+  if [ -n "$step_name" ]; then
+    printf '\033[2m   %s: %ss\033[0m\n' "$step_name" "$((now - step_at))"
+  fi
+  step_name="$1"
+  step_at=$now
+  printf '\n\033[1m→ %s\033[0m\n' "$1"
+}
 
 step "install (frozen lockfile, as CI does)"
 pnpm install --frozen-lockfile
@@ -79,4 +92,5 @@ test ! -e apps/server
 step "what a first visit costs"
 pnpm --filter @nooks/web check-bundle ../../server/router/frontend/dist/assets
 
-printf '\n\033[1;32m✓ everything CI runs passes\033[0m\n'
+printf '\033[2m   %s: %ss\033[0m\n' "$step_name" "$(($(date +%s) - step_at))"
+printf '\n\033[1;32m✓ everything CI runs passes in %ss\033[0m\n' "$(($(date +%s) - started))"

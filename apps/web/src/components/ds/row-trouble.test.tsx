@@ -1,9 +1,7 @@
-/** @vitest-environment jsdom */
 import { beforeAll, describe, expect, it, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
-import "@/test/dom"
 import { readyForEnglish } from "@/test/i18n"
 import { RowTrouble, type RowTroubleLabels } from "./row-trouble"
 import type { RowTrouble as Trouble } from "@/lib/row-trouble"

@@ -1,11 +1,9 @@
-/** @vitest-environment jsdom */
 import { beforeAll, describe, expect, it, vi } from "vitest"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { RouterProvider, createRootRoute, createRouter } from "@tanstack/react-router"
 import { render, screen } from "@testing-library/react"
 import { Sharing, type List } from "@nooks/api"
 
-import "@/test/dom"
 import { readyForEnglish } from "@/test/i18n"
 import { Sidebar } from "./sidebar"
 

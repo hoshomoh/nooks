@@ -1,10 +1,8 @@
-/** @vitest-environment jsdom */
 import { afterEach, beforeAll, describe, expect, it } from "vitest"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
-import "@/test/dom"
 import { readyForEnglish } from "@/test/i18n"
 import { OfflineBanner } from "./offline-banner"
 import { connectionStore } from "@/lib/connection-store"

@@ -1,10 +1,8 @@
-/** @vitest-environment jsdom */
 import { beforeAll, describe, expect, it, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Sharing, type List } from "@nooks/api"
 
-import "@/test/dom"
 import { readyForEnglish } from "@/test/i18n"
 import { AddTokenDialog, type NewToken } from "./add-token-dialog"
 

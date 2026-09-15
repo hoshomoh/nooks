@@ -1,4 +1,3 @@
-/** @vitest-environment jsdom */
 import { beforeAll, describe, expect, it } from "vitest"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { RouterProvider, createRootRoute, createRouter } from "@tanstack/react-router"
@@ -6,7 +5,6 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import type { GetPublicListResponse, PublicItem } from "@nooks/api"
 
-import "@/test/dom"
 import { readyForEnglish } from "@/test/i18n"
 import { PublicListScreen } from "./public-list"
 import { publicListQuery } from "@/lib/public-queries"

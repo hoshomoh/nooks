@@ -1,11 +1,9 @@
-/** @vitest-environment jsdom */
 import { beforeAll, describe, expect, it, vi } from "vitest"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Sharing, type List } from "@nooks/api"
 
-import "@/test/dom"
 import { readyForEnglish } from "@/test/i18n"
 import { ShareDialog, type ShareDecision } from "./share-dialog"
 

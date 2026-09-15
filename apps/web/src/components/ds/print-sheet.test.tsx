@@ -1,9 +1,7 @@
-/** @vitest-environment jsdom */
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest"
 import { render } from "@testing-library/react"
 import type { Item } from "@nooks/api"
 
-import "@/test/dom"
 import { readyForEnglish } from "@/test/i18n"
 import { PrintSheet } from "./print-sheet"
 

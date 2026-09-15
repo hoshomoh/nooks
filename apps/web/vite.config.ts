@@ -81,23 +81,47 @@ export default defineConfig({
     testTimeout: 20_000,
     hookTimeout: 20_000,
     /*
-     * Threads rather than forked processes, and two of them.
+     * Threads rather than forked processes, and one worker per core.
      *
      * Vitest's default pool forks a Node process per worker, each with its own heap and
      * its own jsdom. Threads share one heap instead, which is the difference between a
-     * suite that runs beside a Go build and a Vite build and one the kernel kills —
+     * suite that runs beside a Go build and a Vite build and one the kernel kills:
      * three runs of ./scripts/preflight.sh in a row died here before this changed.
-     *
-     * Two of them. One was tried when runs kept being killed, and kept being killed —
-     * the machine had 11GB available at the time, so the pressure was never this suite's
-     * to relieve.
-     *
-     * Isolation is kept: each file still gets a fresh module registry, which the
-     * module-level stores (the theme, the locale, the pending tick) depend on. Turning
-     * that off is the other way to save memory and it would make tests share state.
      */
     pool: "threads",
-    maxWorkers: 2,
+    maxWorkers: 4,
+    /*
+     * Workers are reused across files rather than replaced between them.
+     *
+     * Isolation meant re-evaluating the whole dependency graph once per test file, which
+     * was two thirds of a twelve and a half minute run. Reusing them takes it under five.
+     *
+     * What isolation was paying for is the cleanup between files, and that is what the
+     * two projects below are: the setup file runs per test file either way, so a render
+     * left behind by one file cannot be found by the next.
+     */
+    isolate: false,
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: "unit",
+          // Everything that is a function rather than a component. No DOM, so these
+          // start in milliseconds.
+          include: ["src/**/*.test.ts"],
+          environment: "node",
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: "dom",
+          include: ["src/**/*.test.tsx"],
+          environment: "jsdom",
+          setupFiles: ["./src/test/dom.ts"],
+        },
+      },
+    ],
   },
   server: {
     port: 3001,

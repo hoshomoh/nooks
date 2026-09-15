@@ -1,13 +1,9 @@
 /**
  * What to paste where, to point an assistant at an Instance.
  *
- * Every client wants the same three facts: the address, the HTTP transport, and one
- * header. Each one wants them in its own shape.
- *
- * Shared because those shapes are stated twice: on the Assistants page in the app, and
- * on the MCP page of the documentation site. They were two hand-written sets of fences
- * that agreed only as long as somebody remembered both. Now a client that changes its
- * format is one edit here and one test.
+ * Every client wants the same three facts, each in its own shape: the address, the HTTP
+ * transport, and one header. Shared, because both the Assistants page in the app and
+ * the MCP page of the documentation site have to state them.
  */
 
 /** The clients the Assistants page knows how to write a block for. */
@@ -25,7 +21,7 @@ export const ASSISTANT_CLIENTS: AssistantClient[] = [
 /** Whether the block is a command to run or a file to save. */
 export type BlockKind = "terminal" | "file"
 
-/** Which block each client takes, so the header says the right word. */
+/** What the block's header calls itself, per client. */
 export const BLOCK_KIND: Record<AssistantClient, BlockKind> = {
   claudeCode: "terminal",
   cursor: "file",

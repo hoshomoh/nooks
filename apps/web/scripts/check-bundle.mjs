@@ -4,31 +4,22 @@ import { readFile, readdir } from "node:fs/promises"
 /**
  * What a first visit costs, held to a budget.
  *
- * The app shipped as one 1.4MB chunk once, so every screen paid for the editor, the
- * calendar and the command menu whether or not it opened one. Splitting it fixed that;
- * this is what stops it growing back. A static import added to the wrong file is all it
- * takes, and nothing about that looks wrong in review.
+ * Without this the app drifts back to one chunk, where every screen pays for the editor,
+ * the calendar and the command menu whether or not it opens one. One static import in
+ * the wrong file is all it takes, and nothing about that looks wrong in review.
  *
- * The entry chunk only. The lazy chunks are allowed to be large — that is the point of
- * their being lazy.
+ * The entry chunk only. A lazy chunk is allowed to be large.
  */
-/*
- * Where to look, because there are two places.
- *
- * `build` writes beside the app and `release` writes where the Go binary embeds from.
- * CI only ever runs the second — building twice to measure would be building twice —
- * so the directory is an argument rather than an assumption.
- */
+// `build` writes beside the app and `release` writes where the Go binary embeds from,
+// so the directory to measure is an argument rather than an assumption.
 const DIST = process.argv[2] ?? "dist/assets"
 
 /*
  * BUDGET_BYTES is the ceiling for the entry chunk, gzipped.
  *
- * 120, against 112 today. Chosen by measuring the regression it exists to catch rather
- * than by picking a round number: putting the command palette back at the top of the
- * root screen takes the entry to 130, so anything looser would let exactly the mistake
- * this guards against through. Eight to grow into; more than that is a decision, and a
- * decision should be made here.
+ * Measured against the regression it exists to catch, not picked round: importing the
+ * command palette eagerly from the root screen takes the entry to 130, so anything
+ * looser would let that through. Raising it is a decision, and it is made here.
  */
 const BUDGET_BYTES = 120 * 1024
 

@@ -22,13 +22,9 @@ func TestHealthRequested(t *testing.T) {
 	}
 }
 
-/*
-A listen address is not a host a client can dial.
-
-":8081" and "0.0.0.0:8081" are both how a server says "every interface", and both mean
-"this machine" to the process asking. Getting this wrong is a health check that fails
-on a perfectly well Instance, which is worse than none — an orchestrator restarts it.
-*/
+// ":8081" and "0.0.0.0:8081" are how a server says "every interface", not addresses a
+// client can dial. Getting it wrong fails the check on a well Instance, and an
+// orchestrator restarts it.
 func TestHealthURLIsSomethingDialable(t *testing.T) {
 	for addr, want := range map[string]string{
 		":8081":          "http://127.0.0.1:8081/healthz",
@@ -81,7 +77,6 @@ func TestHealthCheckFailsWhenNothingIsListening(t *testing.T) {
 	}
 }
 
-/** hostOf is the host:port out of a test server's URL. */
 func hostOf(url string) string {
 	return url[len("http://"):]
 }

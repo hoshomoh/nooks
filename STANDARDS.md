@@ -63,6 +63,16 @@ and `any` needs a comment justifying it.
 a workaround, a spec quirk, or a constraint that is not visible locally — for example why ticks are
 last-write-wins while text conflicts prompt.
 
+Three kinds do not belong, and should be deleted on sight:
+
+- **Restating the code.** `// increment the count` above `count++`. If the reader can see it, writing it
+  down again only gives them something else that can go out of date.
+- **Notes about one developer's computer.** How long a run took here, what else was running, which
+  process the kernel killed. Nobody else has that machine. Say the constraint instead: what the setting
+  protects against, and what breaks without it.
+- **Three paragraphs for one sentence.** A comment is read far more often than it is written. Say the
+  thing, then stop.
+
 ---
 
 ## 4. Errors

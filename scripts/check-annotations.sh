@@ -10,13 +10,12 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-# EXEMPT lists RPCs that deliberately have no HTTP binding, each with the reason.
-# Keep it short: an entry here is a hole in the rule above.
+# EXEMPT lists RPCs that deliberately have no HTTP binding. An entry here is a hole in
+# the rule above, so each one carries its reason.
 EXEMPT=(
   # These four hand over a session, which means a Set-Cookie the gateway adapter cannot
-  # carry — it returns the message and nothing else. A REST client reaches the same
-  # ground a different way: it signs in over Connect once, or it is handed an Access
-  # token, and then it holds the short-lived access token these return in their body.
+  # carry. A REST client signs in over Connect once, or is handed an Access token, and
+  # holds the short-lived access token from the response body.
   "SignIn"
   "CompleteSetup"
   "CompleteJoin"

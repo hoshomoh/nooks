@@ -16,15 +16,12 @@ const temporaryWords = 4
 const temporarySeparator = "-"
 
 /*
-alphabet is a short list of plain English words, chosen to be unambiguous when spoken.
+alphabet is plain English words, chosen to be unambiguous when spoken.
 
-Nooks has no mail server, so an Admin who adds a Member reads the password out or
-writes it down. That makes it a spoken secret, and a spoken secret cannot contain
-characters that have to be described — no "capital eye", no "underscore". Words are
-the only form that survives the journey.
-
-Nothing here sounds like anything else here, nothing is longer than six letters, and
-nothing would embarrass somebody reading it to a flatmate.
+Nooks has no mail server, so an Admin who adds a Member reads the password out. A
+spoken secret cannot contain characters that have to be described: no "capital eye",
+no "underscore". Nothing here sounds like anything else here, and nothing is longer
+than six letters.
 */
 var alphabet = [...]string{
 	"amber", "anchor", "apple", "arrow", "autumn", "bamboo", "basil", "beacon",
@@ -54,12 +51,9 @@ var alphabet = [...]string{
 /*
 NewTemporary makes a password an Admin can read out once.
 
-It is temporary in the only sense that matters: the Member must replace it before they
-can do anything, so its whole life is the walk from one person to another. That is why
-it is words rather than the strongest string this machine could produce — a secret that
-has to be spoken is only as strong as the version that arrives.
-
-The randomness is the runtime's own cryptographic source, seeded per process.
+The Member must replace it before they can do anything, so its whole life is the walk
+from one person to another. Words rather than the strongest possible string, because a
+secret that has to be spoken is only as strong as the version that arrives.
 */
 func NewTemporary() string {
 	words := make([]string, 0, temporaryWords)

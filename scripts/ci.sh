@@ -10,8 +10,7 @@ export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 # shellcheck disable=SC1091
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
-# Each step says how long it took, so a slow run can be pointed at rather than guessed
-# about. The total at the end is what anybody waiting actually cares about.
+# Each step says how long it took, so a slow run can be pointed at rather than guessed at.
 started=$(date +%s)
 step_at=$started
 step_name=""
@@ -89,10 +88,8 @@ pnpm --filter @nooks/website test
 pnpm --filter @nooks/website check-links
 
 step "web build, landing where go:embed reads"
-# One build, not two: `release` is the same Vite build as `build` with the output
-# pointed at the binary, so running both proved the same thing twice and was the
-# heaviest thing in this script. A project that expects to be self-hosted should not
-# need a large machine to test itself.
+# One build, not two: `release` is the same Vite build as `build` with its output
+# pointed at the binary, so running both proves the same thing twice.
 pnpm --filter @nooks/web release
 test -d server/router/frontend/dist/assets
 test ! -e apps/server

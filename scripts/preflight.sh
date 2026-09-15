@@ -3,12 +3,11 @@
 #
 # ./scripts/ci.sh checks the working tree, which is not what gets pushed. A fix made
 # after CI passed, or a file never added, both leave a green local run and a red one on
-# GitHub — which is how b13ab29 went out with a type error in it. `tsc -b` is incremental
-# too, so a local run can skip files a fresh checkout will not.
+# GitHub. `tsc -b` is incremental too, so a local run can skip files a fresh checkout
+# will not.
 #
 # The checkout is kept between runs rather than thrown away, so its node_modules is
-# installed once. A throwaway worktree meant a full install every time, which is slow
-# and, on a machine doing anything else, enough to get the run killed.
+# installed once instead of on every run.
 set -euo pipefail
 
 # So a caller who pipes this to `tail` still sees a failure.
@@ -24,18 +23,13 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-# A linked worktree's .git is a file, not a directory, so test for either — getting
-# this wrong meant the script tried to create a worktree that was already there, failed,
-# and only looked like it had run.
-# Resolved here, in the repository being pushed. Inside the worktree "HEAD" means the
-# worktree's own HEAD, so checking out HEAD there is a no-op that silently verifies
-# whatever it happened to be on last time.
+# A linked worktree's .git is a file, not a directory, so test for either.
+# Resolved here, in the repository being pushed. Inside the worktree "HEAD" is the
+# worktree's own, so checking out HEAD there verifies whatever it was last on.
 target=$(git rev-parse HEAD)
 
-# --force because ci.sh builds inside this checkout, and what it writes is exactly what
-# a later checkout refuses to overwrite. The worktree holds no work of its own, so there
-# is nothing here worth keeping — and without this the script stops on the artefacts of
-# its own previous run.
+# --force because ci.sh builds inside this checkout, and a later checkout refuses to
+# overwrite what it wrote. Nothing here is worth keeping.
 if [ -e "$worktree/.git" ]; then
   git -C "$worktree" checkout -q --detach --force "$target"
 else

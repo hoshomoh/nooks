@@ -15,7 +15,6 @@ type MarkProps = {
   className?: string
 }
 
-/** Below this width the mark uses its simplified two-path form. */
 const SIMPLIFY_BELOW = 20
 
 export function Mark({

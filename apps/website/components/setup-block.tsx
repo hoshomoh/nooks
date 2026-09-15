@@ -14,9 +14,7 @@ export interface SetupBlockProps {
  * The block the app's own Assistants page writes, rendered into the docs.
  *
  * Not a second copy: a client that changes its format changes one file in
- * @nooks/shared, and the page a Member reads in Settings and the page they find on the
- * web both say the new thing. They used to be two hand-written sets of fences that
- * agreed only as long as somebody remembered both.
+ * @nooks/shared, and both pages say the new thing.
  *
  * Highlighted on the server, like an ordinary fence, so this page stays static HTML and
  * nobody downloads a syntax highlighter to read five lines of JSON.

@@ -44,8 +44,7 @@ type Config struct {
 	// so somebody self-hosting can see traffic without being told to turn it on.
 	LogLevel slog.Level
 	// Data is the directory holding the SQLite file and any other instance data.
-	Data string
-	// Driver selects the database backend.
+	Data   string
 	Driver Driver
 	// DSN is the Postgres connection string. Unused, and must be empty, for SQLite.
 	DSN string
@@ -176,11 +175,9 @@ func parseLevel(name string) (slog.Level, error) {
 /*
 URLFor turns a listen address into one somebody can open.
 
-A listen address is often ":8081", "0.0.0.0:8081" or "[::]:8081", and none of those is
-a host a client can dial — all three mean "every interface on this machine" to the
-process listening, and nothing at all to the person reading the line. Both the startup
-log and `--health` need the same translation, and a second copy of it would be a second
-set of edge cases to get right.
+":8081", "0.0.0.0:8081" and "[::]:8081" all mean "every interface" to the process
+listening, and none of them is a host a client can dial. The startup log and `--health`
+both need the translation, so it lives here rather than twice.
 */
 func URLFor(addr, path string) string {
 	host, port, err := net.SplitHostPort(strings.TrimSpace(addr))

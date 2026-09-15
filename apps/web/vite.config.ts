@@ -75,35 +75,29 @@ export default defineConfig({
     ],
   },
   test: {
-    // A test that renders types one character at a time through a real event loop, and
-    // CI runs the whole suite beside a Go build. Five seconds is the default and it is
-    // not enough on a loaded machine; this is about the machine, not the code.
+    // Rendering a sentence one keystroke at a time through a real event loop takes
+    // longer than vitest's five second default allows.
     testTimeout: 20_000,
     hookTimeout: 20_000,
     /*
      * Threads rather than forked processes, and two of them.
      *
-     * Vitest's default pool forks a Node process per worker, each with its own heap and
-     * its own jsdom. Threads share one heap instead, which is the difference between a
-     * suite that runs beside a Go build and a Vite build and one the kernel kills.
+     * The default pool forks a Node process per worker, each with its own heap and its
+     * own jsdom. Threads share one heap, which is what keeps the suite inside the memory
+     * of a machine that is also building Go and Vite.
      *
-     * Two, not one per core. Four is faster on an idle machine and was killed twice
-     * inside ./scripts/ci.sh, which is the only place the number matters: a machine
-     * self-hosting this is running other things, and a suite that does not finish is
-     * worth nothing however quick it is when it does.
+     * Two rather than one per core for the same reason: the extra speed is small and it
+     * is spent when the suite runs beside everything else in ./scripts/ci.sh.
      */
     pool: "threads",
     maxWorkers: 2,
     /*
      * Workers are reused across files rather than replaced between them.
      *
-     * Isolation meant re-evaluating the whole dependency graph once per test file, which
-     * was two thirds of a twelve and a half minute run. Reusing them takes it to under
-     * three.
-     *
-     * What isolation was paying for is the cleanup between files, and that is what the
-     * two projects below are: the setup file runs per test file either way, so a render
-     * left behind by one file cannot be found by the next.
+     * Isolation re-evaluates the whole dependency graph once per test file, which was
+     * two thirds of the run. What it was paying for is the cleanup between files, and
+     * the two projects below buy that instead: a setup file runs per test file with or
+     * without isolation, so a render left behind by one file cannot be found by the next.
      */
     isolate: false,
     projects: [
@@ -111,8 +105,6 @@ export default defineConfig({
         extends: true,
         test: {
           name: "unit",
-          // Everything that is a function rather than a component. No DOM, so these
-          // start in milliseconds.
           include: ["src/**/*.test.ts"],
           environment: "node",
         },

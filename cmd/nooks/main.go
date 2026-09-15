@@ -31,8 +31,8 @@ func main() {
 	}
 }
 
-// run is the real entry point. It takes its arguments, environment and output as
-// parameters so that it can be exercised without the process globals.
+// run takes its arguments, environment and output as parameters so it can be exercised
+// without the process globals.
 func run(ctx context.Context, args []string, env func(string) string, stdout, stderr io.Writer) error {
 	if len(args) > 0 && (args[0] == "--version" || args[0] == "version") {
 		fmt.Fprintln(stdout, version.String())
@@ -73,7 +73,6 @@ func run(ctx context.Context, args []string, env func(string) string, stdout, st
 	return srv.Serve(ctx)
 }
 
-// openStore opens the database the configuration selects.
 func openStore(ctx context.Context, cfg profile.Config) (store.Store, error) {
 	switch cfg.Driver {
 	case profile.DriverSQLite:

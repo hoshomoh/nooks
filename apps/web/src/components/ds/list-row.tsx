@@ -91,7 +91,6 @@ export interface ListRowLabels {
   name: string
   /** Names the area that opens the Item, e.g. "Open item". */
   open: string
-  /** Names the quantity field. */
   quantity: string
   /** What an Item with no date offers, e.g. "Add a date". */
   due: string

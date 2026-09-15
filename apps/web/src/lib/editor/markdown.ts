@@ -65,10 +65,9 @@ export function documentFrom(markdown: string): JSONContent {
     /*
      * A blank line separates blocks; it is not one.
      *
-     * This read every line as a block, so the blank line between two paragraphs became
-     * an empty paragraph — a whole line of height on top of the padding the paragraphs
-     * already have. Anything writing ordinary markdown, an assistant most of all, put
-     * a gap between every pair of paragraphs and the Note came out double spaced.
+     * Read as a block it becomes an empty paragraph, a whole line of height on top of
+     * the padding the paragraphs already have, and anything writing ordinary markdown
+     * comes out double spaced.
      */
     if (!line.trim()) {
       index += 1

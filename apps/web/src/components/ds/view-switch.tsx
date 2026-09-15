@@ -5,7 +5,6 @@ import { cn } from "cn"
 /** Where the switch can send a Member. Only routes that exist are listed. */
 export type ViewRoute = "/today" | "/upcoming" | "/calendar"
 
-/** One side of the switch. */
 interface ViewChoice {
   to: ViewRoute
   labelKey: string
@@ -14,7 +13,6 @@ interface ViewChoice {
 export interface ViewSwitchProps {
   /** The dated view this page belongs to, for the list side of the switch. */
   listRoute: Extract<ViewRoute, "/today" | "/upcoming">
-  /** Which side is showing. */
   showing: "list" | "calendar"
 }
 

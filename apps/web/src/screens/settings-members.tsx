@@ -139,7 +139,6 @@ export function SettingsMembersScreen() {
   )
 }
 
-/** What the role mutation is told. */
 interface MemberRoleVariables {
   memberUid: string
   role: Role

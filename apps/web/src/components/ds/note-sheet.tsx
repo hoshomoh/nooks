@@ -71,13 +71,11 @@ export function NoteSheet({
   const [leaving, setLeaving] = useState(false)
 
   /*
-   * Tells the List the sheet has gone, once the exit has actually played.
+   * Tells the List the sheet has gone, once the exit has played.
    *
-   * A listener put on the element rather than an `onAnimationEnd` prop. React works
-   * out what an animation event is called by asking the browser's style object which
-   * vendor prefixes it owns up to — a question jsdom has no answer to, so the prop
-   * fires in a browser and is silent in a test. The one thing worth proving about a
-   * panel that waits for an animation is that it does eventually go away.
+   * A listener on the element rather than an `onAnimationEnd` prop: React names the
+   * event by asking the style object which vendor prefixes it owns up to, which jsdom
+   * cannot answer, so the prop fires in a browser and is silent in a test.
    */
   const leaveWhenDone = useCallback(
     (node: HTMLElement | null) => {

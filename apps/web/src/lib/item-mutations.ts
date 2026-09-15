@@ -17,13 +17,11 @@ export interface SaveNoteVariables {
   note: string
 }
 
-/** Renaming an Item. */
 export interface RenameItemVariables {
   itemUid: string
   label: string
 }
 
-/** Adding an Item to a List. */
 export interface CreateItemVariables {
   listUid: string
   label: string

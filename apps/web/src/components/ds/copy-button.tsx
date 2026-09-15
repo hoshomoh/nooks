@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next"
 import { Button, type ButtonProps } from "./button"
 
 export interface CopyButtonProps extends Omit<ButtonProps, "onClick" | "children"> {
-  /** What lands on the clipboard. */
   text: string
   /** What the button says before it has been pressed. */
   label: string

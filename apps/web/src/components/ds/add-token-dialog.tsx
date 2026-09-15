@@ -258,7 +258,6 @@ function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
   )
 }
 
-/** One of the answers a Choice offers. */
 interface ChoiceOption<T> {
   value: T
   label: string

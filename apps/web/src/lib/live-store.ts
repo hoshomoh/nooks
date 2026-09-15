@@ -6,7 +6,6 @@
  * useSyncExternalStore rather than synchronising with an effect.
  */
 
-/** What kind of change arrived. */
 export type LiveKind = "list.changed" | "lists.changed" | "activity" | "presence"
 
 /** One change, as the Instance describes it. */

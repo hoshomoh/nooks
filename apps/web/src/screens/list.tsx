@@ -111,12 +111,10 @@ export function ListScreen() {
     item.done && item.doneByUid !== member?.uid && justHappened(item.doneAt, settled)
 
   /*
-   * Which Item's sheet is open, read from the address.
+   * Which Item's sheet is open, read from the address rather than from state.
    *
-   * It was the screen's own state, which meant nothing outside the screen could ask
-   * for it — a search result could only drop the Member on the List and leave them to
-   * find the Item again. It also meant Back left the List rather than closing the
-   * sheet, and a refresh lost it.
+   * The address is what lets a search result open an Item directly, Back close the
+   * sheet instead of leaving the List, and a refresh keep it open.
    */
   const { item: openItemUid } = listRoute.useSearch()
 

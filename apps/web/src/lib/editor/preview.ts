@@ -23,7 +23,6 @@ export interface PreviewRun {
   href?: string
 }
 
-/** A Note as a row shows it. */
 export interface NotePreview {
   /** The first block that says anything, as the runs it is made of. */
   runs: PreviewRun[]

@@ -2,7 +2,6 @@ import type { Editor, Range } from "@tiptap/react"
 
 import type { Translate } from "@/lib/translate"
 
-/** One entry in the `/` menu. */
 export interface SlashItem {
   /** The block type, which is also its key. */
   kind: SlashKind

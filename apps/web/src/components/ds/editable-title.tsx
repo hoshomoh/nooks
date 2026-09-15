@@ -67,10 +67,8 @@ export function EditableTitle({
   /*
    * A title wraps; a row's label does not.
    *
-   * They are the same control doing two jobs. In the sheet and full screen the name is
-   * a heading and has to be readable in full, so it grows down the page. In a list row
-   * it cannot: DESIGN.md §6 says a row never grows and never reflows, because a list
-   * whose rows change height as somebody types is a list nobody can aim at.
+   * As a heading the name has to be readable in full, so it grows down the page. In a
+   * row it cannot: DESIGN.md §6 says a row never grows and never reflows.
    */
   const wraps = as !== "span"
 

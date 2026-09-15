@@ -11,7 +11,6 @@ export type SettingsRoute =
 /** What a nav entry counts, so the number beside it comes from the right query. */
 export type SettingsCount = "tokens" | "members" | "groups"
 
-/** One entry in the settings column. */
 export interface SettingsSection {
   to: SettingsRoute
   labelKey: string

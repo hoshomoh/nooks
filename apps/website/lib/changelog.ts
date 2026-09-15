@@ -8,7 +8,6 @@ export interface Change {
   text: string
 }
 
-/** One released version. */
 export interface Release {
   version: string
   /** The day it was released, already written out. */

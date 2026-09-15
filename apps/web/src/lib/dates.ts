@@ -84,9 +84,7 @@ export type DateLabelOptions = {
   from: Date
   /** The date-fns locale, so weekday and month names match the language. */
   locale: DateLocale
-  /** The word for the current day. */
   todayWord: string
-  /** The word for the next day. */
   tomorrowWord: string
 }
 
@@ -141,7 +139,6 @@ export interface MomentLabelOptions {
   from: Date
   /** The date-fns locale, so weekday and month names match the language. */
   locale: DateLocale
-  /** The word for the day before this one. */
   yesterdayWord: string
 }
 

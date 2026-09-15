@@ -24,11 +24,9 @@ export function DoneSection({ label, children }: DoneSectionProps) {
   /*
    * Whether the rows have ever been asked for.
    *
-   * The section opens by growing to the height of its contents, which means the
-   * contents have to be there to be grown to — but a week of ticked Items is a real
-   * cost to render behind a line nobody has pressed. So they are built on the first
-   * press and kept from then on: the opening that matters is every one after the
-   * first, and by then there is nothing left to build.
+   * The section grows to the height of its contents, so they have to exist to be grown
+   * to, but a week of ticked Items costs something to render behind a line nobody has
+   * pressed. Built on the first press and kept from then on.
    */
   const [everOpened, setEverOpened] = useState(false)
 

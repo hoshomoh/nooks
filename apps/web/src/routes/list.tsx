@@ -16,7 +16,6 @@ export interface ListSearch {
   item?: string
 }
 
-/** One List, with its Items. */
 export const listRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/lists/$listUid",

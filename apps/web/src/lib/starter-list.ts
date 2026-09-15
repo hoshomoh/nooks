@@ -60,7 +60,6 @@ async function publish(listUid: string): Promise<void> {
   })
 }
 
-/** One line of the starter List. */
 interface StarterItem {
   label: string
   quantity: string

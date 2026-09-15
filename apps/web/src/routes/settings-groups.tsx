@@ -4,7 +4,6 @@ import { currentMemberQuery } from "@/lib/queries"
 import { groupsQuery, membersQuery } from "@/lib/sharing-queries"
 import { rootRoute } from "./root"
 
-/** The Groups, and who is in them. */
 export const settingsGroupsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/settings/groups",

@@ -11,9 +11,7 @@ export interface SaveButtonProps {
    * it stops being true, and never while it still is.
    */
   unchanged: boolean
-  /** The save is in flight. */
   pending: boolean
-  /** The last save succeeded. */
   succeeded: boolean
   /** What the button says when there is something to save. Defaults to Save. */
   label?: string

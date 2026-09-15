@@ -151,8 +151,9 @@
      its ground in, and a tick by somebody else holds for a second before settling.
      Nothing bounces and nothing waits for an animation to finish. */
   --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
-  /* Named, because the List pane beside the sheet moves on the same clock. Two numbers
-     that have to agree are one number. */
+  /* Named because the List pane beside the sheet moves on these too: the gap it holds
+     open has to arrive and leave with the sheet, and two numbers that have to agree are
+     one number. */
   --duration-sheet-in: 180ms;
   --duration-sheet-out: 160ms;
   --animate-sheet-in: sheet-in var(--duration-sheet-in) var(--ease-sheet);
@@ -414,9 +415,8 @@
     @apply font-sans;
   }
 
-  /* Less movement, not less to see. Asking for reduced motion means nothing should
-     travel across the screen; it does not mean a Member should be left guessing whether
-     their tick landed. Position and height stop, colour and opacity carry on. */
+  /* Less movement, not less to see: position and height stop, colour and opacity carry
+     on. A Member who asked for reduced motion should still know their tick landed. */
   @media (prefers-reduced-motion: reduce) {
     :root {
       --animate-sheet-in: sheet-reduced-in var(--duration-sheet-in) var(--ease-sheet);

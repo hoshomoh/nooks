@@ -53,15 +53,14 @@ describe("the list row", () => {
     expect(onOpen).not.toHaveBeenCalled()
   })
 
-  // Ticking is the most frequent thing anybody does here, and it used to be the only
-  // action with no answer of its own: the settle animation is for somebody else's tick.
+  // The settle animation is for somebody else's tick, so without this the Member's own
+  // is the one action in the app that answers with nothing.
   it("answers the Member's own tick, and only that much", () => {
     render(<ListRow label="Milk" onToggle={vi.fn()} labels={labels} />)
 
     const box = screen.getByRole("checkbox")
     expect(box).toHaveClass("active:scale-[0.97]")
     expect(box.className).toMatch(/transition-\[background-color,border-color,transform\]/)
-    // Nothing larger. A celebration thirty times a day is not a celebration.
     expect(box.className).not.toMatch(/animate-/)
   })
 

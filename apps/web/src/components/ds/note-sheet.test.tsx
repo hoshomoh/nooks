@@ -23,9 +23,8 @@ const milk = {
 /**
  * show renders the sheet the way the List does, returning what it was asked to do.
  *
- * The List owns whether the sheet is leaving, because the pane beside it has to move on
- * the same frame. A harness that holds it here is what makes these tests the whole
- * loop: the press, the exit, and the List being told once it is over.
+ * The List owns whether the sheet is leaving, so holding it in a harness is what makes
+ * these tests the whole loop: the press, the exit, and the List being told it is over.
  */
 function show(item: Item = milk, canEdit = true) {
   const actions = {
@@ -75,8 +74,7 @@ describe("the item sheet", () => {
   })
 
   describe("leaving", () => {
-    // The List narrows the gap it was holding for the sheet over the same beat, so it
-    // has to hear about the close when it starts, not when it finishes.
+    // The List moves with it, so it has to hear about the close when it starts.
     it("says so the moment it is asked, not when it has finished", async () => {
       const actions = show()
 

@@ -59,8 +59,8 @@ describe("what scrolls", () => {
     expect(tokens).toMatch(/--spacing-sheet-clear:\s*544px/)
   })
 
-  // The gap and the sheet are one movement: a pane that resized once the sheet had
-  // already gone read as two things happening, which is what sharing the token fixes.
+  // The gap and the sheet are one movement. A pane that resizes after the sheet has
+  // gone reads as two things happening.
   it("opens and closes the gap on the sheet's own clock", () => {
     const list = source("../../screens/list.tsx")
     expect(list).toMatch(/transition-\[padding-right\][^"]*ease-sheet/)

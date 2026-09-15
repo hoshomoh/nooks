@@ -133,13 +133,8 @@ export function ListScreen() {
 
   const autosave = useNoteAutosave()
 
-  /*
-   * Whether the sheet is on its way out.
-   *
-   * Held here rather than in the sheet because the pane beside it has to start making
-   * its room back on the same frame the sheet starts leaving. The address still says
-   * which Item is open, and only changes once the movement is over.
-   */
+  // Held here rather than in the sheet, because the pane beside it has to start taking
+  // its room back on the same frame. The address still says which Item is open.
   const [leaving, setLeaving] = useState(false)
   const sheetOpen = Boolean(openItemUid) && !leaving
 
@@ -249,8 +244,6 @@ export function ListScreen() {
             "flex flex-1 justify-center overflow-y-auto pt-14 pb-22 pl-5.5",
             // The sheet is drawn over this pane, so the pane keeps clear of it rather
             // than being covered by it.
-            // The pane and the sheet share a clock: the gap opens as the sheet
-            // arrives and closes as it leaves, rather than snapping once it has.
             "transition-[padding-right] ease-sheet",
             sheetOpen
               ? "pr-sheet-clear duration-(--duration-sheet-in)"

@@ -30,13 +30,7 @@ export interface NoteSheetProps {
   onRename: (label: string) => void
   onQuantityChange: (quantity: string) => void
   onDueChange: (dueOn: DueDate) => void
-  /**
-   * The Member asked to close. The exit starts now.
-   *
-   * Separate from onClose because the List has to narrow the gap it left for the sheet
-   * over the same beat the sheet leaves on, and it cannot do that if it only hears
-   * about the close once the movement is over.
-   */
+  /** The Member asked to close: the exit starts now, and the List has to move with it. */
   onLeave: () => void
   /** The exit has played and the sheet is gone. */
   onClose: () => void

@@ -41,3 +41,17 @@ nooks.example {
 Session cookies are marked `Secure` when the instance knows it is served over HTTPS.
 Pass `X-Forwarded-Proto` so it can tell. Without it the cookie is issued for a scheme
 the browser is not using, and signing in appears to do nothing.
+
+## Offline, and installing it as an app
+
+Nooks keeps a copy of the app on the machine that opened it, so reading a list works with
+no signal, including after closing the tab and opening it again. It is also what lets a
+phone install Nooks to its home screen.
+
+Browsers allow that only in a **secure context**: HTTPS, or the machine the instance runs
+on. Over plain HTTP at a LAN address such as `http://192.168.1.20:8081` the browser
+refuses, and Nooks falls back to what it did before. Everything works while the tab is
+open, and reopening it needs the instance to answer.
+
+So if people use your instance from their phones, TLS is not only about eavesdropping. It
+is the difference between a list that works in a shop and one that does not.

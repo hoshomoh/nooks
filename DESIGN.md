@@ -514,6 +514,11 @@ of the Member's text, then real options. Their text is never discarded.
 conflict** — a tick is a tick whoever made it. The two versions are shown as stacked options, the
 Member's outlined in accent, with `Keep mine` and `Keep both`.
 
+**A newer build waits to be asked.** The app is kept on the Member's machine, so a release does not
+arrive by itself. A strip says one is ready, in the same shape as the offline strip, and nothing
+happens until they press Reload. A Note is saved when the typing settles, so a reload a second early
+loses words they have written.
+
 **Motion** — movement explains where something came from, and is used nowhere else:
 
 | Token | Where | Duration |

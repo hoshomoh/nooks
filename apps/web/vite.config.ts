@@ -1,6 +1,7 @@
 import path from "node:path"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
+import { VitePWA } from "vite-plugin-pwa"
 // vitest's defineConfig, which is Vite's plus the `test` block below.
 import { defineConfig } from "vitest/config"
 
@@ -16,7 +17,52 @@ const INSTANCE = process.env.NOOKS_DEV_TARGET ?? "http://localhost:8081"
 // The dev server proxies the API to the Go binary so that the browser
 // talks to one origin and cookies behave as they do in production.
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    /*
+     * Keeps the app itself on the machine that opened it.
+     *
+     * Reading, ticking and adding already survived losing the connection. Closing the
+     * tab did not, because reopening it fetched the app from an Instance that was not
+     * answering.
+     *
+     * A service worker needs a secure context, so this does nothing over plain HTTP to
+     * a LAN address. That is the browser's rule, not ours.
+     */
+    VitePWA({
+      registerType: "prompt",
+      includeAssets: ["favicon.svg", "icon.svg"],
+      manifest: {
+        name: "Nooks",
+        short_name: "Nooks",
+        description: "A household todo app you run on your own machine.",
+        start_url: "/",
+        scope: "/",
+        display: "standalone",
+        background_color: "#F2F2F0",
+        theme_color: "#F2F2F0",
+        icons: [
+          { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
+          { src: "/icon-512.png", sizes: "512x512", type: "image/png" },
+          {
+            src: "/icon-maskable-512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
+          },
+        ],
+      },
+      workbox: {
+        // The app, not the API. What the Instance knows is TanStack Query's to cache,
+        // and a second copy here would be a second answer to the same question.
+        globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
+        // A client route is the app, not a missing file. Same rule as frontend.go.
+        navigateFallback: "/index.html",
+        navigateFallbackDenylist: [/^\/api/, /^\/mcp/, /^\/nooks\.api\./, /^\/healthz/],
+      },
+    }),
+  ],
   resolve: {
     alias: [
       { find: "@", replacement: path.resolve(import.meta.dirname, "./src") },

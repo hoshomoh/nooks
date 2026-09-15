@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 
 import { OfflineBanner } from "./offline-banner"
+import { UpdateBanner } from "./update-banner"
 import { Sidebar, type SidebarViewCounts } from "./sidebar"
 import type { List } from "@nooks/api"
 
@@ -45,6 +46,7 @@ export function AppShell({
           own content, which is what lets it scroll instead of the page. */}
       <main className="flex min-h-0 min-w-0 flex-1 flex-col">
         <OfflineBanner />
+        <UpdateBanner />
         {children}
       </main>
     </div>

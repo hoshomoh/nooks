@@ -3,7 +3,9 @@
     "name": "nooks",
     "stillWaiting": "Still waiting on the server. It's probably just waking up.",
     "offline": "Offline. What you change is kept and sent when you are back.",
-    "offlineSince": "Offline since {{seen}}. What you change is kept and sent when you are back."
+    "offlineSince": "Offline since {{seen}}. What you change is kept and sent when you are back.",
+    "updateReady": "A new version of Nooks is ready.",
+    "updateReload": "Reload"
   },
   "action": {
     "add": "Add",

@@ -55,7 +55,7 @@ const GROUPS: FeatureGroup[] = [
       },
       {
         name: "Works with no signal",
-        text: "Reading, ticking and adding all work offline. What you change is shown, marked as unsent, and goes when the connection comes back — including after closing the tab.",
+        text: "Reading, ticking and adding all work offline, and so does closing the tab and opening it again, because the app is kept on your own machine. What you change is shown, marked as unsent, and sent when the connection comes back. Browsers allow this over HTTPS, or on the machine the instance runs on.",
       },
     ],
   },

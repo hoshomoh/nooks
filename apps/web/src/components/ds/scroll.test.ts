@@ -49,13 +49,31 @@ describe("what scrolls", () => {
      * every laptop had it.
      */
     const list = source("../../screens/list.tsx")
-    expect(list).toMatch(/openItem \? "pr-sheet-clear" : "pr-5\.5"/)
+    expect(list).toMatch(/sheetOpen\s*\?\s*"pr-sheet-clear/)
+    expect(list).toMatch(/:\s*"pr-5\.5 /)
 
     const tokens = readFileSync(
       fileURLToPath(new URL("../../../../../packages/design/foundations.css", import.meta.url)),
       "utf8",
     )
     expect(tokens).toMatch(/--spacing-sheet-clear:\s*544px/)
+  })
+
+  // The gap and the sheet are one movement: a pane that resized once the sheet had
+  // already gone read as two things happening, which is what sharing the token fixes.
+  it("opens and closes the gap on the sheet's own clock", () => {
+    const list = source("../../screens/list.tsx")
+    expect(list).toMatch(/transition-\[padding-right\][^"]*ease-sheet/)
+    expect(list).toMatch(/duration-\(--duration-sheet-in\)/)
+    expect(list).toMatch(/duration-\(--duration-sheet-out\)/)
+
+    const tokens = readFileSync(
+      fileURLToPath(new URL("../../../../../packages/design/foundations.css", import.meta.url)),
+      "utf8",
+    )
+    // The sheet's own animation reads the same two numbers, so they cannot drift.
+    expect(tokens).toMatch(/--animate-sheet-in:[^;]*var\(--duration-sheet-in\)/)
+    expect(tokens).toMatch(/--animate-sheet-out:[^;]*var\(--duration-sheet-out\)/)
   })
 
   it("anchors the side sheet to something that does not grow", () => {

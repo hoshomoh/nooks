@@ -35,3 +35,6 @@ go*.linux-amd64.tar.gz
 
 # The checkout ./scripts/preflight.sh verifies a commit in.
 .preflight/
+
+# Animation and refactor plans: working notes, not something a contributor needs.
+/plans/

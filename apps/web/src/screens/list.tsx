@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useMemo } from "react"
+import { Suspense, useCallback, useMemo, useState } from "react"
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
 import { getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
@@ -133,11 +133,22 @@ export function ListScreen() {
 
   const autosave = useNoteAutosave()
 
+  /*
+   * Whether the sheet is on its way out.
+   *
+   * Held here rather than in the sheet because the pane beside it has to start making
+   * its room back on the same frame the sheet starts leaving. The address still says
+   * which Item is open, and only changes once the movement is over.
+   */
+  const [leaving, setLeaving] = useState(false)
+  const sheetOpen = Boolean(openItemUid) && !leaving
+
   // Closing flushes, so the last sentence is never lost to a timer that never ran.
   const closeSheet = useCallback(() => {
+    setLeaving(false)
     autosave.flush()
     showItem(undefined)
-  }, [autosave, showItem])
+  }, [autosave, setLeaving, showItem])
 
   // Stable, so the editor is built once rather than on every render.
   const onNoteChange = useCallback(
@@ -238,7 +249,12 @@ export function ListScreen() {
             "flex flex-1 justify-center overflow-y-auto pt-14 pb-22 pl-5.5",
             // The sheet is drawn over this pane, so the pane keeps clear of it rather
             // than being covered by it.
-            openItem ? "pr-sheet-clear" : "pr-5.5",
+            // The pane and the sheet share a clock: the gap opens as the sheet
+            // arrives and closes as it leaves, rather than snapping once it has.
+            "transition-[padding-right] ease-sheet",
+            sheetOpen
+              ? "pr-sheet-clear duration-(--duration-sheet-in)"
+              : "pr-5.5 duration-(--duration-sheet-out)",
           )}
         >
           <div className="w-full max-w-content">
@@ -387,6 +403,8 @@ export function ListScreen() {
                 editItem.mutate({ itemUid: openItem.uid, quantity })
               }
               onDueChange={(dueOn) => editItem.mutate({ itemUid: openItem.uid, dueOn })}
+              leaving={leaving}
+              onLeave={() => setLeaving(true)}
               onClose={closeSheet}
               onOpenFull={() => {
                 autosave.flush()

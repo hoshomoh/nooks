@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { beforeAll, describe, expect, it, vi } from "vitest"
 import { fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
@@ -19,7 +20,13 @@ const milk = {
   note: "",
 } as Item
 
-/** show renders the sheet, returning what it was asked to do. */
+/**
+ * show renders the sheet the way the List does, returning what it was asked to do.
+ *
+ * The List owns whether the sheet is leaving, because the pane beside it has to move on
+ * the same frame. A harness that holds it here is what makes these tests the whole
+ * loop: the press, the exit, and the List being told once it is over.
+ */
 function show(item: Item = milk, canEdit = true) {
   const actions = {
     onNoteChange: vi.fn(),
@@ -27,10 +34,30 @@ function show(item: Item = milk, canEdit = true) {
     onRename: vi.fn(),
     onQuantityChange: vi.fn(),
     onDueChange: vi.fn(),
+    onLeave: vi.fn(),
     onClose: vi.fn(),
     onOpenFull: vi.fn(),
   }
-  render(<NoteSheet item={item} crumbs={["Groceries", "Item"]} listName="Groceries" canEdit={canEdit} {...actions} />)
+
+  function Harness() {
+    const [leaving, setLeaving] = useState(false)
+    return (
+      <NoteSheet
+        item={item}
+        crumbs={["Groceries", "Item"]}
+        listName="Groceries"
+        canEdit={canEdit}
+        {...actions}
+        leaving={leaving}
+        onLeave={() => {
+          actions.onLeave()
+          setLeaving(true)
+        }}
+      />
+    )
+  }
+
+  render(<Harness />)
   return actions
 }
 
@@ -48,6 +75,17 @@ describe("the item sheet", () => {
   })
 
   describe("leaving", () => {
+    // The List narrows the gap it was holding for the sheet over the same beat, so it
+    // has to hear about the close when it starts, not when it finishes.
+    it("says so the moment it is asked, not when it has finished", async () => {
+      const actions = show()
+
+      await userEvent.click(screen.getByRole("button", { name: "Close" }))
+
+      expect(actions.onLeave).toHaveBeenCalled()
+      expect(actions.onClose).not.toHaveBeenCalled()
+    })
+
     it("goes back the way it came rather than vanishing", async () => {
       const actions = show()
 

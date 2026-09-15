@@ -23,6 +23,11 @@ export function Checkbox({ className, justTicked, ...props }: CheckboxProps) {
           "size-[17px] rounded-sm border-[length:1.5px] border-control",
           "data-[checked]:border-muted-foreground data-[checked]:bg-muted-foreground",
           "focus-visible:ring-0",
+          // Ticking is the thing a Member does most, so it gets an answer and nothing
+          // more: the box gives under the press, and the fill catches up rather than
+          // cutting. Anything larger would be a celebration thirty times a day.
+          "transition-[background-color,border-color,transform] duration-150 ease-out",
+          "active:scale-[0.97]",
           justTicked && "border-done bg-done",
           className,
         )}

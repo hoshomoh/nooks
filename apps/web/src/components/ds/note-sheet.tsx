@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback } from "react"
 import type { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import { cn } from "cn"
@@ -30,9 +30,20 @@ export interface NoteSheetProps {
   onRename: (label: string) => void
   onQuantityChange: (quantity: string) => void
   onDueChange: (dueOn: DueDate) => void
+  /**
+   * The Member asked to close. The exit starts now.
+   *
+   * Separate from onClose because the List has to narrow the gap it left for the sheet
+   * over the same beat the sheet leaves on, and it cannot do that if it only hears
+   * about the close once the movement is over.
+   */
+  onLeave: () => void
+  /** The exit has played and the sheet is gone. */
   onClose: () => void
   /** Opens the same Note at full width. */
   onOpenFull: () => void
+  /** True once the Member has asked to close, while the exit plays. */
+  leaving: boolean
   /** Shown at the right of the footer, e.g. "Saving…". */
   status?: string
 }
@@ -62,13 +73,14 @@ export function NoteSheet({
   onRename,
   onQuantityChange,
   onDueChange,
+  onLeave,
+  leaving,
   onClose,
   onOpenFull,
   status,
 }: NoteSheetProps) {
   const { t } = useTranslation()
   const due = useDueLabel()
-  const [leaving, setLeaving] = useState(false)
 
   /*
    * Tells the List the sheet has gone, once the exit has played.
@@ -124,7 +136,7 @@ export function NoteSheet({
         <IconButton
           name="close"
           label={t("note.close")}
-          onClick={() => setLeaving(true)}
+          onClick={onLeave}
           className="ml-1 shrink-0"
         />
       </div>

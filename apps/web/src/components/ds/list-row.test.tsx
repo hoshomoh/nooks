@@ -53,6 +53,18 @@ describe("the list row", () => {
     expect(onOpen).not.toHaveBeenCalled()
   })
 
+  // Ticking is the most frequent thing anybody does here, and it used to be the only
+  // action with no answer of its own: the settle animation is for somebody else's tick.
+  it("answers the Member's own tick, and only that much", () => {
+    render(<ListRow label="Milk" onToggle={vi.fn()} labels={labels} />)
+
+    const box = screen.getByRole("checkbox")
+    expect(box).toHaveClass("active:scale-[0.97]")
+    expect(box.className).toMatch(/transition-\[background-color,border-color,transform\]/)
+    // Nothing larger. A celebration thirty times a day is not a celebration.
+    expect(box.className).not.toMatch(/animate-/)
+  })
+
   it("renames the Item where it is read", async () => {
     const onRename = vi.fn()
     render(<ListRow label="Milk" onRename={onRename} labels={labels} />)

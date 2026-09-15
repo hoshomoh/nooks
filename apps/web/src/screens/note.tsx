@@ -3,6 +3,7 @@ import type { ReactNode } from "react"
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
 import { getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
+import { cn } from "cn"
 
 import { Button } from "@/components/ds/button"
 import { Checkbox } from "@/components/ds/checkbox"
@@ -80,8 +81,18 @@ export function NoteScreen() {
 
   const canEdit = Boolean(list.isOwner || list.canEdit)
 
+  /*
+   * Arriving the way the sheet did, and from the same 16px, so the Item reads as
+   * continuing at a second size rather than being replaced by a page.
+   */
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-background">
+    <div
+      className={cn(
+        "flex h-dvh flex-col overflow-hidden bg-background",
+        "translate-x-0 opacity-100 transition-[opacity,translate] duration-(--duration-sheet-in) ease-sheet",
+        "starting:translate-x-4 starting:opacity-0",
+      )}
+    >
       <ChromeBar
         crumbs={[list.name, t("note.crumb")]}
         actions={

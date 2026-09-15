@@ -2,6 +2,7 @@
 export type SettingsRoute =
   | "/settings/general"
   | "/settings/tokens"
+  | "/settings/assistants"
   | "/settings/members"
   | "/settings/groups"
   | "/settings/public"
@@ -26,13 +27,14 @@ export interface SettingsSection {
  * The settings column and the command palette both read this, so a page added here is
  * reachable from both without anybody remembering to add it twice.
  *
- * A Member sees three of them. The other three are an Admin's, and the server refuses
+ * A Member sees four of them. The other three are an Admin's, and the server refuses
  * them either way — the filter is so the column does not offer a door that will not
  * open.
  */
 export const SETTINGS_SECTIONS: SettingsSection[] = [
   { to: "/settings/general", labelKey: "settings.general" },
   { to: "/settings/tokens", labelKey: "settings.tokens", counts: "tokens" },
+  { to: "/settings/assistants", labelKey: "settings.assistants" },
   { to: "/settings/members", labelKey: "settings.members", adminOnly: true, counts: "members" },
   { to: "/settings/groups", labelKey: "settings.groups", adminOnly: true, counts: "groups" },
   { to: "/settings/public", labelKey: "settings.publicList", adminOnly: true },

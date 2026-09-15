@@ -356,6 +356,17 @@ with a 12.5 `--muted-foreground` explanation under it; control right-aligned. Th
 carries are an input, a segment, a toggle, a select, or a button with a note to its left. A **select**
 is 280 × 36, radius 7, 1px `--border`, the value at 14.5 with a chevron in `--control` at the right.
 
+**Assistants** — one page that ends in a block to copy across. A segmented control for which
+client, then the token as a card: what it reaches and what it may do, and a button that cuts it.
+The secret takes the card's place when it exists, per §9, and drops into the block below. Between
+them sits the address the assistant will connect to: a sentence with a link to change it, or an
+open field when the page is being read on an address only this machine can reach.
+
+The block is a bordered box with a header naming what it is (Terminal, or the file and where it
+lives) and a Copy at the right. Until the token exists the block still renders, with `NOOKS_TOKEN`
+where the secret will go: a Member should be able to see what they are about to be asked to paste
+before they cut anything.
+
 **About** — what this copy of Nooks is, as settings rows: version, how long the Instance has been
 running, how much room it is taking, how many Members, Lists and Items it holds, and the licence.
 Facts, in the same rows every other settings page uses; there is no dashboard here and nothing is

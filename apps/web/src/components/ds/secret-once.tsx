@@ -1,7 +1,7 @@
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "./button"
+import { CopyButton } from "./copy-button"
 
 export interface SecretOnceProps {
   /** The secret itself, in clear. */
@@ -26,12 +26,6 @@ export interface SecretOnceProps {
  */
 export function SecretOnce({ secret, title, blurb, onDone }: SecretOnceProps) {
   const { t } = useTranslation()
-  const [copied, setCopied] = useState(false)
-
-  const copy = async () => {
-    await navigator.clipboard.writeText(secret)
-    setCopied(true)
-  }
 
   return (
     <div className="flex flex-col gap-4 px-6.5 py-6 translate-y-0 transition-[opacity,translate] duration-160 ease-sheet starting:-translate-y-1.5 starting:opacity-0">
@@ -42,14 +36,13 @@ export function SecretOnce({ secret, title, blurb, onDone }: SecretOnceProps) {
 
       <div className="flex items-center gap-3 rounded-xl border border-shared-line bg-shared-bg px-4 py-3.5">
         <code className="min-w-0 font-mono text-meta break-all text-foreground">{secret}</code>
-        <Button
+        <CopyButton
+          text={secret}
+          label={t("action.copy")}
           tone="secondary"
           scale="compact"
           className="ml-auto shrink-0"
-          onClick={() => void copy()}
-        >
-          {copied ? t("members.copied") : t("members.copy")}
-        </Button>
+        />
       </div>
 
       <div className="flex items-center">

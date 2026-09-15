@@ -19,6 +19,7 @@ import { settingsMembersRoute } from "./routes/settings-members"
 import { settingsAboutRoute } from "./routes/settings-about"
 import { settingsGeneralRoute } from "./routes/settings-general"
 import { settingsPublicRoute } from "./routes/settings-public"
+import { settingsAssistantsRoute } from "./routes/settings-assistants"
 import { settingsTokensRoute } from "./routes/settings-tokens"
 import { setupRoute } from "./routes/setup"
 import { signInRoute } from "./routes/sign-in"
@@ -41,6 +42,7 @@ const routeTree = rootRoute.addChildren([
   settingsGeneralRoute,
   settingsPublicRoute,
   settingsTokensRoute,
+  settingsAssistantsRoute,
 ])
 
 /** buildRouter takes the query client so loaders can prime the cache before rendering. */

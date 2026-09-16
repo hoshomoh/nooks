@@ -120,7 +120,11 @@ export function Sidebar({
         activeListUid={activeListUid}
         instanceName={instanceName}
       />
-      <CompletedGroup group={groups.completed} activeListUid={activeListUid} />
+      <CompletedGroup
+        group={groups.completed}
+        activeListUid={activeListUid}
+        instanceName={instanceName}
+      />
 
       <button
         type="button"
@@ -217,6 +221,7 @@ function SeeAll({ group, status }: SeeAllProps) {
 interface CompletedGroupProps {
   group?: SidebarGroup
   activeListUid?: string
+  instanceName: string
 }
 
 /**
@@ -226,11 +231,8 @@ interface CompletedGroupProps {
  * Member is working on. Open by default because a List finished this morning is still
  * part of this week — it is the ones from March that nobody needs in front of them, and
  * those are behind the count.
- *
- * No `···` on these rows. What a Member does to a finished List — rename it, share it,
- * delete it — is done from All lists, where the row carries the menu.
  */
-function CompletedGroup({ group, activeListUid }: CompletedGroupProps) {
+function CompletedGroup({ group, activeListUid, instanceName }: CompletedGroupProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(true)
 
@@ -260,25 +262,13 @@ function CompletedGroup({ group, activeListUid }: CompletedGroupProps) {
       {open && (
         <>
           {lists.map((list) => (
-            <div
+            <SidebarRow
               key={list.uid}
-              className={cn(
-                "relative flex h-7.5 items-center gap-2.5 rounded-md px-2",
-                list.uid === activeListUid ? "bg-secondary font-medium" : "hover:bg-secondary",
-              )}
-            >
-              <Link
-                to="/lists/$listUid"
-                params={{ listUid: list.uid }}
-                aria-label={list.name}
-                className={COVERING}
-              />
-              {/* Muted, no count and no dot: there is nothing left on it to be shared
-                  about or to count, and the row is a record rather than a destination. */}
-              <span className={cn(INERT, "truncate text-chrome text-muted-foreground")}>
-                {list.name}
-              </span>
-            </div>
+              list={list}
+              active={list.uid === activeListUid}
+              instanceName={instanceName}
+              finished
+            />
           ))}
 
           {group && total > lists.length && <SeeAll group={group} status="completed" />}
@@ -326,10 +316,19 @@ interface SidebarRowProps {
   list: List
   active: boolean
   instanceName: string
+  /** A finished List, drawn as a record rather than as somewhere to go. */
+  finished?: boolean
 }
 
-/** One List in the sidebar: whether it is shared, what it is called, what is left on it. */
-function SidebarRow({ list, active, instanceName }: SidebarRowProps) {
+/**
+ * One List in the sidebar: whether it is shared, what it is called, what is left on it.
+ *
+ * The finished ones are the same row in muted ink rather than a row of their own. They
+ * still carry the `···`: renaming, sharing or deleting a List is no less likely once
+ * everything on it is ticked, and a row that quietly drops its menu is one a Member has
+ * to go and find somewhere else.
+ */
+function SidebarRow({ list, active, instanceName, finished }: SidebarRowProps) {
   return (
     <div
       className={cn(
@@ -346,10 +345,12 @@ function SidebarRow({ list, active, instanceName }: SidebarRowProps) {
 
       {/* Everything that only shows the List is inert, so the whole row stays one
           target and the link behind it is what answers a click. */}
-      {list.sharing !== Sharing.PRIVATE && (
+      {!finished && list.sharing !== Sharing.PRIVATE && (
         <span className={cn(INERT, "size-[5px] shrink-0 rounded-full bg-shared")} />
       )}
-      <span className={cn(INERT, "truncate text-chrome")}>{list.name}</span>
+      <span className={cn(INERT, "truncate text-chrome", finished && "text-muted-foreground")}>
+        {list.name}
+      </span>
 
       {list.openCount > 0 && (
         <span className={cn(INERT, "ml-auto text-badge text-muted-foreground")}>

@@ -165,7 +165,9 @@
     "pageRange": "{{from}}–{{to}} of {{total}}",
     "previousPage": "Previous",
     "nextPage": "Next",
-    "pageRangeAtLeast": "{{from}}–{{to}} of {{total}}+"
+    "pageRangeAtLeast": "{{from}}–{{to}} of {{total}}+",
+    "columnList": "List",
+    "columnUpdated": "Last updated"
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",
@@ -434,7 +436,7 @@
     "print": "Print",
     "duplicate": "Duplicate",
     "archive": "Archive",
-    "restore": "Restore to the sidebar",
+    "restore": "Unarchive",
     "delete": "Delete list",
     "deleteTitle": "Delete “{{name}}”?",
     "deleteBlurb": "The list and everything on it goes. Nobody it was shared with keeps a copy.",

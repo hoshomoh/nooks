@@ -89,3 +89,34 @@ describe("a group the server had to cut short", () => {
     expect(screen.queryByText(/See all/)).not.toBeInTheDocument()
   })
 })
+
+describe("a finished List in the sidebar", () => {
+  /** finished puts one List under Completed, where a Member's ticked-off Lists gather. */
+  function finished(): GetSidebarResponse {
+    return {
+      completed: { lists: [{ ...groceries, openCount: 0, doneCount: 9 }], total: 1 },
+    } as GetSidebarResponse
+  }
+
+  /*
+   * The same row as any other, in muted ink.
+   *
+   * Renaming, sharing or deleting a List is no less likely once everything on it is
+   * ticked, and a row that quietly drops its menu is one a Member has to go and find
+   * somewhere else.
+   */
+  it("keeps the menu every other row has", async () => {
+    show(finished())
+
+    await screen.findByRole("link", { name: "Groceries" })
+    expect(screen.getByRole("button", { name: "More" })).toBeInTheDocument()
+  })
+
+  // Nothing is left on it, so there is no number to show.
+  it("carries no count", async () => {
+    show(finished())
+
+    await screen.findByRole("link", { name: "Groceries" })
+    expect(screen.queryByText("7")).not.toBeInTheDocument()
+  })
+})

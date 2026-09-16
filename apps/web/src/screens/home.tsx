@@ -137,6 +137,7 @@ export function Home() {
               ) : (
                 <>
                   <div className="flex flex-col">
+                    <TableHeader />
                     {lists.map((list) => (
                       <ListTableRow key={list.uid} list={list} instanceName={instanceName} />
                     ))}
@@ -200,6 +201,28 @@ function PageButton({ label, disabled, onSelect }: PageButtonProps) {
   )
 }
 
+/** COLUMNS is the table's one grid, so a heading sits over the thing it names. */
+const COLUMNS = "grid grid-cols-[1fr_96px_26px] items-center gap-4 border-b border-hair px-2 -mx-2"
+
+/**
+ * What each column holds.
+ *
+ * A date on its own does not say which date it is, and this one is the last time
+ * anything on the List changed rather than when it was made — which is also what the
+ * table opens sorted by.
+ */
+function TableHeader() {
+  const { t } = useTranslation()
+
+  return (
+    <div className={cn(COLUMNS, "min-h-8 text-micro text-muted-foreground")}>
+      <span>{t("list.columnList")}</span>
+      <span className="text-right">{t("list.columnUpdated")}</span>
+      <span />
+    </div>
+  )
+}
+
 interface ListTableRowProps {
   list: List
   instanceName: string
@@ -216,7 +239,7 @@ function ListTableRow({ list, instanceName }: ListTableRowProps) {
   const moment = useMomentLabel()
 
   return (
-    <div className="group/list relative grid min-h-13 grid-cols-[1fr_96px_26px] items-center gap-4 border-b border-hair px-2 -mx-2 hover:bg-secondary">
+    <div className={cn(COLUMNS, "group/list relative min-h-13 hover:bg-secondary")}>
       <Link
         to="/lists/$listUid"
         params={{ listUid: list.uid }}
@@ -236,7 +259,7 @@ function ListTableRow({ list, instanceName }: ListTableRowProps) {
         <span className="text-micro text-muted-foreground">{metaFor(list, t)}</span>
       </span>
 
-      <span className={cn(INERT, "text-micro whitespace-nowrap text-muted-foreground")}>
+      <span className={cn(INERT, "text-micro text-right whitespace-nowrap text-muted-foreground")}>
         {moment(list.updatedAt)}
       </span>
 

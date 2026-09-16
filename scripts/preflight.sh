@@ -36,7 +36,52 @@ else
   git worktree add --detach "$worktree" "$target"
 fi
 
+# shellcheck source=lib/groups.sh
+. "$root/scripts/lib/groups.sh"
+
+# What this push would add to the branch it is going to.
+#
+# CI runs every group whatever happens, so the only thing skipping costs is the chance
+# to learn about a break here rather than there. It is worth taking when a group
+# provably cannot be affected — and groups.sh resolves every doubt the other way.
+base=$(git merge-base origin/main "$target" 2>/dev/null || true)
+if [ -n "$base" ]; then
+  changed=$(git diff --name-only "$base" "$target")
+else
+  # No remote to compare with: a fresh clone, or a branch nobody has pushed. Run the lot.
+  changed=""
+fi
+
+if [ -n "$changed" ]; then
+  groups=$(groupsFor $changed)
+  skipped=$(for g in $ALL_GROUPS; do case " $groups " in *" $g "*) ;; *) printf '%s ' "$g" ;; esac; done)
+else
+  groups="$ALL_GROUPS"
+  skipped=""
+fi
+
+if [ "${1:-}" = "--explain" ]; then
+  echo "changed since origin/main:"
+  echo "$changed" | sed 's/^/  /'
+  echo "groups: ${groups:-none}"
+  echo "skipped: ${skipped:-none}"
+  exit 0
+fi
+
+# The mapping decides what is allowed to go unchecked, so it is checked first.
+"$root/scripts/lib/groups.test.sh"
+
 echo "preflight: checking $(git rev-parse --short "$target") in a clean checkout"
-(cd "$worktree" && ./scripts/ci.sh)
+if [ -n "$skipped" ]; then
+  printf '\033[2m  nothing changed under %s; CI still runs them\033[0m\n' "${skipped% }"
+fi
+
+if [ -z "$groups" ]; then
+  printf '\n\033[1;32m✓ %s changes nothing any check covers\033[0m\n' "$(git rev-parse --short "$target")"
+  exit 0
+fi
+
+# shellcheck disable=SC2086
+(cd "$worktree" && ./scripts/ci.sh $groups)
 
 printf '\n\033[1;32m✓ %s is what it says it is\033[0m\n' "$(git rev-parse --short "$target")"

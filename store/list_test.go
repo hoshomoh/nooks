@@ -239,3 +239,49 @@ func TestUnpinIsForgiving(t *testing.T) {
 		})
 	}
 }
+
+/*
+A sidebar is read by a person, so the order has to be a person's.
+
+Comparing raw names compares character codes, and every capital sorts below every
+lowercase one: the Lists somebody happened to capitalise come out as a block above the
+ones they did not. The two drivers disagreed about it as well, so the same instance
+looked different depending on what it was stored in.
+*/
+func TestListsAreOrderedTheWayAPersonReads(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			owner := newMember(t, s)
+
+			// Named out of order, and mixing case the way a household does.
+			for _, name := range []string{"Groceries", "avocados", "Flat jobs", "bike parts"} {
+				if _, err := s.CreateList(t.Context(), CreateListParams{
+					UID: "list_" + name, Name: name, OwnerID: owner.ID,
+					Sharing: SharingPrivate, CanEdit: true, At: createdAt,
+				}); err != nil {
+					t.Fatalf("CreateList %q: %v", name, err)
+				}
+			}
+
+			lists, err := s.ListsForMember(t.Context(), owner.ID)
+			if err != nil {
+				t.Fatalf("ListsForMember: %v", err)
+			}
+
+			got := make([]string, 0, len(lists))
+			for _, list := range lists {
+				got = append(got, list.Name)
+			}
+			want := []string{"avocados", "bike parts", "Flat jobs", "Groceries"}
+			if len(got) != len(want) {
+				t.Fatalf("got %v, want %v", got, want)
+			}
+			for i := range want {
+				if got[i] != want[i] {
+					t.Fatalf("got %v, want %v", got, want)
+				}
+			}
+		})
+	}
+}

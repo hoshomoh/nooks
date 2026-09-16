@@ -126,7 +126,7 @@ func (s *sqlStore) ListsForMember(ctx context.Context, memberID int64) ([]List, 
 	query := s.db.NewSelect().
 		Model((*listModel)(nil)).
 		Where("deleted_at = ''").
-		Order("name ASC")
+		OrderExpr(byName)
 
 	query = whereListVisible(query, memberID, named)
 

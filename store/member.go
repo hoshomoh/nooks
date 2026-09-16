@@ -152,7 +152,7 @@ func (s *sqlStore) DeleteMember(ctx context.Context, id int64) error {
 // Members returns everyone on the Instance, by name — who a List can be shared with.
 func (s *sqlStore) Members(ctx context.Context) ([]Member, error) {
 	var rows []memberModel
-	if err := s.db.NewSelect().Model(&rows).Order("name ASC").Scan(ctx); err != nil {
+	if err := s.db.NewSelect().Model(&rows).OrderExpr(byName).Scan(ctx); err != nil {
 		return nil, fmt.Errorf("read members: %w", err)
 	}
 

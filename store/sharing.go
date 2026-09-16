@@ -56,7 +56,7 @@ func (s *sqlStore) GroupByUID(ctx context.Context, uid string) (Group, error) {
 // Groups lists every Group on the Instance, by name.
 func (s *sqlStore) Groups(ctx context.Context) ([]Group, error) {
 	var rows []groupModel
-	if err := s.db.NewSelect().Model(&rows).Order("name ASC").Scan(ctx); err != nil {
+	if err := s.db.NewSelect().Model(&rows).OrderExpr(byName).Scan(ctx); err != nil {
 		return nil, fmt.Errorf("read groups: %w", err)
 	}
 	groups := make([]Group, 0, len(rows))
@@ -206,7 +206,7 @@ func (s *sqlStore) ListsSharedWithGroup(ctx context.Context, groupID int64) ([]L
 			Model((*listShareModel)(nil)).
 			Column("list_id").
 			Where("group_id = ?", groupID)).
-		Order("name ASC").
+		OrderExpr(byName).
 		Scan(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("read lists shared with group: %w", err)

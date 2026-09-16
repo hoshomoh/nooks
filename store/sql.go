@@ -26,6 +26,22 @@ const (
 	settingPublicAllowJoin  = "instance.public_allow_join"
 )
 
+/*
+byName orders the way a reader would, rather than the way bytes do.
+
+Plain "name ASC" compares character codes, and every capital letter sorts below every
+lowercase one: "Groceries" and "Flat jobs" come out above "avocados" and "bike parts"
+in a block, which is not a household's idea of alphabetical. Comparing the lowercased
+name is what puts them in one sequence.
+
+Accented names are still ordered by code, so "Éclairs" lands after "Zebra" rather than
+between "bike parts" and "Flat jobs". Putting that right means language-aware collation
+and a decision about whose language, which this is not.
+*/
+// OrderExpr, not Order: Bun quotes Order's argument as a column name, which would make
+// this the identifier "lower(name)" rather than a call.
+const byName = "lower(name) ASC"
+
 // sqlStore implements Store over Bun.
 //
 // Bun carries the dialect, so a query is written once and runs on both drivers. The

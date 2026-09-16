@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.4.0](https://github.com/hoshomoh/nooks/compare/v1.3.0...v1.4.0) (2026-09-16)
+
+
+### New
+
+* **api:** say how much of a list is done, and when it changed ([548877a](https://github.com/hoshomoh/nooks/commit/548877a7c383cc496f915ed254193e7ceb359933))
+* archive a list without losing it ([c42631c](https://github.com/hoshomoh/nooks/commit/c42631cd5a6cd7a18c052668e37d70ed036c6f48))
+* **web:** give finished lists a group of their own ([e595e47](https://github.com/hoshomoh/nooks/commit/e595e47979fb46a746e14e457ac2659755d7e36b))
+* **web:** keep a record of what was ticked, and when ([7fe09fd](https://github.com/hoshomoh/nooks/commit/7fe09fd01319a8f8726032f45c5a0fab73350638))
+* **web:** make All lists somewhere you can look things up ([fbc056d](https://github.com/hoshomoh/nooks/commit/fbc056dd7d24db6885a454c6392ddc79a277ba4c))
+* **web:** mark a note on the row instead of quoting it ([e8530f8](https://github.com/hoshomoh/nooks/commit/e8530f8e31d2a0e4cd13beb50b3d199932fa5781))
+
+
+### Fixed
+
+* **mcp:** tell an assistant when there are more lists than it was shown ([1a57ab3](https://github.com/hoshomoh/nooks/commit/1a57ab3d34beb33e6cd4f0e1d9aa3182042adfe5))
+* **store:** order names the way a person reads them ([16b8fb8](https://github.com/hoshomoh/nooks/commit/16b8fb8d76477f4c4a5422d316c5a8743538e7db))
+* **web:** leave room under what scrolls, and put the count at the end ([a7ac9e8](https://github.com/hoshomoh/nooks/commit/a7ac9e8c04c476d105076ad52b346b1f5eef68e9))
+* **web:** let Escape stop at the control that took it ([84ff998](https://github.com/hoshomoh/nooks/commit/84ff99885f557d70c6418178f43a3e04f97dd0d3))
+
+
+### Changed
+
+* **ci:** let preflight skip groups a commit cannot affect ([925aaaa](https://github.com/hoshomoh/nooks/commit/925aaaaac7377ed2144a545355d2342708bf7c8c))
+* read Lists a page at a time ([d7e4e2a](https://github.com/hoshomoh/nooks/commit/d7e4e2ab28b4b720a4f5c7671b88d58f56bbd62d))
+* **store:** keep a List's counts on the List, and index what a page is ordered by ([b2578d0](https://github.com/hoshomoh/nooks/commit/b2578d0f1f285cb1b06bd8816612ea10ea729941))
+* **web:** let the typecheck reuse what it already knows ([4ae67f4](https://github.com/hoshomoh/nooks/commit/4ae67f4436498f1b31501e150cad6885e4199779))
+
 ## [1.3.0](https://github.com/hoshomoh/nooks/compare/v1.2.0...v1.3.0) (2026-09-15)
 
 

@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    /* Without this the build info file is written and never read, so every run is a
+       full one. */
+    "incremental": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "es2023",
     "lib": ["ES2023"],

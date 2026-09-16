@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.1](https://github.com/hoshomoh/nooks/compare/v1.4.0...v1.4.1) (2026-09-16)
+
+
+### Fixed
+
+* **web:** make a menu answer the keys it prints ([8f7114a](https://github.com/hoshomoh/nooks/commit/8f7114a5775248b57d8db345153cd8b5429f945f))
+* **web:** say what the date column is, and stop finished lists losing their menu ([3a2ff3e](https://github.com/hoshomoh/nooks/commit/3a2ff3e061e2d815760369b545fcb4324602857c))
+
 ## [1.4.0](https://github.com/hoshomoh/nooks/compare/v1.3.0...v1.4.0) (2026-09-16)
 
 

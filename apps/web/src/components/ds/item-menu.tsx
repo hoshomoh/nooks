@@ -9,6 +9,7 @@ import { Icon } from "./icon"
 import { DateCalendar } from "./date-calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { parseDue, toStored, type DueDate } from "@/lib/dates"
+import { answers, keysIn } from "@/lib/keycaps"
 import { useLocale } from "@/lib/use-locale"
 
 export interface ItemMenuActions {
@@ -129,9 +130,12 @@ interface ActionsPanelProps {
 function ActionsPanel({ onView, onDate, onQuantity, onDuplicate, onDelete }: ActionsPanelProps) {
   const { t } = useTranslation()
 
-  return (
-    <div className="flex flex-col">
-      <Entry label={t("itemMenu.view")} shortcut="↵" onSelect={onView} />
+  // The keycaps the entries below print are the keys this panel answers. Enter is left
+  // alone: it is what a focused entry already does, so claiming it for one of them
+  // would fire two things at once.
+  const entries = (
+    <>
+      <Entry label={t("itemMenu.view")} onSelect={onView} />
       {/* These two open a field rather than leaving: the entry names it, so the entry
           should be where it is. */}
       <Entry label={t("itemMenu.setDate")} opensPanel onSelect={onDate} />
@@ -141,6 +145,20 @@ function ActionsPanel({ onView, onDate, onQuantity, onDuplicate, onDelete }: Act
 
       <Entry label={t("itemMenu.duplicate")} onSelect={onDuplicate} />
       <Entry label={t("itemMenu.delete")} shortcut="⌫" destructive onSelect={onDelete} />
+    </>
+  )
+  const keys = keysIn(entries, Entry)
+
+  return (
+    <div
+      className="flex flex-col"
+      onKeyDown={(event) => {
+        if (answers(keys, event.nativeEvent)) {
+          event.preventDefault()
+        }
+      }}
+    >
+      {entries}
     </div>
   )
 }

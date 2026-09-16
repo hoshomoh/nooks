@@ -123,7 +123,7 @@ export function Home() {
                   {LIST_SORTS.map((one) => (
                     <MenuItem
                       key={one}
-                      shortcut={one === sort ? "✓" : undefined}
+                      checked={one === sort}
                       onSelect={() => show({ sort: one })}
                     >
                       {t(`list.sort${capitalise(one)}`)}

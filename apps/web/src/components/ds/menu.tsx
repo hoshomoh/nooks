@@ -1,5 +1,7 @@
-import type { ReactElement, ReactNode } from "react"
+import type { KeyboardEvent, ReactElement, ReactNode } from "react"
 import { cn } from "cn"
+
+import { answers, keysIn } from "@/lib/keycaps"
 
 import {
   DropdownMenu,
@@ -29,11 +31,21 @@ export interface MenuProps {
  * never the menu's primary action and never sits with the rest.
  */
 export function Menu({ trigger, children }: MenuProps) {
+  const keys = keysIn(children, MenuItem)
+
+  const press = (event: KeyboardEvent) => {
+    // The browser has its own idea about most of these.
+    if (answers(keys, event.nativeEvent)) {
+      event.preventDefault()
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger render={trigger} />
       <DropdownMenuContent
         align="end"
+        onKeyDown={press}
         className="w-62 rounded-menu border border-border p-1.5 shadow-floating"
       >
         {children}
@@ -44,8 +56,15 @@ export function Menu({ trigger, children }: MenuProps) {
 
 export interface MenuItemProps {
   children: ReactNode
-  /** The keyboard shortcut, shown right in muted text. */
+  /**
+   * The key that does the same thing, drawn at the right and answered by the menu.
+   *
+   * A keycap, so "⌘⇧A" and "⌫" rather than the words for them. Whatever is written
+   * here is what the menu listens for — see keysIn.
+   */
   shortcut?: string
+  /** Whether this is the one a menu of choices is currently on. */
+  checked?: boolean
   /** Deleting is never the menu's primary action, and never reads like one. */
   destructive?: boolean
   disabled?: boolean
@@ -56,6 +75,7 @@ export interface MenuItemProps {
 export function MenuItem({
   children,
   shortcut,
+  checked,
   destructive,
   disabled,
   onSelect,
@@ -70,9 +90,9 @@ export function MenuItem({
       )}
     >
       {children}
-      {shortcut && (
+      {(shortcut || checked) && (
         <DropdownMenuShortcut className="text-micro tracking-normal">
-          {shortcut}
+          {checked ? "✓" : shortcut}
         </DropdownMenuShortcut>
       )}
     </DropdownMenuItem>

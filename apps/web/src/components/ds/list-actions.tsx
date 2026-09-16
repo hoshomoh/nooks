@@ -110,16 +110,16 @@ export function ListActions({ list, instanceName, items, withControls }: ListAct
       <Menu
         trigger={<IconButton name="more" scale="compact" label={t("sidebarMenu.open")} />}
       >
-        <MenuItem
-          shortcut="↵"
-          onSelect={() => void navigate({ to: "/lists/$listUid", params: { listUid } })}
-        >
+        {/* No keycap either: Enter is what the menu itself does to whichever entry is
+            highlighted, so printing it against one of them says the wrong thing. */}
+        <MenuItem onSelect={() => void navigate({ to: "/lists/$listUid", params: { listUid } })}>
           {t("sidebarMenu.openList")}
         </MenuItem>
+        {/* Rename carries no keycap: F2 is the brightness key on a Mac unless somebody
+            has changed it, and the combinations a browser leaves free are ones it may
+            want back. Renaming is rare enough to be worth a click. */}
         {list.isOwner && (
-          <MenuItem shortcut="F2" onSelect={() => setRenaming(true)}>
-            {t("sidebarMenu.rename")}
-          </MenuItem>
+          <MenuItem onSelect={() => setRenaming(true)}>{t("sidebarMenu.rename")}</MenuItem>
         )}
         <MenuItem shortcut="⌘D" onSelect={() => pin.mutate(!list.isPinned)}>
           {t(list.isPinned ? "sidebarMenu.unpin" : "sidebarMenu.pin")}

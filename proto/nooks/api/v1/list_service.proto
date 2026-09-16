@@ -7,8 +7,9 @@ import "google/api/annotations.proto";
 // ListService covers Lists and the Items on them — the whole of Nooks, really.
 // Everything else is a view over these.
 service ListService {
-  // ListLists returns every List the signed-in Member can reach, with the counts the
-  // sidebar shows.
+  // ListLists returns one page of the Lists the signed-in Member can reach, filtered
+  // and ordered as asked. What a page holds is the server's own promise about how much
+  // work one read is, so a caller asking for more than the ceiling gets the ceiling.
   rpc ListLists(ListListsRequest) returns (ListListsResponse) {
     option (google.api.http) = {get: "/api/v1/lists"};
   }

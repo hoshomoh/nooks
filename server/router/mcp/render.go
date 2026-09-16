@@ -49,6 +49,33 @@ func listLine(list *apiv1.List) string {
 	return said
 }
 
+/*
+pageLine says where a page of Lists sits, when there is more than one.
+
+Spelled out rather than left to be inferred: a caller handed twenty-five rows and no
+word about the rest will answer "you have twenty-five lists", and be wrong.
+*/
+func pageLine(res *apiv1.ListListsResponse) string {
+	shown := len(res.GetLists())
+	size := int(res.GetPageSize())
+	page := max(int(res.GetPage()), 1)
+	if shown == 0 || (page == 1 && shown < size) {
+		return ""
+	}
+
+	total := fmt.Sprintf("%d", res.GetTotal())
+	if res.GetAtLeast() {
+		total = "at least " + total
+	}
+	first := (page-1)*size + 1
+
+	said := fmt.Sprintf("Showing %d-%d of %s.", first, first+shown-1, total)
+	if shown == size {
+		said += fmt.Sprintf(" Ask for page %d for more.", page+1)
+	}
+	return said
+}
+
 // memberLine is one person: enough to name them in a sentence, and the identifier
 // sharing needs.
 func memberLine(member *apiv1.Member) string {

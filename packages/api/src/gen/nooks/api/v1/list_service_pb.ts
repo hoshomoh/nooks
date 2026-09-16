@@ -1245,8 +1245,9 @@ export const SearchHitKindSchema: GenEnum<SearchHitKind> = /*@__PURE__*/
  */
 export const ListService: GenService<{
   /**
-   * ListLists returns every List the signed-in Member can reach, with the counts the
-   * sidebar shows.
+   * ListLists returns one page of the Lists the signed-in Member can reach, filtered
+   * and ordered as asked. What a page holds is the server's own promise about how much
+   * work one read is, so a caller asking for more than the ceiling gets the ceiling.
    *
    * @generated from rpc nooks.api.v1.ListService.ListLists
    */

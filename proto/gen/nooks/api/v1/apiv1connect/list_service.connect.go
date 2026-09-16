@@ -79,8 +79,9 @@ const (
 
 // ListServiceClient is a client for the nooks.api.v1.ListService service.
 type ListServiceClient interface {
-	// ListLists returns every List the signed-in Member can reach, with the counts the
-	// sidebar shows.
+	// ListLists returns one page of the Lists the signed-in Member can reach, filtered
+	// and ordered as asked. What a page holds is the server's own promise about how much
+	// work one read is, so a caller asking for more than the ceiling gets the ceiling.
 	ListLists(context.Context, *connect.Request[v1.ListListsRequest]) (*connect.Response[v1.ListListsResponse], error)
 	// GetList returns one List and its Items, in their manual order.
 	// The four groups a sidebar draws, each capped and each saying how many there are.
@@ -370,8 +371,9 @@ func (c *listServiceClient) Search(ctx context.Context, req *connect.Request[v1.
 
 // ListServiceHandler is an implementation of the nooks.api.v1.ListService service.
 type ListServiceHandler interface {
-	// ListLists returns every List the signed-in Member can reach, with the counts the
-	// sidebar shows.
+	// ListLists returns one page of the Lists the signed-in Member can reach, filtered
+	// and ordered as asked. What a page holds is the server's own promise about how much
+	// work one read is, so a caller asking for more than the ceiling gets the ceiling.
 	ListLists(context.Context, *connect.Request[v1.ListListsRequest]) (*connect.Response[v1.ListListsResponse], error)
 	// GetList returns one List and its Items, in their manual order.
 	// The four groups a sidebar draws, each capped and each saying how many there are.

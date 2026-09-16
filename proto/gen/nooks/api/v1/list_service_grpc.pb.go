@@ -46,8 +46,9 @@ const (
 // ListService covers Lists and the Items on them — the whole of Nooks, really.
 // Everything else is a view over these.
 type ListServiceClient interface {
-	// ListLists returns every List the signed-in Member can reach, with the counts the
-	// sidebar shows.
+	// ListLists returns one page of the Lists the signed-in Member can reach, filtered
+	// and ordered as asked. What a page holds is the server's own promise about how much
+	// work one read is, so a caller asking for more than the ceiling gets the ceiling.
 	ListLists(ctx context.Context, in *ListListsRequest, opts ...grpc.CallOption) (*ListListsResponse, error)
 	// GetList returns one List and its Items, in their manual order.
 	// The four groups a sidebar draws, each capped and each saying how many there are.
@@ -296,8 +297,9 @@ func (c *listServiceClient) Search(ctx context.Context, in *SearchRequest, opts 
 // ListService covers Lists and the Items on them — the whole of Nooks, really.
 // Everything else is a view over these.
 type ListServiceServer interface {
-	// ListLists returns every List the signed-in Member can reach, with the counts the
-	// sidebar shows.
+	// ListLists returns one page of the Lists the signed-in Member can reach, filtered
+	// and ordered as asked. What a page holds is the server's own promise about how much
+	// work one read is, so a caller asking for more than the ceiling gets the ceiling.
 	ListLists(context.Context, *ListListsRequest) (*ListListsResponse, error)
 	// GetList returns one List and its Items, in their manual order.
 	// The four groups a sidebar draws, each capped and each saying how many there are.

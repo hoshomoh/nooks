@@ -11,7 +11,9 @@ import (
 	v1 "github.com/hoshomoh/nooks/server/router/api/v1"
 )
 
-type listListsArgs struct{}
+type listListsArgs struct {
+	Page int `json:"page,omitempty" jsonschema:"which page to read, 1-based; leave it out for the first"`
+}
 
 type getListArgs struct {
 	ListUID string `json:"list_uid" jsonschema:"the list to read, from list_lists"`
@@ -43,14 +45,18 @@ type archiveListArgs struct {
 // addListTools registers what can be done to a List itself, as opposed to what is on it.
 func addListTools(server *sdk.Server, lists *v1.ListService) {
 	sdk.AddTool(server, &sdk.Tool{
-		Name:        "list_lists",
-		Description: "Every list the caller can reach, with how many items are still open on each.",
-	}, func(ctx context.Context, _ *sdk.CallToolRequest, _ listListsArgs) (*sdk.CallToolResult, any, error) {
-		return answer(ctx, lists.ListLists, &apiv1.ListListsRequest{},
+		Name: "list_lists",
+		Description: "One page of the lists the caller can reach, with how many items are " +
+			"still open on each. The last line says whether there are more and how to ask for them.",
+	}, func(ctx context.Context, _ *sdk.CallToolRequest, args listListsArgs) (*sdk.CallToolResult, any, error) {
+		return answer(ctx, lists.ListLists, &apiv1.ListListsRequest{Page: int32(args.Page)},
 			func(res *apiv1.ListListsResponse) string {
-				rows := make([]string, 0, len(res.GetLists()))
+				rows := make([]string, 0, len(res.GetLists())+1)
 				for _, list := range res.GetLists() {
 					rows = append(rows, listLine(list))
+				}
+				if where := pageLine(res); where != "" {
+					rows = append(rows, "", where)
 				}
 				return lines(rows, "No lists.")
 			})

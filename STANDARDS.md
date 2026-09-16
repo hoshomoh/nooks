@@ -63,7 +63,7 @@ and `any` needs a comment justifying it.
 a workaround, a spec quirk, or a constraint that is not visible locally — for example why ticks are
 last-write-wins while text conflicts prompt.
 
-Three kinds do not belong, and should be deleted on sight:
+Four kinds do not belong, and should be deleted on sight:
 
 - **Restating the code.** `// increment the count` above `count++`. If the reader can see it, writing it
   down again only gives them something else that can go out of date.
@@ -72,6 +72,10 @@ Three kinds do not belong, and should be deleted on sight:
   protects against, and what breaks without it.
 - **Three paragraphs for one sentence.** A comment is read far more often than it is written. Say the
   thing, then stop.
+- **The same fact in more than one file.** Each copy reads fine alone; together they tell a reader the
+  same thing every time they open a file, and they drift. Explain it once where the shared thing is
+  defined, and let the places that use it be brief. `--duration-sheet-in` in `packages/design/foundations.css`
+  carries why the sheet and the List pane move on one clock; the five files that read it do not repeat it.
 
 ---
 

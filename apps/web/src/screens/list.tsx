@@ -8,6 +8,7 @@ import { ActivityControl } from "@/components/ds/activity-control"
 import { Presence } from "@/components/ds/presence"
 import { AddRow } from "@/components/ds/add-row"
 import { DoneSection } from "@/components/ds/done-section"
+import { SectionHeading } from "@/components/ds/section-heading"
 import { ItemMenu } from "@/components/ds/item-menu"
 import { ListActions } from "@/components/ds/list-actions"
 import { AppShell } from "@/components/ds/app-shell"
@@ -33,6 +34,8 @@ import { useDueLabel } from "@/lib/use-due-label"
 import { useLocale } from "@/lib/use-locale"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useLive } from "@/lib/use-live"
+import { groupDone } from "@/lib/done-groups"
+import { useDoneDayLabels } from "@/lib/use-done-day-labels"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 import { Sharing, type Item } from "@nooks/api"
 
@@ -168,6 +171,8 @@ export function ListScreen() {
   const openItem = list.items.find((item) => item.uid === openItemUid)
   const open = list.items.filter((item) => !item.done)
   const done = list.items.filter((item) => item.done)
+  const doneDays = groupDone(done)
+  const { dayName, clock } = useDoneDayLabels()
   const canEdit = list.list?.isOwner || list.list?.canEdit
 
   return (
@@ -327,25 +332,44 @@ export function ListScreen() {
 
             {done.length > 0 && (
               <DoneSection label={doneLabel(t, done, from)}>
-                {done.map((item) => (
-                  <ListRow
-                    key={item.uid}
-                    label={item.label}
-                    quantity={item.quantity}
-                    addedByName={item.doneByName || item.addedByName}
-                    done
-                    justTicked={justTickedByAnother(item)}
-                    onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
-                    onOpen={() => showItem(item.uid)}
-                    onRename={
-                      canEdit
-                        ? (label) =>
-                            rename.rename({ itemUid: item.uid, label, expected: item.label })
-                        : undefined
-                    }
-                    labels={rowLabels}
-                  />
+                {/* Grouped by the day it happened: the count alone cannot say which
+                    three of twenty were today, which is the question a Member has. */}
+                {doneDays.days.map((day) => (
+                  <div key={day.key} className="flex flex-col gap-1.5">
+                    <SectionHeading label={dayName(day.at)} />
+                    {day.items.map((item) => (
+                      <ListRow
+                        key={item.uid}
+                        label={item.label}
+                        quantity={item.quantity}
+                        addedByName={t("list.doneBy", {
+                          name: item.doneByName || item.addedByName,
+                          when: clock(item.doneAt),
+                        })}
+                        done
+                        hasNote={Boolean(item.note)}
+                        justTicked={justTickedByAnother(item)}
+                        onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
+                        onOpen={() => showItem(item.uid)}
+                        onRename={
+                          canEdit
+                            ? (label) =>
+                                rename.rename({ itemUid: item.uid, label, expected: item.label })
+                            : undefined
+                        }
+                        labels={rowLabels}
+                      />
+                    ))}
+                  </div>
                 ))}
+
+                {/* Everything older than those days, behind one line rather than
+                    unrolling a year of ticks under somebody who opened the section. */}
+                {doneDays.earlier > 0 && (
+                  <span className="px-2 py-1.5 text-meta text-muted-foreground">
+                    {t("list.doneEarlierLine", { count: doneDays.earlier })}
+                  </span>
+                )}
               </DoneSection>
             )}
           </div>

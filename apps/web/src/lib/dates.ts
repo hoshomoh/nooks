@@ -140,6 +140,8 @@ export interface MomentLabelOptions {
   /** The date-fns locale, so weekday and month names match the language. */
   locale: DateLocale
   yesterdayWord: string
+  /** Only dayLabel needs it: momentLabel says a clock time for today, not a word. */
+  todayWord?: string
 }
 
 /**
@@ -171,6 +173,32 @@ export function momentLabel(at: Date, options: MomentLabelOptions): string {
 export const SETTLE_MS = 3000
 
 /** happenedToday reports whether a moment falls on the day being measured against. */
+/**
+ * dayLabel names the day something happened, for a heading over the things that
+ * happened on it.
+ *
+ * momentLabel answers "when", which for today is a clock time. This answers "which
+ * day", which for today is the word.
+ */
+export function dayLabel(at: Date, options: MomentLabelOptions): string {
+  const days = differenceInCalendarDays(startOfDay(options.from), startOfDay(at))
+  if (days <= 0) {
+    return options.todayWord ?? ""
+  }
+  if (days === 1) {
+    return options.yesterdayWord
+  }
+  if (days < 7) {
+    return format(at, "EEEE", { locale: options.locale })
+  }
+  return format(at, "d MMM", { locale: options.locale })
+}
+
+/** timeOfDay is the clock time, for a row under a heading that already says the day. */
+export function timeOfDay(at: Date, options: MomentLabelOptions): string {
+  return format(at, "HH:mm", { locale: options.locale })
+}
+
 export function happenedToday(at: string, from: Date): boolean {
   const parsed = parseMoment(at)
   return parsed !== null && differenceInCalendarDays(startOfDay(from), startOfDay(parsed)) === 0

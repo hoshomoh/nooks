@@ -141,7 +141,9 @@
     "saveFailed": "That did not save.",
     "textKept": "What you wrote is still here:",
     "tryAgain": "Try again",
-    "discardMine": "Discard mine"
+    "discardMine": "Discard mine",
+    "doneBy": "{{name}} · {{when}}",
+    "doneEarlierLine": "{{count}} completed earlier"
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",

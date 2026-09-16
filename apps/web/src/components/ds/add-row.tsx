@@ -200,6 +200,9 @@ export function AddRow({
                 unchip()
               }
               if (event.key === "Escape") {
+                // Clearing the row is what Escape did; the screen behind it should not
+                // also take it as "leave".
+                event.preventDefault()
                 if (isEmpty(draft)) {
                   inputRef.current?.blur()
                 }

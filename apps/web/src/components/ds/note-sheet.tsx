@@ -10,6 +10,7 @@ import { EditableTitle } from "./editable-title"
 import { NoteEditor } from "./note-editor"
 import type { DueDate } from "@/lib/dates"
 import { useDueLabel } from "@/lib/use-due-label"
+import { useEscape } from "@/lib/use-escape"
 import { Icon } from "./icon"
 import { IconButton } from "./icon-button"
 
@@ -75,6 +76,17 @@ export function NoteSheet({
 }: NoteSheetProps) {
   const { t } = useTranslation()
   const due = useDueLabel()
+
+  // Esc backs out of the sheet the way it backs out of a Note or Settings. It goes
+  // through onLeave rather than onClose so it plays the exit rather than cutting it,
+  // and it is ignored once the sheet is already on its way out.
+  useEscape(
+    useCallback(() => {
+      if (!leaving) {
+        onLeave()
+      }
+    }, [leaving, onLeave]),
+  )
 
   /*
    * Tells the List the sheet has gone, once the exit has played.

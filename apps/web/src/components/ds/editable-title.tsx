@@ -131,6 +131,9 @@ export function EditableTitle({
         fieldRef.current?.blur()
       }
       if (event.key === "Escape") {
+        // Handled here: putting the old name back is what Escape did, and the screen
+        // behind this should not also take it as "leave".
+        event.preventDefault()
         setDraft(null)
         fieldRef.current?.blur()
       }

@@ -84,6 +84,31 @@ describe("the item sheet", () => {
       expect(actions.onClose).not.toHaveBeenCalled()
     })
 
+    // Esc backs out of a Note and out of Settings; the sheet was the one full-screen
+    // thing it did nothing to.
+    it("backs out on Escape, playing the exit rather than cutting it", async () => {
+      const actions = show()
+
+      fireEvent.keyDown(window, { key: "Escape" })
+
+      expect(actions.onLeave).toHaveBeenCalled()
+      expect(actions.onClose).not.toHaveBeenCalled()
+      expect(screen.getByRole("complementary")).toHaveClass("animate-sheet-out")
+    })
+
+    // Escape out of a rename puts the old name back. Closing the sheet under the Member
+    // at the same time would be a second answer to one key.
+    it("leaves Escape alone when a control inside it took the key", async () => {
+      const actions = show()
+
+      const title = screen.getByRole("textbox", { name: "Item name" })
+      await userEvent.click(title)
+      await userEvent.keyboard("{Escape}")
+
+      expect(actions.onLeave).not.toHaveBeenCalled()
+      expect(screen.getByRole("complementary")).not.toHaveClass("animate-sheet-out")
+    })
+
     it("goes back the way it came rather than vanishing", async () => {
       const actions = show()
 

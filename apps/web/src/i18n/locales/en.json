@@ -99,6 +99,9 @@
     "pinned": "Pinned",
     "myLists": "My lists",
     "sharedWithMe": "Shared with me",
+    "completed": "Completed",
+    "seeAllCompleted": "See all {{count}}",
+    "toggleCompleted": "Completed lists",
     "addList": "Add a list"
   },
   "list": {

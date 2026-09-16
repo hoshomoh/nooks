@@ -1,11 +1,14 @@
+import { useState } from "react"
 import { Link, useRouterState } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { cn } from "cn"
 import { Sharing, type List } from "@nooks/api"
 
 import { COVERING, INERT, RAISED } from "./covering"
+import { Icon } from "./icon"
 import { ListActions } from "./list-actions"
 import { SETTINGS_HOME } from "./settings-sections"
+import { groupLists } from "@/lib/list-groups"
 
 import { Mark } from "@nooks/design/mark"
 
@@ -49,9 +52,7 @@ export function Sidebar({
   const { t } = useTranslation()
   const path = useRouterState({ select: (state) => state.location.pathname })
   const active = viewForPath(path)
-  const pinned = lists.filter((list) => list.isPinned)
-  const mine = lists.filter((list) => !list.isPinned && list.isOwner)
-  const shared = lists.filter((list) => !list.isPinned && !list.isOwner)
+  const groups = groupLists(lists)
 
   return (
     <aside
@@ -102,22 +103,23 @@ export function Sidebar({
 
       <ListGroup
         label={t("sidebar.pinned")}
-        lists={pinned}
+        lists={groups.pinned}
         activeListUid={activeListUid}
         instanceName={instanceName}
       />
       <ListGroup
         label={t("sidebar.myLists")}
-        lists={mine}
+        lists={groups.mine}
         activeListUid={activeListUid}
         instanceName={instanceName}
       />
       <ListGroup
         label={t("sidebar.sharedWithMe")}
-        lists={shared}
+        lists={groups.shared}
         activeListUid={activeListUid}
         instanceName={instanceName}
       />
+      <CompletedGroup lists={groups.completed} activeListUid={activeListUid} />
 
       <button
         type="button"
@@ -187,6 +189,89 @@ function ViewLink({ to, label, count, active, accent }: ViewLinkProps) {
         </span>
       )}
     </Link>
+  )
+}
+
+/** SHOWN_COMPLETED is how many finished Lists the sidebar draws before saying how many. */
+const SHOWN_COMPLETED = 5
+
+interface CompletedGroupProps {
+  lists: List[]
+  activeListUid?: string
+}
+
+/**
+ * The finished Lists, last and open.
+ *
+ * They leave My lists rather than sitting in both, so the groups above stay what a
+ * Member is working on. Open by default because a List finished this morning is still
+ * part of this week — it is the ones from March that nobody needs in front of them, and
+ * those are behind the count.
+ *
+ * No `···` on these rows. What a Member does to a finished List — rename it, share it,
+ * delete it — is done from All lists, where the row carries the menu.
+ */
+function CompletedGroup({ lists, activeListUid }: CompletedGroupProps) {
+  const { t } = useTranslation()
+  const [open, setOpen] = useState(true)
+
+  if (lists.length === 0) {
+    return null
+  }
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-label={t("sidebar.toggleCompleted")}
+        className={cn(
+          "flex h-6.5 items-center gap-1 rounded-md px-2 text-badge font-semibold tracking-[0.03em]",
+          "text-muted-foreground transition-colors hover:bg-secondary",
+        )}
+      >
+        <Icon name={open ? "collapse" : "expand"} size="small" className="size-3" />
+        <span>{t("sidebar.completed")}</span>
+        <span className="ml-auto font-normal">{lists.length}</span>
+      </button>
+
+      {open && (
+        <>
+          {lists.slice(0, SHOWN_COMPLETED).map((list) => (
+            <div
+              key={list.uid}
+              className={cn(
+                "relative flex h-7.5 items-center gap-2.5 rounded-md px-2",
+                list.uid === activeListUid ? "bg-secondary font-medium" : "hover:bg-secondary",
+              )}
+            >
+              <Link
+                to="/lists/$listUid"
+                params={{ listUid: list.uid }}
+                aria-label={list.name}
+                className={COVERING}
+              />
+              {/* Muted, no count and no dot: there is nothing left on it to be shared
+                  about or to count, and the row is a record rather than a destination. */}
+              <span className={cn(INERT, "truncate text-chrome text-muted-foreground")}>
+                {list.name}
+              </span>
+            </div>
+          ))}
+
+          {lists.length > SHOWN_COMPLETED && (
+            <Link
+              to="/"
+              search={{ status: "completed" }}
+              className="flex h-7.5 items-center rounded-md px-2 text-badge text-shared hover:bg-secondary"
+            >
+              {t("sidebar.seeAllCompleted", { count: lists.length })}
+            </Link>
+          )}
+        </>
+      )}
+    </div>
   )
 }
 

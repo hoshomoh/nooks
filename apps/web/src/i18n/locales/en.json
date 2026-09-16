@@ -102,7 +102,8 @@
     "completed": "Completed",
     "toggleCompleted": "Completed lists",
     "addList": "Add a list",
-    "seeAll": "See all {{count}}"
+    "seeAll": "See all {{count}}",
+    "seeAllAtLeast": "See all {{count}}+"
   },
   "list": {
     "allLists": "All lists",
@@ -163,7 +164,8 @@
     "archivedBy": "archived by {{name}}",
     "pageRange": "{{from}}–{{to}} of {{total}}",
     "previousPage": "Previous",
-    "nextPage": "Next"
+    "nextPage": "Next",
+    "pageRangeAtLeast": "{{from}}–{{to}} of {{total}}+"
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",

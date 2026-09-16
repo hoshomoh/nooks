@@ -194,14 +194,13 @@ function ViewLink({ to, label, count, active, accent }: ViewLinkProps) {
 }
 
 interface SeeAllProps {
-  /** How many there are altogether, which is what the row offers to show. */
-  total: number
+  group: SidebarGroup
   /** Which filter All lists should open on. */
   status?: "completed"
 }
 
 /** The row under a group the server had to cut short. */
-function SeeAll({ total, status }: SeeAllProps) {
+function SeeAll({ group, status }: SeeAllProps) {
   const { t } = useTranslation()
 
   return (
@@ -210,7 +209,7 @@ function SeeAll({ total, status }: SeeAllProps) {
       search={status ? { status } : {}}
       className="flex h-7.5 items-center rounded-md px-2 text-badge text-shared hover:bg-secondary"
     >
-      {t("sidebar.seeAll", { count: total })}
+      {t(group.atLeast ? "sidebar.seeAllAtLeast" : "sidebar.seeAll", { count: group.total })}
     </Link>
   )
 }
@@ -282,7 +281,7 @@ function CompletedGroup({ group, activeListUid }: CompletedGroupProps) {
             </div>
           ))}
 
-          {total > lists.length && <SeeAll total={total} status="completed" />}
+          {group && total > lists.length && <SeeAll group={group} status="completed" />}
         </>
       )}
     </div>
@@ -318,7 +317,7 @@ function ListGroup({ label, group, activeListUid, instanceName }: ListGroupProps
           instanceName={instanceName}
         />
       ))}
-      {total > lists.length && <SeeAll total={total} />}
+      {group && total > lists.length && <SeeAll group={group} />}
     </div>
   )
 }

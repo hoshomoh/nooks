@@ -344,3 +344,133 @@ func TestListsPageNarrowsToWhatATokenNames(t *testing.T) {
 		})
 	}
 }
+
+// many puts count Lists in front of one Member, quickly. Straight into the table, so a
+// test about counting is not also a test of how fast a thousand inserts are.
+func many(t *testing.T, s Store, owner Member, count int) {
+	t.Helper()
+	rows := make([]listModel, 0, count)
+	for i := range count {
+		rows = append(rows, listModel{
+			UID:  fmt.Sprintf("list_%05d", i),
+			Name: fmt.Sprintf("List %05d", i),
+			// One open Item each, without the Items: the counts are what the filters
+			// read, and this is a test about the total rather than about them.
+			OwnerID: owner.ID, Sharing: string(SharingPrivate), CanEdit: true,
+			CreatedAt: formatTime(createdAt), UpdatedAt: formatTime(createdAt), OpenCount: 1,
+		})
+	}
+	if _, err := s.(*sqlStore).db.NewInsert().Model(&rows).Exec(t.Context()); err != nil {
+		t.Fatalf("seed lists: %v", err)
+	}
+}
+
+/*
+Counting stops at a ceiling, because it is the one part of reading a page that grows.
+
+Past it the answer is "at least this many", which the row under the table prints with a
+plus sign rather than a number nobody waited for.
+*/
+func TestATotalGivesUpRatherThanCountingForever(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			owner := newMember(t, s)
+			many(t, s, owner, countCeiling+5)
+
+			read, err := s.ListsPage(t.Context(), ListQuery{
+				MemberID: owner.ID, Order: OrderName, Limit: 25,
+			})
+			if err != nil {
+				t.Fatalf("ListsPage: %v", err)
+			}
+			if read.Total != countCeiling {
+				t.Errorf("total is %d, want it to stop at %d", read.Total, countCeiling)
+			}
+			if !read.AtLeast {
+				t.Error("the total is a floor and does not say so")
+			}
+			if len(read.Lists) != 25 {
+				t.Errorf("page holds %d Lists, want the 25 asked for", len(read.Lists))
+			}
+		})
+	}
+}
+
+// Below the ceiling the number is the number, which is every Instance anybody runs.
+func TestATotalIsExactUntilTheCeiling(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			owner := newMember(t, s)
+			many(t, s, owner, 30)
+
+			read, err := s.ListsPage(t.Context(), ListQuery{
+				MemberID: owner.ID, Order: OrderName, Limit: 25,
+			})
+			if err != nil {
+				t.Fatalf("ListsPage: %v", err)
+			}
+			if read.Total != 30 || read.AtLeast {
+				t.Errorf("total is %d (a floor: %v), want exactly 30", read.Total, read.AtLeast)
+			}
+		})
+	}
+}
+
+/*
+The counts live on the List now, so they have to follow every way an Item moves between
+open, done and gone. A count that drifts is a number the sidebar shows and nobody can
+explain.
+*/
+func TestTheCountsOnAListFollowItsItems(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			owner := newMember(t, s)
+			list := withItems(t, s, owner, "Groceries", 3, 1, createdAt)
+
+			counts := func(after string) (int, int) {
+				t.Helper()
+				again, err := s.ListByUID(t.Context(), list.UID)
+				if err != nil {
+					t.Fatalf("ListByUID after %s: %v", after, err)
+				}
+				return again.OpenCount, again.DoneCount
+			}
+
+			if open, done := counts("adding"); open != 3 || done != 1 {
+				t.Errorf("after adding: %d open, %d done, want 3 and 1", open, done)
+			}
+
+			items, err := s.ItemsOnList(t.Context(), list.ID)
+			if err != nil {
+				t.Fatalf("ItemsOnList: %v", err)
+			}
+			one := items[0]
+
+			if err := s.SetItemDone(t.Context(), one.UID, owner.ID, createdAt); err != nil {
+				t.Fatalf("SetItemDone: %v", err)
+			}
+			if open, done := counts("ticking"); open != 2 || done != 2 {
+				t.Errorf("after ticking: %d open, %d done, want 2 and 2", open, done)
+			}
+
+			if err := s.SetItemNotDone(t.Context(), one.UID, createdAt); err != nil {
+				t.Fatalf("SetItemNotDone: %v", err)
+			}
+			if open, done := counts("unticking"); open != 3 || done != 1 {
+				t.Errorf("after unticking: %d open, %d done, want 3 and 1", open, done)
+			}
+
+			// The one a recount cannot look up after the fact: a deleted Item can no
+			// longer be found by uid, and its List still has to be told.
+			if err := s.DeleteItem(t.Context(), one.UID, createdAt); err != nil {
+				t.Fatalf("DeleteItem: %v", err)
+			}
+			if open, done := counts("deleting"); open != 2 || done != 1 {
+				t.Errorf("after deleting: %d open, %d done, want 2 and 1", open, done)
+			}
+		})
+	}
+}

@@ -98,6 +98,9 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 	if err != nil {
 		return Item{}, err
 	}
+	if err := s.recount(ctx, item.ListID); err != nil {
+		return Item{}, err
+	}
 	if err := s.indexItem(ctx, item); err != nil {
 		return Item{}, err
 	}
@@ -165,6 +168,9 @@ func (s *sqlStore) CreateItems(ctx context.Context, params []CreateItemParams) (
 
 	items, err := toItems(rows)
 	if err != nil {
+		return nil, err
+	}
+	if err := s.recount(ctx, params[0].ListID); err != nil {
 		return nil, err
 	}
 	// Indexed after the commit: a Note that fails to index is a Note that cannot be
@@ -288,31 +294,19 @@ func (s *sqlStore) UpdateItem(ctx context.Context, uid string, params UpdateItem
 // Ticking is last-write-wins: a tick is a tick whoever made it, so this never conflicts
 // and never asks a question — see DESIGN.md §11.
 func (s *sqlStore) SetItemDone(ctx context.Context, uid string, doneBy int64, at time.Time) error {
-	result, err := s.db.NewUpdate().
-		Model((*itemModel)(nil)).
-		Set("done_at = ?", formatTime(at)).
-		Set("done_by_id = ?", doneBy).
-		Set("updated_at = ?", formatTime(at)).
-		Where("uid = ? AND deleted_at = ''", uid).
-		Exec(ctx)
-	if err != nil {
-		return fmt.Errorf("tick item: %w", err)
-	}
-	return requireOneRow(result, "item")
+	return s.changeItemCount(ctx, uid, "tick item", func(q *bun.UpdateQuery) *bun.UpdateQuery {
+		return q.Set("done_at = ?", formatTime(at)).
+			Set("done_by_id = ?", doneBy).
+			Set("updated_at = ?", formatTime(at))
+	})
 }
 
 func (s *sqlStore) SetItemNotDone(ctx context.Context, uid string, at time.Time) error {
-	result, err := s.db.NewUpdate().
-		Model((*itemModel)(nil)).
-		Set("done_at = ?", "").
-		Set("done_by_id = ?", nil).
-		Set("updated_at = ?", formatTime(at)).
-		Where("uid = ? AND deleted_at = ''", uid).
-		Exec(ctx)
-	if err != nil {
-		return fmt.Errorf("untick item: %w", err)
-	}
-	return requireOneRow(result, "item")
+	return s.changeItemCount(ctx, uid, "untick item", func(q *bun.UpdateQuery) *bun.UpdateQuery {
+		return q.Set("done_at = ?", "").
+			Set("done_by_id = ?", nil).
+			Set("updated_at = ?", formatTime(at))
+	})
 }
 
 // MoveItem places an Item at a position, which the caller works out from its new
@@ -332,22 +326,55 @@ func (s *sqlStore) MoveItem(ctx context.Context, uid string, position float64, a
 
 // DeleteItem removes an Item. The removal is soft.
 func (s *sqlStore) DeleteItem(ctx context.Context, uid string, at time.Time) error {
-	result, err := s.db.NewUpdate().
-		Model((*itemModel)(nil)).
-		Set("deleted_at = ?", formatTime(at)).
-		Set("updated_at = ?", formatTime(at)).
-		Where("uid = ? AND deleted_at = ''", uid).
-		Exec(ctx)
+	err := s.changeItemCount(ctx, uid, "delete item", func(q *bun.UpdateQuery) *bun.UpdateQuery {
+		return q.Set("deleted_at = ?", formatTime(at)).
+			Set("updated_at = ?", formatTime(at))
+	})
 	if err != nil {
-		return fmt.Errorf("delete item: %w", err)
-	}
-	if err := requireOneRow(result, "item"); err != nil {
 		return err
 	}
 	if err := s.Unindex(ctx, KindItem, uid); err != nil {
 		return err
 	}
 	return s.Unindex(ctx, KindNote, uid)
+}
+
+/*
+changeItemCount applies a write that moves an Item between open, done and gone.
+
+The three of them all name the Item by uid and all leave its List's counts out of step,
+so the recount happens here rather than in each of them. Which List it is on is read
+first: after a delete the Item can no longer be found by uid, and the List still has to
+be told.
+*/
+func (s *sqlStore) changeItemCount(
+	ctx context.Context,
+	uid string,
+	what string,
+	apply func(*bun.UpdateQuery) *bun.UpdateQuery,
+) error {
+	var listID int64
+	err := s.db.NewSelect().
+		Model((*itemModel)(nil)).
+		Column("list_id").
+		Where("uid = ? AND deleted_at = ''", uid).
+		Scan(ctx, &listID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrNotFound
+		}
+		return fmt.Errorf("read item: %w", err)
+	}
+
+	query := s.db.NewUpdate().Model((*itemModel)(nil)).Where("uid = ? AND deleted_at = ''", uid)
+	result, err := apply(query).Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("%s: %w", what, err)
+	}
+	if err := requireOneRow(result, "item"); err != nil {
+		return err
+	}
+	return s.recount(ctx, listID)
 }
 
 // indexItem makes an Item findable by its label and quantity — both are text a Member

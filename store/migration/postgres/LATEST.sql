@@ -85,11 +85,32 @@ CREATE TABLE list (
   -- Archiving is not deleting: out of the sidebar, still searchable and restorable.
   -- A property of the List, so a shared one leaves everybody's sidebar together.
   archived_at TEXT    NOT NULL DEFAULT '',
-  archived_by_id INTEGER NOT NULL DEFAULT 0
+  archived_by_id INTEGER NOT NULL DEFAULT 0,
+  -- How much is on it, kept here rather than added up on every read. The store
+  -- rewrites both whenever an Item on the List is added, ticked or removed.
+  open_count INTEGER NOT NULL DEFAULT 0,
+  done_count INTEGER NOT NULL DEFAULT 0
 );
 
-CREATE INDEX idx_list_archived_at ON list (archived_at);
 CREATE INDEX idx_list_owner_id ON list (owner_id);
+-- The orders a page of Lists is read in. Partial, because every read but the Archived
+-- filter is of live, unarchived Lists, and it is the ORDER BY these exist for: an index
+-- already in the order asked for is walked and stopped at twenty-five, where any other
+-- means finding every match and sorting the lot.
+CREATE INDEX idx_list_live_name ON list (lower(name))
+  WHERE deleted_at = '' AND archived_at = '';
+CREATE INDEX idx_list_live_updated ON list (updated_at DESC)
+  WHERE deleted_at = '' AND archived_at = '';
+CREATE INDEX idx_list_live_open ON list (open_count DESC, lower(name) ASC)
+  WHERE deleted_at = '' AND archived_at = '';
+CREATE INDEX idx_list_live_owner_name ON list (owner_id, lower(name))
+  WHERE deleted_at = '' AND archived_at = '';
+CREATE INDEX idx_list_live_done_name ON list (lower(name))
+  WHERE deleted_at = '' AND archived_at = '' AND open_count = 0 AND done_count > 0;
+CREATE INDEX idx_list_archived_name ON list (lower(name))
+  WHERE deleted_at = '' AND archived_at <> '';
+CREATE INDEX idx_list_live_sharing_name ON list (sharing, lower(name))
+  WHERE deleted_at = '' AND archived_at = '';
 
 -- One line on a List.
 CREATE TABLE item (

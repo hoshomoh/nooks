@@ -1846,6 +1846,13 @@ components:
                     type: integer
                     description: How many matched, not how many are on this page.
                     format: int32
+                atLeast:
+                    type: boolean
+                    description: |-
+                        Whether counting gave up: there are more than total, and total is where it
+                         stopped. Reading a page costs the same however much there is; counting one does
+                         not, so past a point the answer is "at least this many" rather than a number that
+                         took a second to earn.
                 page:
                     type: integer
                     description: Echoed back so a caller knows what it got, whatever it asked for.
@@ -2217,6 +2224,9 @@ components:
                 total:
                     type: integer
                     format: int32
+                atLeast:
+                    type: boolean
+                    description: Whether counting gave up short of the truth — see ListListsResponse.at_least.
             description: 'One group of the sidebar: the rows it draws, and how many there are in total.'
         Status:
             type: object

@@ -29,10 +29,22 @@ import (
 // shutdownGrace is how long in-flight requests get to finish once a stop is asked for.
 const shutdownGrace = 10 * time.Second
 
+/*
+analyseEvery is how often the database is asked to look at itself again.
+
+An Instance's shape changes slowly and only ever in one direction, so this is measured
+in hours rather than minutes. It matters because the query planner plans for the shape
+it last saw: an Instance that grew from ten Lists to ten thousand is still being planned
+for ten, and the plan that suits ten reads all ten thousand to draw a page of
+twenty-five.
+*/
+const analyseEvery = 6 * time.Hour
+
 // Server is one Instance's HTTP server.
 type Server struct {
-	http *http.Server
-	log  *slog.Logger
+	http  *http.Server
+	log   *slog.Logger
+	store store.Store
 	// mode is kept so the startup lines can say what this process is actually serving.
 	mode profile.Mode
 }
@@ -53,7 +65,8 @@ func New(cfg profile.Config, s store.Store, log *slog.Logger) (*Server, error) {
 	}
 
 	return &Server{
-		mode: cfg.Mode,
+		mode:  cfg.Mode,
+		store: s,
 		http: &http.Server{
 			Addr:              cfg.Addr,
 			Handler:           requestLogger(log, mux),
@@ -164,6 +177,8 @@ func (s *Server) Serve(ctx context.Context) error {
 			"app", "http://localhost:3001")
 	}
 
+	go s.keepStatisticsFresh(ctx)
+
 	errs := make(chan error, 1)
 	go func() {
 		if err := s.http.Serve(listener); err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -178,6 +193,28 @@ func (s *Server) Serve(ctx context.Context) error {
 		return err
 	case <-ctx.Done():
 		return s.shutdown()
+	}
+}
+
+/*
+keepStatisticsFresh has the database re-examine itself every few hours.
+
+Logged and carried on with rather than returned: statistics going stale makes an Instance
+slower, not wrong, and it is not a reason to stop serving the shopping list.
+*/
+func (s *Server) keepStatisticsFresh(ctx context.Context) {
+	ticker := time.NewTicker(analyseEvery)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			if err := s.store.Analyse(ctx); err != nil {
+				s.log.Warn("could not refresh database statistics", "error", err)
+			}
+		}
 	}
 }
 

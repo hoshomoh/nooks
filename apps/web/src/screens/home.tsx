@@ -50,7 +50,7 @@ export function Home() {
 
   const answer = useSuspenseQuery(listPageQuery(search)).data
   const { lists, total } = answer
-  const { pages, from, to } = boundsOf(answer)
+  const { more, from, to } = boundsOf(answer)
 
   /*
    * Changing what is shown goes back to the first page.
@@ -144,10 +144,14 @@ export function Home() {
 
                   {/* Only once there is more than a page. A household with nine Lists
                       should not be told it is looking at 1–9 of 9. */}
-                  {pages > 1 && (
+                  {(more || page > 1) && (
                     <div className="mt-4 flex items-center gap-1.5">
                       <span className="text-micro text-muted-foreground">
-                        {t("list.pageRange", { from, to, total })}
+                        {t(answer.atLeast ? "list.pageRangeAtLeast" : "list.pageRange", {
+                          from,
+                          to,
+                          total,
+                        })}
                       </span>
                       <span className="ml-auto flex gap-1.5">
                         <PageButton
@@ -157,7 +161,7 @@ export function Home() {
                         />
                         <PageButton
                           label={t("list.nextPage")}
-                          disabled={page === pages}
+                          disabled={!more}
                           onSelect={() => turnTo(page + 1)}
                         />
                       </span>

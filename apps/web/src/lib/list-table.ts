@@ -64,7 +64,8 @@ export function sortOnTheWire(sort: ListSort): ListOrder {
 
 /** Where a page sits in the set, for "1–25 of 60" and for the two arrows. */
 export interface PageBounds {
-  pages: number
+  /** Whether there is a page after this one. */
+  more: boolean
   /** The 1-based range this page covers. Both zero when it holds nothing. */
   from: number
   to: number
@@ -76,14 +77,19 @@ export interface PageBounds {
  * From the answer rather than from what was asked for: the server has the last word on
  * how big a page is, and a range worked out from a size it did not agree to would count
  * rows that are not there.
+ *
+ * "Is there another page" rather than "how many pages", because past a point the server
+ * stops counting and answers "at least a thousand". A page that came back short is the
+ * last one whatever the total says.
  */
 export function boundsOf(answer: ListListsResponse): PageBounds {
   const size = answer.pageSize || PAGE_SIZE
+  const shown = answer.lists.length
   const start = (Math.max(answer.page, 1) - 1) * size
 
   return {
-    pages: Math.max(1, Math.ceil(answer.total / size)),
-    from: answer.lists.length === 0 ? 0 : start + 1,
-    to: start + answer.lists.length,
+    more: shown === size && (answer.atLeast || start + shown < answer.total),
+    from: shown === 0 ? 0 : start + 1,
+    to: start + shown,
   }
 }

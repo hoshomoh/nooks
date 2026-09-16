@@ -276,6 +276,12 @@ message ListListsResponse {
   // How many matched, not how many are on this page.
   int32 total = 2;
 
+  // Whether counting gave up: there are more than total, and total is where it
+  // stopped. Reading a page costs the same however much there is; counting one does
+  // not, so past a point the answer is "at least this many" rather than a number that
+  // took a second to earn.
+  bool at_least = 5;
+
   // Echoed back so a caller knows what it got, whatever it asked for.
   int32 page = 3;
   int32 page_size = 4;
@@ -287,6 +293,9 @@ message GetSidebarRequest {}
 message SidebarGroup {
   repeated List lists = 1;
   int32 total = 2;
+
+  // Whether counting gave up short of the truth — see ListListsResponse.at_least.
+  bool at_least = 3;
 }
 
 message GetSidebarResponse {

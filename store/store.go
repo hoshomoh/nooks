@@ -310,6 +310,16 @@ type Store interface {
 	// AdminIDs lists the Members who can act on a request.
 	AdminIDs(ctx context.Context) ([]int64, error)
 
+	/*
+		Analyse brings the query planner's statistics up to date.
+
+		Worth calling now and again on a running Instance rather than only at start: an
+		Instance that grew from ten Lists to ten thousand was planned for ten until
+		somebody says otherwise, and the plan that suits ten reads every List to draw a
+		page of twenty-five.
+	*/
+	Analyse(ctx context.Context) error
+
 	// Close releases the underlying database handle.
 	Close() error
 }

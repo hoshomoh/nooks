@@ -113,6 +113,7 @@ func (s *ListService) ListLists(
 	return connect.NewResponse(&apiv1.ListListsResponse{
 		Lists:    lists,
 		Total:    int32(read.Total),
+		AtLeast:  read.AtLeast,
 		Page:     int32(page),
 		PageSize: int32(size),
 	}), nil
@@ -146,7 +147,7 @@ func (s *ListService) GetSidebar(
 		if err != nil {
 			return nil, err
 		}
-		return &apiv1.SidebarGroup{Lists: lists, Total: int32(g.Total)}, nil
+		return &apiv1.SidebarGroup{Lists: lists, Total: int32(g.Total), AtLeast: g.AtLeast}, nil
 	}
 
 	out := &apiv1.GetSidebarResponse{}
@@ -187,7 +188,7 @@ archived Lists on it was archived by the same person.
 */
 func (s *ListService) listsToProto(
 	ctx context.Context,
-	read []store.ListWithCounts,
+	read []store.List,
 	member store.Member,
 ) ([]*apiv1.List, error) {
 	pinned, err := s.pinnedSet(ctx, member.ID)
@@ -211,7 +212,7 @@ func (s *ListService) listsToProto(
 
 	out := make([]*apiv1.List, 0, len(read))
 	for _, list := range read {
-		proto := listToProto(list.List, member, pinned[list.ID], list.OpenCount, list.DoneCount)
+		proto := listToProto(list, member, pinned[list.ID], list.OpenCount, list.DoneCount)
 		proto.ArchivedByName = archivers[list.ArchivedByID]
 		out = append(out, proto)
 	}

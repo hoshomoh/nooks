@@ -597,6 +597,11 @@ type ListListsResponse struct {
 	Lists []*List                `protobuf:"bytes,1,rep,name=lists,proto3" json:"lists,omitempty"`
 	// How many matched, not how many are on this page.
 	Total int32 `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	// Whether counting gave up: there are more than total, and total is where it
+	// stopped. Reading a page costs the same however much there is; counting one does
+	// not, so past a point the answer is "at least this many" rather than a number that
+	// took a second to earn.
+	AtLeast bool `protobuf:"varint,5,opt,name=at_least,json=atLeast,proto3" json:"at_least,omitempty"`
 	// Echoed back so a caller knows what it got, whatever it asked for.
 	Page          int32 `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`
 	PageSize      int32 `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
@@ -646,6 +651,13 @@ func (x *ListListsResponse) GetTotal() int32 {
 		return x.Total
 	}
 	return 0
+}
+
+func (x *ListListsResponse) GetAtLeast() bool {
+	if x != nil {
+		return x.AtLeast
+	}
+	return false
 }
 
 func (x *ListListsResponse) GetPage() int32 {
@@ -700,9 +712,11 @@ func (*GetSidebarRequest) Descriptor() ([]byte, []int) {
 
 // One group of the sidebar: the rows it draws, and how many there are in total.
 type SidebarGroup struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Lists         []*List                `protobuf:"bytes,1,rep,name=lists,proto3" json:"lists,omitempty"`
-	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Lists []*List                `protobuf:"bytes,1,rep,name=lists,proto3" json:"lists,omitempty"`
+	Total int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	// Whether counting gave up short of the truth — see ListListsResponse.at_least.
+	AtLeast       bool `protobuf:"varint,3,opt,name=at_least,json=atLeast,proto3" json:"at_least,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -749,6 +763,13 @@ func (x *SidebarGroup) GetTotal() int32 {
 		return x.Total
 	}
 	return 0
+}
+
+func (x *SidebarGroup) GetAtLeast() bool {
+	if x != nil {
+		return x.AtLeast
+	}
+	return false
 }
 
 type GetSidebarResponse struct {
@@ -2568,16 +2589,18 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\x06status\x18\x01 \x01(\x0e2\x18.nooks.api.v1.ListStatusR\x06status\x12-\n" +
 	"\x05order\x18\x02 \x01(\x0e2\x17.nooks.api.v1.ListOrderR\x05order\x12\x12\n" +
 	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"\x84\x01\n" +
+	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"\x9f\x01\n" +
 	"\x11ListListsResponse\x12(\n" +
 	"\x05lists\x18\x01 \x03(\v2\x12.nooks.api.v1.ListR\x05lists\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x12\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x19\n" +
+	"\bat_least\x18\x05 \x01(\bR\aatLeast\x12\x12\n" +
 	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
 	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"\x13\n" +
-	"\x11GetSidebarRequest\"N\n" +
+	"\x11GetSidebarRequest\"i\n" +
 	"\fSidebarGroup\x12(\n" +
 	"\x05lists\x18\x01 \x03(\v2\x12.nooks.api.v1.ListR\x05lists\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total\"\xe6\x01\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\x12\x19\n" +
+	"\bat_least\x18\x03 \x01(\bR\aatLeast\"\xe6\x01\n" +
 	"\x12GetSidebarResponse\x122\n" +
 	"\x06pinned\x18\x01 \x01(\v2\x1a.nooks.api.v1.SidebarGroupR\x06pinned\x12.\n" +
 	"\x04mine\x18\x02 \x01(\v2\x1a.nooks.api.v1.SidebarGroupR\x04mine\x122\n" +

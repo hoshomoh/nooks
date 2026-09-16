@@ -41,6 +41,11 @@ type List struct {
 	ArchivedAt time.Time
 	// ArchivedByID is who put it away, so a row can say so. Zero while it is not.
 	ArchivedByID int64
+	// OpenCount and DoneCount are how many Items are not yet ticked and how many are.
+	// Kept on the List by the store rather than added up on read — see the 0015
+	// migration for why.
+	OpenCount int
+	DoneCount int
 }
 
 // Archived reports whether the List has been put away.
@@ -177,34 +182,43 @@ type ListQuery struct {
 	Limit  int
 }
 
-// ListWithCounts is a List and how much is on it, read together.
-type ListWithCounts struct {
-	List
-	OpenCount int
-	DoneCount int
-}
-
 // ListPage is the rows a query asked for, and how many there were in total.
 type ListPage struct {
-	Lists []ListWithCounts
+	Lists []List
 	Total int
+	// AtLeast says the count stopped at countCeiling and there are more than Total.
+	AtLeast bool
 }
 
 /*
-countsSubquery is how many Items are open and done on each List, in one pass.
+countCeiling is how far a total is counted before it is called "at least this many".
 
-Counting by reading a List's Items, one query per List, made drawing a sidebar cost a
-read of every Item in the database. This is a single grouped aggregate the page joins
-against, so the work is one scan rather than one query per row.
+Reading a page stops depending on how much there is; counting one does not. An exact
+total visits every row that matched, so on a very large Instance it is the one part of
+drawing All lists that grows without limit — a fifth of a second on a hundred thousand
+Lists, where the page itself is two milliseconds.
+
+A thousand is past anything a household will reach and far short of what it costs to
+count a million, and the row says "of 1,000+" rather than a number it did not earn.
 */
-func (s *sqlStore) countsSubquery() *bun.SelectQuery {
-	return s.db.NewSelect().
-		Model((*itemModel)(nil)).
-		Column("list_id").
-		ColumnExpr("SUM(CASE WHEN done_at = '' THEN 1 ELSE 0 END) AS open_count").
-		ColumnExpr("SUM(CASE WHEN done_at <> '' THEN 1 ELSE 0 END) AS done_count").
-		Where("deleted_at = ''").
-		GroupExpr("list_id")
+const countCeiling = 1000
+
+/*
+countUpTo counts what a query matched, giving up at countCeiling.
+
+The limit is inside the subquery, so the database stops reading rather than counting
+them all and rounding down afterwards.
+*/
+func (s *sqlStore) countUpTo(ctx context.Context, matching *bun.SelectQuery) (int, bool, error) {
+	var found int
+	err := s.db.NewSelect().
+		ColumnExpr("COUNT(*)").
+		TableExpr("(?) AS counted", matching.Limit(countCeiling+1)).
+		Scan(ctx, &found)
+	if err != nil {
+		return 0, false, fmt.Errorf("count lists: %w", err)
+	}
+	return min(found, countCeiling), found > countCeiling, nil
 }
 
 /*
@@ -220,56 +234,44 @@ func (s *sqlStore) ListsPage(ctx context.Context, q ListQuery) (ListPage, error)
 		return ListPage{}, err
 	}
 
-	rows := []listWithCountsRow{}
+	// Built twice rather than once and reused: counting wants no columns, no order and
+	// a limit of its own, and the page wants all three.
+	matching := func(query *bun.SelectQuery) *bun.SelectQuery {
+		query = query.ModelTableExpr("list AS list").Where("list.deleted_at = ''")
+		query = whereListVisible(query, q.MemberID, named)
+		query = q.Reach.narrow(query)
+		return whereListStatus(query, q.Status)
+	}
 
-	query := s.db.NewSelect().
-		Model(&rows).
-		ModelTableExpr("list AS list").
-		ColumnExpr("list.*").
-		ColumnExpr("COALESCE(counts.open_count, 0) AS open_count").
-		ColumnExpr("COALESCE(counts.done_count, 0) AS done_count").
-		Join("LEFT JOIN (?) AS counts ON counts.list_id = list.id", s.countsSubquery()).
-		Where("list.deleted_at = ''")
-
-	query = whereListVisible(query, q.MemberID, named)
-	query = q.Reach.narrow(query)
-	query = whereListStatus(query, q.Status)
-
-	total, err := query.Count(ctx)
+	counting := matching(s.db.NewSelect().Model((*listModel)(nil)).ColumnExpr("1"))
+	total, atLeast, err := s.countUpTo(ctx, counting)
 	if err != nil {
-		return ListPage{}, fmt.Errorf("count lists: %w", err)
+		return ListPage{}, err
 	}
 
-	query = orderListsBy(query, q.Order)
+	rows := []listModel{}
+	reading := orderListsBy(matching(s.db.NewSelect().Model(&rows).ColumnExpr("list.*")), q.Order)
 	if q.Limit > 0 {
-		query = query.Limit(q.Limit).Offset(q.Offset)
+		reading = reading.Limit(q.Limit).Offset(q.Offset)
 	}
-
-	if err := query.Scan(ctx); err != nil {
+	if err := reading.Scan(ctx); err != nil {
 		return ListPage{}, fmt.Errorf("read lists: %w", err)
 	}
 
-	return toListPage(rows, total)
-}
-
-// listWithCountsRow is a List row with its two counts joined on.
-type listWithCountsRow struct {
-	listModel `bun:",extend"`
-	OpenCount int `bun:"open_count"`
-	DoneCount int `bun:"done_count"`
+	return toListPage(rows, total, atLeast)
 }
 
 // toListPage converts the rows a read returned.
-func toListPage(rows []listWithCountsRow, total int) (ListPage, error) {
-	out := make([]ListWithCounts, 0, len(rows))
+func toListPage(rows []listModel, total int, atLeast bool) (ListPage, error) {
+	out := make([]List, 0, len(rows))
 	for _, row := range rows {
-		list, err := row.listModel.toList()
+		list, err := row.toList()
 		if err != nil {
 			return ListPage{}, err
 		}
-		out = append(out, ListWithCounts{List: list, OpenCount: row.OpenCount, DoneCount: row.DoneCount})
+		out = append(out, list)
 	}
-	return ListPage{Lists: out, Total: total}, nil
+	return ListPage{Lists: out, Total: total, AtLeast: atLeast}, nil
 }
 
 /*
@@ -286,11 +288,11 @@ func whereListStatus(query *bun.SelectQuery, status ListStatus) *bun.SelectQuery
 		return query.Where("list.archived_at <> ''")
 	case StatusActive:
 		return query.Where("list.archived_at = ''").
-			Where("(COALESCE(counts.open_count, 0) > 0 OR COALESCE(counts.done_count, 0) = 0)")
+			Where("(list.open_count > 0 OR list.done_count = 0)")
 	case StatusCompleted:
 		return query.Where("list.archived_at = ''").
-			Where("COALESCE(counts.open_count, 0) = 0").
-			Where("COALESCE(counts.done_count, 0) > 0")
+			Where("list.open_count = 0").
+			Where("list.done_count > 0")
 	default:
 		return query.Where("list.archived_at = ''")
 	}
@@ -304,7 +306,7 @@ func orderListsBy(query *bun.SelectQuery, order ListOrder) *bun.SelectQuery {
 	case OrderOpen:
 		// Fullest first, and by name between equals, so the order does not shuffle
 		// every time something is ticked.
-		return query.OrderExpr("COALESCE(counts.open_count, 0) DESC").OrderExpr(byName)
+		return query.OrderExpr("list.open_count DESC").OrderExpr(byName)
 	default:
 		return query.OrderExpr("list.updated_at DESC")
 	}
@@ -317,8 +319,10 @@ Capped, because a sidebar is what somebody is working in rather than everything 
 can reach. Total is what the "see all" beside it says.
 */
 type SidebarGroup struct {
-	Lists []ListWithCounts
+	Lists []List
 	Total int
+	// AtLeast says the count gave up and there are more than Total. See countCeiling.
+	AtLeast bool
 }
 
 // Sidebar is the four groups the sidebar draws, read in one go.
@@ -347,43 +351,80 @@ have ever made.
 Pinned wins over finished, and both win over the plain groups, so a List appears once.
 */
 func (s *sqlStore) SidebarLists(ctx context.Context, memberID int64, caps SidebarCaps, reach TokenReach) (Sidebar, error) {
+	named, err := s.SharedListIDs(ctx, memberID)
+	if err != nil {
+		return Sidebar{}, err
+	}
+	pins, err := s.PinnedListIDs(ctx, memberID)
+	if err != nil {
+		return Sidebar{}, err
+	}
+
+	/*
+		Each group says the whole of what it is, rather than narrowing a shared query.
+
+		A group drawn as "everything reachable, minus what the other three took" has to
+		read everything reachable to find out it is empty — and a Member with no pinned
+		Lists and a great many of their own would pay for a whole scan to draw nothing.
+		Said in full, each of these starts from the index that answers it.
+	*/
+	unfinished := func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.Where("NOT (list.open_count = 0 AND list.done_count > 0)")
+	}
+	notPinned := func(q *bun.SelectQuery) *bun.SelectQuery {
+		if len(pins) == 0 {
+			return q
+		}
+		return q.Where("list.id NOT IN (?)", bun.In(pins))
+	}
+	// Shared with me is what somebody else made and I can reach: whoever shared it with
+	// everybody, or named me. Not "anything I do not own" — that is every List here.
+	sharedWithMe := func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.Where("list.owner_id <> ?", memberID).
+			WhereGroup(" AND ", func(q *bun.SelectQuery) *bun.SelectQuery {
+				q = q.Where("list.sharing = ?", string(SharingInstance))
+				if len(named) > 0 {
+					q = q.WhereOr("list.id IN (?)", bun.In(named))
+				}
+				return q
+			})
+	}
+
 	group := func(limit int, narrow func(*bun.SelectQuery) *bun.SelectQuery) (SidebarGroup, error) {
-		page, err := s.listsWhere(ctx, memberID, limit, reach, narrow)
+		page, err := s.listsWhere(ctx, limit, reach, narrow)
 		if err != nil {
 			return SidebarGroup{}, err
 		}
-		return SidebarGroup{Lists: page.Lists, Total: page.Total}, nil
+		return SidebarGroup{Lists: page.Lists, Total: page.Total, AtLeast: page.AtLeast}, nil
 	}
 
 	var out Sidebar
-	var err error
 
+	// The pins are already in hand, so this is a read of a handful by identifier.
 	if out.Pinned, err = group(caps.Pinned, func(q *bun.SelectQuery) *bun.SelectQuery {
-		return q.Where("pin.member_id IS NOT NULL")
+		if len(pins) == 0 {
+			return q.Where("1 = 0")
+		}
+		return whereListVisible(q.Where("list.id IN (?)", bun.In(pins)), memberID, named)
 	}); err != nil {
 		return Sidebar{}, err
 	}
 
 	if out.Mine, err = group(caps.Mine, func(q *bun.SelectQuery) *bun.SelectQuery {
-		return q.Where("pin.member_id IS NULL").
-			Where("list.owner_id = ?", memberID).
-			Where("NOT (COALESCE(counts.open_count, 0) = 0 AND COALESCE(counts.done_count, 0) > 0)")
+		return unfinished(notPinned(q.Where("list.owner_id = ?", memberID)))
 	}); err != nil {
 		return Sidebar{}, err
 	}
 
 	if out.Shared, err = group(caps.Shared, func(q *bun.SelectQuery) *bun.SelectQuery {
-		return q.Where("pin.member_id IS NULL").
-			Where("list.owner_id <> ?", memberID).
-			Where("NOT (COALESCE(counts.open_count, 0) = 0 AND COALESCE(counts.done_count, 0) > 0)")
+		return unfinished(notPinned(sharedWithMe(q)))
 	}); err != nil {
 		return Sidebar{}, err
 	}
 
 	if out.Completed, err = group(caps.Completed, func(q *bun.SelectQuery) *bun.SelectQuery {
-		return q.Where("pin.member_id IS NULL").
-			Where("COALESCE(counts.open_count, 0) = 0").
-			Where("COALESCE(counts.done_count, 0) > 0")
+		q = notPinned(q).Where("list.open_count = 0").Where("list.done_count > 0")
+		return whereListVisible(q, memberID, named)
 	}); err != nil {
 		return Sidebar{}, err
 	}
@@ -399,46 +440,33 @@ the List without a second read.
 */
 func (s *sqlStore) listsWhere(
 	ctx context.Context,
-	memberID int64,
 	limit int,
 	reach TokenReach,
 	narrow func(*bun.SelectQuery) *bun.SelectQuery,
 ) (ListPage, error) {
-	named, err := s.SharedListIDs(ctx, memberID)
+	matching := func(query *bun.SelectQuery) *bun.SelectQuery {
+		query = query.ModelTableExpr("list AS list").
+			Where("list.deleted_at = ''").
+			Where("list.archived_at = ''")
+		return narrow(reach.narrow(query))
+	}
+
+	counting := matching(s.db.NewSelect().Model((*listModel)(nil)).ColumnExpr("1"))
+	total, atLeast, err := s.countUpTo(ctx, counting)
 	if err != nil {
 		return ListPage{}, err
 	}
 
-	rows := []listWithCountsRow{}
-	query := s.db.NewSelect().
-		Model(&rows).
-		ModelTableExpr("list AS list").
-		ColumnExpr("list.*").
-		ColumnExpr("COALESCE(counts.open_count, 0) AS open_count").
-		ColumnExpr("COALESCE(counts.done_count, 0) AS done_count").
-		Join("LEFT JOIN (?) AS counts ON counts.list_id = list.id", s.countsSubquery()).
-		Join("LEFT JOIN list_pin AS pin ON pin.list_id = list.id AND pin.member_id = ?", memberID).
-		Where("list.deleted_at = ''").
-		Where("list.archived_at = ''")
-
-	query = whereListVisible(query, memberID, named)
-	query = reach.narrow(query)
-	query = narrow(query)
-
-	total, err := query.Count(ctx)
-	if err != nil {
-		return ListPage{}, fmt.Errorf("count sidebar lists: %w", err)
-	}
-
-	query = query.OrderExpr(byName)
+	rows := []listModel{}
+	reading := matching(s.db.NewSelect().Model(&rows).ColumnExpr("list.*")).OrderExpr(byName)
 	if limit > 0 {
-		query = query.Limit(limit)
+		reading = reading.Limit(limit)
 	}
-	if err := query.Scan(ctx); err != nil {
+	if err := reading.Scan(ctx); err != nil {
 		return ListPage{}, fmt.Errorf("read sidebar lists: %w", err)
 	}
 
-	return toListPage(rows, total)
+	return toListPage(rows, total, atLeast)
 }
 
 // ListsForMember returns every live List a Member can reach: their own, everything
@@ -545,6 +573,30 @@ func (s *sqlStore) DeleteList(ctx context.Context, uid string, at time.Time) err
 	return s.Unindex(ctx, KindList, uid)
 }
 
+/*
+recount rewrites how much is on one List.
+
+Counted rather than adjusted. A counter kept by adding and subtracting drifts the first
+time a path forgets to adjust it or a write is retried, and the number a Member reads
+beside a name is then wrong until somebody notices. Counting one List reads one index,
+so being right costs nothing worth saving.
+*/
+func (s *sqlStore) recount(ctx context.Context, listID int64) error {
+	const open = `(SELECT COUNT(*) FROM item WHERE item.list_id = ? AND item.deleted_at = '' AND item.done_at = '')`
+	const done = `(SELECT COUNT(*) FROM item WHERE item.list_id = ? AND item.deleted_at = '' AND item.done_at <> '')`
+
+	_, err := s.db.NewUpdate().
+		Model((*listModel)(nil)).
+		Set("open_count = "+open, listID).
+		Set("done_count = "+done, listID).
+		Where("id = ?", listID).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("recount list: %w", err)
+	}
+	return nil
+}
+
 // indexList makes a List findable by its name.
 func (s *sqlStore) indexList(ctx context.Context, list List) error {
 	return s.Index(ctx, IndexEntry{
@@ -624,6 +676,9 @@ type listModel struct {
 
 	ArchivedAt   string `bun:"archived_at,notnull"`
 	ArchivedByID int64  `bun:"archived_by_id,notnull"`
+
+	OpenCount int `bun:"open_count,notnull"`
+	DoneCount int `bun:"done_count,notnull"`
 }
 
 func (m listModel) toList() (List, error) {
@@ -648,6 +703,7 @@ func (m listModel) toList() (List, error) {
 		Sharing: Sharing(m.Sharing), CanEdit: m.CanEdit,
 		CreatedAt: createdAt, UpdatedAt: updatedAt, DeletedAt: deletedAt,
 		ArchivedAt: archivedAt, ArchivedByID: m.ArchivedByID,
+		OpenCount: m.OpenCount, DoneCount: m.DoneCount,
 	}, nil
 }
 

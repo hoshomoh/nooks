@@ -1679,6 +1679,18 @@ components:
                     type: integer
                     description: How many Items are not yet ticked. The number beside the name in the sidebar.
                     format: int32
+                doneCount:
+                    type: integer
+                    description: |-
+                        How many Items have been ticked. With open_count it says whether a List is
+                         finished or simply empty: a List nobody has put anything on yet is neither.
+                    format: int32
+                createdAt:
+                    type: string
+                    description: When the List was made, RFC 3339.
+                updatedAt:
+                    type: string
+                    description: When it, or anything on it, last changed. RFC 3339.
             description: List is a named, ordered collection of Items.
         ListAccessTokensResponse:
             type: object

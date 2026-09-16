@@ -144,7 +144,14 @@ type List struct {
 	// Whether the signed-in Member has pinned it to their own sidebar.
 	IsPinned bool `protobuf:"varint,6,opt,name=is_pinned,json=isPinned,proto3" json:"is_pinned,omitempty"`
 	// How many Items are not yet ticked. The number beside the name in the sidebar.
-	OpenCount     int32 `protobuf:"varint,7,opt,name=open_count,json=openCount,proto3" json:"open_count,omitempty"`
+	OpenCount int32 `protobuf:"varint,7,opt,name=open_count,json=openCount,proto3" json:"open_count,omitempty"`
+	// How many Items have been ticked. With open_count it says whether a List is
+	// finished or simply empty: a List nobody has put anything on yet is neither.
+	DoneCount int32 `protobuf:"varint,8,opt,name=done_count,json=doneCount,proto3" json:"done_count,omitempty"`
+	// When the List was made, RFC 3339.
+	CreatedAt string `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// When it, or anything on it, last changed. RFC 3339.
+	UpdatedAt     string `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -226,6 +233,27 @@ func (x *List) GetOpenCount() int32 {
 		return x.OpenCount
 	}
 	return 0
+}
+
+func (x *List) GetDoneCount() int32 {
+	if x != nil {
+		return x.DoneCount
+	}
+	return 0
+}
+
+func (x *List) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *List) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
 }
 
 // Item is one line on a List.
@@ -2058,7 +2086,7 @@ var File_nooks_api_v1_list_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1fnooks/api/v1/list_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\"\xcf\x01\n" +
+	"\x1fnooks/api/v1/list_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\"\xac\x02\n" +
 	"\x04List\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12/\n" +
@@ -2067,7 +2095,14 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\bis_owner\x18\x05 \x01(\bR\aisOwner\x12\x1b\n" +
 	"\tis_pinned\x18\x06 \x01(\bR\bisPinned\x12\x1d\n" +
 	"\n" +
-	"open_count\x18\a \x01(\x05R\topenCount\"\xe3\x02\n" +
+	"open_count\x18\a \x01(\x05R\topenCount\x12\x1d\n" +
+	"\n" +
+	"done_count\x18\b \x01(\x05R\tdoneCount\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\t \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\n" +
+	" \x01(\tR\tupdatedAt\"\xe3\x02\n" +
 	"\x04Item\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x14\n" +
 	"\x05label\x18\x02 \x01(\tR\x05label\x12\x1a\n" +

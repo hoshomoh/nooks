@@ -38,12 +38,13 @@ func (s *ListService) DuplicateList(
 	if err != nil {
 		return nil, err
 	}
-	if err := s.copyOpenItems(ctx, source, copied, grant.Member); err != nil {
+	copiedOpen, err := s.copyOpenItems(ctx, source, copied, grant.Member)
+	if err != nil {
 		return nil, err
 	}
 
 	return connect.NewResponse(&apiv1.DuplicateListResponse{
-		List: listToProto(copied, grant.Member, false, 0),
+		List: listToProto(copied, grant.Member, false, copiedOpen, 0),
 	}), nil
 }
 
@@ -67,15 +68,16 @@ func (s *ListService) newList(
 	return list, nil
 }
 
-// copyOpenItems puts everything still open on the source onto the copy, in order.
+// copyOpenItems puts everything still open on the source onto the copy, in order, and
+// says how many that was.
 func (s *ListService) copyOpenItems(
 	ctx context.Context,
 	source, copied store.List,
 	member store.Member,
-) error {
+) (int, error) {
 	items, err := s.store.ItemsOnList(ctx, source.ID)
 	if err != nil {
-		return internalError("read items", err)
+		return 0, internalError("read items", err)
 	}
 
 	// Built first and written once. One insert per Item meant one transaction per Item,
@@ -87,7 +89,7 @@ func (s *ListService) copyOpenItems(
 		}
 		uid, err := s.newUID()
 		if err != nil {
-			return internalError("make item uid", err)
+			return 0, internalError("make item uid", err)
 		}
 		// Whoever makes the copy is who added everything on it: the Items are new, and
 		// attributing them to somebody who never touched this List would be a lie.
@@ -99,7 +101,7 @@ func (s *ListService) copyOpenItems(
 	}
 
 	if _, err := s.store.CreateItems(ctx, copies); err != nil {
-		return internalError("copy items", err)
+		return 0, internalError("copy items", err)
 	}
-	return nil
+	return len(copies), nil
 }

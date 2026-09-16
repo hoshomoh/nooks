@@ -155,6 +155,16 @@ message List {
 
   // How many Items are not yet ticked. The number beside the name in the sidebar.
   int32 open_count = 7;
+
+  // How many Items have been ticked. With open_count it says whether a List is
+  // finished or simply empty: a List nobody has put anything on yet is neither.
+  int32 done_count = 8;
+
+  // When the List was made, RFC 3339.
+  string created_at = 9;
+
+  // When it, or anything on it, last changed. RFC 3339.
+  string updated_at = 10;
 }
 
 // Item is one line on a List.

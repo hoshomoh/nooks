@@ -84,11 +84,11 @@ func (s *ListService) ListLists(
 
 	out := make([]*apiv1.List, 0, len(reachable))
 	for _, list := range reachable {
-		open, err := s.openCount(ctx, list.ID)
+		open, done, err := s.counts(ctx, list.ID)
 		if err != nil {
 			return nil, err
 		}
-		out = append(out, listToProto(list, grant.Member, pinned[list.ID], open))
+		out = append(out, listToProto(list, grant.Member, pinned[list.ID], open, done))
 	}
 	return connect.NewResponse(&apiv1.ListListsResponse{Lists: out}), nil
 }
@@ -122,14 +122,17 @@ func (s *ListService) GetList(
 
 	out := make([]*apiv1.Item, 0, len(items))
 	open := 0
+	done := 0
 	for _, item := range items {
-		if !item.Done() {
+		if item.Done() {
+			done++
+		} else {
 			open++
 		}
 		out = append(out, itemToProto(item, names))
 	}
 	return connect.NewResponse(&apiv1.GetListResponse{
-		List:  listToProto(list, grant.Member, pinned[list.ID], open),
+		List:  listToProto(list, grant.Member, pinned[list.ID], open, done),
 		Items: out,
 	}), nil
 }
@@ -159,7 +162,7 @@ func (s *ListService) CreateList(
 		return nil, internalError("create list", err)
 	}
 	return connect.NewResponse(&apiv1.CreateListResponse{
-		List: listToProto(list, member, false, 0),
+		List: listToProto(list, member, false, 0, 0),
 	}), nil
 }
 
@@ -182,7 +185,7 @@ func (s *ListService) RenameList(
 
 	list.Name = req.Msg.GetName()
 	return connect.NewResponse(&apiv1.RenameListResponse{
-		List: listToProto(list, member, false, 0),
+		List: listToProto(list, member, false, 0, 0),
 	}), nil
 }
 
@@ -220,7 +223,7 @@ func (s *ListService) SetListSharing(
 	// Who can reach it changed, so the sidebars that show it did too.
 	s.announceListChanged(ctx, list)
 	return connect.NewResponse(&apiv1.SetListSharingResponse{
-		List: listToProto(list, member, false, 0),
+		List: listToProto(list, member, false, 0, 0),
 	}), nil
 }
 
@@ -296,24 +299,27 @@ func (s *ListService) pinnedSet(ctx context.Context, memberID int64) (map[int64]
 	return pinned, nil
 }
 
-// openCount is how many Items on a List are not yet ticked — the number the sidebar
-// shows beside its name.
-func (s *ListService) openCount(ctx context.Context, listID int64) (int, error) {
+// counts is how many Items on a List are open and how many are ticked.
+//
+// Both from one read: the open number is what the sidebar shows, and the pair is how a
+// caller tells a finished List from one nobody has put anything on yet.
+func (s *ListService) counts(ctx context.Context, listID int64) (open int, done int, err error) {
 	items, err := s.store.ItemsOnList(ctx, listID)
 	if err != nil {
-		return 0, internalError("read items", err)
+		return 0, 0, internalError("read items", err)
 	}
-	open := 0
 	for _, item := range items {
-		if !item.Done() {
+		if item.Done() {
+			done++
+		} else {
 			open++
 		}
 	}
-	return open, nil
+	return open, done, nil
 }
 
 // listToProto converts a List for the wire, from one Member's point of view.
-func listToProto(list store.List, member store.Member, pinned bool, open int) *apiv1.List {
+func listToProto(list store.List, member store.Member, pinned bool, open, done int) *apiv1.List {
 	return &apiv1.List{
 		Uid:       list.UID,
 		Name:      list.Name,
@@ -322,6 +328,9 @@ func listToProto(list store.List, member store.Member, pinned bool, open int) *a
 		IsOwner:   list.OwnerID == member.ID,
 		IsPinned:  pinned,
 		OpenCount: int32(open),
+		DoneCount: int32(done),
+		CreatedAt: formatMoment(list.CreatedAt),
+		UpdatedAt: formatMoment(list.UpdatedAt),
 	}
 }
 

@@ -1040,3 +1040,75 @@ func TestSearchReturnsOneHitPerItem(t *testing.T) {
 		t.Errorf("the Item came back %d times, want once — it is one Item", got)
 	}
 }
+
+/*
+A finished List and an empty one are not the same thing.
+
+Both have nothing open, which is all the sidebar used to be told. The pair of counts is
+what separates "you have done everything on this" from "you have not put anything on
+this yet" — and only the first of those belongs under Completed.
+*/
+func TestListCountsSeparateFinishedFromEmpty(t *testing.T) {
+	f := newListFixture(t)
+	ctx := f.as(t, f.anna)
+
+	empty := f.createList(t, f.anna, "Nothing on it yet")
+
+	finished := f.createList(t, f.anna, "All done")
+	itemUID := f.addItem(t, f.anna, finished, "Bread")
+	if _, err := f.svc.SetItemDone(ctx, connect.NewRequest(&apiv1.SetItemDoneRequest{
+		ItemUid: itemUID, Done: true,
+	})); err != nil {
+		t.Fatalf("SetItemDone: %v", err)
+	}
+
+	working := f.createList(t, f.anna, "Still going")
+	f.addItem(t, f.anna, working, "Milk")
+
+	res, err := f.svc.ListLists(ctx, connect.NewRequest(&apiv1.ListListsRequest{}))
+	if err != nil {
+		t.Fatalf("ListLists: %v", err)
+	}
+
+	counts := map[string][2]int32{}
+	for _, list := range res.Msg.GetLists() {
+		counts[list.GetUid()] = [2]int32{list.GetOpenCount(), list.GetDoneCount()}
+	}
+
+	for _, want := range []struct {
+		name string
+		uid  string
+		open int32
+		done int32
+	}{
+		{"an empty List", empty, 0, 0},
+		{"a finished List", finished, 0, 1},
+		{"a List still in use", working, 1, 0},
+	} {
+		got := counts[want.uid]
+		if got[0] != want.open || got[1] != want.done {
+			t.Errorf("%s: open=%d done=%d, want open=%d done=%d", want.name, got[0], got[1], want.open, want.done)
+		}
+	}
+}
+
+// A List says when it was made and when it last changed, which is what a table of them
+// is sorted and read by.
+func TestListCarriesItsTimestamps(t *testing.T) {
+	f := newListFixture(t)
+	ctx := f.as(t, f.anna)
+	f.createList(t, f.anna, "Groceries")
+
+	res, err := f.svc.ListLists(ctx, connect.NewRequest(&apiv1.ListListsRequest{}))
+	if err != nil {
+		t.Fatalf("ListLists: %v", err)
+	}
+	list := res.Msg.GetLists()[0]
+
+	if list.GetCreatedAt() == "" {
+		t.Error("CreatedAt is empty, want the moment it was made")
+	}
+	if list.GetUpdatedAt() == "" {
+		t.Error("UpdatedAt is empty, want the moment it last changed")
+	}
+}

@@ -9,6 +9,7 @@ import type { QueryClient } from "@tanstack/react-query"
  */
 const AFFECTED_BY_A_CHANGE = [
   ["lists"],
+  ["sidebar"],
   ["list"],
   ["list-shares"],
   ["dated"],

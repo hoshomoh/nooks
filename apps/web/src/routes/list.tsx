@@ -1,7 +1,7 @@
 import { createRoute, lazyRouteComponent, redirect } from "@tanstack/react-router"
 
 import { currentMemberQuery, instanceQuery } from "@/lib/queries"
-import { listQuery, listsQuery } from "@/lib/list-queries"
+import { listQuery, sidebarQuery } from "@/lib/list-queries"
 import { rootRoute } from "./root"
 
 /** What a List screen can be asked to show, beyond the List itself. */
@@ -33,7 +33,7 @@ export const listRoute = createRoute({
     // one after another.
     const [instance, lists, list] = await Promise.all([
       context.queryClient.ensureQueryData(instanceQuery),
-      context.queryClient.ensureQueryData(listsQuery),
+      context.queryClient.ensureQueryData(sidebarQuery),
       context.queryClient.ensureQueryData(listQuery(params.listUid)),
     ])
     return { member, instance, lists, list }

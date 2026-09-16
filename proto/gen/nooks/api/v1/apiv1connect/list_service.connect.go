@@ -35,6 +35,8 @@ const (
 const (
 	// ListServiceListListsProcedure is the fully-qualified name of the ListService's ListLists RPC.
 	ListServiceListListsProcedure = "/nooks.api.v1.ListService/ListLists"
+	// ListServiceGetSidebarProcedure is the fully-qualified name of the ListService's GetSidebar RPC.
+	ListServiceGetSidebarProcedure = "/nooks.api.v1.ListService/GetSidebar"
 	// ListServiceGetListProcedure is the fully-qualified name of the ListService's GetList RPC.
 	ListServiceGetListProcedure = "/nooks.api.v1.ListService/GetList"
 	// ListServiceCreateListProcedure is the fully-qualified name of the ListService's CreateList RPC.
@@ -81,6 +83,12 @@ type ListServiceClient interface {
 	// sidebar shows.
 	ListLists(context.Context, *connect.Request[v1.ListListsRequest]) (*connect.Response[v1.ListListsResponse], error)
 	// GetList returns one List and its Items, in their manual order.
+	// The four groups a sidebar draws, each capped and each saying how many there are.
+	//
+	// Its own call rather than a page of ListLists: a sidebar is four bounded reads with
+	// four totals, and asking for that as pages would be four round trips to draw one
+	// column.
+	GetSidebar(context.Context, *connect.Request[v1.GetSidebarRequest]) (*connect.Response[v1.GetSidebarResponse], error)
 	GetList(context.Context, *connect.Request[v1.GetListRequest]) (*connect.Response[v1.GetListResponse], error)
 	// CreateList adds a List. It starts private.
 	CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error)
@@ -141,6 +149,12 @@ func NewListServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			httpClient,
 			baseURL+ListServiceListListsProcedure,
 			connect.WithSchema(listServiceMethods.ByName("ListLists")),
+			connect.WithClientOptions(opts...),
+		),
+		getSidebar: connect.NewClient[v1.GetSidebarRequest, v1.GetSidebarResponse](
+			httpClient,
+			baseURL+ListServiceGetSidebarProcedure,
+			connect.WithSchema(listServiceMethods.ByName("GetSidebar")),
 			connect.WithClientOptions(opts...),
 		),
 		getList: connect.NewClient[v1.GetListRequest, v1.GetListResponse](
@@ -245,6 +259,7 @@ func NewListServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 // listServiceClient implements ListServiceClient.
 type listServiceClient struct {
 	listLists       *connect.Client[v1.ListListsRequest, v1.ListListsResponse]
+	getSidebar      *connect.Client[v1.GetSidebarRequest, v1.GetSidebarResponse]
 	getList         *connect.Client[v1.GetListRequest, v1.GetListResponse]
 	createList      *connect.Client[v1.CreateListRequest, v1.CreateListResponse]
 	renameList      *connect.Client[v1.RenameListRequest, v1.RenameListResponse]
@@ -266,6 +281,11 @@ type listServiceClient struct {
 // ListLists calls nooks.api.v1.ListService.ListLists.
 func (c *listServiceClient) ListLists(ctx context.Context, req *connect.Request[v1.ListListsRequest]) (*connect.Response[v1.ListListsResponse], error) {
 	return c.listLists.CallUnary(ctx, req)
+}
+
+// GetSidebar calls nooks.api.v1.ListService.GetSidebar.
+func (c *listServiceClient) GetSidebar(ctx context.Context, req *connect.Request[v1.GetSidebarRequest]) (*connect.Response[v1.GetSidebarResponse], error) {
+	return c.getSidebar.CallUnary(ctx, req)
 }
 
 // GetList calls nooks.api.v1.ListService.GetList.
@@ -354,6 +374,12 @@ type ListServiceHandler interface {
 	// sidebar shows.
 	ListLists(context.Context, *connect.Request[v1.ListListsRequest]) (*connect.Response[v1.ListListsResponse], error)
 	// GetList returns one List and its Items, in their manual order.
+	// The four groups a sidebar draws, each capped and each saying how many there are.
+	//
+	// Its own call rather than a page of ListLists: a sidebar is four bounded reads with
+	// four totals, and asking for that as pages would be four round trips to draw one
+	// column.
+	GetSidebar(context.Context, *connect.Request[v1.GetSidebarRequest]) (*connect.Response[v1.GetSidebarResponse], error)
 	GetList(context.Context, *connect.Request[v1.GetListRequest]) (*connect.Response[v1.GetListResponse], error)
 	// CreateList adds a List. It starts private.
 	CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error)
@@ -410,6 +436,12 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 		ListServiceListListsProcedure,
 		svc.ListLists,
 		connect.WithSchema(listServiceMethods.ByName("ListLists")),
+		connect.WithHandlerOptions(opts...),
+	)
+	listServiceGetSidebarHandler := connect.NewUnaryHandler(
+		ListServiceGetSidebarProcedure,
+		svc.GetSidebar,
+		connect.WithSchema(listServiceMethods.ByName("GetSidebar")),
 		connect.WithHandlerOptions(opts...),
 	)
 	listServiceGetListHandler := connect.NewUnaryHandler(
@@ -512,6 +544,8 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 		switch r.URL.Path {
 		case ListServiceListListsProcedure:
 			listServiceListListsHandler.ServeHTTP(w, r)
+		case ListServiceGetSidebarProcedure:
+			listServiceGetSidebarHandler.ServeHTTP(w, r)
 		case ListServiceGetListProcedure:
 			listServiceGetListHandler.ServeHTTP(w, r)
 		case ListServiceCreateListProcedure:
@@ -555,6 +589,10 @@ type UnimplementedListServiceHandler struct{}
 
 func (UnimplementedListServiceHandler) ListLists(context.Context, *connect.Request[v1.ListListsRequest]) (*connect.Response[v1.ListListsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.ListLists is not implemented"))
+}
+
+func (UnimplementedListServiceHandler) GetSidebar(context.Context, *connect.Request[v1.GetSidebarRequest]) (*connect.Response[v1.GetSidebarResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.GetSidebar is not implemented"))
 }
 
 func (UnimplementedListServiceHandler) GetList(context.Context, *connect.Request[v1.GetListRequest]) (*connect.Response[v1.GetListResponse], error) {

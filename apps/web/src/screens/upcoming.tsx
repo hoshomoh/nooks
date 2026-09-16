@@ -26,7 +26,7 @@ import { DatedRow } from "./today"
  * Nothing here has to be done today, which is the point of having it here.
  */
 export function UpcomingScreen() {
-  const { instanceName, member, lists } = useSignedInData()
+  const { instanceName, member, groups } = useSignedInData()
   const { t } = useTranslation()
   const palette = useCommandPalette()
   const queryClient = useQueryClient()
@@ -55,7 +55,7 @@ export function UpcomingScreen() {
     <AppShell
       instanceName={instanceName}
       memberName={member?.name ?? ""}
-      lists={lists}
+      groups={groups}
       onSearch={palette.open}
       onAddList={palette.openAddList}
     >
@@ -107,7 +107,7 @@ export function UpcomingScreen() {
 
           {/* Upcoming is what is not today, so a new Item here is due tomorrow. */}
           <DatedAddRow
-            lists={lists}
+            groups={groups}
             defaultDue={toStored(shift(today(), 1))}
             divided={days.length > 0}
           />

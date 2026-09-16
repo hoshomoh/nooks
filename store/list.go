@@ -122,6 +122,28 @@ func whereListVisible(query *bun.SelectQuery, memberID int64, named []int64) *bu
 	})
 }
 
+/*
+TokenReach narrows a read to the Lists an Access token was cut for.
+
+Limited is the whole of it: a token that names nothing reaches nothing, which is not
+the same as a caller that names nothing because it is not a token.
+*/
+type TokenReach struct {
+	Limited bool
+	ListIDs []int64
+}
+
+// narrow applies the token's reach, if there is one.
+func (r TokenReach) narrow(query *bun.SelectQuery) *bun.SelectQuery {
+	if !r.Limited {
+		return query
+	}
+	if len(r.ListIDs) == 0 {
+		return query.Where("1 = 0")
+	}
+	return query.Where("list.id IN (?)", bun.In(r.ListIDs))
+}
+
 /** ListStatus narrows a page to Lists in one state. */
 type ListStatus string
 
@@ -146,6 +168,9 @@ type ListQuery struct {
 	MemberID int64
 	Status   ListStatus
 	Order    ListOrder
+	// Reach narrows to the Lists an Access token names. The zero value does not narrow,
+	// which is what a browser and a token cut for everything both want.
+	Reach TokenReach
 	// Offset and Limit are rows, not pages. Limit zero means no limit, which only the
 	// sidebar's own bounded reads use.
 	Offset int
@@ -195,11 +220,7 @@ func (s *sqlStore) ListsPage(ctx context.Context, q ListQuery) (ListPage, error)
 		return ListPage{}, err
 	}
 
-	rows := []struct {
-		listModel `bun:",extend"`
-		OpenCount int `bun:"open_count"`
-		DoneCount int `bun:"done_count"`
-	}{}
+	rows := []listWithCountsRow{}
 
 	query := s.db.NewSelect().
 		Model(&rows).
@@ -211,6 +232,7 @@ func (s *sqlStore) ListsPage(ctx context.Context, q ListQuery) (ListPage, error)
 		Where("list.deleted_at = ''")
 
 	query = whereListVisible(query, q.MemberID, named)
+	query = q.Reach.narrow(query)
 	query = whereListStatus(query, q.Status)
 
 	total, err := query.Count(ctx)
@@ -227,6 +249,18 @@ func (s *sqlStore) ListsPage(ctx context.Context, q ListQuery) (ListPage, error)
 		return ListPage{}, fmt.Errorf("read lists: %w", err)
 	}
 
+	return toListPage(rows, total)
+}
+
+// listWithCountsRow is a List row with its two counts joined on.
+type listWithCountsRow struct {
+	listModel `bun:",extend"`
+	OpenCount int `bun:"open_count"`
+	DoneCount int `bun:"done_count"`
+}
+
+// toListPage converts the rows a read returned.
+func toListPage(rows []listWithCountsRow, total int) (ListPage, error) {
 	out := make([]ListWithCounts, 0, len(rows))
 	for _, row := range rows {
 		list, err := row.listModel.toList()
@@ -274,6 +308,137 @@ func orderListsBy(query *bun.SelectQuery, order ListOrder) *bun.SelectQuery {
 	default:
 		return query.OrderExpr("list.updated_at DESC")
 	}
+}
+
+/*
+SidebarGroup is one group of the sidebar: what it draws, and how many there are.
+
+Capped, because a sidebar is what somebody is working in rather than everything they
+can reach. Total is what the "see all" beside it says.
+*/
+type SidebarGroup struct {
+	Lists []ListWithCounts
+	Total int
+}
+
+// Sidebar is the four groups the sidebar draws, read in one go.
+type Sidebar struct {
+	Pinned    SidebarGroup
+	Mine      SidebarGroup
+	Shared    SidebarGroup
+	Completed SidebarGroup
+}
+
+// SidebarCaps is how many rows each group draws before it says how many there are.
+type SidebarCaps struct {
+	Pinned    int
+	Mine      int
+	Shared    int
+	Completed int
+}
+
+/*
+SidebarLists reads the four groups a sidebar draws.
+
+Four bounded queries rather than everything a Member can reach: the groups are what
+somebody is working in, and the cost of drawing them should not grow with how much they
+have ever made.
+
+Pinned wins over finished, and both win over the plain groups, so a List appears once.
+*/
+func (s *sqlStore) SidebarLists(ctx context.Context, memberID int64, caps SidebarCaps, reach TokenReach) (Sidebar, error) {
+	group := func(limit int, narrow func(*bun.SelectQuery) *bun.SelectQuery) (SidebarGroup, error) {
+		page, err := s.listsWhere(ctx, memberID, limit, reach, narrow)
+		if err != nil {
+			return SidebarGroup{}, err
+		}
+		return SidebarGroup{Lists: page.Lists, Total: page.Total}, nil
+	}
+
+	var out Sidebar
+	var err error
+
+	if out.Pinned, err = group(caps.Pinned, func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.Where("pin.member_id IS NOT NULL")
+	}); err != nil {
+		return Sidebar{}, err
+	}
+
+	if out.Mine, err = group(caps.Mine, func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.Where("pin.member_id IS NULL").
+			Where("list.owner_id = ?", memberID).
+			Where("NOT (COALESCE(counts.open_count, 0) = 0 AND COALESCE(counts.done_count, 0) > 0)")
+	}); err != nil {
+		return Sidebar{}, err
+	}
+
+	if out.Shared, err = group(caps.Shared, func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.Where("pin.member_id IS NULL").
+			Where("list.owner_id <> ?", memberID).
+			Where("NOT (COALESCE(counts.open_count, 0) = 0 AND COALESCE(counts.done_count, 0) > 0)")
+	}); err != nil {
+		return Sidebar{}, err
+	}
+
+	if out.Completed, err = group(caps.Completed, func(q *bun.SelectQuery) *bun.SelectQuery {
+		return q.Where("pin.member_id IS NULL").
+			Where("COALESCE(counts.open_count, 0) = 0").
+			Where("COALESCE(counts.done_count, 0) > 0")
+	}); err != nil {
+		return Sidebar{}, err
+	}
+
+	return out, nil
+}
+
+/*
+listsWhere reads one bounded, name-ordered group of Lists for the sidebar.
+
+It joins the pins as well as the counts, so a group can ask whether this Member pinned
+the List without a second read.
+*/
+func (s *sqlStore) listsWhere(
+	ctx context.Context,
+	memberID int64,
+	limit int,
+	reach TokenReach,
+	narrow func(*bun.SelectQuery) *bun.SelectQuery,
+) (ListPage, error) {
+	named, err := s.SharedListIDs(ctx, memberID)
+	if err != nil {
+		return ListPage{}, err
+	}
+
+	rows := []listWithCountsRow{}
+	query := s.db.NewSelect().
+		Model(&rows).
+		ModelTableExpr("list AS list").
+		ColumnExpr("list.*").
+		ColumnExpr("COALESCE(counts.open_count, 0) AS open_count").
+		ColumnExpr("COALESCE(counts.done_count, 0) AS done_count").
+		Join("LEFT JOIN (?) AS counts ON counts.list_id = list.id", s.countsSubquery()).
+		Join("LEFT JOIN list_pin AS pin ON pin.list_id = list.id AND pin.member_id = ?", memberID).
+		Where("list.deleted_at = ''").
+		Where("list.archived_at = ''")
+
+	query = whereListVisible(query, memberID, named)
+	query = reach.narrow(query)
+	query = narrow(query)
+
+	total, err := query.Count(ctx)
+	if err != nil {
+		return ListPage{}, fmt.Errorf("count sidebar lists: %w", err)
+	}
+
+	query = query.OrderExpr(byName)
+	if limit > 0 {
+		query = query.Limit(limit)
+	}
+	if err := query.Scan(ctx); err != nil {
+		return ListPage{}, fmt.Errorf("read sidebar lists: %w", err)
+	}
+
+	return toListPage(rows, total)
 }
 
 // ListsForMember returns every live List a Member can reach: their own, everything

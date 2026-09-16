@@ -16,12 +16,14 @@ import { Button } from "@/components/ds/button"
 import { CopyButton } from "@/components/ds/copy-button"
 import { Field } from "@/components/ds/field"
 import { FormError } from "@/components/ds/form-error"
+import { PickOneList } from "@/components/ds/list-picker"
 import { SegmentedControl, type Segment } from "@/components/ds/segmented"
-import { SelectField, type SelectOption } from "@/components/ds/select-field"
 import { SettingsRow } from "@/components/ds/settings-row"
 import { SettingsShell } from "@/components/ds/settings-shell"
 import { tokenClient } from "@/lib/api"
 import { messageFrom } from "@/lib/errors"
+import { pickable, type PickableList } from "@/lib/pick-lists"
+import { sidebarLists } from "@/lib/sidebar-groups"
 import { tokensQuery } from "@/lib/token-queries"
 import type { Translate } from "@/lib/translate"
 import { useSettingsCounts } from "@/lib/use-settings-counts"
@@ -41,9 +43,6 @@ const ABILITIES: Record<Permission, TokenAbilities> = {
   readAndAdd: { read: true, write: true, delete: false } as TokenAbilities,
   everything: { read: true, write: true, delete: true } as TokenAbilities,
 }
-
-/** ALL_LISTS is the scope answer that is not one List's uid. */
-const ALL_LISTS = "all"
 
 /** The token once it exists, which is the only moment its secret can be read. */
 interface MadeToken {
@@ -65,13 +64,13 @@ export function SettingsAssistantsScreen() {
   const { t } = useTranslation()
   const counts = useSettingsCounts()
   const queryClient = useQueryClient()
-  const { lists } = useSignedInData()
+  const { groups } = useSignedInData()
 
   const here = typeof window === "undefined" ? "" : window.location.origin
 
   const [client, setClient] = useState<AssistantClient>("claudeCode")
   const [permission, setPermission] = useState<Permission>("readAndAdd")
-  const [scope, setScope] = useState(ALL_LISTS)
+  const [scope, setScope] = useState<PickableList | undefined>(undefined)
   const [address, setAddress] = useState(here)
   const [draft, setDraft] = useState(here)
   // An address only this machine can reach is asked about before it is copied, rather
@@ -79,18 +78,15 @@ export function SettingsAssistantsScreen() {
   const [asking, setAsking] = useState(onlyThisMachine(here))
   const [made, setMade] = useState<MadeToken | null>(null)
 
-  const scopeLabel = () =>
-    scope === ALL_LISTS
-      ? t("assistants.allLists")
-      : (lists.find((list) => list.uid === scope)?.name ?? "")
+  const scopeLabel = () => scope?.name ?? t("assistants.allLists")
 
   const create = useMutation({
     mutationFn: () =>
       tokenClient.createAccessToken({
         name: t(clientKey(client)),
         abilities: ABILITIES[permission],
-        listUids: scope === ALL_LISTS ? [] : [scope],
-        allLists: scope === ALL_LISTS,
+        listUids: scope ? [scope.uid] : [],
+        allLists: scope === undefined,
         // No expiry: this page never asks for one, and an assistant that stops working
         // on a day nobody was told about is worse than one that keeps working.
         expiresAt: "",
@@ -155,17 +151,12 @@ export function SettingsAssistantsScreen() {
               <>
                 <div className="flex flex-col border-t border-hair">
                   <SettingsRow label={t("assistants.lists")}>
-                    <SelectField
+                    <PickOneList
                       label={t("assistants.lists")}
-                      options={[
-                        { value: ALL_LISTS, label: t("assistants.allLists") },
-                        ...lists.map<SelectOption>((list) => ({
-                          value: list.uid,
-                          label: list.name,
-                        })),
-                      ]}
-                      value={scope}
-                      onValueChange={setScope}
+                      suggested={pickable(sidebarLists(groups))}
+                      picked={scope}
+                      noneLabel={t("assistants.allLists")}
+                      onPick={setScope}
                     />
                   </SettingsRow>
 

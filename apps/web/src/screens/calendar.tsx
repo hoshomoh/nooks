@@ -23,7 +23,7 @@ const WEEKDAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const
  * Lists.
  */
 export function CalendarScreen() {
-  const { instanceName, member, lists } = useSignedInData()
+  const { instanceName, member, groups } = useSignedInData()
   const { t } = useTranslation()
   const { dateLocale } = useLocale()
   const palette = useCommandPalette()
@@ -39,7 +39,7 @@ export function CalendarScreen() {
     <AppShell
       instanceName={instanceName}
       memberName={member?.name ?? ""}
-      lists={lists}
+      groups={groups}
       onSearch={palette.open}
       onAddList={palette.openAddList}
     >

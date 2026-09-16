@@ -276,7 +276,10 @@ type PublicListSettings struct {
 	// Quantities and dates on the rows — the metadata a shopper actually needs.
 	ShowMeta bool `protobuf:"varint,3,opt,name=show_meta,json=showMeta,proto3" json:"show_meta,omitempty"`
 	// A quiet link at the foot of the page for a Visitor to ask for an account.
-	AllowJoin     bool `protobuf:"varint,4,opt,name=allow_join,json=allowJoin,proto3" json:"allow_join,omitempty"`
+	AllowJoin bool `protobuf:"varint,4,opt,name=allow_join,json=allowJoin,proto3" json:"allow_join,omitempty"`
+	// What that List is called, so the settings page can say which one is published
+	// without looking it up. Filled on read and ignored on write.
+	ListName      string `protobuf:"bytes,5,opt,name=list_name,json=listName,proto3" json:"list_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -337,6 +340,13 @@ func (x *PublicListSettings) GetAllowJoin() bool {
 		return x.AllowJoin
 	}
 	return false
+}
+
+func (x *PublicListSettings) GetListName() string {
+	if x != nil {
+		return x.ListName
+	}
+	return ""
 }
 
 type InstanceSettings struct {
@@ -720,14 +730,15 @@ const file_nooks_api_v1_instance_service_proto_rawDesc = "" +
 	"\rstorage_bytes\x18\x06 \x01(\x03R\fstorageBytes\x12\x18\n" +
 	"\alicence\x18\a \x01(\tR\alicence\x12%\n" +
 	"\x0estorage_driver\x18\b \x01(\tR\rstorageDriver\x12#\n" +
-	"\rinstance_name\x18\t \x01(\tR\finstanceName\"\x8a\x01\n" +
+	"\rinstance_name\x18\t \x01(\tR\finstanceName\"\xa7\x01\n" +
 	"\x12PublicListSettings\x12\x19\n" +
 	"\blist_uid\x18\x01 \x01(\tR\alistUid\x12\x1d\n" +
 	"\n" +
 	"show_names\x18\x02 \x01(\bR\tshowNames\x12\x1b\n" +
 	"\tshow_meta\x18\x03 \x01(\bR\bshowMeta\x12\x1d\n" +
 	"\n" +
-	"allow_join\x18\x04 \x01(\bR\tallowJoin\"\xb5\x01\n" +
+	"allow_join\x18\x04 \x01(\bR\tallowJoin\x12\x1b\n" +
+	"\tlist_name\x18\x05 \x01(\tR\blistName\"\xb5\x01\n" +
 	"\x10InstanceSettings\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12#\n" +
 	"\rpublic_signup\x18\x02 \x01(\bR\fpublicSignup\x12A\n" +

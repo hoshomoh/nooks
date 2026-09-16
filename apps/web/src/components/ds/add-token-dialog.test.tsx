@@ -1,38 +1,37 @@
+import type { ReactNode } from "react"
 import { beforeAll, describe, expect, it, vi } from "vitest"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { Sharing, type List } from "@nooks/api"
 
 import { readyForEnglish } from "@/test/i18n"
 import { AddTokenDialog, type NewToken } from "./add-token-dialog"
 
 beforeAll(readyForEnglish)
 
-/** list builds one of the Member's Lists. */
-function list(uid: string, name: string): List {
-  return {
-    uid,
-    name,
-    sharing: Sharing.PRIVATE,
-    canEdit: true,
-    isOwner: true,
-    isPinned: false,
-    openCount: 0,
-  } as List
-}
+const LISTS = [
+  { uid: "list_groceries", name: "Groceries" },
+  { uid: "list_bike", name: "Bike" },
+]
 
-const LISTS = [list("list_groceries", "Groceries"), list("list_bike", "Bike")]
+/** inQuery wraps what the picker's search needs a client for. */
+function inQuery(node: ReactNode) {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  return <QueryClientProvider client={queryClient}>{node}</QueryClientProvider>
+}
 
 /** show opens the dialog and answers with what it reports. */
 function show(onAdd: (token: NewToken) => void = vi.fn()) {
   render(
-    <AddTokenDialog
-      open
-      onOpenChange={vi.fn()}
-      lists={LISTS}
-      onAdd={onAdd}
-      onSecretRead={vi.fn()}
-    />,
+    inQuery(
+      <AddTokenDialog
+        open
+        onOpenChange={vi.fn()}
+        suggested={LISTS}
+        onAdd={onAdd}
+        onSecretRead={vi.fn()}
+      />,
+    ),
   )
 }
 
@@ -149,14 +148,16 @@ describe("cutting an access token", () => {
   // The one moment the secret exists outside the caller's hands.
   it("shows the secret instead of the form once there is one", () => {
     render(
-      <AddTokenDialog
-        open
-        onOpenChange={vi.fn()}
-        lists={LISTS}
-        onAdd={vi.fn()}
-        secret={{ tokenName: "Kitchen tablet", secret: "cedar-lantern-pebble" }}
-        onSecretRead={vi.fn()}
-      />,
+      inQuery(
+        <AddTokenDialog
+          open
+          onOpenChange={vi.fn()}
+          suggested={LISTS}
+          onAdd={vi.fn()}
+          secret={{ tokenName: "Kitchen tablet", secret: "cedar-lantern-pebble" }}
+          onSecretRead={vi.fn()}
+        />,
+      ),
     )
 
     expect(screen.getByText("cedar-lantern-pebble")).toBeInTheDocument()

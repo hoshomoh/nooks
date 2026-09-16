@@ -64,7 +64,7 @@ const NoteSheet = lazyNamed<NoteSheetProps>(
 
 export function ListScreen() {
   const { listUid } = route.useParams()
-  const { instanceName, member, lists } = useSignedInData()
+  const { instanceName, member, groups } = useSignedInData()
   const list = useSuspenseQuery(listQuery(listUid)).data
   const live = useLive()
   const queryClient = useQueryClient()
@@ -179,7 +179,7 @@ export function ListScreen() {
     <AppShell
       instanceName={instanceName}
       memberName={member?.name ?? ""}
-      lists={lists}
+      groups={groups}
       activeListUid={listUid}
       onSearch={palette.open}
       onAddList={palette.openAddList}

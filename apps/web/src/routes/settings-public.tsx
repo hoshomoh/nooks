@@ -2,7 +2,7 @@ import { createRoute, lazyRouteComponent, redirect } from "@tanstack/react-route
 
 import { currentMemberQuery } from "@/lib/queries"
 import { instanceSettingsQuery } from "@/lib/instance-queries"
-import { listsQuery } from "@/lib/list-queries"
+import { sidebarQuery } from "@/lib/list-queries"
 import { rootRoute } from "./root"
 
 /** Which List an Instance publishes, and how much of it a Visitor sees. */
@@ -17,7 +17,7 @@ export const settingsPublicRoute = createRoute({
 
     await Promise.all([
       context.queryClient.ensureQueryData(instanceSettingsQuery),
-      context.queryClient.ensureQueryData(listsQuery),
+      context.queryClient.ensureQueryData(sidebarQuery),
     ])
     return null
   },

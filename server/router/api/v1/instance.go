@@ -67,8 +67,12 @@ func (s *InstanceService) GetInstanceSettings(
 	if err != nil {
 		return nil, internalError("read instance settings", err)
 	}
+	name, err := s.publishedName(ctx, settings.Public.ListUID)
+	if err != nil {
+		return nil, err
+	}
 	return connect.NewResponse(&apiv1.GetInstanceSettingsResponse{
-		Settings: settingsToProto(settings),
+		Settings: settingsToProto(settings, name),
 	}), nil
 }
 
@@ -106,9 +110,28 @@ func (s *InstanceService) UpdateInstanceSettings(
 	if err := s.store.SaveInstanceSettings(ctx, settings); err != nil {
 		return nil, internalError("save instance settings", err)
 	}
+	published, err := s.publishedName(ctx, settings.Public.ListUID)
+	if err != nil {
+		return nil, err
+	}
 	return connect.NewResponse(&apiv1.UpdateInstanceSettingsResponse{
-		Settings: settingsToProto(settings),
+		Settings: settingsToProto(settings, published),
 	}), nil
+}
+
+// publishedName is what the published List is called, or empty when none is.
+func (s *InstanceService) publishedName(ctx context.Context, listUID string) (string, error) {
+	if listUID == "" {
+		return "", nil
+	}
+	list, err := s.store.ListByUID(ctx, listUID)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			return "", nil
+		}
+		return "", internalError("read list", err)
+	}
+	return list.Name, nil
 }
 
 // publicFromProto checks that the List being published is one that exists.
@@ -139,7 +162,7 @@ func (s *InstanceService) publicFromProto(
 }
 
 // settingsToProto converts the Instance's configuration for the wire.
-func settingsToProto(settings store.InstanceSettings) *apiv1.InstanceSettings {
+func settingsToProto(settings store.InstanceSettings, publishedName string) *apiv1.InstanceSettings {
 	return &apiv1.InstanceSettings{
 		Name:          settings.Name,
 		PublicSignup:  settings.PublicSignup,
@@ -149,6 +172,7 @@ func settingsToProto(settings store.InstanceSettings) *apiv1.InstanceSettings {
 			ShowNames: settings.Public.ShowNames,
 			ShowMeta:  settings.Public.ShowMeta,
 			AllowJoin: settings.Public.AllowJoin,
+			ListName:  publishedName,
 		},
 	}
 }

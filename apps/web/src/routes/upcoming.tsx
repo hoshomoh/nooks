@@ -1,7 +1,7 @@
 import { createRoute, lazyRouteComponent, redirect } from "@tanstack/react-router"
 
 import { currentMemberQuery, instanceQuery } from "@/lib/queries"
-import { listsQuery } from "@/lib/list-queries"
+import { sidebarQuery } from "@/lib/list-queries"
 import { upcomingQuery } from "@/lib/dated-queries"
 import { today } from "@/lib/dates"
 import { rootRoute } from "./root"
@@ -18,7 +18,7 @@ export const upcomingRoute = createRoute({
 
     const [instance, lists, dated] = await Promise.all([
       context.queryClient.ensureQueryData(instanceQuery),
-      context.queryClient.ensureQueryData(listsQuery),
+      context.queryClient.ensureQueryData(sidebarQuery),
       context.queryClient.ensureQueryData(upcomingQuery(today())),
     ])
     return { member, instance, lists, dated }

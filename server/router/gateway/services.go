@@ -200,6 +200,14 @@ func (g listService) ListLists(ctx context.Context, req *apiv1.ListListsRequest)
 	return res.Msg, nil
 }
 
+func (g listService) GetSidebar(ctx context.Context, req *apiv1.GetSidebarRequest) (*apiv1.GetSidebarResponse, error) {
+	res, err := g.svc.GetSidebar(ctx, connect.NewRequest(req))
+	if err != nil {
+		return nil, asStatus(err)
+	}
+	return res.Msg, nil
+}
+
 func (g listService) GetList(ctx context.Context, req *apiv1.GetListRequest) (*apiv1.GetListResponse, error) {
 	res, err := g.svc.GetList(ctx, connect.NewRequest(req))
 	if err != nil {

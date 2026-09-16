@@ -14,6 +14,15 @@ service ListService {
   }
 
   // GetList returns one List and its Items, in their manual order.
+  // The four groups a sidebar draws, each capped and each saying how many there are.
+  //
+  // Its own call rather than a page of ListLists: a sidebar is four bounded reads with
+  // four totals, and asking for that as pages would be four round trips to draw one
+  // column.
+  rpc GetSidebar(GetSidebarRequest) returns (GetSidebarResponse) {
+    option (google.api.http) = {get: "/api/v1/sidebar"};
+  }
+
   rpc GetList(GetListRequest) returns (GetListResponse) {
     option (google.api.http) = {get: "/api/v1/lists/{list_uid}"};
   }
@@ -230,10 +239,61 @@ message Item {
   string added_via_token = 13;
 }
 
-message ListListsRequest {}
+// Which Lists a page covers.
+enum ListStatus {
+  LIST_STATUS_UNSPECIFIED = 0;
+  // Everything still in play: nothing archived, and nothing finished.
+  LIST_STATUS_ACTIVE = 1;
+  // Had Items and none are open. A List nobody has filled in is not finished.
+  LIST_STATUS_COMPLETED = 2;
+  // Put out of the sidebar. Out of the other three as well.
+  LIST_STATUS_ARCHIVED = 3;
+}
+
+// How a page of Lists is arranged.
+enum ListOrder {
+  LIST_ORDER_UNSPECIFIED = 0;
+  LIST_ORDER_UPDATED = 1;
+  LIST_ORDER_NAME = 2;
+  LIST_ORDER_OPEN = 3;
+}
+
+message ListListsRequest {
+  ListStatus status = 1;
+  ListOrder order = 2;
+
+  // 1-based. Zero reads as the first page.
+  int32 page = 3;
+
+  // How many rows a page holds. Zero takes the server's own, and anything above it is
+  // clamped: the page size is the server's promise about how much work one read is.
+  int32 page_size = 4;
+}
 
 message ListListsResponse {
   repeated List lists = 1;
+
+  // How many matched, not how many are on this page.
+  int32 total = 2;
+
+  // Echoed back so a caller knows what it got, whatever it asked for.
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+message GetSidebarRequest {}
+
+// One group of the sidebar: the rows it draws, and how many there are in total.
+message SidebarGroup {
+  repeated List lists = 1;
+  int32 total = 2;
+}
+
+message GetSidebarResponse {
+  SidebarGroup pinned = 1;
+  SidebarGroup mine = 2;
+  SidebarGroup shared = 3;
+  SidebarGroup completed = 4;
 }
 
 message GetListRequest {

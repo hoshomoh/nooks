@@ -164,6 +164,14 @@ type Store interface {
 	// ListByUID returns ErrNotFound when there is no such live List.
 	ListByUID(ctx context.Context, uid string) (List, error)
 
+	// ListsPage reads one page of the Lists a Member can reach, with how much is on
+	// each, filtered and ordered and cut in that order. Counting by reading every
+	// Item of every List made drawing a sidebar cost a read of the whole database.
+	ListsPage(ctx context.Context, q ListQuery) (ListPage, error)
+
+	// SidebarLists reads the four capped groups a sidebar draws, in one go.
+	SidebarLists(ctx context.Context, memberID int64, caps SidebarCaps, reach TokenReach) (Sidebar, error)
+
 	// ListsForMember returns every live List a Member can reach.
 	ListsForMember(ctx context.Context, memberID int64) ([]List, error)
 

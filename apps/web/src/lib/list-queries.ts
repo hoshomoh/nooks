@@ -1,12 +1,46 @@
 import { keepPreviousData, queryOptions } from "@tanstack/react-query"
 
 import { listClient } from "./api"
+import {
+  DEFAULT_SORT,
+  PAGE_SIZE,
+  sortOnTheWire,
+  statusOnTheWire,
+  type ListsSearch,
+} from "./list-table"
 
-/** Every List the signed-in Member can reach — what the sidebar renders. */
-export const listsQuery = queryOptions({
-  queryKey: ["lists"],
-  queryFn: () => listClient.listLists({}),
+/**
+ * The four groups the sidebar draws, each capped and each saying how many there are.
+ *
+ * Not a page of every List filtered here. A Member with a great many of them would
+ * otherwise have all of them sent to draw a column that shows twenty.
+ */
+export const sidebarQuery = queryOptions({
+  queryKey: ["sidebar"],
+  queryFn: () => listClient.getSidebar({}),
 })
+
+/**
+ * One page of All lists, filtered and ordered by the server.
+ *
+ * keepPreviousData because paging should move the table, not empty it: without it the
+ * rows vanish for as long as the next page takes and the page jumps to the top.
+ */
+export function listPageQuery(search: ListsSearch) {
+  const { status = "all", sort = DEFAULT_SORT, page = 1 } = search
+
+  return queryOptions({
+    queryKey: ["lists", status, sort, page],
+    queryFn: () =>
+      listClient.listLists({
+        status: statusOnTheWire(status),
+        order: sortOnTheWire(sort),
+        page,
+        pageSize: PAGE_SIZE,
+      }),
+    placeholderData: keepPreviousData,
+  })
+}
 
 /** One List and its Items. */
 export function listQuery(listUid: string) {

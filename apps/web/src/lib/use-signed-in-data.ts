@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
-import type { List, Member } from "@nooks/api"
+import type { GetSidebarResponse, Member } from "@nooks/api"
 
-import { listsQuery } from "./list-queries"
+import { sidebarQuery } from "./list-queries"
 import { currentMemberQuery, instanceQuery } from "./queries"
 
 /** The three reads every signed-in screen renders from. */
@@ -9,7 +9,8 @@ export interface SignedInData {
   instanceName: string
   /** Null only while signing out; a route loader has already redirected by then. */
   member: Member | null
-  lists: List[]
+  /** The four groups the sidebar draws. */
+  groups: GetSidebarResponse
 }
 
 /**
@@ -23,7 +24,7 @@ export interface SignedInData {
 export function useSignedInData(): SignedInData {
   const instance = useSuspenseQuery(instanceQuery).data
   const member = useSuspenseQuery(currentMemberQuery).data
-  const lists = useSuspenseQuery(listsQuery).data
+  const groups = useSuspenseQuery(sidebarQuery).data
 
-  return { instanceName: instance.name, member, lists: lists.lists }
+  return { instanceName: instance.name, member, groups }
 }

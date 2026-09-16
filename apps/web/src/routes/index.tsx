@@ -2,29 +2,17 @@ import { createRoute, redirect } from "@tanstack/react-router"
 
 import { Landing } from "@/screens/landing"
 import { currentMemberQuery, instanceQuery } from "@/lib/queries"
-import { listsQuery } from "@/lib/list-queries"
+import { listPageQuery, sidebarQuery } from "@/lib/list-queries"
 import {
   DEFAULT_SORT,
   LIST_SORTS,
   LIST_STATUSES,
   type ListSort,
   type ListStatus,
+  type ListsSearch,
 } from "@/lib/list-table"
 import { publicListQuery } from "@/lib/public-queries"
 import { rootRoute } from "./root"
-
-/**
- * How All lists is being read.
- *
- * In the address rather than in the screen, so the sidebar can point at the finished
- * Lists, a refresh keeps the view, and Back undoes a filter rather than leaving.
- */
-export interface ListsSearch {
-  status?: ListStatus
-  sort?: ListSort
-  /** 1-based. Absent is the first page, so the commonest address stays clean. */
-  page?: number
-}
 
 /**
  * Where an arriving browser lands, whoever it belongs to.
@@ -54,7 +42,8 @@ export const indexRoute = createRoute({
     }
     return out
   },
-  loader: async ({ context }) => {
+  loaderDeps: ({ search }) => search,
+  loader: async ({ context, deps }) => {
     const instance = await context.queryClient.ensureQueryData(instanceQuery)
     if (instance.needsSetup) {
       throw redirect({ to: "/setup" })
@@ -75,7 +64,10 @@ export const indexRoute = createRoute({
       throw redirect({ to: "/replace-password" })
     }
 
-    await context.queryClient.ensureQueryData(listsQuery)
+    await Promise.all([
+      context.queryClient.ensureQueryData(sidebarQuery),
+      context.queryClient.ensureQueryData(listPageQuery(deps)),
+    ])
     return { signedIn: true }
   },
   component: Landing,

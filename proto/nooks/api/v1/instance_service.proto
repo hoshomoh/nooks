@@ -97,6 +97,10 @@ message PublicListSettings {
 
   // A quiet link at the foot of the page for a Visitor to ask for an account.
   bool allow_join = 4;
+
+  // What that List is called, so the settings page can say which one is published
+  // without looking it up. Filled on read and ignored on write.
+  string list_name = 5;
 }
 
 message InstanceSettings {

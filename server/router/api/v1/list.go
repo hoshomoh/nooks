@@ -62,30 +62,141 @@ func (s *ListService) activity() activityRecorder {
 }
 
 // ListLists returns every List the signed-in Member can reach.
+/*
+DEFAULT_PAGE_SIZE is how many Lists a page holds when a caller does not say.
+
+MAX_PAGE_SIZE is the ceiling. The page size is the server's promise about how much work
+one read is, so a caller asking for a million rows gets the ceiling rather than the
+promise broken.
+*/
+const (
+	defaultPageSize = 25
+	maxPageSize     = 100
+)
+
+// ListLists reads one page of the Lists the caller can reach.
 func (s *ListService) ListLists(
 	ctx context.Context,
-	_ *connect.Request[apiv1.ListListsRequest],
+	req *connect.Request[apiv1.ListListsRequest],
 ) (*connect.Response[apiv1.ListListsResponse], error) {
 	grant, err := requireGrant(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// Through the shared reach rather than the store directly, so a token sees only the
-	// Lists it names: the sidebar is a way of learning what exists, too.
-	reachable, err := s.reachableListsInOrder(ctx, grant)
-	if err != nil {
-		return nil, err
+	size := int(req.Msg.GetPageSize())
+	if size <= 0 {
+		size = defaultPageSize
 	}
-	pinned, err := s.pinnedSet(ctx, grant.Member.ID)
+	size = min(size, maxPageSize)
+
+	page := max(int(req.Msg.GetPage()), 1)
+
+	reachIDs, limited := grant.ReachIDs()
+	read, err := s.store.ListsPage(ctx, store.ListQuery{
+		MemberID: grant.Member.ID,
+		Reach:    store.TokenReach{Limited: limited, ListIDs: reachIDs},
+		Status:   statusFromProto(req.Msg.GetStatus()),
+		Order:    orderFromProto(req.Msg.GetOrder()),
+		Offset:   (page - 1) * size,
+		Limit:    size,
+	})
+	if err != nil {
+		return nil, internalError("read lists", err)
+	}
+
+	lists, err := s.listsToProto(ctx, read.Lists, grant.Member)
 	if err != nil {
 		return nil, err
 	}
 
-	// Who archived what, resolved once rather than per List: most households archive a
-	// handful, and the same person archived most of them.
+	return connect.NewResponse(&apiv1.ListListsResponse{
+		Lists:    lists,
+		Total:    int32(read.Total),
+		Page:     int32(page),
+		PageSize: int32(size),
+	}), nil
+}
+
+/*
+GetSidebar reads the four groups the sidebar draws.
+
+Capped, because the sidebar is what somebody is working in. Each group says how many
+there are so the row beneath it can offer the rest.
+*/
+func (s *ListService) GetSidebar(
+	ctx context.Context,
+	_ *connect.Request[apiv1.GetSidebarRequest],
+) (*connect.Response[apiv1.GetSidebarResponse], error) {
+	grant, err := requireGrant(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	reachIDs, limited := grant.ReachIDs()
+	side, err := s.store.SidebarLists(ctx, grant.Member.ID, store.SidebarCaps{
+		Pinned: sidebarPinnedCap, Mine: sidebarGroupCap, Shared: sidebarGroupCap, Completed: sidebarDoneCap,
+	}, store.TokenReach{Limited: limited, ListIDs: reachIDs})
+	if err != nil {
+		return nil, internalError("read sidebar", err)
+	}
+
+	group := func(g store.SidebarGroup) (*apiv1.SidebarGroup, error) {
+		lists, err := s.listsToProto(ctx, g.Lists, grant.Member)
+		if err != nil {
+			return nil, err
+		}
+		return &apiv1.SidebarGroup{Lists: lists, Total: int32(g.Total)}, nil
+	}
+
+	out := &apiv1.GetSidebarResponse{}
+	for _, wire := range []struct {
+		from store.SidebarGroup
+		to   **apiv1.SidebarGroup
+	}{
+		{side.Pinned, &out.Pinned},
+		{side.Mine, &out.Mine},
+		{side.Shared, &out.Shared},
+		{side.Completed, &out.Completed},
+	} {
+		if *wire.to, err = group(wire.from); err != nil {
+			return nil, err
+		}
+	}
+	return connect.NewResponse(out), nil
+}
+
+/*
+The sidebar's caps.
+
+Pinned is generous because pinning is deliberate and somebody who pinned twelve Lists
+meant to. The other three are short: they are a way in to the ones being used, and All
+lists is where anybody goes to find the rest.
+*/
+const (
+	sidebarPinnedCap = 20
+	sidebarGroupCap  = 8
+	sidebarDoneCap   = 5
+)
+
+/*
+listsToProto converts a read page, resolving who archived what once for the page.
+
+One lookup per distinct archiver rather than per List: most of a page that has any
+archived Lists on it was archived by the same person.
+*/
+func (s *ListService) listsToProto(
+	ctx context.Context,
+	read []store.ListWithCounts,
+	member store.Member,
+) ([]*apiv1.List, error) {
+	pinned, err := s.pinnedSet(ctx, member.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	archivers := map[int64]string{}
-	for _, list := range reachable {
+	for _, list := range read {
 		if list.ArchivedByID == 0 {
 			continue
 		}
@@ -98,17 +209,39 @@ func (s *ListService) ListLists(
 		}
 	}
 
-	out := make([]*apiv1.List, 0, len(reachable))
-	for _, list := range reachable {
-		open, done, err := s.counts(ctx, list.ID)
-		if err != nil {
-			return nil, err
-		}
-		proto := listToProto(list, grant.Member, pinned[list.ID], open, done)
+	out := make([]*apiv1.List, 0, len(read))
+	for _, list := range read {
+		proto := listToProto(list.List, member, pinned[list.ID], list.OpenCount, list.DoneCount)
 		proto.ArchivedByName = archivers[list.ArchivedByID]
 		out = append(out, proto)
 	}
-	return connect.NewResponse(&apiv1.ListListsResponse{Lists: out}), nil
+	return out, nil
+}
+
+// statusFromProto reads which Lists a caller asked for.
+func statusFromProto(status apiv1.ListStatus) store.ListStatus {
+	switch status {
+	case apiv1.ListStatus_LIST_STATUS_ACTIVE:
+		return store.StatusActive
+	case apiv1.ListStatus_LIST_STATUS_COMPLETED:
+		return store.StatusCompleted
+	case apiv1.ListStatus_LIST_STATUS_ARCHIVED:
+		return store.StatusArchived
+	default:
+		return store.StatusAny
+	}
+}
+
+// orderFromProto reads how a caller asked for them to be arranged.
+func orderFromProto(order apiv1.ListOrder) store.ListOrder {
+	switch order {
+	case apiv1.ListOrder_LIST_ORDER_NAME:
+		return store.OrderName
+	case apiv1.ListOrder_LIST_ORDER_OPEN:
+		return store.OrderOpen
+	default:
+		return store.OrderUpdated
+	}
 }
 
 // GetList returns one List and its Items, in their manual order.

@@ -1,16 +1,18 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { cn } from "cn"
-import type { List, TokenAbilities } from "@nooks/api"
+import type { TokenAbilities } from "@nooks/api"
 
 import { Button } from "./button"
 import { DIALOG_BODY, DIALOG_SURFACE } from "./dialog-surface"
 import { Field } from "./field"
+import { ListPicker } from "./list-picker"
 import { SecretOnce } from "./secret-once"
 import { TickBox } from "./tick-box"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { DateField } from "./date-field"
 import { atEndOf, momentIn, type DueDate } from "@/lib/dates"
+import type { PickableList } from "@/lib/pick-lists"
 import { toggled } from "@/lib/toggle-uid"
 import { useDueLabel } from "@/lib/use-due-label"
 
@@ -35,8 +37,8 @@ export interface TokenSecret {
 export interface AddTokenDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  /** Every List the Member can reach — a token can never be pointed past these. */
-  lists: List[]
+  /** The Lists to offer before anything is typed. The rest are found by typing. */
+  suggested: PickableList[]
   onAdd: (token: NewToken) => void
   /** The secret, once there is one. Shown, then never again. */
   secret?: TokenSecret
@@ -54,7 +56,7 @@ export interface AddTokenDialogProps {
 export function AddTokenDialog({
   open,
   onOpenChange,
-  lists,
+  suggested,
   onAdd,
   secret,
   onSecretRead,
@@ -75,7 +77,7 @@ export function AddTokenDialog({
           // Keyed on being open, so a second token does not start from the first's answers.
           <AddTokenForm
             key={String(open)}
-            lists={lists}
+            suggested={suggested}
             onCancel={() => onOpenChange(false)}
             onAdd={onAdd}
           />
@@ -102,13 +104,14 @@ const ABILITIES: Ability[] = ["read", "write", "delete"]
 type Abilities = Record<Ability, boolean>
 
 interface AddTokenFormProps {
-  lists: List[]
+  /** The Lists to offer before anything is typed. The rest are found by typing. */
+  suggested: PickableList[]
   onCancel: () => void
   onAdd: (token: NewToken) => void
 }
 
 /** The form itself, which owns the answers so far. */
-function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
+function AddTokenForm({ suggested, onCancel, onAdd }: AddTokenFormProps) {
   const { t } = useTranslation()
   const due = useDueLabel()
   const [name, setName] = useState("")
@@ -202,24 +205,11 @@ function AddTokenForm({ lists, onCancel, onAdd }: AddTokenFormProps) {
         />
 
         {scope === "some" && (
-          <div className="flex flex-col gap-0.5">
-            {lists.map((list) => (
-              <button
-                key={list.uid}
-                type="button"
-                role="checkbox"
-                aria-checked={picked.includes(list.uid)}
-                onClick={() => setPicked(toggled(picked, list.uid))}
-                className={cn(
-                  "flex min-h-row items-center gap-3 rounded-md px-2 py-1.5 text-left transition-colors",
-                  picked.includes(list.uid) ? "bg-secondary" : "hover:bg-secondary",
-                )}
-              >
-                <span className="text-field">{list.name}</span>
-                <TickBox picked={picked.includes(list.uid)} className="ml-auto" />
-              </button>
-            ))}
-          </div>
+          <ListPicker
+            suggested={suggested}
+            chosen={picked}
+            onToggle={(list) => setPicked(toggled(picked, list.uid))}
+          />
         )}
 
         <Choice

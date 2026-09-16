@@ -3,14 +3,16 @@ import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-q
 import { useTranslation } from "react-i18next"
 import type { InstanceSettings, PublicListSettings } from "@nooks/api"
 
+import { PickOneList } from "@/components/ds/list-picker"
 import { SaveButton } from "@/components/ds/save-button"
-import { SelectField } from "@/components/ds/select-field"
 import { SettingsRow, Toggle } from "@/components/ds/settings-row"
 import { SettingsShell } from "@/components/ds/settings-shell"
 import { instanceClient } from "@/lib/api"
 import { instanceSettingsQuery } from "@/lib/instance-queries"
-import { listsQuery } from "@/lib/list-queries"
+import { pickable } from "@/lib/pick-lists"
+import { sidebarLists } from "@/lib/sidebar-groups"
 import { useSettingsCounts } from "@/lib/use-settings-counts"
+import { useSignedInData } from "@/lib/use-signed-in-data"
 
 /**
  * The public list settings: which List, and how much of it a Visitor sees.
@@ -23,7 +25,7 @@ export function SettingsPublicScreen() {
   const counts = useSettingsCounts()
   const queryClient = useQueryClient()
   const saved = useSuspenseQuery(instanceSettingsQuery).data.settings
-  const lists = useSuspenseQuery(listsQuery).data.lists
+  const { groups } = useSignedInData()
 
   // Held until Save, so a half-made decision never reaches a Visitor.
   const [draft, setDraft] = useState<PublicListSettings | undefined>(saved?.publicList)
@@ -51,14 +53,12 @@ export function SettingsPublicScreen() {
 
       <div className="mt-3.5 flex flex-col">
         <SettingsRow label={t("publicSettings.whichList")} blurb={t("publicSettings.whichListBlurb")}>
-          <SelectField
+          <PickOneList
             label={t("publicSettings.whichList")}
-            options={[
-              { value: "", label: t("publicSettings.none") },
-              ...lists.map((list) => ({ value: list.uid, label: list.name })),
-            ]}
-            value={draft?.listUid ?? ""}
-            onValueChange={(listUid) => set({ listUid })}
+            suggested={pickable(sidebarLists(groups))}
+            picked={draft?.listUid ? { uid: draft.listUid, name: draft.listName } : undefined}
+            noneLabel={t("publicSettings.none")}
+            onPick={(list) => set({ listUid: list?.uid ?? "", listName: list?.name ?? "" })}
           />
         </SettingsRow>
 

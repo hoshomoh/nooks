@@ -47,7 +47,7 @@ export interface SettingsShellProps {
  */
 export function SettingsShell({ active, crumb, counts, children }: SettingsShellProps) {
   const { t } = useTranslation()
-  const { instanceName, member, lists } = useSignedInData()
+  const { instanceName, member, groups } = useSignedInData()
   const isAdmin = member?.role === Role.ADMIN
   const palette = useCommandPalette()
   const navigate = useNavigate()
@@ -61,7 +61,7 @@ export function SettingsShell({ active, crumb, counts, children }: SettingsShell
       <Sidebar
         instanceName={instanceName}
         memberName={member?.name ?? ""}
-        lists={lists}
+        groups={groups}
         onSearch={palette.open}
         onAddList={palette.openAddList}
       />

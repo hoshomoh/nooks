@@ -51,6 +51,26 @@ func (g Grant) Reaches(listID int64) bool {
 	return g.reach[listID]
 }
 
+/*
+ReachIDs is the Lists a token names, and whether it names any at all.
+
+Reaches answers about one List, which is right at a call site holding one. A read that
+returns many needs the set, so the narrowing can be part of the query rather than a
+filter over everything the Member can see.
+
+limited is false for a browser and for a token cut to reach everything: neither narrows.
+*/
+func (g Grant) ReachIDs() (ids []int64, limited bool) {
+	if g.Token == nil || g.Token.AllLists {
+		return nil, false
+	}
+	ids = make([]int64, 0, len(g.reach))
+	for id := range g.reach {
+		ids = append(ids, id)
+	}
+	return ids, true
+}
+
 // TokenID is the Access token the caller presented, or zero for a browser.
 //
 // For recording what a change came through. Nothing decides access from it: that is

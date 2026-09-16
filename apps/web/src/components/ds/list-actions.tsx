@@ -13,7 +13,7 @@ import { ShareDialog, type ShareDecision } from "./share-dialog"
 import { listClient } from "@/lib/api"
 import { download } from "@/lib/download"
 import { exportFileFor } from "@/lib/list-export"
-import { isArchived } from "@/lib/list-groups"
+import { isArchived } from "@/lib/list-state"
 import { refreshLists } from "@/lib/refresh"
 
 export interface ListActionsProps {

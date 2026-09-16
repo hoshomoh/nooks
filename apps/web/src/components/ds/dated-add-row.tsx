@@ -1,15 +1,21 @@
 import { useTranslation } from "react-i18next"
-import type { List } from "@nooks/api"
+import type { GetSidebarResponse } from "@nooks/api"
 
 import { AddRow } from "./add-row"
 import type { DueDate } from "@/lib/dates"
 import { useAddItem } from "@/lib/use-item-changes"
 import { useDueLabel } from "@/lib/use-due-label"
+import { sidebarLists } from "@/lib/sidebar-groups"
 import { useLastList } from "@/lib/use-last-list"
 
 export interface DatedAddRowProps {
-  /** Every List the Member can reach, to pick the one an Item lands on. */
-  lists: List[]
+  /**
+   * The Lists the sidebar is showing, to pick the one an Item lands on.
+   *
+   * Those rather than every List the Member can reach: the target is named in the
+   * placeholder before anything is typed, so a Member always sees where it is going.
+   */
+  groups: GetSidebarResponse
   /** The date this view gives a new Item: today on Today, tomorrow on Upcoming. */
   defaultDue: DueDate
   /** Whether a rule separates the row from what is above it. See AddRow. */
@@ -26,10 +32,10 @@ export interface DatedAddRowProps {
  * Nothing renders when the Member has no Lists at all: there would be nowhere to put
  * what they typed, and a row that swallows an Item is worse than no row.
  */
-export function DatedAddRow({ lists, defaultDue, divided }: DatedAddRowProps) {
+export function DatedAddRow({ groups, defaultDue, divided }: DatedAddRowProps) {
   const { t } = useTranslation()
   const due = useDueLabel()
-  const { target, remember } = useLastList(lists)
+  const { target, remember } = useLastList(sidebarLists(groups))
 
   const addItem = useAddItem()
 

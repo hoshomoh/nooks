@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	ListService_ListLists_FullMethodName       = "/nooks.api.v1.ListService/ListLists"
+	ListService_GetSidebar_FullMethodName      = "/nooks.api.v1.ListService/GetSidebar"
 	ListService_GetList_FullMethodName         = "/nooks.api.v1.ListService/GetList"
 	ListService_CreateList_FullMethodName      = "/nooks.api.v1.ListService/CreateList"
 	ListService_RenameList_FullMethodName      = "/nooks.api.v1.ListService/RenameList"
@@ -49,6 +50,12 @@ type ListServiceClient interface {
 	// sidebar shows.
 	ListLists(ctx context.Context, in *ListListsRequest, opts ...grpc.CallOption) (*ListListsResponse, error)
 	// GetList returns one List and its Items, in their manual order.
+	// The four groups a sidebar draws, each capped and each saying how many there are.
+	//
+	// Its own call rather than a page of ListLists: a sidebar is four bounded reads with
+	// four totals, and asking for that as pages would be four round trips to draw one
+	// column.
+	GetSidebar(ctx context.Context, in *GetSidebarRequest, opts ...grpc.CallOption) (*GetSidebarResponse, error)
 	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
 	// CreateList adds a List. It starts private.
 	CreateList(ctx context.Context, in *CreateListRequest, opts ...grpc.CallOption) (*CreateListResponse, error)
@@ -106,6 +113,16 @@ func (c *listServiceClient) ListLists(ctx context.Context, in *ListListsRequest,
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListListsResponse)
 	err := c.cc.Invoke(ctx, ListService_ListLists_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *listServiceClient) GetSidebar(ctx context.Context, in *GetSidebarRequest, opts ...grpc.CallOption) (*GetSidebarResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSidebarResponse)
+	err := c.cc.Invoke(ctx, ListService_GetSidebar_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -283,6 +300,12 @@ type ListServiceServer interface {
 	// sidebar shows.
 	ListLists(context.Context, *ListListsRequest) (*ListListsResponse, error)
 	// GetList returns one List and its Items, in their manual order.
+	// The four groups a sidebar draws, each capped and each saying how many there are.
+	//
+	// Its own call rather than a page of ListLists: a sidebar is four bounded reads with
+	// four totals, and asking for that as pages would be four round trips to draw one
+	// column.
+	GetSidebar(context.Context, *GetSidebarRequest) (*GetSidebarResponse, error)
 	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
 	// CreateList adds a List. It starts private.
 	CreateList(context.Context, *CreateListRequest) (*CreateListResponse, error)
@@ -338,6 +361,9 @@ type UnimplementedListServiceServer struct{}
 
 func (UnimplementedListServiceServer) ListLists(context.Context, *ListListsRequest) (*ListListsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListLists not implemented")
+}
+func (UnimplementedListServiceServer) GetSidebar(context.Context, *GetSidebarRequest) (*GetSidebarResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSidebar not implemented")
 }
 func (UnimplementedListServiceServer) GetList(context.Context, *GetListRequest) (*GetListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetList not implemented")
@@ -422,6 +448,24 @@ func _ListService_ListLists_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ListServiceServer).ListLists(ctx, req.(*ListListsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ListService_GetSidebar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSidebarRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ListServiceServer).GetSidebar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ListService_GetSidebar_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ListServiceServer).GetSidebar(ctx, req.(*GetSidebarRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -724,6 +768,10 @@ var ListService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListLists",
 			Handler:    _ListService_ListLists_Handler,
+		},
+		{
+			MethodName: "GetSidebar",
+			Handler:    _ListService_GetSidebar_Handler,
 		},
 		{
 			MethodName: "GetList",

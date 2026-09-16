@@ -13,8 +13,10 @@ import { tokenClient } from "@/lib/api"
 import { tokensQuery } from "@/lib/token-queries"
 import type { Translate } from "@/lib/translate"
 import { useMomentLabel, type FormatMoment } from "@/lib/use-moment-label"
-import { useSignedInData } from "@/lib/use-signed-in-data"
+import { pickable } from "@/lib/pick-lists"
+import { sidebarLists } from "@/lib/sidebar-groups"
 import { useSettingsCounts } from "@/lib/use-settings-counts"
+import { useSignedInData } from "@/lib/use-signed-in-data"
 
 /**
  * The Access tokens page: the keys a Member has cut, and a way to stop one working.
@@ -27,7 +29,7 @@ export function SettingsTokensScreen() {
   const { t } = useTranslation()
   const counts = useSettingsCounts()
   const queryClient = useQueryClient()
-  const { lists, member } = useSignedInData()
+  const { groups, member } = useSignedInData()
   const tokens = useSuspenseQuery(tokensQuery).data.tokens
 
   const [adding, setAdding] = useState(false)
@@ -81,7 +83,7 @@ export function SettingsTokensScreen() {
             add.reset()
           }
         }}
-        lists={lists}
+        suggested={pickable(sidebarLists(groups))}
         onAdd={(fresh) => add.mutate(fresh)}
         secret={secret ?? undefined}
         onSecretRead={() => {

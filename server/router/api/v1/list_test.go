@@ -1142,9 +1142,22 @@ func TestArchivingKeepsTheListAndSaysWhoDidIt(t *testing.T) {
 		t.Errorf("OpenCount = %d, want the Item to still be there", got)
 	}
 
-	// Still reachable: All lists is where somebody goes to find one and bring it back,
-	// and the row there has to be able to say who put it away.
-	listed, err := f.svc.ListLists(ctx, connect.NewRequest(&apiv1.ListListsRequest{}))
+	// Out of the default listing — that is what archiving is — and found under its own
+	// filter, which is where somebody goes to bring one back. The row there has to be
+	// able to say who put it away.
+	if plain, err := f.svc.ListLists(ctx, connect.NewRequest(&apiv1.ListListsRequest{})); err != nil {
+		t.Fatalf("ListLists: %v", err)
+	} else {
+		for _, list := range plain.Msg.GetLists() {
+			if list.GetUid() == uid {
+				t.Error("an archived List is still in the default listing")
+			}
+		}
+	}
+
+	listed, err := f.svc.ListLists(ctx, connect.NewRequest(&apiv1.ListListsRequest{
+		Status: apiv1.ListStatus_LIST_STATUS_ARCHIVED,
+	}))
 	if err != nil {
 		t.Fatalf("ListLists: %v", err)
 	}
@@ -1189,4 +1202,138 @@ func TestOnlyTheOwnerArchives(t *testing.T) {
 	if err == nil {
 		t.Fatal("SetListArchived by somebody who does not own it = nil, want a refusal")
 	}
+}
+
+func TestListListsAnswersOnePageAtATime(t *testing.T) {
+	f := newListFixture(t)
+	ctx := f.as(t, f.anna)
+
+	for i := range 30 {
+		f.createList(t, f.anna, fmt.Sprintf("List %02d", i))
+	}
+
+	first, err := f.svc.ListLists(ctx, connect.NewRequest(&apiv1.ListListsRequest{
+		Order: apiv1.ListOrder_LIST_ORDER_NAME,
+	}))
+	if err != nil {
+		t.Fatalf("ListLists: %v", err)
+	}
+	if got := len(first.Msg.GetLists()); got != defaultPageSize {
+		t.Errorf("first page holds %d Lists, want %d", got, defaultPageSize)
+	}
+	if got := first.Msg.GetTotal(); got != 30 {
+		t.Errorf("total is %d, want the 30 that matched and not the page", got)
+	}
+
+	second, err := f.svc.ListLists(ctx, connect.NewRequest(&apiv1.ListListsRequest{
+		Order: apiv1.ListOrder_LIST_ORDER_NAME, Page: 2,
+	}))
+	if err != nil {
+		t.Fatalf("ListLists page 2: %v", err)
+	}
+	if got := len(second.Msg.GetLists()); got != 5 {
+		t.Errorf("last page holds %d Lists, want the 5 that were left", got)
+	}
+	if got := second.Msg.GetLists()[0].GetName(); got != "List 25" {
+		t.Errorf("page 2 starts at %q, want it to carry on from page 1", got)
+	}
+}
+
+/*
+The page size is the server's promise about how much work one read is.
+
+A caller asking for a million rows is answered with the ceiling rather than the promise
+broken, and is told what it got so it can page from there.
+*/
+func TestListListsClampsThePageSizeItIsAskedFor(t *testing.T) {
+	f := newListFixture(t)
+	ctx := f.as(t, f.anna)
+
+	f.createList(t, f.anna, "Groceries")
+
+	res, err := f.svc.ListLists(ctx, connect.NewRequest(&apiv1.ListListsRequest{PageSize: 1_000_000}))
+	if err != nil {
+		t.Fatalf("ListLists: %v", err)
+	}
+	if got := res.Msg.GetPageSize(); got != maxPageSize {
+		t.Errorf("answered with a page size of %d, want the ceiling of %d", got, maxPageSize)
+	}
+}
+
+func TestGetSidebarCapsEachGroupAndSaysHowManyThereAre(t *testing.T) {
+	f := newListFixture(t)
+	ctx := f.as(t, f.anna)
+
+	for i := range 20 {
+		f.createList(t, f.anna, fmt.Sprintf("Mine %02d", i))
+	}
+
+	side, err := f.svc.GetSidebar(ctx, connect.NewRequest(&apiv1.GetSidebarRequest{}))
+	if err != nil {
+		t.Fatalf("GetSidebar: %v", err)
+	}
+
+	mine := side.Msg.GetMine()
+	if got := len(mine.GetLists()); got != sidebarGroupCap {
+		t.Errorf("My lists drew %d rows, want the cap of %d", got, sidebarGroupCap)
+	}
+	if got := mine.GetTotal(); got != 20 {
+		t.Errorf("My lists says %d altogether, want 20", got)
+	}
+}
+
+// A List belongs to one group. Counting it in two would make the number beside All
+// lists, which is the four totals added up, larger than the Lists that exist.
+func TestGetSidebarPutsAListInExactlyOneGroup(t *testing.T) {
+	f := newListFixture(t)
+	ctx := f.as(t, f.anna)
+
+	pinned := f.createList(t, f.anna, "Flat jobs")
+	if _, err := f.svc.SetListPinned(ctx, connect.NewRequest(&apiv1.SetListPinnedRequest{
+		ListUid: pinned, Pinned: true,
+	})); err != nil {
+		t.Fatalf("SetListPinned: %v", err)
+	}
+
+	done := f.createList(t, f.anna, "Party")
+	item := f.addItem(t, f.anna, done, "Cake")
+	if _, err := f.svc.SetItemDone(ctx, connect.NewRequest(&apiv1.SetItemDoneRequest{
+		ItemUid: item, Done: true,
+	})); err != nil {
+		t.Fatalf("SetItemDone: %v", err)
+	}
+
+	theirs := f.createList(t, f.jonas, "Landlord questions")
+	f.share(t, f.jonas, theirs, true)
+
+	f.createList(t, f.anna, "Groceries")
+
+	side, err := f.svc.GetSidebar(ctx, connect.NewRequest(&apiv1.GetSidebarRequest{}))
+	if err != nil {
+		t.Fatalf("GetSidebar: %v", err)
+	}
+
+	for _, group := range []struct {
+		label string
+		group *apiv1.SidebarGroup
+		want  string
+	}{
+		{"Pinned", side.Msg.GetPinned(), "Flat jobs"},
+		{"My lists", side.Msg.GetMine(), "Groceries"},
+		{"Shared with me", side.Msg.GetShared(), "Landlord questions"},
+		{"Completed", side.Msg.GetCompleted(), "Party"},
+	} {
+		if got := drewNames(group.group.GetLists()); len(got) != 1 || got[0] != group.want {
+			t.Errorf("%s holds %v, want only %q", group.label, got, group.want)
+		}
+	}
+}
+
+// drewNames is what a group drew, so a test reads as an expectation.
+func drewNames(lists []*apiv1.List) []string {
+	out := make([]string, 0, len(lists))
+	for _, list := range lists {
+		out = append(out, list.GetName())
+	}
+	return out
 }

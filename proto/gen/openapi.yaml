@@ -661,6 +661,41 @@ paths:
                 ListLists returns every List the signed-in Member can reach, with the counts the
                  sidebar shows.
             operationId: ListService_ListLists
+            parameters:
+                - name: status
+                  in: query
+                  schema:
+                    enum:
+                        - LIST_STATUS_UNSPECIFIED
+                        - LIST_STATUS_ACTIVE
+                        - LIST_STATUS_COMPLETED
+                        - LIST_STATUS_ARCHIVED
+                    type: string
+                    format: enum
+                - name: order
+                  in: query
+                  schema:
+                    enum:
+                        - LIST_ORDER_UNSPECIFIED
+                        - LIST_ORDER_UPDATED
+                        - LIST_ORDER_NAME
+                        - LIST_ORDER_OPEN
+                    type: string
+                    format: enum
+                - name: page
+                  in: query
+                  description: 1-based. Zero reads as the first page.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  description: |-
+                    How many rows a page holds. Zero takes the server's own, and anything above it is
+                     clamped: the page size is the server's promise about how much work one read is.
+                  schema:
+                    type: integer
+                    format: int32
             responses:
                 "200":
                     description: OK
@@ -702,7 +737,6 @@ paths:
         get:
             tags:
                 - ListService
-            description: GetList returns one List and its Items, in their manual order.
             operationId: ListService_GetList
             parameters:
                 - name: listUid
@@ -1233,6 +1267,31 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/v1/sidebar:
+        get:
+            tags:
+                - ListService
+            description: |-
+                GetList returns one List and its Items, in their manual order.
+                 The four groups a sidebar draws, each capped and each saying how many there are.
+
+                 Its own call rather than a page of ListLists: a sidebar is four bounded reads with
+                 four totals, and asking for that as pages would be four round trips to draw one
+                 column.
+            operationId: ListService_GetSidebar
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetSidebarResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
 components:
     schemas:
         AccessToken:
@@ -1599,6 +1658,17 @@ components:
                         - REQUEST_STATUS_IGNORED
                     type: string
                     format: enum
+        GetSidebarResponse:
+            type: object
+            properties:
+                pinned:
+                    $ref: '#/components/schemas/SidebarGroup'
+                mine:
+                    $ref: '#/components/schemas/SidebarGroup'
+                shared:
+                    $ref: '#/components/schemas/SidebarGroup'
+                completed:
+                    $ref: '#/components/schemas/SidebarGroup'
         GoogleProtobufAny:
             type: object
             properties:
@@ -1772,6 +1842,17 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/List'
+                total:
+                    type: integer
+                    description: How many matched, not how many are on this page.
+                    format: int32
+                page:
+                    type: integer
+                    description: Echoed back so a caller knows what it got, whatever it asked for.
+                    format: int32
+                pageSize:
+                    type: integer
+                    format: int32
         ListMembersResponse:
             type: object
             properties:
@@ -1919,6 +2000,11 @@ components:
                 allowJoin:
                     type: boolean
                     description: A quiet link at the foot of the page for a Visitor to ask for an account.
+                listName:
+                    type: string
+                    description: |-
+                        What that List is called, so the settings page can say which one is published
+                         without looking it up. Filled on read and ignored on write.
             description: PublicListSettings is the Instance's one public page, and what a Visitor sees of it.
         RefreshAccessRequest:
             type: object
@@ -2121,6 +2207,17 @@ components:
             properties:
                 member:
                     $ref: '#/components/schemas/Member'
+        SidebarGroup:
+            type: object
+            properties:
+                lists:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/List'
+                total:
+                    type: integer
+                    format: int32
+            description: 'One group of the sidebar: the rows it draws, and how many there are in total.'
         Status:
             type: object
             properties:

@@ -71,6 +71,11 @@ var reaches = map[string]reach{
 	"ActivityService.MarkActivityRead": {tool: "mark_activity_read"},
 	"InstanceService.GetInstanceAbout": {tool: "about_instance"},
 
+	// The shape one screen draws, not a thing a caller can do. An assistant reading
+	// Lists uses list_lists, which answers the same question without four capped groups
+	// and the counts a sidebar puts beside them.
+	"ListService.GetSidebar": {why: "the sidebar's own shape; list_lists is the tool"},
+
 	// Running the Instance. A token cannot, anywhere.
 	"AuthService.ReplacePassword":            {why: browserOnly},
 	"MemberService.UpdateOwnProfile":         {why: browserOnly},

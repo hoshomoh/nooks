@@ -2,13 +2,13 @@ import { useState } from "react"
 import { Link, useRouterState } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { cn } from "cn"
-import { Sharing, type List } from "@nooks/api"
+import { Sharing, type GetSidebarResponse, type List, type SidebarGroup } from "@nooks/api"
 
 import { COVERING, INERT, RAISED } from "./covering"
 import { Icon } from "./icon"
 import { ListActions } from "./list-actions"
 import { SETTINGS_HOME } from "./settings-sections"
-import { groupLists } from "@/lib/list-groups"
+import { reachableCount } from "@/lib/sidebar-groups"
 
 import { Mark } from "@nooks/design/mark"
 
@@ -25,7 +25,8 @@ export type ViewTarget = "/today" | "/upcoming" | "/"
 export type SidebarProps = {
   instanceName: string
   memberName: string
-  lists: List[]
+  /** The four groups, as the server capped them. */
+  groups: GetSidebarResponse
   /** The List currently open, so it can be marked. */
   activeListUid?: string
   /** The numbers beside Today and Upcoming. */
@@ -37,13 +38,14 @@ export type SidebarProps = {
 /**
  * The sidebar, per DESIGN.md §5: 258px, grouped as Pinned, My lists and Shared with me.
  *
- * The grouping is derived from the Lists themselves rather than stored, so a List moves
- * between groups the moment it is pinned or shared.
+ * Every group is capped by the server and says how many there are, so the column is the
+ * same handful of rows whether a Member has ten Lists or ten thousand. The rest are one
+ * row away, in All lists.
  */
 export function Sidebar({
   instanceName,
   memberName,
-  lists,
+  groups,
   activeListUid,
   counts,
   onSearch,
@@ -52,7 +54,6 @@ export function Sidebar({
   const { t } = useTranslation()
   const path = useRouterState({ select: (state) => state.location.pathname })
   const active = viewForPath(path)
-  const groups = groupLists(lists)
 
   return (
     <aside
@@ -96,30 +97,30 @@ export function Sidebar({
         <ViewLink
           to="/"
           label={t("list.allLists")}
-          count={lists.length}
+          count={reachableCount(groups)}
           active={active === "/"}
         />
       </div>
 
       <ListGroup
         label={t("sidebar.pinned")}
-        lists={groups.pinned}
+        group={groups.pinned}
         activeListUid={activeListUid}
         instanceName={instanceName}
       />
       <ListGroup
         label={t("sidebar.myLists")}
-        lists={groups.mine}
+        group={groups.mine}
         activeListUid={activeListUid}
         instanceName={instanceName}
       />
       <ListGroup
         label={t("sidebar.sharedWithMe")}
-        lists={groups.shared}
+        group={groups.shared}
         activeListUid={activeListUid}
         instanceName={instanceName}
       />
-      <CompletedGroup lists={groups.completed} activeListUid={activeListUid} />
+      <CompletedGroup group={groups.completed} activeListUid={activeListUid} />
 
       <button
         type="button"
@@ -192,11 +193,30 @@ function ViewLink({ to, label, count, active, accent }: ViewLinkProps) {
   )
 }
 
-/** SHOWN_COMPLETED is how many finished Lists the sidebar draws before saying how many. */
-const SHOWN_COMPLETED = 5
+interface SeeAllProps {
+  /** How many there are altogether, which is what the row offers to show. */
+  total: number
+  /** Which filter All lists should open on. */
+  status?: "completed"
+}
+
+/** The row under a group the server had to cut short. */
+function SeeAll({ total, status }: SeeAllProps) {
+  const { t } = useTranslation()
+
+  return (
+    <Link
+      to="/"
+      search={status ? { status } : {}}
+      className="flex h-7.5 items-center rounded-md px-2 text-badge text-shared hover:bg-secondary"
+    >
+      {t("sidebar.seeAll", { count: total })}
+    </Link>
+  )
+}
 
 interface CompletedGroupProps {
-  lists: List[]
+  group?: SidebarGroup
   activeListUid?: string
 }
 
@@ -211,13 +231,15 @@ interface CompletedGroupProps {
  * No `···` on these rows. What a Member does to a finished List — rename it, share it,
  * delete it — is done from All lists, where the row carries the menu.
  */
-function CompletedGroup({ lists, activeListUid }: CompletedGroupProps) {
+function CompletedGroup({ group, activeListUid }: CompletedGroupProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(true)
 
+  const lists = group?.lists ?? []
   if (lists.length === 0) {
     return null
   }
+  const total = group?.total ?? lists.length
 
   return (
     <div className="flex flex-col gap-0.5">
@@ -233,12 +255,12 @@ function CompletedGroup({ lists, activeListUid }: CompletedGroupProps) {
       >
         <Icon name={open ? "collapse" : "expand"} size="small" className="size-3" />
         <span>{t("sidebar.completed")}</span>
-        <span className="ml-auto font-normal">{lists.length}</span>
+        <span className="ml-auto font-normal">{total}</span>
       </button>
 
       {open && (
         <>
-          {lists.slice(0, SHOWN_COMPLETED).map((list) => (
+          {lists.map((list) => (
             <div
               key={list.uid}
               className={cn(
@@ -260,15 +282,7 @@ function CompletedGroup({ lists, activeListUid }: CompletedGroupProps) {
             </div>
           ))}
 
-          {lists.length > SHOWN_COMPLETED && (
-            <Link
-              to="/"
-              search={{ status: "completed" }}
-              className="flex h-7.5 items-center rounded-md px-2 text-badge text-shared hover:bg-secondary"
-            >
-              {t("sidebar.seeAllCompleted", { count: lists.length })}
-            </Link>
-          )}
+          {total > lists.length && <SeeAll total={total} status="completed" />}
         </>
       )}
     </div>
@@ -277,17 +291,19 @@ function CompletedGroup({ lists, activeListUid }: CompletedGroupProps) {
 
 interface ListGroupProps {
   label: string
-  lists: List[]
+  group?: SidebarGroup
   activeListUid?: string
   /** What this Instance calls itself, for the share dialog behind each row's menu. */
   instanceName: string
 }
 
 /** One labelled group of Lists. An empty group is not rendered at all. */
-function ListGroup({ label, lists, activeListUid, instanceName }: ListGroupProps) {
+function ListGroup({ label, group, activeListUid, instanceName }: ListGroupProps) {
+  const lists = group?.lists ?? []
   if (lists.length === 0) {
     return null
   }
+  const total = group?.total ?? lists.length
 
   return (
     <div className="flex flex-col gap-0.5">
@@ -295,51 +311,69 @@ function ListGroup({ label, lists, activeListUid, instanceName }: ListGroupProps
         {label}
       </div>
       {lists.map((list) => (
-        <div
+        <SidebarRow
           key={list.uid}
-          className={cn(
-            "group/list relative flex h-7.5 items-center gap-2.5 rounded-md px-2",
-            list.uid === activeListUid ? "bg-secondary font-medium" : "hover:bg-secondary",
-          )}
-        >
-          <Link
-            to="/lists/$listUid"
-            params={{ listUid: list.uid }}
-            aria-label={list.name}
-            className={COVERING}
-          />
-
-          {/* Everything that only shows the List is inert, so the whole row stays one
-              target and the link behind it is what answers a click. */}
-          {list.sharing !== Sharing.PRIVATE && (
-            <span className={cn(INERT, "size-[5px] shrink-0 rounded-full bg-shared")} />
-          )}
-          <span className={cn(INERT, "truncate text-chrome")}>{list.name}</span>
-
-          {list.openCount > 0 && (
-            <span className={cn(INERT, "ml-auto text-badge text-muted-foreground")}>
-              {list.openCount}
-            </span>
-          )}
-
-          {/* The `···` has a slot of its own, always the same size, so nothing moves
-              when the pointer crosses the row. It is hidden by opacity rather than by
-              display: a trigger that stops being rendered takes with it the element its
-              menu is positioned against, and the menu jumps to the corner of the page
-              the moment the pointer leaves the row to reach it. */}
-          <span
-            className={cn(
-              RAISED,
-              "-mr-1 shrink-0 opacity-0 transition-opacity",
-              "group-hover/list:opacity-100 focus-within:opacity-100",
-              "has-[[data-popup-open]]:opacity-100",
-              list.openCount > 0 || "ml-auto",
-            )}
-          >
-            <ListActions list={list} instanceName={instanceName} />
-          </span>
-        </div>
+          list={list}
+          active={list.uid === activeListUid}
+          instanceName={instanceName}
+        />
       ))}
+      {total > lists.length && <SeeAll total={total} />}
+    </div>
+  )
+}
+
+interface SidebarRowProps {
+  list: List
+  active: boolean
+  instanceName: string
+}
+
+/** One List in the sidebar: whether it is shared, what it is called, what is left on it. */
+function SidebarRow({ list, active, instanceName }: SidebarRowProps) {
+  return (
+    <div
+      className={cn(
+        "group/list relative flex h-7.5 items-center gap-2.5 rounded-md px-2",
+        active ? "bg-secondary font-medium" : "hover:bg-secondary",
+      )}
+    >
+      <Link
+        to="/lists/$listUid"
+        params={{ listUid: list.uid }}
+        aria-label={list.name}
+        className={COVERING}
+      />
+
+      {/* Everything that only shows the List is inert, so the whole row stays one
+          target and the link behind it is what answers a click. */}
+      {list.sharing !== Sharing.PRIVATE && (
+        <span className={cn(INERT, "size-[5px] shrink-0 rounded-full bg-shared")} />
+      )}
+      <span className={cn(INERT, "truncate text-chrome")}>{list.name}</span>
+
+      {list.openCount > 0 && (
+        <span className={cn(INERT, "ml-auto text-badge text-muted-foreground")}>
+          {list.openCount}
+        </span>
+      )}
+
+      {/* The `···` has a slot of its own, always the same size, so nothing moves
+          when the pointer crosses the row. It is hidden by opacity rather than by
+          display: a trigger that stops being rendered takes with it the element its
+          menu is positioned against, and the menu jumps to the corner of the page
+          the moment the pointer leaves the row to reach it. */}
+      <span
+        className={cn(
+          RAISED,
+          "-mr-1 shrink-0 opacity-0 transition-opacity",
+          "group-hover/list:opacity-100 focus-within:opacity-100",
+          "has-[[data-popup-open]]:opacity-100",
+          list.openCount > 0 || "ml-auto",
+        )}
+      >
+        <ListActions list={list} instanceName={instanceName} />
+      </span>
     </div>
   )
 }

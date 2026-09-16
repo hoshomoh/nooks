@@ -23,7 +23,8 @@ import {
   CommandList,
 } from "@/components/ui/command"
 import { listClient } from "@/lib/api"
-import { listsQuery, searchQuery } from "@/lib/list-queries"
+import { searchQuery, sidebarQuery } from "@/lib/list-queries"
+import { sidebarLists } from "@/lib/sidebar-groups"
 import { refreshLists } from "@/lib/refresh"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { SETTINGS_SECTIONS, type SettingsRoute } from "./settings-sections"
@@ -86,11 +87,13 @@ function SearchPanel() {
   // React's own deferral rather than a timer, so there is nothing to clean up.
   const searching = useDeferredValue(query)
   const results = useQuery(searchQuery(searching))
-  const lists = useQuery(listsQuery)
+  const sidebar = useQuery(sidebarQuery)
 
   const hits = results.data?.hits ?? []
   const destinations = DESTINATIONS.filter((place) => matches(t(place.labelKey), query))
-  const reachable = (lists.data?.lists ?? []).filter((list) => matches(list.name, query))
+  // The sidebar's own Lists, not every one of them: this group is a shortcut to what
+  // somebody is working in, and anything else is what the results below are for.
+  const reachable = sidebarLists(sidebar.data).filter((list) => matches(list.name, query))
 
   const go = async (to: Destination["to"]) => {
     palette.close()

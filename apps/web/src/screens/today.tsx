@@ -30,7 +30,7 @@ import { useSignedInData } from "@/lib/use-signed-in-data"
  * where they belong.
  */
 export function TodayScreen() {
-  const { instanceName, member, lists } = useSignedInData()
+  const { instanceName, member, groups } = useSignedInData()
   const { t } = useTranslation()
   const { dateLocale } = useLocale()
   const palette = useCommandPalette()
@@ -63,7 +63,7 @@ export function TodayScreen() {
     <AppShell
       instanceName={instanceName}
       memberName={member?.name ?? ""}
-      lists={lists}
+      groups={groups}
       onSearch={palette.open}
       onAddList={palette.openAddList}
     >
@@ -147,7 +147,7 @@ export function TodayScreen() {
             </div>
           )}
 
-          <DatedAddRow lists={lists} defaultDue={toStored(from)} divided={dated.items.length > 0} />
+          <DatedAddRow groups={groups} defaultDue={toStored(from)} divided={dated.items.length > 0} />
         </div>
       </div>
     </AppShell>

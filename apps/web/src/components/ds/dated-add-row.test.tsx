@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { render, screen } from "@testing-library/react"
-import { Sharing, type List } from "@nooks/api"
+import { Sharing, type GetSidebarResponse, type List } from "@nooks/api"
 
 import { readyForEnglish } from "@/test/i18n"
 import { DatedAddRow } from "./dated-add-row"
@@ -28,7 +28,7 @@ function show(lists: List[], defaultDue: string, divided?: boolean) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={queryClient}>
-      <DatedAddRow lists={lists} defaultDue={defaultDue} divided={divided} />
+      <DatedAddRow groups={{ mine: { lists, total: lists.length } } as GetSidebarResponse} defaultDue={defaultDue} divided={divided} />
     </QueryClientProvider>,
   )
 }

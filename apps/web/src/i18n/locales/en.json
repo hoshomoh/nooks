@@ -100,9 +100,9 @@
     "myLists": "My lists",
     "sharedWithMe": "Shared with me",
     "completed": "Completed",
-    "seeAllCompleted": "See all {{count}}",
     "toggleCompleted": "Completed lists",
-    "addList": "Add a list"
+    "addList": "Add a list",
+    "seeAll": "See all {{count}}"
   },
   "list": {
     "allLists": "All lists",
@@ -712,5 +712,11 @@
     "placeholderNote": "NOOKS_TOKEN is a placeholder until the token exists. Create it above and this becomes the finished block.",
     "ownToken": "Already holding a token you would rather use? Put it where NOOKS_TOKEN is. nooks cannot fill it in, since it keeps only a hash.",
     "troubleshooting": "Troubleshooting"
+  },
+  "pickList": {
+    "find": "Find a list",
+    "placeholder": "Type to find a list",
+    "noneFound": "No list here is called that.",
+    "noneYet": "You have no lists yet."
   }
 }

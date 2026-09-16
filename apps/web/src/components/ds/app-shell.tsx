@@ -3,7 +3,7 @@ import type { ReactNode } from "react"
 import { OfflineBanner } from "./offline-banner"
 import { UpdateBanner } from "./update-banner"
 import { Sidebar, type SidebarViewCounts } from "./sidebar"
-import type { List } from "@nooks/api"
+import type { GetSidebarResponse } from "@nooks/api"
 
 /**
  * The signed-in layout, per DESIGN.md §5: a 258px sidebar beside everything else.
@@ -11,7 +11,8 @@ import type { List } from "@nooks/api"
 export type AppShellProps = {
   instanceName: string
   memberName: string
-  lists: List[]
+  /** The four groups the sidebar draws, as the server capped them. */
+  groups: GetSidebarResponse
   /** The List currently open, so the sidebar can mark it. */
   activeListUid?: string
   /** The numbers beside Today and Upcoming. */
@@ -24,7 +25,7 @@ export type AppShellProps = {
 export function AppShell({
   instanceName,
   memberName,
-  lists,
+  groups,
   activeListUid,
   counts,
   onSearch,
@@ -36,7 +37,7 @@ export function AppShell({
       <Sidebar
         instanceName={instanceName}
         memberName={memberName}
-        lists={lists}
+        groups={groups}
         activeListUid={activeListUid}
         counts={counts}
         onSearch={onSearch}

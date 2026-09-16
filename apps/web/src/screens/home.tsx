@@ -1,3 +1,4 @@
+import { useSuspenseQuery } from "@tanstack/react-query"
 import { Link, getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { cn } from "cn"
@@ -13,22 +14,20 @@ import { ListActions } from "@/components/ds/list-actions"
 import { Icon } from "@/components/ds/icon"
 import { Menu, MenuItem } from "@/components/ds/menu"
 import { SegmentedControl, type Segment } from "@/components/ds/segmented"
+import { listPageQuery } from "@/lib/list-queries"
 import {
   DEFAULT_SORT,
   LIST_SORTS,
   LIST_STATUSES,
-  filterLists,
-  pageOf,
-  sortLists,
+  boundsOf,
   type ListStatus,
+  type ListsSearch,
 } from "@/lib/list-table"
-import { isArchived } from "@/lib/list-groups"
+import { isArchived } from "@/lib/list-state"
 import type { Translate } from "@/lib/translate"
 import { useCommandPalette } from "@/lib/use-command-palette"
-import { useLocale } from "@/lib/use-locale"
 import { useMomentLabel } from "@/lib/use-moment-label"
 import { useSignedInData } from "@/lib/use-signed-in-data"
-import type { ListsSearch } from "@/routes/index"
 
 const route = getRouteApi("/")
 
@@ -42,14 +41,16 @@ const route = getRouteApi("/")
  * An empty instance says what a List is for rather than apologising, per DESIGN.md §11.
  */
 export function Home() {
-  const { instanceName, member, lists } = useSignedInData()
+  const { instanceName, member, groups } = useSignedInData()
   const palette = useCommandPalette()
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { status = "all", sort = DEFAULT_SORT, page = 1 } = route.useSearch()
-  const { code: locale } = useLocale()
+  const search = route.useSearch()
+  const { status = "all", sort = DEFAULT_SORT, page = 1 } = search
 
-  const shown = pageOf(sortLists(filterLists(lists, status), sort, locale), page)
+  const answer = useSuspenseQuery(listPageQuery(search)).data
+  const { lists, total } = answer
+  const { pages, from, to } = boundsOf(answer)
 
   /*
    * Changing what is shown goes back to the first page.
@@ -60,11 +61,14 @@ export function Home() {
   const show = (next: Partial<ListsSearch>) =>
     void navigate({ to: ".", search: (old) => ({ ...old, ...next, page: undefined }) })
 
+  const turnTo = (next: number) =>
+    void navigate({ to: ".", search: (old) => ({ ...old, page: next }) })
+
   return (
     <AppShell
       instanceName={instanceName}
       memberName={member?.name ?? ""}
-      lists={lists}
+      groups={groups}
       onSearch={palette.open}
       onAddList={palette.openAddList}
     >
@@ -79,7 +83,9 @@ export function Home() {
             </p>
           </header>
 
-          {lists.length === 0 ? (
+          {/* Nothing at all, rather than nothing matching: a filter that finds none is
+              answered below, where the filter that caused it is still on screen. */}
+          {total === 0 && status === "all" ? (
             <div className="flex flex-col gap-6">
               <EmptyState title={t("list.coldStartTitle")} body={t("list.coldStartBody")} />
               <Button onClick={palette.openAddList} className="self-start">
@@ -126,47 +132,33 @@ export function Home() {
                 </Menu>
               </div>
 
-              {shown.total === 0 ? (
+              {lists.length === 0 ? (
                 <EmptyState title={t("list.noneMatching")} body={t("list.noneMatchingBody")} />
               ) : (
                 <>
                   <div className="flex flex-col">
-                    {shown.rows.map((list) => (
+                    {lists.map((list) => (
                       <ListTableRow key={list.uid} list={list} instanceName={instanceName} />
                     ))}
                   </div>
 
                   {/* Only once there is more than a page. A household with nine Lists
                       should not be told it is looking at 1–9 of 9. */}
-                  {shown.pages > 1 && (
+                  {pages > 1 && (
                     <div className="mt-4 flex items-center gap-1.5">
                       <span className="text-micro text-muted-foreground">
-                        {t("list.pageRange", {
-                          from: shown.from,
-                          to: shown.to,
-                          total: shown.total,
-                        })}
+                        {t("list.pageRange", { from, to, total })}
                       </span>
                       <span className="ml-auto flex gap-1.5">
                         <PageButton
                           label={t("list.previousPage")}
-                          disabled={shown.page === 1}
-                          onSelect={() =>
-                            void navigate({
-                              to: ".",
-                              search: (old) => ({ ...old, page: shown.page - 1 }),
-                            })
-                          }
+                          disabled={page === 1}
+                          onSelect={() => turnTo(page - 1)}
                         />
                         <PageButton
                           label={t("list.nextPage")}
-                          disabled={shown.page === shown.pages}
-                          onSelect={() =>
-                            void navigate({
-                              to: ".",
-                              search: (old) => ({ ...old, page: shown.page + 1 }),
-                            })
-                          }
+                          disabled={page === pages}
+                          onSelect={() => turnTo(page + 1)}
                         />
                       </span>
                     </div>

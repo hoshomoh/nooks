@@ -2,7 +2,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { RouterProvider, createRootRoute, createRouter } from "@tanstack/react-router"
 import { render, screen } from "@testing-library/react"
-import { Sharing, type List } from "@nooks/api"
+import { Sharing, type GetSidebarResponse, type List } from "@nooks/api"
 
 import { readyForEnglish } from "@/test/i18n"
 import { Sidebar } from "./sidebar"
@@ -20,8 +20,13 @@ const groceries = {
   openCount: 7,
 } as List
 
+/** mine puts Lists in My lists, saying how many there are altogether. */
+function mine(lists: List[], total = lists.length): GetSidebarResponse {
+  return { mine: { lists, total } } as GetSidebarResponse
+}
+
 /** show renders the sidebar inside a router, since every row is a link. */
-function show(lists: List[] = [groceries]) {
+function show(groups: GetSidebarResponse = mine([groceries])) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const router = createRouter({
     routeTree: createRootRoute({
@@ -29,7 +34,7 @@ function show(lists: List[] = [groceries]) {
         <Sidebar
           instanceName="Brunnen Street"
           memberName="Anna"
-          lists={lists}
+          groups={groups}
           onSearch={vi.fn()}
           onAddList={vi.fn()}
         />
@@ -64,5 +69,23 @@ describe("a List in the sidebar", () => {
   it("keeps the menu's trigger mounted whether or not the pointer is over it", async () => {
     show()
     expect(await screen.findByRole("button", { name: "More" })).toBeInTheDocument()
+  })
+})
+
+describe("a group the server had to cut short", () => {
+  // The sidebar draws a handful whatever a Member has. The row is what says the rest
+  // are somewhere, and where.
+  it("offers the rest in All lists", async () => {
+    show(mine([groceries], 240))
+
+    const seeAll = await screen.findByRole("link", { name: "See all 240" })
+    expect(seeAll).toHaveAttribute("href", "/")
+  })
+
+  it("says nothing when the group is all there is", async () => {
+    show(mine([groceries]))
+
+    await screen.findByRole("link", { name: "Groceries" })
+    expect(screen.queryByText(/See all/)).not.toBeInTheDocument()
   })
 })

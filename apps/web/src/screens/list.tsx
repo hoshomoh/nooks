@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useMemo, useState } from "react"
+import { Suspense, useCallback, useState } from "react"
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
 import { getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
@@ -13,7 +13,7 @@ import { ListActions } from "@/components/ds/list-actions"
 import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
-import { ListRow, type ListRowLabels, type ListRowNote } from "@/components/ds/list-row"
+import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
 import { PrintSheet } from "@/components/ds/print-sheet"
 import { lazyNamed } from "@/components/ds/lazy"
 import type { NoteSheetProps } from "@/components/ds/note-sheet"
@@ -22,7 +22,6 @@ import { listQuery } from "@/lib/list-queries"
 import { listRoute } from "@/routes/list"
 import { refreshLists } from "@/lib/refresh"
 import { useAddItem, useSetDone } from "@/lib/use-item-changes"
-import { previewOf } from "@/lib/editor/preview"
 import { isProvisional } from "@/lib/queued-changes"
 import { useQueuedChanges } from "@/lib/use-queued-changes"
 import { useRenameItem } from "@/lib/use-rename-item"
@@ -60,36 +59,10 @@ const NoteSheet = lazyNamed<NoteSheetProps>(
   "NoteSheet",
 )
 
-/*
-noteOf is what a row shows of an Item's Note.
-
-Read from the Note itself rather than from the two fields the Instance derives beside
-it: those are produced by taking the shorthand off the front of the markdown, which
-guesses, and guessed wrong often enough to put "[ ]" on a row. This goes through the
-same parser the editor renders from, so a row and the Note it belongs to cannot
-disagree about what the Note says.
-*/
-function noteOf(markdown: string): ListRowNote {
-  const preview = previewOf(markdown)
-  return { runs: preview.runs, remainingLines: preview.remaining }
-}
-
-/**
- * previews reads every Note on the List once per change, rather than once per render.
- *
- * Reading a Note means parsing it, and a List re-renders for reasons that have nothing
- * to do with its Notes — a tick landing, somebody else's change arriving, a keystroke
- * in the composer. Parsing forty Notes on each of those is work nobody asked for.
- */
-function usePreviews(items: readonly Item[]): Map<string, ListRowNote> {
-  return useMemo(() => new Map(items.map((item) => [item.uid, noteOf(item.note)])), [items])
-}
-
 export function ListScreen() {
   const { listUid } = route.useParams()
   const { instanceName, member, lists } = useSignedInData()
   const list = useSuspenseQuery(listQuery(listUid)).data
-  const previews = usePreviews(list.items)
   const live = useLive()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -289,8 +262,7 @@ export function ListScreen() {
                     dueLabel={due.label(item.dueOn)}
                     overdue={isOverdue(item.dueOn, from)}
                     justTicked={justTickedByAnother(item)}
-                    note={previews.get(item.uid)}
-                    moreLinesLabel={(count) => t("note.moreLines", { count })}
+                    hasNote={Boolean(item.note)}
                     onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
                     onOpen={() => showItem(item.uid)}
                     onRename={

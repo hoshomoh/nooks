@@ -110,21 +110,24 @@ describe("the list row", () => {
     })
   })
 
-  it("shows the Note's own first line under the row", () => {
-    render(
-      <ListRow
-        label="Coffee"
-        note={{
-          runs: [{ text: "Saturday market, second row.", marks: [] }],
-          remainingLines: 3,
-        }}
-        moreLinesLabel={(count) => `+${count} lines`}
-        labels={labels}
-      />,
-    )
+  /*
+   * A Note is marked on the row, not quoted on it.
+   *
+   * The row used to carry the Note's first line and a count of the rest, which made
+   * every row with a Note two lines tall and a List of them hard to run an eye down.
+   * The Note is read in the sheet; the row only says there is one.
+   */
+  it("marks an Item that carries a Note, without quoting it", () => {
+    const { container } = render(<ListRow label="Coffee" hasNote labels={labels} />)
 
-    expect(screen.getByText("Saturday market, second row.")).toBeInTheDocument()
-    expect(screen.getByText("+3 lines")).toBeInTheDocument()
+    expect(container.querySelector("svg")).not.toBeNull()
+    expect(screen.getByText("Coffee")).toBeInTheDocument()
+  })
+
+  it("leaves the mark off an Item with no Note", () => {
+    const { container } = render(<ListRow label="Milk" labels={labels} />)
+
+    expect(container.querySelector("svg")).toBeNull()
   })
 
   describe("aiming at a row", () => {

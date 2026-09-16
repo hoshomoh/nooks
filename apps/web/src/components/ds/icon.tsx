@@ -1,4 +1,5 @@
 import {
+  AlignLeft,
   Bold,
   CalendarDays,
   Check,
@@ -32,6 +33,7 @@ const GLYPHS = {
   date: CalendarDays,
   fullScreen: Maximize2,
   more: Ellipsis,
+  note: AlignLeft,
   search: Search,
   add: Plus,
   bold: Bold,

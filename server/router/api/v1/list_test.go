@@ -1112,3 +1112,81 @@ func TestListCarriesItsTimestamps(t *testing.T) {
 		t.Error("UpdatedAt is empty, want the moment it last changed")
 	}
 }
+
+/*
+Archiving is not deleting: the List keeps its Items and comes back whole.
+
+It is also a property of the List rather than of one Member, so a shared List leaves
+everybody's sidebar together — which is what lets a row say who put it away.
+*/
+func TestArchivingKeepsTheListAndSaysWhoDidIt(t *testing.T) {
+	f := newListFixture(t)
+	ctx := f.as(t, f.anna)
+
+	uid := f.createList(t, f.anna, "Move — Kreuzberg")
+	f.addItem(t, f.anna, uid, "Boxes")
+
+	res, err := f.svc.SetListArchived(ctx, connect.NewRequest(&apiv1.SetListArchivedRequest{
+		ListUid: uid, Archived: true,
+	}))
+	if err != nil {
+		t.Fatalf("SetListArchived: %v", err)
+	}
+	if res.Msg.GetList().GetArchivedAt() == "" {
+		t.Error("ArchivedAt is empty, want the moment it was archived")
+	}
+	if got := res.Msg.GetList().GetArchivedByName(); got != "Anna" {
+		t.Errorf("ArchivedByName = %q, want Anna", got)
+	}
+	if got := res.Msg.GetList().GetOpenCount(); got != 1 {
+		t.Errorf("OpenCount = %d, want the Item to still be there", got)
+	}
+
+	// Still reachable: All lists is where somebody goes to find one and bring it back,
+	// and the row there has to be able to say who put it away.
+	listed, err := f.svc.ListLists(ctx, connect.NewRequest(&apiv1.ListListsRequest{}))
+	if err != nil {
+		t.Fatalf("ListLists: %v", err)
+	}
+	found := false
+	for _, list := range listed.Msg.GetLists() {
+		if list.GetUid() != uid {
+			continue
+		}
+		found = true
+		if got := list.GetArchivedByName(); got != "Anna" {
+			t.Errorf("ArchivedByName from ListLists = %q, want Anna", got)
+		}
+	}
+	if !found {
+		t.Error("an archived List is not listed, so nobody could restore it")
+	}
+
+	back, err := f.svc.SetListArchived(ctx, connect.NewRequest(&apiv1.SetListArchivedRequest{
+		ListUid: uid, Archived: false,
+	}))
+	if err != nil {
+		t.Fatalf("SetListArchived back: %v", err)
+	}
+	if got := back.Msg.GetList().GetArchivedAt(); got != "" {
+		t.Errorf("ArchivedAt = %q after restoring, want empty", got)
+	}
+	if got := back.Msg.GetList().GetArchivedByName(); got != "" {
+		t.Errorf("ArchivedByName = %q after restoring, want empty", got)
+	}
+}
+
+// Archiving a shared List takes it out of everybody's sidebar, so it is the owner's to
+// decide rather than anybody it was shared with.
+func TestOnlyTheOwnerArchives(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Flat jobs")
+	f.share(t, f.anna, uid, true)
+
+	_, err := f.svc.SetListArchived(f.as(t, f.jonas), connect.NewRequest(&apiv1.SetListArchivedRequest{
+		ListUid: uid, Archived: true,
+	}))
+	if err == nil {
+		t.Fatal("SetListArchived by somebody who does not own it = nil, want a refusal")
+	}
+}

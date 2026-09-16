@@ -24,6 +24,11 @@ export function isCompleted(list: List): boolean {
   return list.doneCount > 0 && list.openCount === 0
 }
 
+/** isArchived reports whether a List has been put out of the sidebar. */
+export function isArchived(list: List): boolean {
+  return Boolean(list.archivedAt)
+}
+
 /**
  * groupLists sorts the Lists into the four the sidebar draws.
  *
@@ -32,8 +37,11 @@ export function isCompleted(list: List): boolean {
  * thing on it.
  */
 export function groupLists(lists: readonly List[]): ListGroups {
-  const pinned = lists.filter((list) => list.isPinned)
-  const rest = lists.filter((list) => !list.isPinned)
+  // Archived Lists are still sent, so that All lists can show them. The sidebar is
+  // exactly what archiving takes them out of.
+  const here = lists.filter((list) => !isArchived(list))
+  const pinned = here.filter((list) => list.isPinned)
+  const rest = here.filter((list) => !list.isPinned)
 
   return {
     pinned,

@@ -150,6 +150,7 @@
     "statusAll": "All",
     "statusActive": "Active",
     "statusCompleted": "Completed",
+    "statusArchived": "Archived",
     "statusLabel": "Which lists",
     "sortUpdated": "Recently updated",
     "sortName": "Name A–Z",
@@ -158,7 +159,8 @@
     "nothingOpen": "nothing open",
     "updatedOn": "Updated {{when}}",
     "noneMatching": "No lists here",
-    "noneMatchingBody": "Nothing on this instance matches what you asked for. Try another filter."
+    "noneMatchingBody": "Nothing on this instance matches what you asked for. Try another filter.",
+    "archivedBy": "archived by {{name}}"
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",
@@ -426,6 +428,8 @@
     "share": "Share…",
     "print": "Print",
     "duplicate": "Duplicate",
+    "archive": "Archive",
+    "restore": "Restore to the sidebar",
     "delete": "Delete list",
     "deleteTitle": "Delete “{{name}}”?",
     "deleteBlurb": "The list and everything on it goes. Nobody it was shared with keeps a copy.",

@@ -19,22 +19,23 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ListService_ListLists_FullMethodName      = "/nooks.api.v1.ListService/ListLists"
-	ListService_GetList_FullMethodName        = "/nooks.api.v1.ListService/GetList"
-	ListService_CreateList_FullMethodName     = "/nooks.api.v1.ListService/CreateList"
-	ListService_RenameList_FullMethodName     = "/nooks.api.v1.ListService/RenameList"
-	ListService_SetListSharing_FullMethodName = "/nooks.api.v1.ListService/SetListSharing"
-	ListService_GetListShares_FullMethodName  = "/nooks.api.v1.ListService/GetListShares"
-	ListService_DeleteList_FullMethodName     = "/nooks.api.v1.ListService/DeleteList"
-	ListService_DuplicateList_FullMethodName  = "/nooks.api.v1.ListService/DuplicateList"
-	ListService_SetListPinned_FullMethodName  = "/nooks.api.v1.ListService/SetListPinned"
-	ListService_CreateItem_FullMethodName     = "/nooks.api.v1.ListService/CreateItem"
-	ListService_UpdateItem_FullMethodName     = "/nooks.api.v1.ListService/UpdateItem"
-	ListService_SetItemDone_FullMethodName    = "/nooks.api.v1.ListService/SetItemDone"
-	ListService_MoveItem_FullMethodName       = "/nooks.api.v1.ListService/MoveItem"
-	ListService_DeleteItem_FullMethodName     = "/nooks.api.v1.ListService/DeleteItem"
-	ListService_ListDatedItems_FullMethodName = "/nooks.api.v1.ListService/ListDatedItems"
-	ListService_Search_FullMethodName         = "/nooks.api.v1.ListService/Search"
+	ListService_ListLists_FullMethodName       = "/nooks.api.v1.ListService/ListLists"
+	ListService_GetList_FullMethodName         = "/nooks.api.v1.ListService/GetList"
+	ListService_CreateList_FullMethodName      = "/nooks.api.v1.ListService/CreateList"
+	ListService_RenameList_FullMethodName      = "/nooks.api.v1.ListService/RenameList"
+	ListService_SetListSharing_FullMethodName  = "/nooks.api.v1.ListService/SetListSharing"
+	ListService_GetListShares_FullMethodName   = "/nooks.api.v1.ListService/GetListShares"
+	ListService_SetListArchived_FullMethodName = "/nooks.api.v1.ListService/SetListArchived"
+	ListService_DeleteList_FullMethodName      = "/nooks.api.v1.ListService/DeleteList"
+	ListService_DuplicateList_FullMethodName   = "/nooks.api.v1.ListService/DuplicateList"
+	ListService_SetListPinned_FullMethodName   = "/nooks.api.v1.ListService/SetListPinned"
+	ListService_CreateItem_FullMethodName      = "/nooks.api.v1.ListService/CreateItem"
+	ListService_UpdateItem_FullMethodName      = "/nooks.api.v1.ListService/UpdateItem"
+	ListService_SetItemDone_FullMethodName     = "/nooks.api.v1.ListService/SetItemDone"
+	ListService_MoveItem_FullMethodName        = "/nooks.api.v1.ListService/MoveItem"
+	ListService_DeleteItem_FullMethodName      = "/nooks.api.v1.ListService/DeleteItem"
+	ListService_ListDatedItems_FullMethodName  = "/nooks.api.v1.ListService/ListDatedItems"
+	ListService_Search_FullMethodName          = "/nooks.api.v1.ListService/Search"
 )
 
 // ListServiceClient is the client API for ListService service.
@@ -58,6 +59,9 @@ type ListServiceClient interface {
 	// GetListShares returns who a List reaches by name, for the share dialog.
 	GetListShares(ctx context.Context, in *GetListSharesRequest, opts ...grpc.CallOption) (*GetListSharesResponse, error)
 	// DeleteList removes a List and the Items on it. Only its owner may.
+	// Puts a List out of the sidebar, or brings it back. Archiving is not deleting: what
+	// is archived keeps its Items and can be restored.
+	SetListArchived(ctx context.Context, in *SetListArchivedRequest, opts ...grpc.CallOption) (*SetListArchivedResponse, error)
 	DeleteList(ctx context.Context, in *DeleteListRequest, opts ...grpc.CallOption) (*DeleteListResponse, error)
 	// DuplicateList copies a List and the Items still open on it.
 	//
@@ -152,6 +156,16 @@ func (c *listServiceClient) GetListShares(ctx context.Context, in *GetListShares
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetListSharesResponse)
 	err := c.cc.Invoke(ctx, ListService_GetListShares_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *listServiceClient) SetListArchived(ctx context.Context, in *SetListArchivedRequest, opts ...grpc.CallOption) (*SetListArchivedResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SetListArchivedResponse)
+	err := c.cc.Invoke(ctx, ListService_SetListArchived_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -279,6 +293,9 @@ type ListServiceServer interface {
 	// GetListShares returns who a List reaches by name, for the share dialog.
 	GetListShares(context.Context, *GetListSharesRequest) (*GetListSharesResponse, error)
 	// DeleteList removes a List and the Items on it. Only its owner may.
+	// Puts a List out of the sidebar, or brings it back. Archiving is not deleting: what
+	// is archived keeps its Items and can be restored.
+	SetListArchived(context.Context, *SetListArchivedRequest) (*SetListArchivedResponse, error)
 	DeleteList(context.Context, *DeleteListRequest) (*DeleteListResponse, error)
 	// DuplicateList copies a List and the Items still open on it.
 	//
@@ -336,6 +353,9 @@ func (UnimplementedListServiceServer) SetListSharing(context.Context, *SetListSh
 }
 func (UnimplementedListServiceServer) GetListShares(context.Context, *GetListSharesRequest) (*GetListSharesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetListShares not implemented")
+}
+func (UnimplementedListServiceServer) SetListArchived(context.Context, *SetListArchivedRequest) (*SetListArchivedResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetListArchived not implemented")
 }
 func (UnimplementedListServiceServer) DeleteList(context.Context, *DeleteListRequest) (*DeleteListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteList not implemented")
@@ -492,6 +512,24 @@ func _ListService_GetListShares_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ListServiceServer).GetListShares(ctx, req.(*GetListSharesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ListService_SetListArchived_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetListArchivedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ListServiceServer).SetListArchived(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ListService_SetListArchived_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ListServiceServer).SetListArchived(ctx, req.(*SetListArchivedRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -706,6 +744,10 @@ var ListService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetListShares",
 			Handler:    _ListService_GetListShares_Handler,
+		},
+		{
+			MethodName: "SetListArchived",
+			Handler:    _ListService_SetListArchived_Handler,
 		},
 		{
 			MethodName: "DeleteList",

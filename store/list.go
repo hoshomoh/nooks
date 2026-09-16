@@ -36,7 +36,15 @@ type List struct {
 	UpdatedAt time.Time
 	// DeletedAt is the zero value for a live List.
 	DeletedAt time.Time
+	// ArchivedAt is the zero value for a List still in the sidebar. Archiving is not
+	// deleting: what is archived is out of the way, not gone.
+	ArchivedAt time.Time
+	// ArchivedByID is who put it away, so a row can say so. Zero while it is not.
+	ArchivedByID int64
 }
+
+// Archived reports whether the List has been put away.
+func (l List) Archived() bool { return !l.ArchivedAt.IsZero() }
 
 // Shared reports whether anyone besides the owner can reach the List. The sidebar shows
 // a dot against a shared List.
@@ -169,6 +177,25 @@ func (s *sqlStore) SetListSharing(ctx context.Context, uid string, sharing Shari
 	})
 }
 
+/*
+SetListArchived puts a List away, or brings it back.
+
+Archived Lists are still returned here: they are reachable, searchable and restorable,
+and only the sidebar leaves them out. A query that hid them would also hide them from
+the page somebody goes to in order to find one.
+
+memberID is recorded on the way in so a row can say who did it, and cleared on the way
+back out: "archived by Anna" is only true while it is.
+*/
+func (s *sqlStore) SetListArchived(ctx context.Context, uid string, memberID int64, at time.Time) error {
+	return s.updateList(ctx, uid, at, func(q *bun.UpdateQuery) *bun.UpdateQuery {
+		if memberID == 0 {
+			return q.Set("archived_at = ?", "").Set("archived_by_id = ?", 0)
+		}
+		return q.Set("archived_at = ?", formatTime(at)).Set("archived_by_id = ?", memberID)
+	})
+}
+
 // DeleteList removes a List, and with it the Items on it. The removal is soft, so a
 // List deleted by mistake is recoverable.
 func (s *sqlStore) DeleteList(ctx context.Context, uid string, at time.Time) error {
@@ -275,6 +302,9 @@ type listModel struct {
 	CreatedAt string `bun:"created_at,notnull"`
 	UpdatedAt string `bun:"updated_at,notnull"`
 	DeletedAt string `bun:"deleted_at,notnull"`
+
+	ArchivedAt   string `bun:"archived_at,notnull"`
+	ArchivedByID int64  `bun:"archived_by_id,notnull"`
 }
 
 func (m listModel) toList() (List, error) {
@@ -290,10 +320,15 @@ func (m listModel) toList() (List, error) {
 	if err != nil {
 		return List{}, err
 	}
+	archivedAt, err := parseTime(m.ArchivedAt)
+	if err != nil {
+		return List{}, err
+	}
 	return List{
 		ID: m.ID, UID: m.UID, Name: m.Name, OwnerID: m.OwnerID,
 		Sharing: Sharing(m.Sharing), CanEdit: m.CanEdit,
 		CreatedAt: createdAt, UpdatedAt: updatedAt, DeletedAt: deletedAt,
+		ArchivedAt: archivedAt, ArchivedByID: m.ArchivedByID,
 	}, nil
 }
 

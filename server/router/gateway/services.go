@@ -5,9 +5,10 @@
 // services are Connect-shaped. These adapters are that difference and nothing else:
 // unwrap the request, call the service, hand back the message.
 //
-// It is boilerplate, but boilerplate the compiler checks. RegisterXHandlerServer wants
-// the whole interface, so an RPC added to a proto without a line here does not build —
-// which is what keeps the REST API from quietly falling a version behind the app.
+// It is boilerplate, and the compiler does not check it: each adapter embeds an
+// UnimplementedXServiceServer, so an RPC with no line here still builds and answers
+// "unimplemented" over REST while working perfectly in the app. scripts/check-gateway.sh
+// is what actually catches that, and runs in CI.
 package gateway
 
 import (
@@ -63,6 +64,14 @@ func (g authService) SignIn(ctx context.Context, req *apiv1.SignInRequest) (*api
 
 func (g authService) SignOut(ctx context.Context, req *apiv1.SignOutRequest) (*apiv1.SignOutResponse, error) {
 	res, err := g.svc.SignOut(ctx, connect.NewRequest(req))
+	if err != nil {
+		return nil, asStatus(err)
+	}
+	return res.Msg, nil
+}
+
+func (g authService) RefreshAccess(ctx context.Context, req *apiv1.RefreshAccessRequest) (*apiv1.RefreshAccessResponse, error) {
+	res, err := g.svc.RefreshAccess(ctx, connect.NewRequest(req))
 	if err != nil {
 		return nil, asStatus(err)
 	}
@@ -209,6 +218,14 @@ func (g listService) CreateList(ctx context.Context, req *apiv1.CreateListReques
 
 func (g listService) RenameList(ctx context.Context, req *apiv1.RenameListRequest) (*apiv1.RenameListResponse, error) {
 	res, err := g.svc.RenameList(ctx, connect.NewRequest(req))
+	if err != nil {
+		return nil, asStatus(err)
+	}
+	return res.Msg, nil
+}
+
+func (g listService) SetListArchived(ctx context.Context, req *apiv1.SetListArchivedRequest) (*apiv1.SetListArchivedResponse, error) {
+	res, err := g.svc.SetListArchived(ctx, connect.NewRequest(req))
 	if err != nil {
 		return nil, asStatus(err)
 	}

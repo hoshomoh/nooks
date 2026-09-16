@@ -12,6 +12,8 @@ function list(name: string, over: Partial<List> = {}): List {
     isPinned: false,
     openCount: 1,
     doneCount: 0,
+    archivedAt: "",
+    archivedByName: "",
     ...over,
   } as List
 }
@@ -82,5 +84,21 @@ describe("how the sidebar divides them", () => {
 
   it("has four empty groups for a Member with no Lists", () => {
     expect(groupLists([])).toEqual({ pinned: [], mine: [], shared: [], completed: [] })
+  })
+})
+
+describe("what archiving takes out of the sidebar", () => {
+  // The sidebar is exactly what archiving removes a List from. It is still sent, so
+  // that All lists can show it under the filter.
+  it("leaves an archived List out of every group", () => {
+    const groups = groupLists([
+      list("Groceries"),
+      list("Move", { archivedAt: "2026-08-04T10:00:00Z" }),
+      list("Party", { isPinned: true, archivedAt: "2026-08-04T10:00:00Z" }),
+    ])
+
+    expect(names(groups.mine)).toEqual(["Groceries"])
+    expect(groups.pinned).toEqual([])
+    expect(groups.completed).toEqual([])
   })
 })

@@ -726,7 +726,6 @@ paths:
         delete:
             tags:
                 - ListService
-            description: DeleteList removes a List and the Items on it. Only its owner may.
             operationId: ListService_DeleteList
             parameters:
                 - name: listUid
@@ -771,6 +770,40 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RenameListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/lists/{listUid}/archived:
+        post:
+            tags:
+                - ListService
+            description: |-
+                DeleteList removes a List and the Items on it. Only its owner may.
+                 Puts a List out of the sidebar, or brings it back. Archiving is not deleting: what
+                 is archived keeps its Items and can be restored.
+            operationId: ListService_SetListArchived
+            parameters:
+                - name: listUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SetListArchivedRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SetListArchivedResponse'
                 default:
                     description: Default error response
                     content:
@@ -1691,6 +1724,14 @@ components:
                 updatedAt:
                     type: string
                     description: When it, or anything on it, last changed. RFC 3339.
+                archivedAt:
+                    type: string
+                    description: |-
+                        When it was archived, RFC 3339, or empty while it is not. An archived List is out
+                         of the sidebar and still searchable and restorable.
+                archivedByName:
+                    type: string
+                    description: Who archived it, by name, for a row that says so. Empty while it is not archived.
             description: List is a named, ordered collection of Items.
         ListAccessTokensResponse:
             type: object
@@ -2008,6 +2049,19 @@ components:
             properties:
                 item:
                     $ref: '#/components/schemas/Item'
+        SetListArchivedRequest:
+            type: object
+            properties:
+                listUid:
+                    type: string
+                archived:
+                    type: boolean
+                    description: True to put it away, false to bring it back.
+        SetListArchivedResponse:
+            type: object
+            properties:
+                list:
+                    $ref: '#/components/schemas/List'
         SetListPinnedRequest:
             type: object
             properties:

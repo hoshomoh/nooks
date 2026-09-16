@@ -11,7 +11,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file nooks/api/v1/list_service.proto.
  */
 export const file_nooks_api_v1_list_service: GenFile = /*@__PURE__*/
-  fileDesc("Ch9ub29rcy9hcGkvdjEvbGlzdF9zZXJ2aWNlLnByb3RvEgxub29rcy5hcGkudjEi0AEKBExpc3QSCwoDdWlkGAEgASgJEgwKBG5hbWUYAiABKAkSJgoHc2hhcmluZxgDIAEoDjIVLm5vb2tzLmFwaS52MS5TaGFyaW5nEhAKCGNhbl9lZGl0GAQgASgIEhAKCGlzX293bmVyGAUgASgIEhEKCWlzX3Bpbm5lZBgGIAEoCBISCgpvcGVuX2NvdW50GAcgASgFEhIKCmRvbmVfY291bnQYCCABKAUSEgoKY3JlYXRlZF9hdBgJIAEoCRISCgp1cGRhdGVkX2F0GAogASgJIv8BCgRJdGVtEgsKA3VpZBgBIAEoCRINCgVsYWJlbBgCIAEoCRIQCghxdWFudGl0eRgDIAEoCRIOCgZkdWVfb24YBCABKAkSDAoEZG9uZRgFIAEoCBIVCg1hZGRlZF9ieV9uYW1lGAYgASgJEhQKDGRvbmVfYnlfbmFtZRgHIAEoCRIPCgdkb25lX2F0GAsgASgJEhMKC2RvbmVfYnlfdWlkGAwgASgJEgwKBG5vdGUYCCABKAkSFwoPYWRkZWRfdmlhX3Rva2VuGA0gASgJSgQICRAKSgQIChALUg9ub3RlX2ZpcnN0X2xpbmVSFG5vdGVfcmVtYWluaW5nX2xpbmVzIhIKEExpc3RMaXN0c1JlcXVlc3QiNgoRTGlzdExpc3RzUmVzcG9uc2USIQoFbGlzdHMYASADKAsyEi5ub29rcy5hcGkudjEuTGlzdCIiCg5HZXRMaXN0UmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCSJWCg9HZXRMaXN0UmVzcG9uc2USIAoEbGlzdBgBIAEoCzISLm5vb2tzLmFwaS52MS5MaXN0EiEKBWl0ZW1zGAIgAygLMhIubm9va3MuYXBpLnYxLkl0ZW0iIQoRQ3JlYXRlTGlzdFJlcXVlc3QSDAoEbmFtZRgBIAEoCSI2ChJDcmVhdGVMaXN0UmVzcG9uc2USIAoEbGlzdBgBIAEoCzISLm5vb2tzLmFwaS52MS5MaXN0IjMKEVJlbmFtZUxpc3RSZXF1ZXN0EhAKCGxpc3RfdWlkGAEgASgJEgwKBG5hbWUYAiABKAkiNgoSUmVuYW1lTGlzdFJlc3BvbnNlEiAKBGxpc3QYASABKAsyEi5ub29rcy5hcGkudjEuTGlzdCKMAQoVU2V0TGlzdFNoYXJpbmdSZXF1ZXN0EhAKCGxpc3RfdWlkGAEgASgJEiYKB3NoYXJpbmcYAiABKA4yFS5ub29rcy5hcGkudjEuU2hhcmluZxIQCghjYW5fZWRpdBgDIAEoCBITCgttZW1iZXJfdWlkcxgEIAMoCRISCgpncm91cF91aWRzGAUgAygJIjoKFlNldExpc3RTaGFyaW5nUmVzcG9uc2USIAoEbGlzdBgBIAEoCzISLm5vb2tzLmFwaS52MS5MaXN0IigKFEdldExpc3RTaGFyZXNSZXF1ZXN0EhAKCGxpc3RfdWlkGAEgASgJIkAKFUdldExpc3RTaGFyZXNSZXNwb25zZRITCgttZW1iZXJfdWlkcxgBIAMoCRISCgpncm91cF91aWRzGAIgAygJIigKFER1cGxpY2F0ZUxpc3RSZXF1ZXN0EhAKCGxpc3RfdWlkGAEgASgJIjkKFUR1cGxpY2F0ZUxpc3RSZXNwb25zZRIgCgRsaXN0GAEgASgLMhIubm9va3MuYXBpLnYxLkxpc3QiJQoRRGVsZXRlTGlzdFJlcXVlc3QSEAoIbGlzdF91aWQYASABKAkiFAoSRGVsZXRlTGlzdFJlc3BvbnNlIjgKFFNldExpc3RQaW5uZWRSZXF1ZXN0EhAKCGxpc3RfdWlkGAEgASgJEg4KBnBpbm5lZBgCIAEoCCIXChVTZXRMaXN0UGlubmVkUmVzcG9uc2UiVgoRQ3JlYXRlSXRlbVJlcXVlc3QSEAoIbGlzdF91aWQYASABKAkSDQoFbGFiZWwYAiABKAkSEAoIcXVhbnRpdHkYAyABKAkSDgoGZHVlX29uGAQgASgJIjYKEkNyZWF0ZUl0ZW1SZXNwb25zZRIgCgRpdGVtGAEgASgLMhIubm9va3MuYXBpLnYxLkl0ZW0igQIKEVVwZGF0ZUl0ZW1SZXF1ZXN0EhAKCGl0ZW1fdWlkGAEgASgJEhIKBWxhYmVsGAIgASgJSACIAQESFQoIcXVhbnRpdHkYAyABKAlIAYgBARITCgZkdWVfb24YBCABKAlIAogBARIRCgRub3RlGAUgASgJSAOIAQESGwoOZXhwZWN0ZWRfbGFiZWwYBiABKAlIBIgBARIaCg1leHBlY3RlZF9ub3RlGAcgASgJSAWIAQFCCAoGX2xhYmVsQgsKCV9xdWFudGl0eUIJCgdfZHVlX29uQgcKBV9ub3RlQhEKD19leHBlY3RlZF9sYWJlbEIQCg5fZXhwZWN0ZWRfbm90ZSI2ChJVcGRhdGVJdGVtUmVzcG9uc2USIAoEaXRlbRgBIAEoCzISLm5vb2tzLmFwaS52MS5JdGVtIjQKElNldEl0ZW1Eb25lUmVxdWVzdBIQCghpdGVtX3VpZBgBIAEoCRIMCgRkb25lGAIgASgIIjcKE1NldEl0ZW1Eb25lUmVzcG9uc2USIAoEaXRlbRgBIAEoCzISLm5vb2tzLmFwaS52MS5JdGVtIjsKD01vdmVJdGVtUmVxdWVzdBIQCghpdGVtX3VpZBgBIAEoCRIWCg5hZnRlcl9pdGVtX3VpZBgCIAEoCSISChBNb3ZlSXRlbVJlc3BvbnNlIiUKEURlbGV0ZUl0ZW1SZXF1ZXN0EhAKCGl0ZW1fdWlkGAEgASgJIhQKEkRlbGV0ZUl0ZW1SZXNwb25zZSJ7CglTZWFyY2hIaXQSKQoEa2luZBgBIAEoDjIbLm5vb2tzLmFwaS52MS5TZWFyY2hIaXRLaW5kEhAKCGxpc3RfdWlkGAIgASgJEhAKCGl0ZW1fdWlkGAMgASgJEgwKBHRleHQYBCABKAkSEQoJbGlzdF9uYW1lGAUgASgJIh4KDVNlYXJjaFJlcXVlc3QSDQoFcXVlcnkYASABKAkiNwoOU2VhcmNoUmVzcG9uc2USJQoEaGl0cxgBIAMoCzIXLm5vb2tzLmFwaS52MS5TZWFyY2hIaXQiUgoJRGF0ZWRJdGVtEiAKBGl0ZW0YASABKAsyEi5ub29rcy5hcGkudjEuSXRlbRIQCghsaXN0X3VpZBgCIAEoCRIRCglsaXN0X25hbWUYAyABKAkiMQoVTGlzdERhdGVkSXRlbXNSZXF1ZXN0EgwKBGZyb20YASABKAkSCgoCdG8YAiABKAkiQAoWTGlzdERhdGVkSXRlbXNSZXNwb25zZRImCgVpdGVtcxgBIAMoCzIXLm5vb2tzLmFwaS52MS5EYXRlZEl0ZW0qYwoHU2hhcmluZxIXChNTSEFSSU5HX1VOU1BFQ0lGSUVEEAASEwoPU0hBUklOR19QUklWQVRFEAESFAoQU0hBUklOR19JTlNUQU5DRRACEhQKEFNIQVJJTkdfU1BFQ0lGSUMQAyp+Cg1TZWFyY2hIaXRLaW5kEh8KG1NFQVJDSF9ISVRfS0lORF9VTlNQRUNJRklFRBAAEhgKFFNFQVJDSF9ISVRfS0lORF9MSVNUEAESGAoUU0VBUkNIX0hJVF9LSU5EX0lURU0QAhIYChRTRUFSQ0hfSElUX0tJTkRfTk9URRADMv8OCgtMaXN0U2VydmljZRJjCglMaXN0TGlzdHMSHi5ub29rcy5hcGkudjEuTGlzdExpc3RzUmVxdWVzdBofLm5vb2tzLmFwaS52MS5MaXN0TGlzdHNSZXNwb25zZSIVgtPkkwIPEg0vYXBpL3YxL2xpc3RzEmgKB0dldExpc3QSHC5ub29rcy5hcGkudjEuR2V0TGlzdFJlcXVlc3QaHS5ub29rcy5hcGkudjEuR2V0TGlzdFJlc3BvbnNlIiCC0+STAhoSGC9hcGkvdjEvbGlzdHMve2xpc3RfdWlkfRJpCgpDcmVhdGVMaXN0Eh8ubm9va3MuYXBpLnYxLkNyZWF0ZUxpc3RSZXF1ZXN0GiAubm9va3MuYXBpLnYxLkNyZWF0ZUxpc3RSZXNwb25zZSIYgtPkkwISOgEqIg0vYXBpL3YxL2xpc3RzEnQKClJlbmFtZUxpc3QSHy5ub29rcy5hcGkudjEuUmVuYW1lTGlzdFJlcXVlc3QaIC5ub29rcy5hcGkudjEuUmVuYW1lTGlzdFJlc3BvbnNlIiOC0+STAh06ASoyGC9hcGkvdjEvbGlzdHMve2xpc3RfdWlkfRKIAQoOU2V0TGlzdFNoYXJpbmcSIy5ub29rcy5hcGkudjEuU2V0TGlzdFNoYXJpbmdSZXF1ZXN0GiQubm9va3MuYXBpLnYxLlNldExpc3RTaGFyaW5nUmVzcG9uc2UiK4LT5JMCJToBKhogL2FwaS92MS9saXN0cy97bGlzdF91aWR9L3NoYXJpbmcSgQEKDUdldExpc3RTaGFyZXMSIi5ub29rcy5hcGkudjEuR2V0TGlzdFNoYXJlc1JlcXVlc3QaIy5ub29rcy5hcGkudjEuR2V0TGlzdFNoYXJlc1Jlc3BvbnNlIieC0+STAiESHy9hcGkvdjEvbGlzdHMve2xpc3RfdWlkfS9zaGFyZXMScQoKRGVsZXRlTGlzdBIfLm5vb2tzLmFwaS52MS5EZWxldGVMaXN0UmVxdWVzdBogLm5vb2tzLmFwaS52MS5EZWxldGVMaXN0UmVzcG9uc2UiIILT5JMCGioYL2FwaS92MS9saXN0cy97bGlzdF91aWR9EocBCg1EdXBsaWNhdGVMaXN0EiIubm9va3MuYXBpLnYxLkR1cGxpY2F0ZUxpc3RSZXF1ZXN0GiMubm9va3MuYXBpLnYxLkR1cGxpY2F0ZUxpc3RSZXNwb25zZSItgtPkkwInOgEqIiIvYXBpL3YxL2xpc3RzL3tsaXN0X3VpZH06ZHVwbGljYXRlEoQBCg1TZXRMaXN0UGlubmVkEiIubm9va3MuYXBpLnYxLlNldExpc3RQaW5uZWRSZXF1ZXN0GiMubm9va3MuYXBpLnYxLlNldExpc3RQaW5uZWRSZXNwb25zZSIqgtPkkwIkOgEqGh8vYXBpL3YxL2xpc3RzL3tsaXN0X3VpZH0vcGlubmVkEnoKCkNyZWF0ZUl0ZW0SHy5ub29rcy5hcGkudjEuQ3JlYXRlSXRlbVJlcXVlc3QaIC5ub29rcy5hcGkudjEuQ3JlYXRlSXRlbVJlc3BvbnNlIimC0+STAiM6ASoiHi9hcGkvdjEvbGlzdHMve2xpc3RfdWlkfS9pdGVtcxJ0CgpVcGRhdGVJdGVtEh8ubm9va3MuYXBpLnYxLlVwZGF0ZUl0ZW1SZXF1ZXN0GiAubm9va3MuYXBpLnYxLlVwZGF0ZUl0ZW1SZXNwb25zZSIjgtPkkwIdOgEqMhgvYXBpL3YxL2l0ZW1zL3tpdGVtX3VpZH0SfAoLU2V0SXRlbURvbmUSIC5ub29rcy5hcGkudjEuU2V0SXRlbURvbmVSZXF1ZXN0GiEubm9va3MuYXBpLnYxLlNldEl0ZW1Eb25lUmVzcG9uc2UiKILT5JMCIjoBKhodL2FwaS92MS9pdGVtcy97aXRlbV91aWR9L2RvbmUScwoITW92ZUl0ZW0SHS5ub29rcy5hcGkudjEuTW92ZUl0ZW1SZXF1ZXN0Gh4ubm9va3MuYXBpLnYxLk1vdmVJdGVtUmVzcG9uc2UiKILT5JMCIjoBKiIdL2FwaS92MS9pdGVtcy97aXRlbV91aWR9Om1vdmUScQoKRGVsZXRlSXRlbRIfLm5vb2tzLmFwaS52MS5EZWxldGVJdGVtUmVxdWVzdBogLm5vb2tzLmFwaS52MS5EZWxldGVJdGVtUmVzcG9uc2UiIILT5JMCGioYL2FwaS92MS9pdGVtcy97aXRlbV91aWR9EngKDkxpc3REYXRlZEl0ZW1zEiMubm9va3MuYXBpLnYxLkxpc3REYXRlZEl0ZW1zUmVxdWVzdBokLm5vb2tzLmFwaS52MS5MaXN0RGF0ZWRJdGVtc1Jlc3BvbnNlIhuC0+STAhUSEy9hcGkvdjEvZGF0ZWQtaXRlbXMSWwoGU2VhcmNoEhsubm9va3MuYXBpLnYxLlNlYXJjaFJlcXVlc3QaHC5ub29rcy5hcGkudjEuU2VhcmNoUmVzcG9uc2UiFoLT5JMCEBIOL2FwaS92MS9zZWFyY2hCrgEKEGNvbS5ub29rcy5hcGkudjFCEExpc3RTZXJ2aWNlUHJvdG9QAVo2Z2l0aHViLmNvbS9ob3Nob21vaC9ub29rcy9wcm90by9nZW4vbm9va3MvYXBpL3YxO2FwaXYxogIDTkFYqgIMTm9va3MuQXBpLlYxygIMTm9va3NcQXBpXFYx4gIYTm9va3NcQXBpXFYxXEdQQk1ldGFkYXRh6gIOTm9va3M6OkFwaTo6VjFiBnByb3RvMw", [file_google_api_annotations]);
+  fileDesc("Ch9ub29rcy9hcGkvdjEvbGlzdF9zZXJ2aWNlLnByb3RvEgxub29rcy5hcGkudjEi/wEKBExpc3QSCwoDdWlkGAEgASgJEgwKBG5hbWUYAiABKAkSJgoHc2hhcmluZxgDIAEoDjIVLm5vb2tzLmFwaS52MS5TaGFyaW5nEhAKCGNhbl9lZGl0GAQgASgIEhAKCGlzX293bmVyGAUgASgIEhEKCWlzX3Bpbm5lZBgGIAEoCBISCgpvcGVuX2NvdW50GAcgASgFEhIKCmRvbmVfY291bnQYCCABKAUSEgoKY3JlYXRlZF9hdBgJIAEoCRISCgp1cGRhdGVkX2F0GAogASgJEhMKC2FyY2hpdmVkX2F0GAsgASgJEhgKEGFyY2hpdmVkX2J5X25hbWUYDCABKAki/wEKBEl0ZW0SCwoDdWlkGAEgASgJEg0KBWxhYmVsGAIgASgJEhAKCHF1YW50aXR5GAMgASgJEg4KBmR1ZV9vbhgEIAEoCRIMCgRkb25lGAUgASgIEhUKDWFkZGVkX2J5X25hbWUYBiABKAkSFAoMZG9uZV9ieV9uYW1lGAcgASgJEg8KB2RvbmVfYXQYCyABKAkSEwoLZG9uZV9ieV91aWQYDCABKAkSDAoEbm90ZRgIIAEoCRIXCg9hZGRlZF92aWFfdG9rZW4YDSABKAlKBAgJEApKBAgKEAtSD25vdGVfZmlyc3RfbGluZVIUbm90ZV9yZW1haW5pbmdfbGluZXMiEgoQTGlzdExpc3RzUmVxdWVzdCI2ChFMaXN0TGlzdHNSZXNwb25zZRIhCgVsaXN0cxgBIAMoCzISLm5vb2tzLmFwaS52MS5MaXN0IiIKDkdldExpc3RSZXF1ZXN0EhAKCGxpc3RfdWlkGAEgASgJIlYKD0dldExpc3RSZXNwb25zZRIgCgRsaXN0GAEgASgLMhIubm9va3MuYXBpLnYxLkxpc3QSIQoFaXRlbXMYAiADKAsyEi5ub29rcy5hcGkudjEuSXRlbSIhChFDcmVhdGVMaXN0UmVxdWVzdBIMCgRuYW1lGAEgASgJIjYKEkNyZWF0ZUxpc3RSZXNwb25zZRIgCgRsaXN0GAEgASgLMhIubm9va3MuYXBpLnYxLkxpc3QiMwoRUmVuYW1lTGlzdFJlcXVlc3QSEAoIbGlzdF91aWQYASABKAkSDAoEbmFtZRgCIAEoCSI2ChJSZW5hbWVMaXN0UmVzcG9uc2USIAoEbGlzdBgBIAEoCzISLm5vb2tzLmFwaS52MS5MaXN0IowBChVTZXRMaXN0U2hhcmluZ1JlcXVlc3QSEAoIbGlzdF91aWQYASABKAkSJgoHc2hhcmluZxgCIAEoDjIVLm5vb2tzLmFwaS52MS5TaGFyaW5nEhAKCGNhbl9lZGl0GAMgASgIEhMKC21lbWJlcl91aWRzGAQgAygJEhIKCmdyb3VwX3VpZHMYBSADKAkiOgoWU2V0TGlzdFNoYXJpbmdSZXNwb25zZRIgCgRsaXN0GAEgASgLMhIubm9va3MuYXBpLnYxLkxpc3QiKAoUR2V0TGlzdFNoYXJlc1JlcXVlc3QSEAoIbGlzdF91aWQYASABKAkiQAoVR2V0TGlzdFNoYXJlc1Jlc3BvbnNlEhMKC21lbWJlcl91aWRzGAEgAygJEhIKCmdyb3VwX3VpZHMYAiADKAkiKAoURHVwbGljYXRlTGlzdFJlcXVlc3QSEAoIbGlzdF91aWQYASABKAkiOQoVRHVwbGljYXRlTGlzdFJlc3BvbnNlEiAKBGxpc3QYASABKAsyEi5ub29rcy5hcGkudjEuTGlzdCI8ChZTZXRMaXN0QXJjaGl2ZWRSZXF1ZXN0EhAKCGxpc3RfdWlkGAEgASgJEhAKCGFyY2hpdmVkGAIgASgIIjsKF1NldExpc3RBcmNoaXZlZFJlc3BvbnNlEiAKBGxpc3QYASABKAsyEi5ub29rcy5hcGkudjEuTGlzdCIlChFEZWxldGVMaXN0UmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCSIUChJEZWxldGVMaXN0UmVzcG9uc2UiOAoUU2V0TGlzdFBpbm5lZFJlcXVlc3QSEAoIbGlzdF91aWQYASABKAkSDgoGcGlubmVkGAIgASgIIhcKFVNldExpc3RQaW5uZWRSZXNwb25zZSJWChFDcmVhdGVJdGVtUmVxdWVzdBIQCghsaXN0X3VpZBgBIAEoCRINCgVsYWJlbBgCIAEoCRIQCghxdWFudGl0eRgDIAEoCRIOCgZkdWVfb24YBCABKAkiNgoSQ3JlYXRlSXRlbVJlc3BvbnNlEiAKBGl0ZW0YASABKAsyEi5ub29rcy5hcGkudjEuSXRlbSKBAgoRVXBkYXRlSXRlbVJlcXVlc3QSEAoIaXRlbV91aWQYASABKAkSEgoFbGFiZWwYAiABKAlIAIgBARIVCghxdWFudGl0eRgDIAEoCUgBiAEBEhMKBmR1ZV9vbhgEIAEoCUgCiAEBEhEKBG5vdGUYBSABKAlIA4gBARIbCg5leHBlY3RlZF9sYWJlbBgGIAEoCUgEiAEBEhoKDWV4cGVjdGVkX25vdGUYByABKAlIBYgBAUIICgZfbGFiZWxCCwoJX3F1YW50aXR5QgkKB19kdWVfb25CBwoFX25vdGVCEQoPX2V4cGVjdGVkX2xhYmVsQhAKDl9leHBlY3RlZF9ub3RlIjYKElVwZGF0ZUl0ZW1SZXNwb25zZRIgCgRpdGVtGAEgASgLMhIubm9va3MuYXBpLnYxLkl0ZW0iNAoSU2V0SXRlbURvbmVSZXF1ZXN0EhAKCGl0ZW1fdWlkGAEgASgJEgwKBGRvbmUYAiABKAgiNwoTU2V0SXRlbURvbmVSZXNwb25zZRIgCgRpdGVtGAEgASgLMhIubm9va3MuYXBpLnYxLkl0ZW0iOwoPTW92ZUl0ZW1SZXF1ZXN0EhAKCGl0ZW1fdWlkGAEgASgJEhYKDmFmdGVyX2l0ZW1fdWlkGAIgASgJIhIKEE1vdmVJdGVtUmVzcG9uc2UiJQoRRGVsZXRlSXRlbVJlcXVlc3QSEAoIaXRlbV91aWQYASABKAkiFAoSRGVsZXRlSXRlbVJlc3BvbnNlInsKCVNlYXJjaEhpdBIpCgRraW5kGAEgASgOMhsubm9va3MuYXBpLnYxLlNlYXJjaEhpdEtpbmQSEAoIbGlzdF91aWQYAiABKAkSEAoIaXRlbV91aWQYAyABKAkSDAoEdGV4dBgEIAEoCRIRCglsaXN0X25hbWUYBSABKAkiHgoNU2VhcmNoUmVxdWVzdBINCgVxdWVyeRgBIAEoCSI3Cg5TZWFyY2hSZXNwb25zZRIlCgRoaXRzGAEgAygLMhcubm9va3MuYXBpLnYxLlNlYXJjaEhpdCJSCglEYXRlZEl0ZW0SIAoEaXRlbRgBIAEoCzISLm5vb2tzLmFwaS52MS5JdGVtEhAKCGxpc3RfdWlkGAIgASgJEhEKCWxpc3RfbmFtZRgDIAEoCSIxChVMaXN0RGF0ZWRJdGVtc1JlcXVlc3QSDAoEZnJvbRgBIAEoCRIKCgJ0bxgCIAEoCSJAChZMaXN0RGF0ZWRJdGVtc1Jlc3BvbnNlEiYKBWl0ZW1zGAEgAygLMhcubm9va3MuYXBpLnYxLkRhdGVkSXRlbSpjCgdTaGFyaW5nEhcKE1NIQVJJTkdfVU5TUEVDSUZJRUQQABITCg9TSEFSSU5HX1BSSVZBVEUQARIUChBTSEFSSU5HX0lOU1RBTkNFEAISFAoQU0hBUklOR19TUEVDSUZJQxADKn4KDVNlYXJjaEhpdEtpbmQSHwobU0VBUkNIX0hJVF9LSU5EX1VOU1BFQ0lGSUVEEAASGAoUU0VBUkNIX0hJVF9LSU5EX0xJU1QQARIYChRTRUFSQ0hfSElUX0tJTkRfSVRFTRACEhgKFFNFQVJDSF9ISVRfS0lORF9OT1RFEAMyjhAKC0xpc3RTZXJ2aWNlEmMKCUxpc3RMaXN0cxIeLm5vb2tzLmFwaS52MS5MaXN0TGlzdHNSZXF1ZXN0Gh8ubm9va3MuYXBpLnYxLkxpc3RMaXN0c1Jlc3BvbnNlIhWC0+STAg8SDS9hcGkvdjEvbGlzdHMSaAoHR2V0TGlzdBIcLm5vb2tzLmFwaS52MS5HZXRMaXN0UmVxdWVzdBodLm5vb2tzLmFwaS52MS5HZXRMaXN0UmVzcG9uc2UiIILT5JMCGhIYL2FwaS92MS9saXN0cy97bGlzdF91aWR9EmkKCkNyZWF0ZUxpc3QSHy5ub29rcy5hcGkudjEuQ3JlYXRlTGlzdFJlcXVlc3QaIC5ub29rcy5hcGkudjEuQ3JlYXRlTGlzdFJlc3BvbnNlIhiC0+STAhI6ASoiDS9hcGkvdjEvbGlzdHMSdAoKUmVuYW1lTGlzdBIfLm5vb2tzLmFwaS52MS5SZW5hbWVMaXN0UmVxdWVzdBogLm5vb2tzLmFwaS52MS5SZW5hbWVMaXN0UmVzcG9uc2UiI4LT5JMCHToBKjIYL2FwaS92MS9saXN0cy97bGlzdF91aWR9EogBCg5TZXRMaXN0U2hhcmluZxIjLm5vb2tzLmFwaS52MS5TZXRMaXN0U2hhcmluZ1JlcXVlc3QaJC5ub29rcy5hcGkudjEuU2V0TGlzdFNoYXJpbmdSZXNwb25zZSIrgtPkkwIlOgEqGiAvYXBpL3YxL2xpc3RzL3tsaXN0X3VpZH0vc2hhcmluZxKBAQoNR2V0TGlzdFNoYXJlcxIiLm5vb2tzLmFwaS52MS5HZXRMaXN0U2hhcmVzUmVxdWVzdBojLm5vb2tzLmFwaS52MS5HZXRMaXN0U2hhcmVzUmVzcG9uc2UiJ4LT5JMCIRIfL2FwaS92MS9saXN0cy97bGlzdF91aWR9L3NoYXJlcxKMAQoPU2V0TGlzdEFyY2hpdmVkEiQubm9va3MuYXBpLnYxLlNldExpc3RBcmNoaXZlZFJlcXVlc3QaJS5ub29rcy5hcGkudjEuU2V0TGlzdEFyY2hpdmVkUmVzcG9uc2UiLILT5JMCJjoBKiIhL2FwaS92MS9saXN0cy97bGlzdF91aWR9L2FyY2hpdmVkEnEKCkRlbGV0ZUxpc3QSHy5ub29rcy5hcGkudjEuRGVsZXRlTGlzdFJlcXVlc3QaIC5ub29rcy5hcGkudjEuRGVsZXRlTGlzdFJlc3BvbnNlIiCC0+STAhoqGC9hcGkvdjEvbGlzdHMve2xpc3RfdWlkfRKHAQoNRHVwbGljYXRlTGlzdBIiLm5vb2tzLmFwaS52MS5EdXBsaWNhdGVMaXN0UmVxdWVzdBojLm5vb2tzLmFwaS52MS5EdXBsaWNhdGVMaXN0UmVzcG9uc2UiLYLT5JMCJzoBKiIiL2FwaS92MS9saXN0cy97bGlzdF91aWR9OmR1cGxpY2F0ZRKEAQoNU2V0TGlzdFBpbm5lZBIiLm5vb2tzLmFwaS52MS5TZXRMaXN0UGlubmVkUmVxdWVzdBojLm5vb2tzLmFwaS52MS5TZXRMaXN0UGlubmVkUmVzcG9uc2UiKoLT5JMCJDoBKhofL2FwaS92MS9saXN0cy97bGlzdF91aWR9L3Bpbm5lZBJ6CgpDcmVhdGVJdGVtEh8ubm9va3MuYXBpLnYxLkNyZWF0ZUl0ZW1SZXF1ZXN0GiAubm9va3MuYXBpLnYxLkNyZWF0ZUl0ZW1SZXNwb25zZSIpgtPkkwIjOgEqIh4vYXBpL3YxL2xpc3RzL3tsaXN0X3VpZH0vaXRlbXMSdAoKVXBkYXRlSXRlbRIfLm5vb2tzLmFwaS52MS5VcGRhdGVJdGVtUmVxdWVzdBogLm5vb2tzLmFwaS52MS5VcGRhdGVJdGVtUmVzcG9uc2UiI4LT5JMCHToBKjIYL2FwaS92MS9pdGVtcy97aXRlbV91aWR9EnwKC1NldEl0ZW1Eb25lEiAubm9va3MuYXBpLnYxLlNldEl0ZW1Eb25lUmVxdWVzdBohLm5vb2tzLmFwaS52MS5TZXRJdGVtRG9uZVJlc3BvbnNlIiiC0+STAiI6ASoaHS9hcGkvdjEvaXRlbXMve2l0ZW1fdWlkfS9kb25lEnMKCE1vdmVJdGVtEh0ubm9va3MuYXBpLnYxLk1vdmVJdGVtUmVxdWVzdBoeLm5vb2tzLmFwaS52MS5Nb3ZlSXRlbVJlc3BvbnNlIiiC0+STAiI6ASoiHS9hcGkvdjEvaXRlbXMve2l0ZW1fdWlkfTptb3ZlEnEKCkRlbGV0ZUl0ZW0SHy5ub29rcy5hcGkudjEuRGVsZXRlSXRlbVJlcXVlc3QaIC5ub29rcy5hcGkudjEuRGVsZXRlSXRlbVJlc3BvbnNlIiCC0+STAhoqGC9hcGkvdjEvaXRlbXMve2l0ZW1fdWlkfRJ4Cg5MaXN0RGF0ZWRJdGVtcxIjLm5vb2tzLmFwaS52MS5MaXN0RGF0ZWRJdGVtc1JlcXVlc3QaJC5ub29rcy5hcGkudjEuTGlzdERhdGVkSXRlbXNSZXNwb25zZSIbgtPkkwIVEhMvYXBpL3YxL2RhdGVkLWl0ZW1zElsKBlNlYXJjaBIbLm5vb2tzLmFwaS52MS5TZWFyY2hSZXF1ZXN0Ghwubm9va3MuYXBpLnYxLlNlYXJjaFJlc3BvbnNlIhaC0+STAhASDi9hcGkvdjEvc2VhcmNoQq4BChBjb20ubm9va3MuYXBpLnYxQhBMaXN0U2VydmljZVByb3RvUAFaNmdpdGh1Yi5jb20vaG9zaG9tb2gvbm9va3MvcHJvdG8vZ2VuL25vb2tzL2FwaS92MTthcGl2MaICA05BWKoCDE5vb2tzLkFwaS5WMcoCDE5vb2tzXEFwaVxWMeICGE5vb2tzXEFwaVxWMVxHUEJNZXRhZGF0YeoCDk5vb2tzOjpBcGk6OlYxYgZwcm90bzM", [file_google_api_annotations]);
 
 /**
  * List is a named, ordered collection of Items.
@@ -83,6 +83,21 @@ export type List = Message<"nooks.api.v1.List"> & {
    * @generated from field: string updated_at = 10;
    */
   updatedAt: string;
+
+  /**
+   * When it was archived, RFC 3339, or empty while it is not. An archived List is out
+   * of the sidebar and still searchable and restorable.
+   *
+   * @generated from field: string archived_at = 11;
+   */
+  archivedAt: string;
+
+  /**
+   * Who archived it, by name, for a row that says so. Empty while it is not archived.
+   *
+   * @generated from field: string archived_by_name = 12;
+   */
+  archivedByName: string;
 };
 
 /**
@@ -455,6 +470,47 @@ export const DuplicateListResponseSchema: GenMessage<DuplicateListResponse> = /*
   messageDesc(file_nooks_api_v1_list_service, 15);
 
 /**
+ * @generated from message nooks.api.v1.SetListArchivedRequest
+ */
+export type SetListArchivedRequest = Message<"nooks.api.v1.SetListArchivedRequest"> & {
+  /**
+   * @generated from field: string list_uid = 1;
+   */
+  listUid: string;
+
+  /**
+   * True to put it away, false to bring it back.
+   *
+   * @generated from field: bool archived = 2;
+   */
+  archived: boolean;
+};
+
+/**
+ * Describes the message nooks.api.v1.SetListArchivedRequest.
+ * Use `create(SetListArchivedRequestSchema)` to create a new message.
+ */
+export const SetListArchivedRequestSchema: GenMessage<SetListArchivedRequest> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_list_service, 16);
+
+/**
+ * @generated from message nooks.api.v1.SetListArchivedResponse
+ */
+export type SetListArchivedResponse = Message<"nooks.api.v1.SetListArchivedResponse"> & {
+  /**
+   * @generated from field: nooks.api.v1.List list = 1;
+   */
+  list?: List | undefined;
+};
+
+/**
+ * Describes the message nooks.api.v1.SetListArchivedResponse.
+ * Use `create(SetListArchivedResponseSchema)` to create a new message.
+ */
+export const SetListArchivedResponseSchema: GenMessage<SetListArchivedResponse> = /*@__PURE__*/
+  messageDesc(file_nooks_api_v1_list_service, 17);
+
+/**
  * @generated from message nooks.api.v1.DeleteListRequest
  */
 export type DeleteListRequest = Message<"nooks.api.v1.DeleteListRequest"> & {
@@ -469,7 +525,7 @@ export type DeleteListRequest = Message<"nooks.api.v1.DeleteListRequest"> & {
  * Use `create(DeleteListRequestSchema)` to create a new message.
  */
 export const DeleteListRequestSchema: GenMessage<DeleteListRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 16);
+  messageDesc(file_nooks_api_v1_list_service, 18);
 
 /**
  * @generated from message nooks.api.v1.DeleteListResponse
@@ -482,7 +538,7 @@ export type DeleteListResponse = Message<"nooks.api.v1.DeleteListResponse"> & {
  * Use `create(DeleteListResponseSchema)` to create a new message.
  */
 export const DeleteListResponseSchema: GenMessage<DeleteListResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 17);
+  messageDesc(file_nooks_api_v1_list_service, 19);
 
 /**
  * @generated from message nooks.api.v1.SetListPinnedRequest
@@ -504,7 +560,7 @@ export type SetListPinnedRequest = Message<"nooks.api.v1.SetListPinnedRequest"> 
  * Use `create(SetListPinnedRequestSchema)` to create a new message.
  */
 export const SetListPinnedRequestSchema: GenMessage<SetListPinnedRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 18);
+  messageDesc(file_nooks_api_v1_list_service, 20);
 
 /**
  * @generated from message nooks.api.v1.SetListPinnedResponse
@@ -517,7 +573,7 @@ export type SetListPinnedResponse = Message<"nooks.api.v1.SetListPinnedResponse"
  * Use `create(SetListPinnedResponseSchema)` to create a new message.
  */
 export const SetListPinnedResponseSchema: GenMessage<SetListPinnedResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 19);
+  messageDesc(file_nooks_api_v1_list_service, 21);
 
 /**
  * @generated from message nooks.api.v1.CreateItemRequest
@@ -549,7 +605,7 @@ export type CreateItemRequest = Message<"nooks.api.v1.CreateItemRequest"> & {
  * Use `create(CreateItemRequestSchema)` to create a new message.
  */
 export const CreateItemRequestSchema: GenMessage<CreateItemRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 20);
+  messageDesc(file_nooks_api_v1_list_service, 22);
 
 /**
  * @generated from message nooks.api.v1.CreateItemResponse
@@ -566,7 +622,7 @@ export type CreateItemResponse = Message<"nooks.api.v1.CreateItemResponse"> & {
  * Use `create(CreateItemResponseSchema)` to create a new message.
  */
 export const CreateItemResponseSchema: GenMessage<CreateItemResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 21);
+  messageDesc(file_nooks_api_v1_list_service, 23);
 
 /**
  * @generated from message nooks.api.v1.UpdateItemRequest
@@ -627,7 +683,7 @@ export type UpdateItemRequest = Message<"nooks.api.v1.UpdateItemRequest"> & {
  * Use `create(UpdateItemRequestSchema)` to create a new message.
  */
 export const UpdateItemRequestSchema: GenMessage<UpdateItemRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 22);
+  messageDesc(file_nooks_api_v1_list_service, 24);
 
 /**
  * @generated from message nooks.api.v1.UpdateItemResponse
@@ -644,7 +700,7 @@ export type UpdateItemResponse = Message<"nooks.api.v1.UpdateItemResponse"> & {
  * Use `create(UpdateItemResponseSchema)` to create a new message.
  */
 export const UpdateItemResponseSchema: GenMessage<UpdateItemResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 23);
+  messageDesc(file_nooks_api_v1_list_service, 25);
 
 /**
  * @generated from message nooks.api.v1.SetItemDoneRequest
@@ -666,7 +722,7 @@ export type SetItemDoneRequest = Message<"nooks.api.v1.SetItemDoneRequest"> & {
  * Use `create(SetItemDoneRequestSchema)` to create a new message.
  */
 export const SetItemDoneRequestSchema: GenMessage<SetItemDoneRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 24);
+  messageDesc(file_nooks_api_v1_list_service, 26);
 
 /**
  * @generated from message nooks.api.v1.SetItemDoneResponse
@@ -683,7 +739,7 @@ export type SetItemDoneResponse = Message<"nooks.api.v1.SetItemDoneResponse"> & 
  * Use `create(SetItemDoneResponseSchema)` to create a new message.
  */
 export const SetItemDoneResponseSchema: GenMessage<SetItemDoneResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 25);
+  messageDesc(file_nooks_api_v1_list_service, 27);
 
 /**
  * @generated from message nooks.api.v1.MoveItemRequest
@@ -707,7 +763,7 @@ export type MoveItemRequest = Message<"nooks.api.v1.MoveItemRequest"> & {
  * Use `create(MoveItemRequestSchema)` to create a new message.
  */
 export const MoveItemRequestSchema: GenMessage<MoveItemRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 26);
+  messageDesc(file_nooks_api_v1_list_service, 28);
 
 /**
  * @generated from message nooks.api.v1.MoveItemResponse
@@ -720,7 +776,7 @@ export type MoveItemResponse = Message<"nooks.api.v1.MoveItemResponse"> & {
  * Use `create(MoveItemResponseSchema)` to create a new message.
  */
 export const MoveItemResponseSchema: GenMessage<MoveItemResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 27);
+  messageDesc(file_nooks_api_v1_list_service, 29);
 
 /**
  * @generated from message nooks.api.v1.DeleteItemRequest
@@ -737,7 +793,7 @@ export type DeleteItemRequest = Message<"nooks.api.v1.DeleteItemRequest"> & {
  * Use `create(DeleteItemRequestSchema)` to create a new message.
  */
 export const DeleteItemRequestSchema: GenMessage<DeleteItemRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 28);
+  messageDesc(file_nooks_api_v1_list_service, 30);
 
 /**
  * @generated from message nooks.api.v1.DeleteItemResponse
@@ -750,7 +806,7 @@ export type DeleteItemResponse = Message<"nooks.api.v1.DeleteItemResponse"> & {
  * Use `create(DeleteItemResponseSchema)` to create a new message.
  */
 export const DeleteItemResponseSchema: GenMessage<DeleteItemResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 29);
+  messageDesc(file_nooks_api_v1_list_service, 31);
 
 /**
  * SearchHit is one match.
@@ -797,7 +853,7 @@ export type SearchHit = Message<"nooks.api.v1.SearchHit"> & {
  * Use `create(SearchHitSchema)` to create a new message.
  */
 export const SearchHitSchema: GenMessage<SearchHit> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 30);
+  messageDesc(file_nooks_api_v1_list_service, 32);
 
 /**
  * @generated from message nooks.api.v1.SearchRequest
@@ -816,7 +872,7 @@ export type SearchRequest = Message<"nooks.api.v1.SearchRequest"> & {
  * Use `create(SearchRequestSchema)` to create a new message.
  */
 export const SearchRequestSchema: GenMessage<SearchRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 31);
+  messageDesc(file_nooks_api_v1_list_service, 33);
 
 /**
  * @generated from message nooks.api.v1.SearchResponse
@@ -833,7 +889,7 @@ export type SearchResponse = Message<"nooks.api.v1.SearchResponse"> & {
  * Use `create(SearchResponseSchema)` to create a new message.
  */
 export const SearchResponseSchema: GenMessage<SearchResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 32);
+  messageDesc(file_nooks_api_v1_list_service, 34);
 
 /**
  * DatedItem is an Item with enough of its List to render a row away from it.
@@ -862,7 +918,7 @@ export type DatedItem = Message<"nooks.api.v1.DatedItem"> & {
  * Use `create(DatedItemSchema)` to create a new message.
  */
 export const DatedItemSchema: GenMessage<DatedItem> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 33);
+  messageDesc(file_nooks_api_v1_list_service, 35);
 
 /**
  * @generated from message nooks.api.v1.ListDatedItemsRequest
@@ -889,7 +945,7 @@ export type ListDatedItemsRequest = Message<"nooks.api.v1.ListDatedItemsRequest"
  * Use `create(ListDatedItemsRequestSchema)` to create a new message.
  */
 export const ListDatedItemsRequestSchema: GenMessage<ListDatedItemsRequest> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 34);
+  messageDesc(file_nooks_api_v1_list_service, 36);
 
 /**
  * @generated from message nooks.api.v1.ListDatedItemsResponse
@@ -906,7 +962,7 @@ export type ListDatedItemsResponse = Message<"nooks.api.v1.ListDatedItemsRespons
  * Use `create(ListDatedItemsResponseSchema)` to create a new message.
  */
 export const ListDatedItemsResponseSchema: GenMessage<ListDatedItemsResponse> = /*@__PURE__*/
-  messageDesc(file_nooks_api_v1_list_service, 35);
+  messageDesc(file_nooks_api_v1_list_service, 37);
 
 /**
  * Sharing is who can reach a List.
@@ -1050,7 +1106,17 @@ export const ListService: GenService<{
   },
   /**
    * DeleteList removes a List and the Items on it. Only its owner may.
+   * Puts a List out of the sidebar, or brings it back. Archiving is not deleting: what
+   * is archived keeps its Items and can be restored.
    *
+   * @generated from rpc nooks.api.v1.ListService.SetListArchived
+   */
+  setListArchived: {
+    methodKind: "unary";
+    input: typeof SetListArchivedRequestSchema;
+    output: typeof SetListArchivedResponseSchema;
+  },
+  /**
    * @generated from rpc nooks.api.v1.ListService.DeleteList
    */
   deleteList: {

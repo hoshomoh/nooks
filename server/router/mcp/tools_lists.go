@@ -35,6 +35,11 @@ type pinListArgs struct {
 	Pinned  bool   `json:"pinned" jsonschema:"true to pin it to the sidebar, false to unpin"`
 }
 
+type archiveListArgs struct {
+	ListUID  string `json:"list_uid" jsonschema:"the list to archive, from list_lists"`
+	Archived bool   `json:"archived" jsonschema:"true to put it out of the sidebar, false to bring it back"`
+}
+
 // addListTools registers what can be done to a List itself, as opposed to what is on it.
 func addListTools(server *sdk.Server, lists *v1.ListService) {
 	sdk.AddTool(server, &sdk.Tool{
@@ -108,6 +113,19 @@ func addListTools(server *sdk.Server, lists *v1.ListService) {
 		return answer(ctx, lists.SetListPinned,
 			&apiv1.SetListPinnedRequest{ListUid: args.ListUID, Pinned: args.Pinned},
 			done[apiv1.SetListPinnedResponse](said))
+	})
+
+	sdk.AddTool(server, &sdk.Tool{
+		Name:        "archive_list",
+		Description: "Put a list out of the sidebar for everyone, or bring it back. It keeps its items and stays searchable — this is not deleting.",
+	}, func(ctx context.Context, _ *sdk.CallToolRequest, args archiveListArgs) (*sdk.CallToolResult, any, error) {
+		said := "Archived."
+		if !args.Archived {
+			said = "Restored to the sidebar."
+		}
+		return answer(ctx, lists.SetListArchived,
+			&apiv1.SetListArchivedRequest{ListUid: args.ListUID, Archived: args.Archived},
+			done[apiv1.SetListArchivedResponse](said))
 	})
 
 	sdk.AddTool(server, &sdk.Tool{

@@ -13,6 +13,7 @@ import { ShareDialog, type ShareDecision } from "./share-dialog"
 import { listClient } from "@/lib/api"
 import { download } from "@/lib/download"
 import { exportFileFor } from "@/lib/list-export"
+import { isArchived } from "@/lib/list-groups"
 import { refreshLists } from "@/lib/refresh"
 
 export interface ListActionsProps {
@@ -67,6 +68,11 @@ export function ListActions({ list, instanceName, items, withControls }: ListAct
 
   const share = useMutation({
     mutationFn: (decision: ShareDecision) => listClient.setListSharing({ listUid, ...decision }),
+    onSuccess: refresh,
+  })
+
+  const archive = useMutation({
+    mutationFn: (archived: boolean) => listClient.setListArchived({ listUid, archived }),
     onSuccess: refresh,
   })
 
@@ -136,6 +142,15 @@ export function ListActions({ list, instanceName, items, withControls }: ListAct
         {items && (
           <MenuItem onSelect={() => download(exportFileFor(list, items))}>
             {t("listMenu.export")}
+          </MenuItem>
+        )}
+
+        {/* Grouped with Duplicate and above Delete, per the design. Archiving is not
+            deleting — it keeps everything and comes back — so it is not destructive and
+            does not sit with the one thing that is. */}
+        {list.isOwner && (
+          <MenuItem shortcut="⌘⇧A" onSelect={() => archive.mutate(!isArchived(list))}>
+            {t(isArchived(list) ? "sidebarMenu.restore" : "sidebarMenu.archive")}
           </MenuItem>
         )}
 

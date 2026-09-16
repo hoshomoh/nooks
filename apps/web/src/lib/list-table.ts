@@ -1,11 +1,11 @@
 import type { List } from "@nooks/api"
 
-import { isCompleted } from "./list-groups"
+import { isArchived, isCompleted } from "./list-groups"
 
 /** Which Lists the table is showing. */
-export type ListStatus = "all" | "active" | "completed"
+export type ListStatus = "all" | "active" | "completed" | "archived"
 
-export const LIST_STATUSES: ListStatus[] = ["all", "active", "completed"]
+export const LIST_STATUSES: ListStatus[] = ["all", "active", "completed", "archived"]
 
 /**
  * What the table is ordered by.
@@ -20,15 +20,26 @@ export const LIST_SORTS: ListSort[] = ["updated", "name", "open"]
 /** DEFAULT_SORT is what the table opens on: what changed last is what you came for. */
 export const DEFAULT_SORT: ListSort = "updated"
 
-/** filterLists keeps the Lists the chosen status covers. */
+/**
+ * filterLists keeps the Lists the chosen status covers.
+ *
+ * Archived is its own answer rather than a flavour of the others: a List put away is
+ * out of All, Active and Completed alike, because the point of archiving is that it
+ * stops appearing where somebody is looking for what they are working on.
+ */
 export function filterLists(lists: readonly List[], status: ListStatus): List[] {
+  if (status === "archived") {
+    return lists.filter(isArchived)
+  }
+
+  const here = lists.filter((list) => !isArchived(list))
   switch (status) {
     case "active":
-      return lists.filter((list) => !isCompleted(list))
+      return here.filter((list) => !isCompleted(list))
     case "completed":
-      return lists.filter((list) => isCompleted(list))
+      return here.filter(isCompleted)
     case "all":
-      return [...lists]
+      return here
   }
 }
 

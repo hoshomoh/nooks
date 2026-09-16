@@ -81,6 +81,9 @@ if wants proto; then
     echo "proto files are not formatted; run pnpm proto:format"; exit 1
   fi
 
+  step "gateway adapters"
+  ./scripts/check-gateway.sh
+
   # The protos are the contract every client is built against: the web app, a mobile
   # client, and anything anybody writes against the REST API. Checking against main means
   # a change that would break one of those stops here rather than in somebody's build.

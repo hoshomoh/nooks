@@ -82,13 +82,31 @@ func (s *ListService) ListLists(
 		return nil, err
 	}
 
+	// Who archived what, resolved once rather than per List: most households archive a
+	// handful, and the same person archived most of them.
+	archivers := map[int64]string{}
+	for _, list := range reachable {
+		if list.ArchivedByID == 0 {
+			continue
+		}
+		if _, known := archivers[list.ArchivedByID]; known {
+			continue
+		}
+		// Best effort: a List is archived whether or not the name can be read.
+		if who, err := s.store.MemberByID(ctx, list.ArchivedByID); err == nil {
+			archivers[list.ArchivedByID] = who.Name
+		}
+	}
+
 	out := make([]*apiv1.List, 0, len(reachable))
 	for _, list := range reachable {
 		open, done, err := s.counts(ctx, list.ID)
 		if err != nil {
 			return nil, err
 		}
-		out = append(out, listToProto(list, grant.Member, pinned[list.ID], open, done))
+		proto := listToProto(list, grant.Member, pinned[list.ID], open, done)
+		proto.ArchivedByName = archivers[list.ArchivedByID]
+		out = append(out, proto)
 	}
 	return connect.NewResponse(&apiv1.ListListsResponse{Lists: out}), nil
 }
@@ -228,6 +246,46 @@ func (s *ListService) SetListSharing(
 }
 
 // DeleteList removes a List and the Items on it.
+/*
+SetListArchived puts a List out of the sidebar, or brings it back.
+
+An owner's decision, like sharing and deleting, and for the same reason: archiving a
+shared List takes it out of everybody's sidebar, so it is not something one of the
+people it was shared with should be able to do to the rest.
+
+Not requireDeletion. Archiving loses nothing — the Items are still there and the List
+comes back whole — so a token cut to add to a List may also put one away.
+*/
+func (s *ListService) SetListArchived(
+	ctx context.Context,
+	req *connect.Request[apiv1.SetListArchivedRequest],
+) (*connect.Response[apiv1.SetListArchivedResponse], error) {
+	member, list, err := s.ownedList(ctx, req.Msg.GetListUid())
+	if err != nil {
+		return nil, err
+	}
+
+	by := int64(0)
+	if req.Msg.GetArchived() {
+		by = member.ID
+	}
+	if err := s.store.SetListArchived(ctx, list.UID, by, s.now()); err != nil {
+		return nil, internalError("archive list", err)
+	}
+
+	updated, err := s.store.ListByUID(ctx, list.UID)
+	if err != nil {
+		return nil, internalError("read list", err)
+	}
+	open, done, err := s.counts(ctx, updated.ID)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&apiv1.SetListArchivedResponse{
+		List: s.listWithNames(ctx, updated, member, false, open, done),
+	}), nil
+}
+
 func (s *ListService) DeleteList(
 	ctx context.Context,
 	req *connect.Request[apiv1.DeleteListRequest],
@@ -318,19 +376,44 @@ func (s *ListService) counts(ctx context.Context, listID int64) (open int, done 
 	return open, done, nil
 }
 
+/*
+listWithNames is listToProto plus the one field it cannot work out on its own.
+
+Who archived a List is an id on the row and a name on the wire, and resolving it needs
+the store. Every other field is already in hand.
+*/
+func (s *ListService) listWithNames(
+	ctx context.Context,
+	list store.List,
+	member store.Member,
+	pinned bool,
+	open, done int,
+) *apiv1.List {
+	out := listToProto(list, member, pinned, open, done)
+	if list.ArchivedByID != 0 {
+		// Best effort: a List that is archived is archived whether or not the name of
+		// whoever did it can be read.
+		if who, err := s.store.MemberByID(ctx, list.ArchivedByID); err == nil {
+			out.ArchivedByName = who.Name
+		}
+	}
+	return out
+}
+
 // listToProto converts a List for the wire, from one Member's point of view.
 func listToProto(list store.List, member store.Member, pinned bool, open, done int) *apiv1.List {
 	return &apiv1.List{
-		Uid:       list.UID,
-		Name:      list.Name,
-		Sharing:   sharingToProto(list.Sharing),
-		CanEdit:   list.CanEdit,
-		IsOwner:   list.OwnerID == member.ID,
-		IsPinned:  pinned,
-		OpenCount: int32(open),
-		DoneCount: int32(done),
-		CreatedAt: formatMoment(list.CreatedAt),
-		UpdatedAt: formatMoment(list.UpdatedAt),
+		Uid:        list.UID,
+		Name:       list.Name,
+		Sharing:    sharingToProto(list.Sharing),
+		CanEdit:    list.CanEdit,
+		IsOwner:    list.OwnerID == member.ID,
+		IsPinned:   pinned,
+		OpenCount:  int32(open),
+		DoneCount:  int32(done),
+		CreatedAt:  formatMoment(list.CreatedAt),
+		UpdatedAt:  formatMoment(list.UpdatedAt),
+		ArchivedAt: formatMoment(list.ArchivedAt),
 	}
 }
 

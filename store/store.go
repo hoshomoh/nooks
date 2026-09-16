@@ -173,6 +173,11 @@ type Store interface {
 	// SetListSharing changes who can reach a List and whether they may edit it.
 	SetListSharing(ctx context.Context, uid string, sharing Sharing, canEdit bool, at time.Time) error
 
+	// SetListArchived puts a List out of the sidebar, or brings it back. Pass the
+	// Member's id to archive and zero to restore. An archived List is still returned
+	// by ListsForMember: it is out of the way, not gone.
+	SetListArchived(ctx context.Context, uid string, memberID int64, at time.Time) error
+
 	// DeleteList removes a List. The removal is soft.
 	DeleteList(ctx context.Context, uid string, at time.Time) error
 

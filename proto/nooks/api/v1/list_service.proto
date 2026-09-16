@@ -48,6 +48,15 @@ service ListService {
   }
 
   // DeleteList removes a List and the Items on it. Only its owner may.
+  // Puts a List out of the sidebar, or brings it back. Archiving is not deleting: what
+  // is archived keeps its Items and can be restored.
+  rpc SetListArchived(SetListArchivedRequest) returns (SetListArchivedResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/lists/{list_uid}/archived"
+      body: "*"
+    };
+  }
+
   rpc DeleteList(DeleteListRequest) returns (DeleteListResponse) {
     option (google.api.http) = {delete: "/api/v1/lists/{list_uid}"};
   }
@@ -165,6 +174,13 @@ message List {
 
   // When it, or anything on it, last changed. RFC 3339.
   string updated_at = 10;
+
+  // When it was archived, RFC 3339, or empty while it is not. An archived List is out
+  // of the sidebar and still searchable and restorable.
+  string archived_at = 11;
+
+  // Who archived it, by name, for a row that says so. Empty while it is not archived.
+  string archived_by_name = 12;
 }
 
 // Item is one line on a List.
@@ -276,6 +292,17 @@ message DuplicateListRequest {
 }
 
 message DuplicateListResponse {
+  List list = 1;
+}
+
+message SetListArchivedRequest {
+  string list_uid = 1;
+
+  // True to put it away, false to bring it back.
+  bool archived = 2;
+}
+
+message SetListArchivedResponse {
   List list = 1;
 }
 

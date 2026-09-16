@@ -10,17 +10,18 @@ import { ChromeBar } from "@/components/ds/chrome-bar"
 import { COVERING, INERT } from "@/components/ds/covering"
 import { EmptyState } from "@/components/ds/empty-state"
 import { ListActions } from "@/components/ds/list-actions"
+import { Icon } from "@/components/ds/icon"
+import { Menu, MenuItem } from "@/components/ds/menu"
 import { SegmentedControl, type Segment } from "@/components/ds/segmented"
-import { SelectField } from "@/components/ds/select-field"
 import {
   DEFAULT_SORT,
   LIST_SORTS,
   LIST_STATUSES,
   filterLists,
   sortLists,
-  type ListSort,
   type ListStatus,
 } from "@/lib/list-table"
+import { isArchived } from "@/lib/list-groups"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useLocale } from "@/lib/use-locale"
 import { useMomentLabel } from "@/lib/use-moment-label"
@@ -88,21 +89,33 @@ export function Home() {
                   }
                 />
 
-                <SelectField
-                  label={t("list.sortLabel")}
-                  className="ml-auto"
-                  options={LIST_SORTS.map((one) => ({
-                    value: one,
-                    label: t(`list.sort${capitalise(one)}`),
-                  }))}
-                  value={sort}
-                  onValueChange={(next) =>
-                    void navigate({
-                      to: ".",
-                      search: (old) => ({ ...old, sort: next as ListSort }),
-                    })
+                {/* A menu rather than a select, per the design: it says what the
+                    order is now and opens the three it could be, and it is not the
+                    280px a settings row gives its select. */}
+                <Menu
+                  trigger={
+                    <button
+                      type="button"
+                      aria-label={t("list.sortLabel")}
+                      className="ml-auto flex h-control-settings shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 text-meta text-secondary-foreground transition-colors hover:bg-secondary"
+                    >
+                      <span>{t(`list.sort${capitalise(sort)}`)}</span>
+                      <Icon name="collapse" size="small" className="size-3 text-control" />
+                    </button>
                   }
-                />
+                >
+                  {LIST_SORTS.map((one) => (
+                    <MenuItem
+                      key={one}
+                      shortcut={one === sort ? "✓" : undefined}
+                      onSelect={() =>
+                        void navigate({ to: ".", search: (old) => ({ ...old, sort: one }) })
+                      }
+                    >
+                      {t(`list.sort${capitalise(one)}`)}
+                    </MenuItem>
+                  ))}
+                </Menu>
               </div>
 
               {shown.length === 0 ? (
@@ -151,12 +164,16 @@ function ListTableRow({ list, instanceName }: ListTableRowProps) {
           {list.sharing !== Sharing.PRIVATE && (
             <span className="size-[5px] shrink-0 rounded-full bg-shared" />
           )}
-          <span className="truncate text-body">{list.name}</span>
+          <span className={cn("truncate text-body", isArchived(list) && "text-secondary-foreground")}>
+            {list.name}
+          </span>
         </span>
         <span className="text-micro text-muted-foreground">
-          {list.openCount > 0
-            ? t("list.openCount", { count: list.openCount })
-            : t("list.nothingOpen")}
+          {isArchived(list)
+            ? t("list.archivedBy", { name: list.archivedByName })
+            : list.openCount > 0
+              ? t("list.openCount", { count: list.openCount })
+              : t("list.nothingOpen")}
         </span>
       </span>
 

@@ -11,6 +11,8 @@ function list(name: string, over: Partial<List> = {}): List {
     isPinned: false,
     openCount: 1,
     doneCount: 0,
+    archivedAt: "",
+    archivedByName: "",
     updatedAt: "2026-01-01T00:00:00Z",
     ...over,
   } as List
@@ -91,5 +93,36 @@ describe("how the table is ordered", () => {
     const original = [list("B"), list("A")]
     sortLists(original, "name", "en")
     expect(names(original)).toEqual(["B", "A"])
+  })
+})
+
+describe("archived Lists", () => {
+  const lists = [
+    list("Groceries", { openCount: 3 }),
+    list("Party", { openCount: 0, doneCount: 12 }),
+    list("Move — Kreuzberg", { archivedAt: "2026-08-04T10:00:00Z", archivedByName: "Anna" }),
+  ]
+
+  /*
+   * Archiving is for a List somebody has finished with but does not want to lose.
+   *
+   * Leaving it in All would defeat that: the point is that it stops turning up where
+   * somebody is looking for what they are working on.
+   */
+  it("keeps an archived List out of every other filter", () => {
+    expect(names(filterLists(lists, "all"))).toEqual(["Groceries", "Party"])
+    expect(names(filterLists(lists, "active"))).toEqual(["Groceries"])
+    expect(names(filterLists(lists, "completed"))).toEqual(["Party"])
+  })
+
+  it("shows them under Archived, which is the only place they are", () => {
+    expect(names(filterLists(lists, "archived"))).toEqual(["Move — Kreuzberg"])
+  })
+
+  // Archived wins over finished: a List can be both, and it is put away either way.
+  it("files a finished List that was archived under Archived", () => {
+    const both = [list("Done and gone", { openCount: 0, doneCount: 5, archivedAt: "2026-08-04T10:00:00Z" })]
+    expect(names(filterLists(both, "completed"))).toEqual([])
+    expect(names(filterLists(both, "archived"))).toEqual(["Done and gone"])
   })
 })

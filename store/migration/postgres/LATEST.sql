@@ -81,9 +81,14 @@ CREATE TABLE list (
   created_at TEXT    NOT NULL,
   updated_at TEXT    NOT NULL,
   -- Deleting is soft: a List removed by mistake is recoverable until it is purged.
-  deleted_at TEXT    NOT NULL DEFAULT ''
+  deleted_at TEXT    NOT NULL DEFAULT '',
+  -- Archiving is not deleting: out of the sidebar, still searchable and restorable.
+  -- A property of the List, so a shared one leaves everybody's sidebar together.
+  archived_at TEXT    NOT NULL DEFAULT '',
+  archived_by_id INTEGER NOT NULL DEFAULT 0
 );
 
+CREATE INDEX idx_list_archived_at ON list (archived_at);
 CREATE INDEX idx_list_owner_id ON list (owner_id);
 
 -- One line on a List.

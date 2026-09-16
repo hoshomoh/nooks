@@ -1,16 +1,39 @@
-import { Link } from "@tanstack/react-router"
+import { Link, getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
+import { cn } from "cn"
+import { Sharing, type List } from "@nooks/api"
 
 import { AppShell } from "@/components/ds/app-shell"
 import { Button } from "@/components/ds/button"
 import { ActivityControl } from "@/components/ds/activity-control"
 import { ChromeBar } from "@/components/ds/chrome-bar"
+import { COVERING, INERT } from "@/components/ds/covering"
 import { EmptyState } from "@/components/ds/empty-state"
+import { ListActions } from "@/components/ds/list-actions"
+import { SegmentedControl, type Segment } from "@/components/ds/segmented"
+import { SelectField } from "@/components/ds/select-field"
+import {
+  DEFAULT_SORT,
+  LIST_SORTS,
+  LIST_STATUSES,
+  filterLists,
+  sortLists,
+  type ListSort,
+  type ListStatus,
+} from "@/lib/list-table"
 import { useCommandPalette } from "@/lib/use-command-palette"
+import { useLocale } from "@/lib/use-locale"
+import { useMomentLabel } from "@/lib/use-moment-label"
 import { useSignedInData } from "@/lib/use-signed-in-data"
+
+const route = getRouteApi("/")
 
 /**
  * All lists — where a Member lands, and the cold start for a fresh account.
+ *
+ * The sidebar is what somebody is working in; this is everywhere else. It is the only
+ * place a finished List can be found once it has left the groups above, which is why it
+ * carries the filter rather than being a plain index.
  *
  * An empty instance says what a List is for rather than apologising, per DESIGN.md §11.
  */
@@ -18,6 +41,11 @@ export function Home() {
   const { instanceName, member, lists } = useSignedInData()
   const palette = useCommandPalette()
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const { status = "all", sort = DEFAULT_SORT } = route.useSearch()
+  const { code: locale } = useLocale()
+
+  const shown = sortLists(filterLists(lists, status), sort, locale)
 
   return (
     <AppShell
@@ -46,29 +74,104 @@ export function Home() {
               </Button>
             </div>
           ) : (
-            <div className="flex flex-col">
-              {lists.map((list) => (
-                <Link
-                  key={list.uid}
-                  to="/lists/$listUid"
-                  params={{ listUid: list.uid }}
-                  className="grid min-h-row grid-cols-[1fr_auto] items-center gap-3.5 rounded-md border-b border-hair px-2 -mx-2 hover:bg-secondary"
-                >
-                  <span className="flex items-center gap-2.5">
-                    {list.sharing !== 1 && (
-                      <span className="size-[5px] shrink-0 rounded-full bg-shared" />
-                    )}
-                    <span className="truncate text-body">{list.name}</span>
-                  </span>
-                  <span className="text-micro text-muted-foreground">
-                    {t("list.openCount", { count: list.openCount })}
-                  </span>
-                </Link>
-              ))}
-            </div>
+            <>
+              <div className="mb-5 flex flex-wrap items-center gap-3">
+                <SegmentedControl
+                  label={t("list.statusLabel")}
+                  options={LIST_STATUSES.map<Segment<ListStatus>>((one) => ({
+                    value: one,
+                    label: t(`list.status${capitalise(one)}`),
+                  }))}
+                  chosen={status}
+                  onChoose={(next) =>
+                    void navigate({ to: ".", search: (old) => ({ ...old, status: next }) })
+                  }
+                />
+
+                <SelectField
+                  label={t("list.sortLabel")}
+                  className="ml-auto"
+                  options={LIST_SORTS.map((one) => ({
+                    value: one,
+                    label: t(`list.sort${capitalise(one)}`),
+                  }))}
+                  value={sort}
+                  onValueChange={(next) =>
+                    void navigate({
+                      to: ".",
+                      search: (old) => ({ ...old, sort: next as ListSort }),
+                    })
+                  }
+                />
+              </div>
+
+              {shown.length === 0 ? (
+                <EmptyState title={t("list.noneMatching")} body={t("list.noneMatchingBody")} />
+              ) : (
+                <div className="flex flex-col">
+                  {shown.map((list) => (
+                    <ListTableRow key={list.uid} list={list} instanceName={instanceName} />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
     </AppShell>
   )
+}
+
+interface ListTableRowProps {
+  list: List
+  instanceName: string
+}
+
+/**
+ * One List: what it is called, how much is left on it, and when it last changed.
+ *
+ * The whole row opens it, with the `···` raised above that so the menu still answers a
+ * click — the same arrangement every other row in the app uses.
+ */
+function ListTableRow({ list, instanceName }: ListTableRowProps) {
+  const { t } = useTranslation()
+  const moment = useMomentLabel()
+
+  return (
+    <div className="group/list relative grid min-h-13 grid-cols-[1fr_96px_26px] items-center gap-4 border-b border-hair px-2 -mx-2 hover:bg-secondary">
+      <Link
+        to="/lists/$listUid"
+        params={{ listUid: list.uid }}
+        aria-label={list.name}
+        className={COVERING}
+      />
+
+      <span className={cn(INERT, "flex min-w-0 flex-col gap-0.5")}>
+        <span className="flex items-center gap-2.5">
+          {list.sharing !== Sharing.PRIVATE && (
+            <span className="size-[5px] shrink-0 rounded-full bg-shared" />
+          )}
+          <span className="truncate text-body">{list.name}</span>
+        </span>
+        <span className="text-micro text-muted-foreground">
+          {list.openCount > 0
+            ? t("list.openCount", { count: list.openCount })
+            : t("list.nothingOpen")}
+        </span>
+      </span>
+
+      <span className={cn(INERT, "text-micro whitespace-nowrap text-muted-foreground")}>
+        {moment(list.updatedAt)}
+      </span>
+
+      <span className="relative z-10 opacity-0 transition-opacity group-hover/list:opacity-100 focus-within:opacity-100 has-[[data-popup-open]]:opacity-100">
+        <ListActions list={list} instanceName={instanceName} />
+      </span>
+    </div>
+  )
+}
+
+/** capitalise makes a value into the tail of a translation key. */
+function capitalise(word: string): string {
+  return word.charAt(0).toUpperCase() + word.slice(1)
 }

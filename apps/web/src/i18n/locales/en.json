@@ -146,7 +146,19 @@
     "tryAgain": "Try again",
     "discardMine": "Discard mine",
     "doneBy": "{{name}} · {{when}}",
-    "doneEarlierLine": "{{count}} completed earlier"
+    "doneEarlierLine": "{{count}} completed earlier",
+    "statusAll": "All",
+    "statusActive": "Active",
+    "statusCompleted": "Completed",
+    "statusLabel": "Which lists",
+    "sortUpdated": "Recently updated",
+    "sortName": "Name A–Z",
+    "sortOpen": "Most open items",
+    "sortLabel": "Sort",
+    "nothingOpen": "nothing open",
+    "updatedOn": "Updated {{when}}",
+    "noneMatching": "No lists here",
+    "noneMatchingBody": "Nothing on this instance matches what you asked for. Try another filter."
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",

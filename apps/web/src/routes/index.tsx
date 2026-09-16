@@ -3,8 +3,26 @@ import { createRoute, redirect } from "@tanstack/react-router"
 import { Landing } from "@/screens/landing"
 import { currentMemberQuery, instanceQuery } from "@/lib/queries"
 import { listsQuery } from "@/lib/list-queries"
+import {
+  DEFAULT_SORT,
+  LIST_SORTS,
+  LIST_STATUSES,
+  type ListSort,
+  type ListStatus,
+} from "@/lib/list-table"
 import { publicListQuery } from "@/lib/public-queries"
 import { rootRoute } from "./root"
+
+/**
+ * How All lists is being read.
+ *
+ * In the address rather than in the screen, so the sidebar can point at the finished
+ * Lists, a refresh keeps the view, and Back undoes a filter rather than leaving.
+ */
+export interface ListsSearch {
+  status?: ListStatus
+  sort?: ListSort
+}
 
 /**
  * Where an arriving browser lands, whoever it belongs to.
@@ -20,6 +38,16 @@ import { rootRoute } from "./root"
 export const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
+  validateSearch: (search: Record<string, unknown>): ListsSearch => {
+    const out: ListsSearch = {}
+    if (LIST_STATUSES.includes(search.status as ListStatus) && search.status !== "all") {
+      out.status = search.status as ListStatus
+    }
+    if (LIST_SORTS.includes(search.sort as ListSort) && search.sort !== DEFAULT_SORT) {
+      out.sort = search.sort as ListSort
+    }
+    return out
+  },
   loader: async ({ context }) => {
     const instance = await context.queryClient.ensureQueryData(instanceQuery)
     if (instance.needsSetup) {

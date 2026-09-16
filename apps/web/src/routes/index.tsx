@@ -22,6 +22,8 @@ import { rootRoute } from "./root"
 export interface ListsSearch {
   status?: ListStatus
   sort?: ListSort
+  /** 1-based. Absent is the first page, so the commonest address stays clean. */
+  page?: number
 }
 
 /**
@@ -45,6 +47,10 @@ export const indexRoute = createRoute({
     }
     if (LIST_SORTS.includes(search.sort as ListSort) && search.sort !== DEFAULT_SORT) {
       out.sort = search.sort as ListSort
+    }
+    const page = Number(search.page)
+    if (Number.isFinite(page) && page > 1) {
+      out.page = Math.floor(page)
     }
     return out
   },

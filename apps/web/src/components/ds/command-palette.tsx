@@ -141,11 +141,14 @@ function SearchPanel() {
           <CommandGroup heading={t("palette.lists")}>
             {reachable.map((list) => (
               <CommandItem key={list.uid} value={list.uid} onSelect={() => void openList(list.uid)}>
-                {list.name}
+                {/* The name takes the room that is left, which is what puts the count
+                    at the end. Without it the count sits wherever the name stops, so
+                    two rows put their numbers in two different places. */}
+                <span className="min-w-0 flex-1 truncate">{list.name}</span>
                 {list.openCount > 0 && (
                   // A count, drawn as DESIGN.md §3 draws counts. CommandShortcut is for
                   // keycaps and letter-spaces what it is given.
-                  <span className="ml-auto shrink-0 font-mono text-badge text-muted-foreground">
+                  <span className="shrink-0 font-mono text-badge text-muted-foreground">
                     {list.openCount}
                   </span>
                 )}

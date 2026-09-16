@@ -70,3 +70,42 @@ export function sortLists(lists: readonly List[], sort: ListSort, locale?: strin
       )
   }
 }
+
+/** PAGE_SIZE is how many rows a page holds. */
+export const PAGE_SIZE = 25
+
+/** One page of the table, and enough to say where in the set it sits. */
+export interface ListPage {
+  rows: List[]
+  /** 1-based, and clamped: a page past the end shows the last one rather than nothing. */
+  page: number
+  pages: number
+  /** The 1-based range this page covers, for "1–25 of 60". Both zero when empty. */
+  from: number
+  to: number
+  total: number
+}
+
+/**
+ * pageOf cuts the table into pages.
+ *
+ * Clamped rather than trusted, because the page is in the address: a filter that leaves
+ * fewer Lists than the page somebody was on would otherwise show them an empty table
+ * and no way to tell why.
+ */
+export function pageOf(lists: readonly List[], page: number, size: number = PAGE_SIZE): ListPage {
+  const total = lists.length
+  const pages = Math.max(1, Math.ceil(total / size))
+  const current = Math.min(Math.max(1, Math.floor(page) || 1), pages)
+  const start = (current - 1) * size
+  const rows = lists.slice(start, start + size)
+
+  return {
+    rows,
+    page: current,
+    pages,
+    from: total === 0 ? 0 : start + 1,
+    to: start + rows.length,
+    total,
+  }
+}

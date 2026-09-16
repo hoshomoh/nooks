@@ -77,8 +77,8 @@ export function TodayScreen() {
         }
       />
 
-      <div className="flex min-h-0 flex-1 justify-center overflow-y-auto px-5.5 pt-14 pb-22">
-        <div className="w-full max-w-content">
+      <div className="flex min-h-0 flex-1 justify-center overflow-y-auto px-5.5 pt-14">
+        <div className="w-full max-w-content self-start pb-22">
           <header className="mb-8.5 flex flex-col gap-3.5">
             <h1 className="text-display">{t("views.today")}</h1>
             <div className="flex items-center gap-3 text-meta text-secondary-foreground">

@@ -219,7 +219,7 @@ export function ListScreen() {
       <div className="relative flex min-h-0 flex-1">
         <div
           className={cn(
-            "flex flex-1 justify-center overflow-y-auto pt-14 pb-22 pl-5.5",
+            "flex flex-1 justify-center overflow-y-auto pt-14 pl-5.5",
             // The sheet is drawn over this pane, so the pane keeps clear of it rather
             // than being covered by it.
             "transition-[padding-right] ease-sheet",
@@ -228,7 +228,7 @@ export function ListScreen() {
               : "pr-5.5 duration-(--duration-sheet-out)",
           )}
         >
-          <div className="w-full max-w-content">
+          <div className="w-full max-w-content self-start pb-22">
             <header className="mb-8.5 flex flex-col gap-3.5">
               <h1 className="text-display">{list.list?.name}</h1>
               <div className="flex items-center gap-3 text-meta text-secondary-foreground">

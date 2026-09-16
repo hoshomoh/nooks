@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import type { List } from "@nooks/api"
 
-import { filterLists, sortLists } from "./list-table"
+import { filterLists, pageOf, sortLists } from "./list-table"
 
 function list(name: string, over: Partial<List> = {}): List {
   return {
@@ -124,5 +124,50 @@ describe("archived Lists", () => {
     const both = [list("Done and gone", { openCount: 0, doneCount: 5, archivedAt: "2026-08-04T10:00:00Z" })]
     expect(names(filterLists(both, "completed"))).toEqual([])
     expect(names(filterLists(both, "archived"))).toEqual(["Done and gone"])
+  })
+})
+
+describe("cutting the table into pages", () => {
+  const many = (count: number) => Array.from({ length: count }, (_, i) => list(`List ${i + 1}`))
+
+  it("fills a page and says where it sits", () => {
+    const { rows, from, to, total, pages } = pageOf(many(60), 1, 25)
+
+    expect(rows).toHaveLength(25)
+    expect([from, to, total, pages]).toEqual([1, 25, 60, 3])
+  })
+
+  it("gives the last page what is left rather than a full one", () => {
+    const { rows, from, to } = pageOf(many(60), 3, 25)
+
+    expect(rows).toHaveLength(10)
+    expect([from, to]).toEqual([51, 60])
+  })
+
+  /*
+   * The page is in the address, so it can outlive what it was counting.
+   *
+   * Narrowing the filter while on page 3 would otherwise answer with an empty table and
+   * nothing to say why, which reads as "you have no lists".
+   */
+  it("clamps a page that is past the end", () => {
+    const { page, rows } = pageOf(many(10), 99, 25)
+
+    expect(page).toBe(1)
+    expect(rows).toHaveLength(10)
+  })
+
+  it("clamps a page below the first", () => {
+    expect(pageOf(many(10), 0, 25).page).toBe(1)
+    expect(pageOf(many(10), -4, 25).page).toBe(1)
+  })
+
+  it("has one page and no range when there is nothing to show", () => {
+    expect(pageOf([], 1, 25)).toMatchObject({ rows: [], page: 1, pages: 1, from: 0, to: 0, total: 0 })
+  })
+
+  // Everything fits, so there is nothing to page through.
+  it("has one page for a household with a handful of lists", () => {
+    expect(pageOf(many(9), 1, 25).pages).toBe(1)
   })
 })

@@ -111,7 +111,7 @@ export function NoteScreen() {
       {/* The chrome bar above and the footer below stay; the Note scrolls between
           them, which is what the footer is for. */}
       <div className="flex min-h-0 flex-1 justify-center overflow-y-auto px-8 pt-11">
-        <div className="flex w-full max-w-content flex-col gap-5.5">
+        <div className="flex w-full max-w-content flex-col gap-5.5 self-start pb-22">
           <div className="grid grid-cols-[24px_1fr] items-start gap-3.5">
             <span className="mt-2">
               <Checkbox

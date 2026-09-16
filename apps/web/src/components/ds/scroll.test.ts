@@ -83,4 +83,40 @@ describe("what scrolls", () => {
     expect(list).toMatch(/<div className="relative flex min-h-0 flex-1">/)
     expect(list).not.toMatch(/relative[^"]*overflow-y-auto/)
   })
+
+
+
+  /*
+   * There is room under the last thing on a screen that scrolls.
+   *
+   * Two traps, and the app fell into both. Padding on the scroller does nothing,
+   * because a scrolling flex container drops the padding on its end edge. And padding
+   * on the column inside does nothing either while that column is a stretched flex
+   * item: it is sized to the container rather than to its contents, so its padding
+   * sits above where the content actually ends.
+   *
+   * The column has to size itself — self-start — and carry the room.
+   */
+  it("leaves room under the last thing on every screen that scrolls", () => {
+    const screens: Array<[string, string]> = [
+      ["../../screens/list.tsx", "list"],
+      ["../../screens/home.tsx", "all lists"],
+      ["../../screens/today.tsx", "today"],
+      ["../../screens/upcoming.tsx", "upcoming"],
+      ["../../screens/calendar.tsx", "calendar"],
+      ["../../screens/note.tsx", "the full note"],
+    ]
+
+    for (const [file, what] of screens) {
+      const text = source(file)
+      const scroller = /overflow-y-auto[^"]*/.exec(text)?.[0] ?? ""
+      expect(scroller, `${what} pads its scroller, which does nothing`).not.toMatch(/\bpb-\d/)
+      expect(text, `${what} has no column that sizes itself and holds the room`).toMatch(
+        /self-start[^"]*\bpb-\d|\bpb-\d[^"]*self-start/,
+      )
+    }
+
+    // The sheet scrolls a column with no single wrapper, so its room is a spacer.
+    expect(source("./note-sheet.tsx")).toMatch(/after:h-\d/)
+  })
 })

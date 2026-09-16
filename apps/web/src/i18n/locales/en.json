@@ -160,7 +160,10 @@
     "updatedOn": "Updated {{when}}",
     "noneMatching": "No lists here",
     "noneMatchingBody": "Nothing on this instance matches what you asked for. Try another filter.",
-    "archivedBy": "archived by {{name}}"
+    "archivedBy": "archived by {{name}}",
+    "pageRange": "{{from}}–{{to}} of {{total}}",
+    "previousPage": "Previous",
+    "nextPage": "Next"
   },
   "palette": {
     "searchPlaceholder": "Search lists and items",

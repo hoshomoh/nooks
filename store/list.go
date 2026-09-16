@@ -122,6 +122,160 @@ func whereListVisible(query *bun.SelectQuery, memberID int64, named []int64) *bu
 	})
 }
 
+/** ListStatus narrows a page to Lists in one state. */
+type ListStatus string
+
+const (
+	StatusAny       ListStatus = ""
+	StatusActive    ListStatus = "ACTIVE"
+	StatusCompleted ListStatus = "COMPLETED"
+	StatusArchived  ListStatus = "ARCHIVED"
+)
+
+/** ListOrder is how a page of Lists is arranged. */
+type ListOrder string
+
+const (
+	OrderUpdated ListOrder = "UPDATED"
+	OrderName    ListOrder = "NAME"
+	OrderOpen    ListOrder = "OPEN"
+)
+
+// ListQuery is one page of the Lists a Member can reach.
+type ListQuery struct {
+	MemberID int64
+	Status   ListStatus
+	Order    ListOrder
+	// Offset and Limit are rows, not pages. Limit zero means no limit, which only the
+	// sidebar's own bounded reads use.
+	Offset int
+	Limit  int
+}
+
+// ListWithCounts is a List and how much is on it, read together.
+type ListWithCounts struct {
+	List
+	OpenCount int
+	DoneCount int
+}
+
+// ListPage is the rows a query asked for, and how many there were in total.
+type ListPage struct {
+	Lists []ListWithCounts
+	Total int
+}
+
+/*
+countsSubquery is how many Items are open and done on each List, in one pass.
+
+Counting by reading a List's Items, one query per List, made drawing a sidebar cost a
+read of every Item in the database. This is a single grouped aggregate the page joins
+against, so the work is one scan rather than one query per row.
+*/
+func (s *sqlStore) countsSubquery() *bun.SelectQuery {
+	return s.db.NewSelect().
+		Model((*itemModel)(nil)).
+		Column("list_id").
+		ColumnExpr("SUM(CASE WHEN done_at = '' THEN 1 ELSE 0 END) AS open_count").
+		ColumnExpr("SUM(CASE WHEN done_at <> '' THEN 1 ELSE 0 END) AS done_count").
+		Where("deleted_at = ''").
+		GroupExpr("list_id")
+}
+
+/*
+ListsPage reads one page of the Lists a Member can reach, with their counts.
+
+Filtering, ordering and paging all happen here rather than in the caller. A page sorted
+after it was cut is sorted within itself and wrong about everything else, and a caller
+that filters what it was given has already paid for the rows it throws away.
+*/
+func (s *sqlStore) ListsPage(ctx context.Context, q ListQuery) (ListPage, error) {
+	named, err := s.SharedListIDs(ctx, q.MemberID)
+	if err != nil {
+		return ListPage{}, err
+	}
+
+	rows := []struct {
+		listModel `bun:",extend"`
+		OpenCount int `bun:"open_count"`
+		DoneCount int `bun:"done_count"`
+	}{}
+
+	query := s.db.NewSelect().
+		Model(&rows).
+		ModelTableExpr("list AS list").
+		ColumnExpr("list.*").
+		ColumnExpr("COALESCE(counts.open_count, 0) AS open_count").
+		ColumnExpr("COALESCE(counts.done_count, 0) AS done_count").
+		Join("LEFT JOIN (?) AS counts ON counts.list_id = list.id", s.countsSubquery()).
+		Where("list.deleted_at = ''")
+
+	query = whereListVisible(query, q.MemberID, named)
+	query = whereListStatus(query, q.Status)
+
+	total, err := query.Count(ctx)
+	if err != nil {
+		return ListPage{}, fmt.Errorf("count lists: %w", err)
+	}
+
+	query = orderListsBy(query, q.Order)
+	if q.Limit > 0 {
+		query = query.Limit(q.Limit).Offset(q.Offset)
+	}
+
+	if err := query.Scan(ctx); err != nil {
+		return ListPage{}, fmt.Errorf("read lists: %w", err)
+	}
+
+	out := make([]ListWithCounts, 0, len(rows))
+	for _, row := range rows {
+		list, err := row.listModel.toList()
+		if err != nil {
+			return ListPage{}, err
+		}
+		out = append(out, ListWithCounts{List: list, OpenCount: row.OpenCount, DoneCount: row.DoneCount})
+	}
+	return ListPage{Lists: out, Total: total}, nil
+}
+
+/*
+whereListStatus narrows to one state.
+
+Completed is "has had Items and none are open", not "nothing open": a List nobody has
+put anything on yet has nothing open either, and it is not finished. Archived is its
+own answer rather than a flavour of the others, so a List put away is out of active and
+completed alike.
+*/
+func whereListStatus(query *bun.SelectQuery, status ListStatus) *bun.SelectQuery {
+	switch status {
+	case StatusArchived:
+		return query.Where("list.archived_at <> ''")
+	case StatusActive:
+		return query.Where("list.archived_at = ''").
+			Where("(COALESCE(counts.open_count, 0) > 0 OR COALESCE(counts.done_count, 0) = 0)")
+	case StatusCompleted:
+		return query.Where("list.archived_at = ''").
+			Where("COALESCE(counts.open_count, 0) = 0").
+			Where("COALESCE(counts.done_count, 0) > 0")
+	default:
+		return query.Where("list.archived_at = ''")
+	}
+}
+
+// orderListsBy arranges a page the way the caller asked.
+func orderListsBy(query *bun.SelectQuery, order ListOrder) *bun.SelectQuery {
+	switch order {
+	case OrderName:
+		return query.OrderExpr(byName)
+	case OrderOpen:
+		// Fullest first, and by name between equals, so the order does not shuffle
+		// every time something is ticked.
+		return query.OrderExpr("COALESCE(counts.open_count, 0) DESC").OrderExpr(byName)
+	default:
+		return query.OrderExpr("list.updated_at DESC")
+	}
+}
+
 // ListsForMember returns every live List a Member can reach: their own, everything
 // shared with the whole Instance, and everything shared with them by name — directly or
 // through a Group they are in.

@@ -18,14 +18,17 @@ import {
   LIST_SORTS,
   LIST_STATUSES,
   filterLists,
+  pageOf,
   sortLists,
   type ListStatus,
 } from "@/lib/list-table"
 import { isArchived } from "@/lib/list-groups"
+import type { Translate } from "@/lib/translate"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useLocale } from "@/lib/use-locale"
 import { useMomentLabel } from "@/lib/use-moment-label"
 import { useSignedInData } from "@/lib/use-signed-in-data"
+import type { ListsSearch } from "@/routes/index"
 
 const route = getRouteApi("/")
 
@@ -43,10 +46,19 @@ export function Home() {
   const palette = useCommandPalette()
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { status = "all", sort = DEFAULT_SORT } = route.useSearch()
+  const { status = "all", sort = DEFAULT_SORT, page = 1 } = route.useSearch()
   const { code: locale } = useLocale()
 
-  const shown = sortLists(filterLists(lists, status), sort, locale)
+  const shown = pageOf(sortLists(filterLists(lists, status), sort, locale), page)
+
+  /*
+   * Changing what is shown goes back to the first page.
+   *
+   * Page 3 of a filter is not page 3 of the next one, and staying put means narrowing
+   * the set and landing somewhere that looks empty.
+   */
+  const show = (next: Partial<ListsSearch>) =>
+    void navigate({ to: ".", search: (old) => ({ ...old, ...next, page: undefined }) })
 
   return (
     <AppShell
@@ -58,8 +70,8 @@ export function Home() {
     >
       <ChromeBar crumbs={[t("list.allLists")]} actions={<ActivityControl />} />
 
-      <div className="flex min-h-0 flex-1 justify-center overflow-y-auto px-5.5 pt-14 pb-22">
-        <div className="w-full max-w-content">
+      <div className="flex min-h-0 flex-1 justify-center overflow-y-auto px-5.5 pt-14">
+        <div className="w-full max-w-content self-start pb-22">
           <header className="mb-8.5 flex flex-col gap-3.5">
             <h1 className="text-display">{t("list.allLists")}</h1>
             <p className="text-meta text-secondary-foreground">
@@ -84,9 +96,7 @@ export function Home() {
                     label: t(`list.status${capitalise(one)}`),
                   }))}
                   chosen={status}
-                  onChoose={(next) =>
-                    void navigate({ to: ".", search: (old) => ({ ...old, status: next }) })
-                  }
+                  onChoose={(next) => show({ status: next })}
                 />
 
                 {/* A menu rather than a select, per the design: it says what the
@@ -108,9 +118,7 @@ export function Home() {
                     <MenuItem
                       key={one}
                       shortcut={one === sort ? "✓" : undefined}
-                      onSelect={() =>
-                        void navigate({ to: ".", search: (old) => ({ ...old, sort: one }) })
-                      }
+                      onSelect={() => show({ sort: one })}
                     >
                       {t(`list.sort${capitalise(one)}`)}
                     </MenuItem>
@@ -118,20 +126,81 @@ export function Home() {
                 </Menu>
               </div>
 
-              {shown.length === 0 ? (
+              {shown.total === 0 ? (
                 <EmptyState title={t("list.noneMatching")} body={t("list.noneMatchingBody")} />
               ) : (
-                <div className="flex flex-col">
-                  {shown.map((list) => (
-                    <ListTableRow key={list.uid} list={list} instanceName={instanceName} />
-                  ))}
-                </div>
+                <>
+                  <div className="flex flex-col">
+                    {shown.rows.map((list) => (
+                      <ListTableRow key={list.uid} list={list} instanceName={instanceName} />
+                    ))}
+                  </div>
+
+                  {/* Only once there is more than a page. A household with nine Lists
+                      should not be told it is looking at 1–9 of 9. */}
+                  {shown.pages > 1 && (
+                    <div className="mt-4 flex items-center gap-1.5">
+                      <span className="text-micro text-muted-foreground">
+                        {t("list.pageRange", {
+                          from: shown.from,
+                          to: shown.to,
+                          total: shown.total,
+                        })}
+                      </span>
+                      <span className="ml-auto flex gap-1.5">
+                        <PageButton
+                          label={t("list.previousPage")}
+                          disabled={shown.page === 1}
+                          onSelect={() =>
+                            void navigate({
+                              to: ".",
+                              search: (old) => ({ ...old, page: shown.page - 1 }),
+                            })
+                          }
+                        />
+                        <PageButton
+                          label={t("list.nextPage")}
+                          disabled={shown.page === shown.pages}
+                          onSelect={() =>
+                            void navigate({
+                              to: ".",
+                              search: (old) => ({ ...old, page: shown.page + 1 }),
+                            })
+                          }
+                        />
+                      </span>
+                    </div>
+                  )}
+                </>
               )}
             </>
           )}
         </div>
       </div>
     </AppShell>
+  )
+}
+
+interface PageButtonProps {
+  label: string
+  disabled: boolean
+  onSelect: () => void
+}
+
+/** One step through the table, per the design: 28px, radius 6, a hairline border. */
+function PageButton({ label, disabled, onSelect }: PageButtonProps) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onSelect}
+      className={cn(
+        "h-7 rounded-md border border-border px-2.5 text-micro transition-colors",
+        disabled ? "text-muted-foreground opacity-50" : "text-secondary-foreground hover:bg-secondary",
+      )}
+    >
+      {label}
+    </button>
   )
 }
 
@@ -168,13 +237,7 @@ function ListTableRow({ list, instanceName }: ListTableRowProps) {
             {list.name}
           </span>
         </span>
-        <span className="text-micro text-muted-foreground">
-          {isArchived(list)
-            ? t("list.archivedBy", { name: list.archivedByName })
-            : list.openCount > 0
-              ? t("list.openCount", { count: list.openCount })
-              : t("list.nothingOpen")}
-        </span>
+        <span className="text-micro text-muted-foreground">{metaFor(list, t)}</span>
       </span>
 
       <span className={cn(INERT, "text-micro whitespace-nowrap text-muted-foreground")}>
@@ -186,6 +249,17 @@ function ListTableRow({ list, instanceName }: ListTableRowProps) {
       </span>
     </div>
   )
+}
+
+/** metaFor is the line under the name: who put it away, or how much is left on it. */
+function metaFor(list: List, t: Translate): string {
+  if (isArchived(list)) {
+    return t("list.archivedBy", { name: list.archivedByName })
+  }
+  if (list.openCount > 0) {
+    return t("list.openCount", { count: list.openCount })
+  }
+  return t("list.nothingOpen")
 }
 
 /** capitalise makes a value into the tail of a translation key. */

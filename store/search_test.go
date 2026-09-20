@@ -1,6 +1,7 @@
 package store
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -236,5 +237,31 @@ func TestSearchDoesNotTreatPunctuationAsSyntax(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+/*
+A query only uses so many words.
+
+One clause is built per word, so the length of what somebody sent decided the size of
+the work, with nothing stopping a caller sending ten thousand words. Anything typed into
+a search box is nowhere near the ceiling.
+*/
+func TestASearchOnlyUsesSoManyWords(t *testing.T) {
+	long := strings.Repeat("milk ", 500)
+
+	terms := searchTerms(long)
+
+	if len(terms) != maxTerms {
+		t.Errorf("used %d words of five hundred, want no more than %d", len(terms), maxTerms)
+	}
+}
+
+// An ordinary search is untouched by the ceiling.
+func TestAnOrdinarySearchKeepsAllItsWords(t *testing.T) {
+	terms := searchTerms("the good beans from the market")
+
+	if len(terms) != 6 {
+		t.Errorf("terms = %v, want all six words", terms)
 	}
 }

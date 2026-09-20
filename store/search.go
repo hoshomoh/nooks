@@ -114,6 +114,16 @@ func (s *sqlStore) Search(ctx context.Context, query string) ([]SearchHit, error
 	return hits, nil
 }
 
+/*
+maxTerms is how many words of a query are used.
+
+One clause is built per word, so without a ceiling the length of the query decides the
+size of the work. Sixteen is past any search somebody types into a box and well short of
+a number that costs anything; a search that needs more words than that is not going to
+be narrowed by the seventeenth.
+*/
+const maxTerms = 16
+
 // searchTerms breaks what a Member typed into words, dropping anything that would
 // confuse either query language.
 //
@@ -125,11 +135,15 @@ func searchTerms(query string) []string {
 		return !unicode.IsLetter(r) && !unicode.IsDigit(r)
 	})
 
-	terms := make([]string, 0, len(fields))
+	terms := make([]string, 0, min(len(fields), maxTerms))
 	for _, field := range fields {
-		if field != "" {
-			terms = append(terms, strings.ToLower(field))
+		if field == "" {
+			continue
 		}
+		if len(terms) == maxTerms {
+			break
+		}
+		terms = append(terms, strings.ToLower(field))
 	}
 	return terms
 }

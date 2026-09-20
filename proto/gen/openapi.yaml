@@ -531,6 +531,35 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Status'
     /api/v1/items/{itemUid}:
+        get:
+            tags:
+                - ListService
+            description: |-
+                GetItem returns one Item, including its Note in full.
+
+                 Its own call rather than a read of the List it sits on: a caller that wants what
+                 somebody wrote about one thing should not have to fetch everything on the List to
+                 find it, and a reader shown a shortened Note needs somewhere to go for the rest.
+            operationId: ListService_GetItem
+            parameters:
+                - name: itemUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetItemResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
         delete:
             tags:
                 - ListService
@@ -1583,6 +1612,17 @@ components:
             properties:
                 settings:
                     $ref: '#/components/schemas/InstanceSettings'
+        GetItemResponse:
+            type: object
+            properties:
+                item:
+                    $ref: '#/components/schemas/Item'
+                list:
+                    allOf:
+                        - $ref: '#/components/schemas/List'
+                    description: |-
+                        The List it is on, so a caller holding only an item_uid knows where it came from
+                         and what it may do with it.
         GetJoinRequestResponse:
             type: object
             properties:

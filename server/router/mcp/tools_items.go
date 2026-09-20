@@ -25,7 +25,16 @@ type updateItemArgs struct {
 	Label    *string `json:"label,omitempty" jsonschema:"new wording, or omit to leave it"`
 	Quantity *string `json:"quantity,omitempty" jsonschema:"new quantity as free text, empty string to clear it, or omit to leave it"`
 	DueOn    *string `json:"due_on,omitempty" jsonschema:"new day as YYYY-MM-DD, empty string to clear it, or omit to leave it"`
-	Note     *string `json:"note,omitempty" jsonschema:"the note as markdown, empty string to remove it, or omit to leave it. Only what the app draws is rendered: paragraphs, one level of heading (### ), checklists (- [ ] and - [x] ), quotes (> ), fenced code blocks, tables, horizontal rules (---), and inline bold, italic, strikethrough, code spans and links. Bullet and numbered lists are not rendered and survive as the literal characters typed, so use a checklist instead"`
+	Note     *string `json:"note,omitempty" jsonschema:"the note as markdown, empty string to remove it, or omit to leave it. This replaces the whole note rather than adding to it, so read the item first with get_item. Only what the app draws is rendered: paragraphs, one level of heading (### ), checklists (- [ ] and - [x] ), quotes (> ), fenced code blocks, tables, horizontal rules (---), and inline bold, italic, strikethrough, code spans and links. Bullet and numbered lists are not rendered and survive as the literal characters typed, so use a checklist instead"`
+
+	// Conflict detection, which is offered for text and nothing else: a tick says what
+	// an Item should be rather than what it was, so there is nothing to compare.
+	ExpectedLabel *string `json:"expected_label,omitempty" jsonschema:"the label as you last read it. Set it and the change is refused if somebody else has since changed the label, rather than overwriting them"`
+	ExpectedNote  *string `json:"expected_note,omitempty" jsonschema:"the note as you last read it, in full. Set it and the change is refused if somebody else has since changed the note. Use this whenever you are rewriting a note you read earlier"`
+}
+
+type getItemArgs struct {
+	ItemUID string `json:"item_uid" jsonschema:"the item to read, from get_list, search or list_dated_items"`
 }
 
 type completeItemArgs struct {
@@ -63,9 +72,22 @@ func addItemTools(server *sdk.Server, lists *v1.ListService) {
 		return answer(ctx, lists.UpdateItem, &apiv1.UpdateItemRequest{
 			ItemUid: args.ItemUID, Label: args.Label,
 			Quantity: args.Quantity, DueOn: args.DueOn, Note: args.Note,
+			ExpectedLabel: args.ExpectedLabel, ExpectedNote: args.ExpectedNote,
 		}, func(res *apiv1.UpdateItemResponse) string {
 			return "Changed. " + itemLine(res.GetItem())
 		})
+	})
+
+	sdk.AddTool(server, &sdk.Tool{
+		Name: "get_item",
+		Description: "One item with its note in full, and the list it is on. " +
+			"get_list shortens a long note to a row, so this is where the rest of it is. " +
+			"Read this before rewriting a note, because update_item replaces it whole.",
+	}, func(ctx context.Context, _ *sdk.CallToolRequest, args getItemArgs) (*sdk.CallToolResult, any, error) {
+		return answer(ctx, lists.GetItem, &apiv1.GetItemRequest{ItemUid: args.ItemUID},
+			func(res *apiv1.GetItemResponse) string {
+				return itemWhole(res.GetItem(), res.GetList())
+			})
 	})
 
 	sdk.AddTool(server, &sdk.Tool{

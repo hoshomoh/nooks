@@ -49,6 +49,7 @@ var reaches = map[string]reach{
 	// Lists and what is on them.
 	"ListService.ListLists":            {tool: "list_lists"},
 	"ListService.GetList":              {tool: "get_list"},
+	"ListService.GetItem":              {tool: "get_item"},
 	"ListService.CreateList":           {tool: "create_list"},
 	"ListService.RenameList":           {tool: "rename_list"},
 	"ListService.DuplicateList":        {tool: "duplicate_list"},

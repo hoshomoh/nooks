@@ -285,3 +285,171 @@ func TestAnAssistantReachesBeyondLists(t *testing.T) {
 		}
 	}
 }
+
+// withItem puts one Item, with a Note, on the fixture's List and answers its uid.
+func (i *instance) withItem(label, note string) string {
+	i.t.Helper()
+	item, err := i.store.CreateItem(i.t.Context(), store.CreateItemParams{
+		UID: "item_" + label, ListID: i.listID, Label: label,
+		Note: note, AddedByID: i.member.ID, At: testClock,
+	})
+	if err != nil {
+		i.t.Fatalf("CreateItem: %v", err)
+	}
+	return item.UID
+}
+
+/*
+Every tool that shows a thing shows what to call about it next.
+
+This is the shape of the whole family of bugs this file grew to catch: a renderer that
+had the identifier in hand and printed the words without it, leaving an assistant able
+to find something and unable to touch it. Search did exactly that for months.
+
+Driven through a real session rather than read off the source, because what matters is
+what reaches the assistant.
+*/
+func TestEveryToolSaysWhatToCallNext(t *testing.T) {
+	i := newInstance(t)
+	itemUID := i.withItem("Coffee", "### Where\nSaturday market.")
+	session := i.connect(i.tokenFor(store.TokenAbilities{Read: true}))
+
+	for _, one := range []struct {
+		tool string
+		args map[string]any
+		want []string
+	}{
+		{tool: "list_lists", want: []string{i.listUID}},
+		{tool: "get_list", args: map[string]any{"list_uid": i.listUID}, want: []string{i.listUID, itemUID}},
+		{tool: "get_item", args: map[string]any{"item_uid": itemUID}, want: []string{itemUID, i.listUID}},
+		{tool: "search", args: map[string]any{"query": "Coffee"}, want: []string{itemUID, i.listUID}},
+		{tool: "list_members", want: []string{i.member.UID}},
+		{tool: "whoami", want: []string{i.member.UID}},
+	} {
+		t.Run(one.tool, func(t *testing.T) {
+			res, err := session.CallTool(t.Context(), &sdk.CallToolParams{
+				Name: one.tool, Arguments: one.args,
+			})
+			if err != nil {
+				t.Fatalf("CallTool %s: %v", one.tool, err)
+			}
+			for _, want := range one.want {
+				if !strings.Contains(said(res), want) {
+					t.Errorf("%s answered %q, want it to carry %q", one.tool, said(res), want)
+				}
+			}
+		})
+	}
+}
+
+/*
+A Note is read whole by asking for it, and never by accident.
+
+get_list shortens one to keep a row a row, so the two have to disagree: if get_list ever
+starts printing Notes in full it is back to dumping a document into a menu, and if
+get_item ever stops there is nowhere left to read one.
+*/
+func TestOnlyGetItemGivesAWholeNote(t *testing.T) {
+	i := newInstance(t)
+	const note = "### Where\nSaturday market.\nThey pack up around two."
+	itemUID := i.withItem("Coffee", note)
+	session := i.connect(i.tokenFor(store.TokenAbilities{Read: true}))
+
+	listed, err := session.CallTool(t.Context(), &sdk.CallToolParams{
+		Name: "get_list", Arguments: map[string]any{"list_uid": i.listUID},
+	})
+	if err != nil {
+		t.Fatalf("get_list: %v", err)
+	}
+	if strings.Contains(said(listed), "They pack up around two") {
+		t.Errorf("get_list said %q, want the Note kept to its row", said(listed))
+	}
+	if !strings.Contains(said(listed), "get_item") {
+		t.Errorf("get_list said %q, want it to say where the rest is", said(listed))
+	}
+
+	whole, err := session.CallTool(t.Context(), &sdk.CallToolParams{
+		Name: "get_item", Arguments: map[string]any{"item_uid": itemUID},
+	})
+	if err != nil {
+		t.Fatalf("get_item: %v", err)
+	}
+	if !strings.Contains(said(whole), note) {
+		t.Errorf("get_item said %q, want the Note byte for byte", said(whole))
+	}
+}
+
+/*
+Archiving a List must not be a way of losing it.
+
+archive_list is offered, so the listing that finds an archived one again has to be too.
+Without the status argument an assistant could put a List away and never see it again.
+*/
+func TestAnAssistantCanFindWhatItArchived(t *testing.T) {
+	i := newInstance(t)
+	session := i.connect(i.tokenFor(store.TokenAbilities{Read: true, Write: true}))
+
+	if _, err := session.CallTool(t.Context(), &sdk.CallToolParams{
+		Name: "archive_list", Arguments: map[string]any{"list_uid": i.listUID, "archived": true},
+	}); err != nil {
+		t.Fatalf("archive_list: %v", err)
+	}
+
+	plain, err := session.CallTool(t.Context(), &sdk.CallToolParams{Name: "list_lists"})
+	if err != nil {
+		t.Fatalf("list_lists: %v", err)
+	}
+	if strings.Contains(said(plain), i.listUID) {
+		t.Errorf("an archived List is still in the plain listing: %q", said(plain))
+	}
+
+	archived, err := session.CallTool(t.Context(), &sdk.CallToolParams{
+		Name: "list_lists", Arguments: map[string]any{"status": "archived"},
+	})
+	if err != nil {
+		t.Fatalf("list_lists archived: %v", err)
+	}
+	if !strings.Contains(said(archived), i.listUID) {
+		t.Errorf("archived listing = %q, want the List it put away", said(archived))
+	}
+}
+
+/*
+A rewritten Note can be refused rather than overwriting somebody.
+
+The API offers this and the tool did not, which left an assistant as the one caller that
+could only ever clobber. It is the other half of shortening a Note on read.
+*/
+func TestARewrittenNoteCanBeRefused(t *testing.T) {
+	i := newInstance(t)
+	itemUID := i.withItem("Coffee", "Saturday market.")
+	session := i.connect(i.tokenFor(store.TokenAbilities{Read: true, Write: true}))
+
+	stale := "What the assistant thought it said."
+	mine := "Sunday market."
+	res, err := session.CallTool(t.Context(), &sdk.CallToolParams{
+		Name: "update_item",
+		Arguments: map[string]any{
+			"item_uid": itemUID, "note": mine, "expected_note": stale,
+		},
+	})
+	if err != nil {
+		t.Fatalf("update_item: %v", err)
+	}
+	if !res.IsError {
+		t.Errorf("update_item answered %q, want it refused", said(res))
+	}
+	// The refusal says who got there first rather than naming a code, because that is
+	// what an assistant has to relay to whoever asked it.
+	if !strings.Contains(said(res), "somebody else wrote in this note") {
+		t.Errorf("refusal said %q, want it to say what happened", said(res))
+	}
+
+	item, err := i.store.ItemByUID(t.Context(), itemUID)
+	if err != nil {
+		t.Fatalf("ItemByUID: %v", err)
+	}
+	if item.Note != "Saturday market." {
+		t.Errorf("Note = %q, want the one that was there", item.Note)
+	}
+}

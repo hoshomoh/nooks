@@ -22,6 +22,7 @@ const (
 	ListService_ListLists_FullMethodName       = "/nooks.api.v1.ListService/ListLists"
 	ListService_GetSidebar_FullMethodName      = "/nooks.api.v1.ListService/GetSidebar"
 	ListService_GetList_FullMethodName         = "/nooks.api.v1.ListService/GetList"
+	ListService_GetItem_FullMethodName         = "/nooks.api.v1.ListService/GetItem"
 	ListService_CreateList_FullMethodName      = "/nooks.api.v1.ListService/CreateList"
 	ListService_RenameList_FullMethodName      = "/nooks.api.v1.ListService/RenameList"
 	ListService_SetListSharing_FullMethodName  = "/nooks.api.v1.ListService/SetListSharing"
@@ -58,6 +59,12 @@ type ListServiceClient interface {
 	// column.
 	GetSidebar(ctx context.Context, in *GetSidebarRequest, opts ...grpc.CallOption) (*GetSidebarResponse, error)
 	GetList(ctx context.Context, in *GetListRequest, opts ...grpc.CallOption) (*GetListResponse, error)
+	// GetItem returns one Item, including its Note in full.
+	//
+	// Its own call rather than a read of the List it sits on: a caller that wants what
+	// somebody wrote about one thing should not have to fetch everything on the List to
+	// find it, and a reader shown a shortened Note needs somewhere to go for the rest.
+	GetItem(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*GetItemResponse, error)
 	// CreateList adds a List. It starts private.
 	CreateList(ctx context.Context, in *CreateListRequest, opts ...grpc.CallOption) (*CreateListResponse, error)
 	// RenameList changes a List's name. Only its owner may.
@@ -134,6 +141,16 @@ func (c *listServiceClient) GetList(ctx context.Context, in *GetListRequest, opt
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetListResponse)
 	err := c.cc.Invoke(ctx, ListService_GetList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *listServiceClient) GetItem(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*GetItemResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetItemResponse)
+	err := c.cc.Invoke(ctx, ListService_GetItem_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -309,6 +326,12 @@ type ListServiceServer interface {
 	// column.
 	GetSidebar(context.Context, *GetSidebarRequest) (*GetSidebarResponse, error)
 	GetList(context.Context, *GetListRequest) (*GetListResponse, error)
+	// GetItem returns one Item, including its Note in full.
+	//
+	// Its own call rather than a read of the List it sits on: a caller that wants what
+	// somebody wrote about one thing should not have to fetch everything on the List to
+	// find it, and a reader shown a shortened Note needs somewhere to go for the rest.
+	GetItem(context.Context, *GetItemRequest) (*GetItemResponse, error)
 	// CreateList adds a List. It starts private.
 	CreateList(context.Context, *CreateListRequest) (*CreateListResponse, error)
 	// RenameList changes a List's name. Only its owner may.
@@ -369,6 +392,9 @@ func (UnimplementedListServiceServer) GetSidebar(context.Context, *GetSidebarReq
 }
 func (UnimplementedListServiceServer) GetList(context.Context, *GetListRequest) (*GetListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetList not implemented")
+}
+func (UnimplementedListServiceServer) GetItem(context.Context, *GetItemRequest) (*GetItemResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetItem not implemented")
 }
 func (UnimplementedListServiceServer) CreateList(context.Context, *CreateListRequest) (*CreateListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateList not implemented")
@@ -486,6 +512,24 @@ func _ListService_GetList_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ListServiceServer).GetList(ctx, req.(*GetListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ListService_GetItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ListServiceServer).GetItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ListService_GetItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ListServiceServer).GetItem(ctx, req.(*GetItemRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -778,6 +822,10 @@ var ListService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetList",
 			Handler:    _ListService_GetList_Handler,
+		},
+		{
+			MethodName: "GetItem",
+			Handler:    _ListService_GetItem_Handler,
 		},
 		{
 			MethodName: "CreateList",

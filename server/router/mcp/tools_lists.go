@@ -13,6 +13,10 @@ import (
 
 type listListsArgs struct {
 	Page int `json:"page,omitempty" jsonschema:"which page to read, 1-based; leave it out for the first"`
+	// Without these an archived list cannot be found again, which would make
+	// archive_list a one way door.
+	Status string `json:"status,omitempty" jsonschema:"which lists to show: active for ones still in play, completed for ones with everything ticked, archived for ones put away, or leave it out for everything except archived"`
+	Order  string `json:"order,omitempty" jsonschema:"how to order them: updated for what changed last, name, or open for the fullest first. Leave it out for updated"`
 }
 
 type getListArgs struct {
@@ -42,6 +46,26 @@ type archiveListArgs struct {
 	Archived bool   `json:"archived" jsonschema:"true to put it out of the sidebar, false to bring it back"`
 }
 
+/*
+statusWords and orderWords map what an assistant may say onto what the API takes.
+
+The enum's own spelling is a protocol detail. A tool that demanded LIST_STATUS_ARCHIVED
+would be asking a reader to learn one, the same way set_list_sharing does not.
+*/
+var statusWords = map[string]apiv1.ListStatus{
+	"":          apiv1.ListStatus_LIST_STATUS_UNSPECIFIED,
+	"active":    apiv1.ListStatus_LIST_STATUS_ACTIVE,
+	"completed": apiv1.ListStatus_LIST_STATUS_COMPLETED,
+	"archived":  apiv1.ListStatus_LIST_STATUS_ARCHIVED,
+}
+
+var orderWords = map[string]apiv1.ListOrder{
+	"":        apiv1.ListOrder_LIST_ORDER_UNSPECIFIED,
+	"updated": apiv1.ListOrder_LIST_ORDER_UPDATED,
+	"name":    apiv1.ListOrder_LIST_ORDER_NAME,
+	"open":    apiv1.ListOrder_LIST_ORDER_OPEN,
+}
+
 // addListTools registers what can be done to a List itself, as opposed to what is on it.
 func addListTools(server *sdk.Server, lists *v1.ListService) {
 	sdk.AddTool(server, &sdk.Tool{
@@ -49,7 +73,19 @@ func addListTools(server *sdk.Server, lists *v1.ListService) {
 		Description: "One page of the lists the caller can reach, with how many items are " +
 			"still open on each. The last line says whether there are more and how to ask for them.",
 	}, func(ctx context.Context, _ *sdk.CallToolRequest, args listListsArgs) (*sdk.CallToolResult, any, error) {
-		return answer(ctx, lists.ListLists, &apiv1.ListListsRequest{Page: int32(args.Page)},
+		status, ok := statusWords[args.Status]
+		if !ok {
+			return errorText(fmt.Errorf(
+				"status must be active, completed or archived, not %q", args.Status)), nil, nil
+		}
+		order, ok := orderWords[args.Order]
+		if !ok {
+			return errorText(fmt.Errorf(
+				"order must be updated, name or open, not %q", args.Order)), nil, nil
+		}
+		return answer(ctx, lists.ListLists, &apiv1.ListListsRequest{
+			Page: int32(args.Page), Status: status, Order: order,
+		},
 			func(res *apiv1.ListListsResponse) string {
 				rows := make([]string, 0, len(res.GetLists())+1)
 				for _, list := range res.GetLists() {
@@ -63,13 +99,14 @@ func addListTools(server *sdk.Server, lists *v1.ListService) {
 	})
 
 	sdk.AddTool(server, &sdk.Tool{
-		Name:        "get_list",
-		Description: "What is on one list, ticked and unticked, with each item's identifier.",
+		Name: "get_list",
+		Description: "What is on one list, ticked and unticked, with each item's identifier. " +
+			"A long note is shortened to fit its row; get_item has it in full.",
 	}, func(ctx context.Context, _ *sdk.CallToolRequest, args getListArgs) (*sdk.CallToolResult, any, error) {
 		return answer(ctx, lists.GetList, &apiv1.GetListRequest{ListUid: args.ListUID},
 			func(res *apiv1.GetListResponse) string {
 				rows := make([]string, 0, len(res.GetItems())+1)
-				rows = append(rows, res.GetList().GetName())
+				rows = append(rows, listLine(res.GetList()))
 				for _, item := range res.GetItems() {
 					rows = append(rows, itemLine(item))
 				}

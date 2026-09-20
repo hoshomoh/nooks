@@ -289,6 +289,40 @@ func (s *ListService) GetList(
 	}), nil
 }
 
+/*
+GetItem reads one Item, with its Note whole.
+
+A caller may hold an item_uid and nothing else, so this answers with the List as well:
+where it came from, and whether the caller may change it.
+*/
+func (s *ListService) GetItem(
+	ctx context.Context,
+	req *connect.Request[apiv1.GetItemRequest],
+) (*connect.Response[apiv1.GetItemResponse], error) {
+	grant, err := requireGrant(ctx)
+	if err != nil {
+		return nil, err
+	}
+	item, list, err := s.itemWithAccess(ctx, req.Msg.GetItemUid(), grant, AccessRead)
+	if err != nil {
+		return nil, err
+	}
+
+	names, err := s.rowNamesFor(ctx, []store.Item{item})
+	if err != nil {
+		return nil, err
+	}
+	pinned, err := s.pinnedSet(ctx, grant.Member.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&apiv1.GetItemResponse{
+		Item: itemToProto(item, names),
+		List: listToProto(list, grant.Member, pinned[list.ID], list.OpenCount, list.DoneCount),
+	}), nil
+}
+
 // CreateList adds a List. It starts private: sharing is a deliberate second step.
 func (s *ListService) CreateList(
 	ctx context.Context,

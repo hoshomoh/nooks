@@ -26,7 +26,7 @@ func addInstanceTools(server *sdk.Server, services v1.Services) {
 			func(res *apiv1.ListActivityResponse) string {
 				rows := make([]string, 0, len(res.GetActivity()))
 				for _, entry := range res.GetActivity() {
-					rows = append(rows, fmt.Sprintf("%s — %s", entry.GetCreatedAt(), entry.GetText()))
+					rows = append(rows, activityLine(entry))
 				}
 				return lines(rows, "Nothing has happened yet.")
 			})

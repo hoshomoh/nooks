@@ -75,15 +75,16 @@ func addPeopleTools(server *sdk.Server, services v1.Services) {
 	})
 
 	sdk.AddTool(server, &sdk.Tool{
-		Name:        "get_list_shares",
-		Description: "Which people and groups a list reaches by name.",
+		Name: "get_list_shares",
+		Description: "Which people and groups a list reaches, as identifiers. " +
+			"Names are in list_members and list_groups.",
 	}, func(ctx context.Context, _ *sdk.CallToolRequest, args listUIDArgs) (*sdk.CallToolResult, any, error) {
 		return answer(ctx, services.List.GetListShares,
 			&apiv1.GetListSharesRequest{ListUid: args.ListUID},
 			func(res *apiv1.GetListSharesResponse) string {
-				return fmt.Sprintf("%d people, %d groups: %v %v",
-					len(res.GetMemberUids()), len(res.GetGroupUids()),
-					res.GetMemberUids(), res.GetGroupUids())
+				return fmt.Sprintf("%d people: %s\n%d groups: %s",
+					len(res.GetMemberUids()), listed(res.GetMemberUids()),
+					len(res.GetGroupUids()), listed(res.GetGroupUids()))
 			})
 	})
 

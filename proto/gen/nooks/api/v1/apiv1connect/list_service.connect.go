@@ -39,6 +39,8 @@ const (
 	ListServiceGetSidebarProcedure = "/nooks.api.v1.ListService/GetSidebar"
 	// ListServiceGetListProcedure is the fully-qualified name of the ListService's GetList RPC.
 	ListServiceGetListProcedure = "/nooks.api.v1.ListService/GetList"
+	// ListServiceGetItemProcedure is the fully-qualified name of the ListService's GetItem RPC.
+	ListServiceGetItemProcedure = "/nooks.api.v1.ListService/GetItem"
 	// ListServiceCreateListProcedure is the fully-qualified name of the ListService's CreateList RPC.
 	ListServiceCreateListProcedure = "/nooks.api.v1.ListService/CreateList"
 	// ListServiceRenameListProcedure is the fully-qualified name of the ListService's RenameList RPC.
@@ -91,6 +93,12 @@ type ListServiceClient interface {
 	// column.
 	GetSidebar(context.Context, *connect.Request[v1.GetSidebarRequest]) (*connect.Response[v1.GetSidebarResponse], error)
 	GetList(context.Context, *connect.Request[v1.GetListRequest]) (*connect.Response[v1.GetListResponse], error)
+	// GetItem returns one Item, including its Note in full.
+	//
+	// Its own call rather than a read of the List it sits on: a caller that wants what
+	// somebody wrote about one thing should not have to fetch everything on the List to
+	// find it, and a reader shown a shortened Note needs somewhere to go for the rest.
+	GetItem(context.Context, *connect.Request[v1.GetItemRequest]) (*connect.Response[v1.GetItemResponse], error)
 	// CreateList adds a List. It starts private.
 	CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error)
 	// RenameList changes a List's name. Only its owner may.
@@ -162,6 +170,12 @@ func NewListServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			httpClient,
 			baseURL+ListServiceGetListProcedure,
 			connect.WithSchema(listServiceMethods.ByName("GetList")),
+			connect.WithClientOptions(opts...),
+		),
+		getItem: connect.NewClient[v1.GetItemRequest, v1.GetItemResponse](
+			httpClient,
+			baseURL+ListServiceGetItemProcedure,
+			connect.WithSchema(listServiceMethods.ByName("GetItem")),
 			connect.WithClientOptions(opts...),
 		),
 		createList: connect.NewClient[v1.CreateListRequest, v1.CreateListResponse](
@@ -262,6 +276,7 @@ type listServiceClient struct {
 	listLists       *connect.Client[v1.ListListsRequest, v1.ListListsResponse]
 	getSidebar      *connect.Client[v1.GetSidebarRequest, v1.GetSidebarResponse]
 	getList         *connect.Client[v1.GetListRequest, v1.GetListResponse]
+	getItem         *connect.Client[v1.GetItemRequest, v1.GetItemResponse]
 	createList      *connect.Client[v1.CreateListRequest, v1.CreateListResponse]
 	renameList      *connect.Client[v1.RenameListRequest, v1.RenameListResponse]
 	setListSharing  *connect.Client[v1.SetListSharingRequest, v1.SetListSharingResponse]
@@ -292,6 +307,11 @@ func (c *listServiceClient) GetSidebar(ctx context.Context, req *connect.Request
 // GetList calls nooks.api.v1.ListService.GetList.
 func (c *listServiceClient) GetList(ctx context.Context, req *connect.Request[v1.GetListRequest]) (*connect.Response[v1.GetListResponse], error) {
 	return c.getList.CallUnary(ctx, req)
+}
+
+// GetItem calls nooks.api.v1.ListService.GetItem.
+func (c *listServiceClient) GetItem(ctx context.Context, req *connect.Request[v1.GetItemRequest]) (*connect.Response[v1.GetItemResponse], error) {
+	return c.getItem.CallUnary(ctx, req)
 }
 
 // CreateList calls nooks.api.v1.ListService.CreateList.
@@ -383,6 +403,12 @@ type ListServiceHandler interface {
 	// column.
 	GetSidebar(context.Context, *connect.Request[v1.GetSidebarRequest]) (*connect.Response[v1.GetSidebarResponse], error)
 	GetList(context.Context, *connect.Request[v1.GetListRequest]) (*connect.Response[v1.GetListResponse], error)
+	// GetItem returns one Item, including its Note in full.
+	//
+	// Its own call rather than a read of the List it sits on: a caller that wants what
+	// somebody wrote about one thing should not have to fetch everything on the List to
+	// find it, and a reader shown a shortened Note needs somewhere to go for the rest.
+	GetItem(context.Context, *connect.Request[v1.GetItemRequest]) (*connect.Response[v1.GetItemResponse], error)
 	// CreateList adds a List. It starts private.
 	CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error)
 	// RenameList changes a List's name. Only its owner may.
@@ -450,6 +476,12 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 		ListServiceGetListProcedure,
 		svc.GetList,
 		connect.WithSchema(listServiceMethods.ByName("GetList")),
+		connect.WithHandlerOptions(opts...),
+	)
+	listServiceGetItemHandler := connect.NewUnaryHandler(
+		ListServiceGetItemProcedure,
+		svc.GetItem,
+		connect.WithSchema(listServiceMethods.ByName("GetItem")),
 		connect.WithHandlerOptions(opts...),
 	)
 	listServiceCreateListHandler := connect.NewUnaryHandler(
@@ -550,6 +582,8 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 			listServiceGetSidebarHandler.ServeHTTP(w, r)
 		case ListServiceGetListProcedure:
 			listServiceGetListHandler.ServeHTTP(w, r)
+		case ListServiceGetItemProcedure:
+			listServiceGetItemHandler.ServeHTTP(w, r)
 		case ListServiceCreateListProcedure:
 			listServiceCreateListHandler.ServeHTTP(w, r)
 		case ListServiceRenameListProcedure:
@@ -599,6 +633,10 @@ func (UnimplementedListServiceHandler) GetSidebar(context.Context, *connect.Requ
 
 func (UnimplementedListServiceHandler) GetList(context.Context, *connect.Request[v1.GetListRequest]) (*connect.Response[v1.GetListResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.GetList is not implemented"))
+}
+
+func (UnimplementedListServiceHandler) GetItem(context.Context, *connect.Request[v1.GetItemRequest]) (*connect.Response[v1.GetItemResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.GetItem is not implemented"))
 }
 
 func (UnimplementedListServiceHandler) CreateList(context.Context, *connect.Request[v1.CreateListRequest]) (*connect.Response[v1.CreateListResponse], error) {

@@ -216,6 +216,14 @@ func (g listService) GetList(ctx context.Context, req *apiv1.GetListRequest) (*a
 	return res.Msg, nil
 }
 
+func (g listService) GetItem(ctx context.Context, req *apiv1.GetItemRequest) (*apiv1.GetItemResponse, error) {
+	res, err := g.svc.GetItem(ctx, connect.NewRequest(req))
+	if err != nil {
+		return nil, asStatus(err)
+	}
+	return res.Msg, nil
+}
+
 func (g listService) CreateList(ctx context.Context, req *apiv1.CreateListRequest) (*apiv1.CreateListResponse, error) {
 	res, err := g.svc.CreateList(ctx, connect.NewRequest(req))
 	if err != nil {

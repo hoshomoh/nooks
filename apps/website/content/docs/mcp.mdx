@@ -169,21 +169,23 @@ client connected and was refused".
 
 | Tool | What it does |
 | --- | --- |
-| `list_lists` | One page of the lists the token reaches, and how many items are open on each |
-| `get_list` | What is on one list, ticked and unticked |
+| `list_lists` | One page of the lists the token reaches, filtered by status and ordered as asked |
+| `get_list` | What is on one list, ticked and unticked. A long note is shortened to fit its row |
+| `get_item` | One item with its note in full, and the list it is on |
 | `create_list` | Start a new list |
 | `rename_list` | Rename a list |
 | `duplicate_list` | Copy a list and everything on it, unticked |
 | `pin_list` | Pin a list to the caller's own sidebar, or unpin it |
+| `archive_list` | Put a list out of the sidebar, or bring it back |
 | `delete_list` | Delete a list and everything on it |
 | `add_item` | Put something on a list |
 | `update_item` | Change an item's wording, quantity, due date or note |
 | `complete_item` | Tick an item off, or put it back |
 | `move_item` | Reorder an item within its list |
 | `delete_item` | Take an item off a list for good |
-| `search` | Find items by what somebody wrote in them |
+| `search` | Find lists and items by what somebody wrote in them |
 | `list_dated_items` | What is due in a range of days, across every list |
-| `get_list_shares` | Which people and groups a list reaches by name |
+| `get_list_shares` | Which people and groups a list reaches, as identifiers |
 | `set_list_sharing` | Change who a list reaches |
 | `list_members` | Everyone on this instance |
 | `list_groups` | The groups, and who is in them |
@@ -191,6 +193,16 @@ client connected and was refused".
 | `list_activity` | What has happened recently |
 | `mark_activity_read` | Clear the unread count |
 | `about_instance` | Version, licence, and how much is stored |
+
+### Reading and rewriting a note
+
+`get_list` gives one row per item, so an item with a long note shows its first line and
+says how many more there are. `get_item` has the note in full.
+
+That matters because `update_item` replaces a note rather than adding to it. Read the
+item first, and pass what you read as `expected_note` when you write it back: the change
+is then refused if somebody edited the note in the meantime, instead of overwriting
+them.
 
 Everything an access token can reach, which is everything the REST API gives one. The
 set is not curated down to what somebody guessed an assistant would want: a household

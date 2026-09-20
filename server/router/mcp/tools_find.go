@@ -30,7 +30,7 @@ func addFindTools(server *sdk.Server, lists *v1.ListService) {
 			func(res *apiv1.SearchResponse) string {
 				rows := make([]string, 0, len(res.GetHits()))
 				for _, hit := range res.GetHits() {
-					rows = append(rows, fmt.Sprintf("%s — on %s", hit.GetText(), hit.GetListName()))
+					rows = append(rows, hitLine(hit))
 				}
 				return lines(rows, fmt.Sprintf("Nothing matching %q.", args.Query))
 			})

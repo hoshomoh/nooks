@@ -55,6 +55,9 @@ func run(ctx context.Context, args []string, env func(string) string, stdout, st
 	}
 
 	log := slog.New(slog.NewTextHandler(stderr, &slog.HandlerOptions{Level: cfg.LogLevel}))
+	// Also the default, so the one place that turns a failure into an answer can say
+	// what it was without a logger being threaded to it. See internalError.
+	slog.SetDefault(log)
 
 	s, err := openStore(ctx, cfg)
 	if err != nil {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"connectrpc.com/connect"
@@ -372,7 +373,21 @@ func passwordError(err error) error {
 }
 
 // internalError wraps a failure the caller can do nothing about.
+/*
+internalError is what a caller is told when the Instance itself failed.
+
+It logs, because nothing else does. The request log says a request happened and how long
+it took; it does not say that it failed or why, so an Instance that cannot reach its
+database writes one ordinary-looking line per attempt and the person running it has
+nothing to read. Whoever is self-hosting has no other window into this.
+
+The cause still reaches the caller as well, which is a separate question: it carries
+table names, file paths and whatever the database driver felt like saying. Answering
+without it means writing what a Member should read instead, and DESIGN.md §11 has
+opinions about that. Written down in the defense log rather than guessed at here.
+*/
 func internalError(what string, err error) error {
+	slog.Error("request failed", "doing", what, "error", err)
 	return connect.NewError(connect.CodeInternal, fmt.Errorf("%s: %w", what, err))
 }
 

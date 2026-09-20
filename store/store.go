@@ -161,6 +161,9 @@ type Store interface {
 
 	CreateList(ctx context.Context, params CreateListParams) (List, error)
 
+	// ListByID returns ErrNotFound when there is no such live List.
+	ListByID(ctx context.Context, id int64) (List, error)
+
 	// ListByUID returns ErrNotFound when there is no such live List.
 	ListByUID(ctx context.Context, uid string) (List, error)
 

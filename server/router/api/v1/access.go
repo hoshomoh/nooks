@@ -171,7 +171,27 @@ func (s *ListService) listWithAccess(
 		}
 		return store.List{}, internalError("read list", err)
 	}
+	return s.mayUse(ctx, list, grant, need, errListNotFound)
+}
 
+/*
+mayUse answers what a caller may do with a List they have already been handed.
+
+The reading of it is here rather than in each caller, because there are two ways to name
+a List — by uid and by the Item on it — and one of them once answered permission denied
+where the other answered not found, which let a token tell an Item it could not reach
+from one that did not exist.
+
+invisible is what a caller who may not see the List at all is told, and differs only in
+whether they asked about a List or about something on one.
+*/
+func (s *ListService) mayUse(
+	ctx context.Context,
+	list store.List,
+	grant auth.Grant,
+	need Access,
+	invisible error,
+) (store.List, error) {
 	shares, err := s.sharesReaching(ctx, list, grant.Member)
 	if err != nil {
 		return store.List{}, err
@@ -181,7 +201,7 @@ func (s *ListService) listWithAccess(
 	case have >= need:
 		return list, nil
 	case have == AccessNone:
-		return store.List{}, errListNotFound
+		return store.List{}, invisible
 	case need == AccessOwn:
 		return store.List{}, errNotOwner
 	default:
@@ -215,41 +235,30 @@ func (s *ListService) itemWithAccess(
 // errItemNotFound mirrors errListNotFound for Items.
 var errItemNotFound = connect.NewError(connect.CodeNotFound, errors.New("no such item"))
 
-// listByIDWithAccess is listWithAccess for a List already known by internal identity.
+/*
+listByIDWithAccess is listWithAccess for a List already known by internal identity.
+
+It reads the one List. It used to read every List the Member could reach and scan for
+this one, which put a full pass over their Lists in front of every tick, move and
+delete — the work growing with how much somebody had ever made, to answer a question
+about one row.
+*/
 func (s *ListService) listByIDWithAccess(
 	ctx context.Context,
 	id int64,
 	grant auth.Grant,
 	need Access,
 ) (store.List, error) {
-	lists, err := s.store.ListsForMember(ctx, grant.Member.ID)
+	list, err := s.store.ListByID(ctx, id)
 	if err != nil {
-		return store.List{}, internalError("read lists", err)
-	}
-	shares, err := s.namedSharesFor(ctx, grant.Member)
-	if err != nil {
-		return store.List{}, err
-	}
-	for _, list := range lists {
-		if list.ID != id {
-			continue
-		}
-		switch have := accessTo(list, grant, shares); {
-		case have >= need:
-			return list, nil
-		case have == AccessNone:
-			// The Member can reach this List and the token cannot name it. Refusing
-			// would confirm the Item exists, which is the one thing a token must not
-			// be able to learn about a List it was not given. See accessTo.
+		if errors.Is(err, store.ErrNotFound) {
 			return store.List{}, errItemNotFound
-		case need == AccessOwn:
-			return store.List{}, errNotOwner
-		default:
-			return store.List{}, errReadOnly
 		}
+		return store.List{}, internalError("read list", err)
 	}
-	// Not among the Lists they can reach: indistinguishable from not existing.
-	return store.List{}, errItemNotFound
+	// errItemNotFound, not errListNotFound: the caller named an Item, so a List they
+	// cannot see has to read as that Item not being there.
+	return s.mayUse(ctx, list, grant, need, errItemNotFound)
 }
 
 /*

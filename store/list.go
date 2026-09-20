@@ -98,6 +98,20 @@ func (s *sqlStore) CreateList(ctx context.Context, params CreateListParams) (Lis
 }
 
 // ListByUID finds a live List by its public identifier.
+// ListByID reads one List by internal identity, for a caller holding an Item that names
+// its List that way.
+func (s *sqlStore) ListByID(ctx context.Context, id int64) (List, error) {
+	row := new(listModel)
+	err := s.db.NewSelect().Model(row).Where("id = ? AND deleted_at = ''", id).Scan(ctx)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return List{}, ErrNotFound
+		}
+		return List{}, fmt.Errorf("read list: %w", err)
+	}
+	return row.toList()
+}
+
 func (s *sqlStore) ListByUID(ctx context.Context, uid string) (List, error) {
 	row := new(listModel)
 	err := s.db.NewSelect().Model(row).Where("uid = ? AND deleted_at = ''", uid).Scan(ctx)

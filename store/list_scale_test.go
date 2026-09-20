@@ -141,3 +141,33 @@ func BenchmarkSidebar(b *testing.B) {
 		}
 	}
 }
+
+/*
+What authorising one Item costs when a Member has a great many Lists.
+
+Ticking something off asks one question: may this caller change the List this Item is
+on. The answer must not get slower because somebody made more Lists years ago, which is
+what reading them all to find one did.
+*/
+func BenchmarkListByID(b *testing.B) {
+	s, _ := seedBench(b, benchLists, benchItems)
+	ctx := context.Background()
+
+	for b.Loop() {
+		if _, err := s.ListByID(ctx, benchLists/2); err != nil {
+			b.Fatalf("ListByID: %v", err)
+		}
+	}
+}
+
+// The read it replaced, kept so the difference is a number rather than an assertion.
+func BenchmarkListsForMember(b *testing.B) {
+	s, anna := seedBench(b, benchLists, benchItems)
+	ctx := context.Background()
+
+	for b.Loop() {
+		if _, err := s.ListsForMember(ctx, anna.ID); err != nil {
+			b.Fatalf("ListsForMember: %v", err)
+		}
+	}
+}

@@ -46,12 +46,8 @@ type archiveListArgs struct {
 	Archived bool   `json:"archived" jsonschema:"true to put it out of the sidebar, false to bring it back"`
 }
 
-/*
-statusWords and orderWords map what an assistant may say onto what the API takes.
-
-The enum's own spelling is a protocol detail. A tool that demanded LIST_STATUS_ARCHIVED
-would be asking a reader to learn one, the same way set_list_sharing does not.
-*/
+// statusWords and orderWords map what an assistant may say onto what the API takes, for
+// the reason sharingWords gives. The empty string is "did not ask", not a bad answer.
 var statusWords = map[string]apiv1.ListStatus{
 	"":          apiv1.ListStatus_LIST_STATUS_UNSPECIFIED,
 	"active":    apiv1.ListStatus_LIST_STATUS_ACTIVE,

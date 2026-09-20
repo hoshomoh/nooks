@@ -302,12 +302,10 @@ func (i *instance) withItem(label, note string) string {
 /*
 Every tool that shows a thing shows what to call about it next.
 
-This is the shape of the whole family of bugs this file grew to catch: a renderer that
-had the identifier in hand and printed the words without it, leaving an assistant able
-to find something and unable to touch it. Search did exactly that for months.
-
-Driven through a real session rather than read off the source, because what matters is
-what reaches the assistant.
+The shape of a whole family of bugs: a renderer holding the identifier and printing the
+words without it, which leaves an assistant able to find something and unable to touch
+it. Driven through a real session rather than read off the source, because what reaches
+the assistant is the thing that matters.
 */
 func TestEveryToolSaysWhatToCallNext(t *testing.T) {
 	i := newInstance(t)

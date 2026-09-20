@@ -173,12 +173,10 @@ func lines(rows []string, whenEmpty string) string {
 /*
 noteRow keeps a Note to the part that fits on a row, and says when it did.
 
-Nooks never summarises what a Member wrote, so the part shown is their own first line
-rather than anything generated. What matters more is the rest of the sentence: a row
-that quietly shows one line of five reads as the whole Note, and update_item replaces a
-Note rather than adding to it, so an assistant that believed the row would write back a
-fragment and delete the other four lines. Saying how much was held back is what stops
-that, and get_item is where the rest is.
+The part shown is the Member's own first line, because Nooks never summarises what
+somebody wrote. Saying how much was held back is the half that matters: update_item
+replaces a Note rather than adding to it, so a reader that took the row for the whole
+Note would write back a fragment and delete the rest.
 */
 func noteRow(note string) string {
 	first, rest, cut := strings.Cut(note, "\n")
@@ -196,11 +194,11 @@ on. A Note matched inside is cut to a row like any other, for the reason noteRow
 */
 func hitLine(hit *apiv1.SearchHit) string {
 	var said strings.Builder
-	fmt.Fprintf(&said, "[%s] %s — on %s", hitWord(hit.GetKind()), noteRow(hit.GetText()), hit.GetListName())
+	fmt.Fprintf(&said, "[%s] %s", hitWord(hit.GetKind()), noteRow(hit.GetText()))
+	fmt.Fprintf(&said, " — on %s (%s)", hit.GetListName(), hit.GetListUid())
 	if item := hit.GetItemUid(); item != "" {
 		fmt.Fprintf(&said, " — %s", item)
 	}
-	fmt.Fprintf(&said, " — list %s", hit.GetListUid())
 	return said.String()
 }
 

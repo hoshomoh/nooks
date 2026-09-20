@@ -60,13 +60,8 @@ func TestOnePageOfListsSaysNothingAboutPages(t *testing.T) {
 	}
 }
 
-/*
-A row that shortens a Note has to say so.
-
-update_item replaces a Note rather than adding to it, so an assistant that read one line
-of five and wrote back what it thought the Note was would delete the other four. The
-count is what tells it to go and read the rest first.
-*/
+// A row that shortens a Note says so, and says where the rest is. See noteRow for what
+// goes wrong when it does not.
 func TestAShortenedNoteSaysHowMuchIsMissing(t *testing.T) {
 	item := &apiv1.Item{
 		Uid:   "item_coffee",

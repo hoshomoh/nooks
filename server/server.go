@@ -83,6 +83,17 @@ func New(cfg profile.Config, s store.Store, log *slog.Logger) (*Server, error) {
 			Addr:              cfg.Addr,
 			Handler:           requestLogger(log, boundBodies(mux)),
 			ReadHeaderTimeout: 10 * time.Second,
+			// A body may be capped at four mebibytes and still arrive a byte a minute,
+			// which holds a connection and the goroutine reading it for as long as the
+			// sender likes. Requests here are small, so half a minute is generous.
+			ReadTimeout: 30 * time.Second,
+			// Between requests, not during one. Without it a keep-alive connection is
+			// held until whichever side gives up first, which may be neither.
+			IdleTimeout: 2 * time.Minute,
+			// WriteTimeout is deliberately unset. The event stream writes for as long as
+			// a browser has the app open, and a deadline on writing would end it on a
+			// timer. What bounds a stalled reader there is the broker dropping events it
+			// cannot hand over, not the clock.
 		},
 		log: log,
 	}, nil

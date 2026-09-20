@@ -168,6 +168,23 @@ func TestATokenSeesOnlyItsOwnListsEverywhere(t *testing.T) {
 	if got := len(hits.Msg.GetHits()); got != 0 {
 		t.Errorf("got %d hits, want none for a List the token does not name", got)
 	}
+
+	// Reading one Item is another way in, and it takes an item_uid rather than a
+	// list_uid, so the narrowing has to hold on a call that never names a List.
+	elsewhere := f.addItem(t, f.anna, f.createList(t, f.anna, "Shed"), "WD-40")
+	_, err = f.svc.GetItem(ctx, connect.NewRequest(&apiv1.GetItemRequest{ItemUid: elsewhere}))
+	if got := connect.CodeOf(err); got != connect.CodeNotFound {
+		t.Errorf("code = %v, want not_found for an Item on a List the token does not name", got)
+	}
+
+	// Writing is the same question asked louder. Refusing it would confirm the Item is
+	// there just as readily as answering would.
+	_, err = f.svc.SetItemDone(ctx, connect.NewRequest(&apiv1.SetItemDoneRequest{
+		ItemUid: elsewhere, Done: true,
+	}))
+	if got := connect.CodeOf(err); got != connect.CodeNotFound {
+		t.Errorf("code = %v, want not_found for a write to an Item the token cannot reach", got)
+	}
 }
 
 // A read token is its Member's access with one edge taken off: they own the List and

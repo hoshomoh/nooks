@@ -234,13 +234,19 @@ func (s *ListService) listByIDWithAccess(
 		if list.ID != id {
 			continue
 		}
-		if accessTo(list, grant, shares) >= need {
+		switch have := accessTo(list, grant, shares); {
+		case have >= need:
 			return list, nil
-		}
-		if need == AccessOwn {
+		case have == AccessNone:
+			// The Member can reach this List and the token cannot name it. Refusing
+			// would confirm the Item exists, which is the one thing a token must not
+			// be able to learn about a List it was not given. See accessTo.
+			return store.List{}, errItemNotFound
+		case need == AccessOwn:
 			return store.List{}, errNotOwner
+		default:
+			return store.List{}, errReadOnly
 		}
-		return store.List{}, errReadOnly
 	}
 	// Not among the Lists they can reach: indistinguishable from not existing.
 	return store.List{}, errItemNotFound

@@ -81,6 +81,13 @@ if wants proto; then
     echo "proto files are not formatted; run pnpm proto:format"; exit 1
   fi
 
+  # Two halves of one rule: anything the app can do, a script must be able to do. The
+  # annotation is what gives an RPC a REST route at all; the adapter is what answers on
+  # it. An RPC can have either without the other, and then the REST API is a version
+  # behind with nothing saying so.
+  step "rest bindings"
+  ./scripts/check-annotations.sh
+
   step "gateway adapters"
   ./scripts/check-gateway.sh
 

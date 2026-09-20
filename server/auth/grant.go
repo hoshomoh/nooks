@@ -26,6 +26,10 @@ type Grant struct {
 	Member store.Member
 	// Token is nil for a browser. When set, the two fields below apply.
 	Token *store.AccessToken
+	// Session is the stored form of the cookie that answered, and empty for anything
+	// else. It is what lets a Member end every session but the one they are asking
+	// from.
+	Session string
 	// reach is the Lists the token names, by internal identity.
 	reach map[int64]bool
 }

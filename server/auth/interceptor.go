@@ -78,7 +78,7 @@ browser, and narrowing it would be a surprise.
 func (r *Resolver) Grant(ctx context.Context, header http.Header) (Grant, bool) {
 	if session := cookieToken(header); session != "" {
 		if member, ok := r.Member(ctx, session); ok {
-			return Grant{Member: member}, true
+			return Grant{Member: member, Session: HashToken(session)}, true
 		}
 	}
 

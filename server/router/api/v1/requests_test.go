@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -241,5 +242,44 @@ func TestResetApprovalExpires(t *testing.T) {
 		}))
 	if got := connect.CodeOf(err); got != connect.CodeFailedPrecondition {
 		t.Errorf("code = %v, want failed_precondition on an expired approval", got)
+	}
+}
+
+/*
+Recovering an account signs out whoever was already in it.
+
+Somebody resetting a password has lost their way in, so no browser they hold is worth
+keeping — and the reason they are here may be that another one is signed in. Sparing
+none is the point of the reset, not a side effect of it.
+*/
+func TestAPasswordResetEndsEverySession(t *testing.T) {
+	svc, s := newAuthService(t)
+	completeSetup(t, svc)
+
+	anna, err := s.MemberByEmail(t.Context(), "anna@brunnen.lan")
+	if err != nil {
+		t.Fatalf("MemberByEmail: %v", err)
+	}
+	_, theirs := signedInAs(t, s, anna)
+
+	res, err := svc.RequestPasswordReset(t.Context(),
+		connect.NewRequest(&apiv1.RequestPasswordResetRequest{EmailOrName: "anna@brunnen.lan"}))
+	if err != nil {
+		t.Fatalf("RequestPasswordReset: %v", err)
+	}
+	uid := res.Msg.GetRequestUid()
+	if err := s.DecideResetRequest(t.Context(), uid, store.StatusApproved, testClock); err != nil {
+		t.Fatalf("DecideResetRequest: %v", err)
+	}
+
+	if _, err := svc.CompletePasswordReset(t.Context(),
+		connect.NewRequest(&apiv1.CompletePasswordResetRequest{
+			RequestUid: uid, NewPassword: "a brand new password",
+		})); err != nil {
+		t.Fatalf("CompletePasswordReset: %v", err)
+	}
+
+	if _, err := s.SessionByTokenHash(t.Context(), theirs); !errors.Is(err, store.ErrNotFound) {
+		t.Errorf("a browser signed in before the reset is still signed in: %v", err)
 	}
 }

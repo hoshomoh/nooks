@@ -324,14 +324,24 @@ var errNotABrowser = connect.NewError(connect.CodePermissionDenied,
 // Passwords, roles, who is a Member, and the tokens themselves: a leaked key must not
 // be able to make itself permanent, lock its owner out, or hand itself an Admin.
 func requireBrowser(ctx context.Context) (store.Member, error) {
-	grant, err := requireGrant(ctx)
+	grant, err := requireBrowserGrant(ctx)
 	if err != nil {
 		return store.Member{}, err
 	}
-	if grant.Token != nil {
-		return store.Member{}, errNotABrowser
-	}
 	return grant.Member, nil
+}
+
+// requireBrowserGrant is requireBrowser for a caller that needs the session as well as
+// the Member — ending every session but the one asking, for instance.
+func requireBrowserGrant(ctx context.Context) (auth.Grant, error) {
+	grant, err := requireGrant(ctx)
+	if err != nil {
+		return auth.Grant{}, err
+	}
+	if grant.Token != nil {
+		return auth.Grant{}, errNotABrowser
+	}
+	return grant, nil
 }
 
 // requireAdmin rejects anyone who is not a signed-in Admin in a browser.

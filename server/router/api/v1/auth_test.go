@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -322,5 +323,70 @@ func TestReplacePasswordRequiresASession(t *testing.T) {
 		connect.NewRequest(&apiv1.ReplacePasswordRequest{}))
 	if got := connect.CodeOf(err); got != connect.CodeUnauthenticated {
 		t.Errorf("code = %v, want unauthenticated", got)
+	}
+}
+
+// signedInAs puts a Member behind a real session and answers the context that browser
+// would arrive with, plus the stored form of its cookie.
+func signedInAs(t *testing.T, s store.Store, member store.Member) (context.Context, string) {
+	t.Helper()
+	token, hash, err := auth.NewToken()
+	if err != nil {
+		t.Fatalf("NewToken: %v", err)
+	}
+	if err := s.CreateSession(t.Context(), store.Session{
+		TokenHash: hash, MemberID: member.ID,
+		CreatedAt: testClock, ExpiresAt: testClock.Add(24 * time.Hour),
+	}); err != nil {
+		t.Fatalf("CreateSession: %v", err)
+	}
+	_ = token
+	return auth.WithGrant(t.Context(), auth.Grant{Member: member, Session: hash}), hash
+}
+
+// withPassword makes a Member who knows their own password.
+func withPassword(t *testing.T, s store.Store, plain string) store.Member {
+	t.Helper()
+	hash, err := password.Hash(plain)
+	if err != nil {
+		t.Fatalf("Hash: %v", err)
+	}
+	member, err := s.CreateMember(t.Context(), store.CreateMemberParams{
+		UID: "mem_ruth", Name: "Ruth", Email: "ruth@brunnen.lan", Role: store.RoleMember,
+		PasswordHash: hash, CreatedAt: testClock,
+	})
+	if err != nil {
+		t.Fatalf("CreateMember: %v", err)
+	}
+	return member
+}
+
+/*
+Changing a password signs every other browser out.
+
+It is what somebody does when they think another device has their account, so a password
+change that leaves those sessions alive makes the one remedy they reach for do nothing.
+The browser doing the changing keeps its session: it has just proved it knows the old
+password, and answering a settings change with a sign-in page is not a remedy either.
+*/
+func TestReplacingAPasswordEndsEveryOtherBrowser(t *testing.T) {
+	svc, s := newAuthService(t)
+	member := withPassword(t, s, "the one she has now")
+
+	mine, mineHash := signedInAs(t, s, member)
+	_, theirsHash := signedInAs(t, s, member)
+
+	if _, err := svc.ReplacePassword(mine, connect.NewRequest(&apiv1.ReplacePasswordRequest{
+		CurrentPassword: "the one she has now",
+		NewPassword:     "one nobody else knows",
+	})); err != nil {
+		t.Fatalf("ReplacePassword: %v", err)
+	}
+
+	if _, err := s.SessionByTokenHash(t.Context(), theirsHash); !errors.Is(err, store.ErrNotFound) {
+		t.Errorf("the other browser is still signed in: %v", err)
+	}
+	if _, err := s.SessionByTokenHash(t.Context(), mineHash); err != nil {
+		t.Errorf("the browser that changed the password was signed out: %v", err)
 	}
 }

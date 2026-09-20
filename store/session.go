@@ -100,6 +100,32 @@ func (s *sqlStore) DeleteSessionTree(ctx context.Context, refreshHash string) er
 	return nil
 }
 
+/*
+DeleteSessionsFor signs a Member out everywhere, sparing one browser if asked.
+
+Deleting by Member takes the access tokens with it: those carry the same member_id as
+the refresh session that minted them, so one statement ends both kinds.
+
+keep is the refresh token hash of a browser that should survive — the one asking, when
+somebody changes their own password and should not be thrown out for it. Empty keeps
+nothing, which is what a password reset wants: whoever is recovering an account has no
+session worth saving, and anybody else holding one is the reason they are here.
+*/
+func (s *sqlStore) DeleteSessionsFor(ctx context.Context, memberID int64, keep string) error {
+	query := s.db.NewDelete().
+		Model((*sessionModel)(nil)).
+		Where("member_id = ?", memberID)
+
+	if keep != "" {
+		query = query.Where("token_hash <> ? AND parent_hash <> ?", keep, keep)
+	}
+
+	if _, err := query.Exec(ctx); err != nil {
+		return fmt.Errorf("delete sessions for member: %w", err)
+	}
+	return nil
+}
+
 // DeleteExpiredSessions clears out Sessions that have passed their expiry, and reports
 // how many went.
 func (s *sqlStore) DeleteExpiredSessions(ctx context.Context, now time.Time) (int64, error) {

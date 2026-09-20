@@ -181,10 +181,11 @@ func (s *AuthService) ReplacePassword(
 ) (*connect.Response[apiv1.ReplacePasswordResponse], error) {
 	// A browser, never a token: a key that reaches somebody's Lists must not be a way
 	// to take the account those Lists belong to.
-	member, err := requireBrowser(ctx)
+	grant, err := requireBrowserGrant(ctx)
 	if err != nil {
 		return nil, err
 	}
+	member := grant.Member
 
 	if err := password.Verify(member.PasswordHash, req.Msg.GetCurrentPassword()); err != nil {
 		if errors.Is(err, password.ErrWrong) {
@@ -200,6 +201,18 @@ func (s *AuthService) ReplacePassword(
 	}
 	if err := s.store.SetMemberPassword(ctx, member.ID, hash); err != nil {
 		return nil, internalError("set member password", err)
+	}
+	/*
+		Every other browser is signed out.
+
+		Changing a password is what somebody does when they think another device has
+		their account, so leaving those sessions alive would make the one remedy they
+		reach for do nothing. The browser asking keeps its session: it has just proved
+		it knows the old password, and throwing it out would answer a settings change
+		with a sign-in page.
+	*/
+	if err := s.store.DeleteSessionsFor(ctx, member.ID, grant.Session); err != nil {
+		return nil, internalError("end other sessions", err)
 	}
 
 	updated, err := s.store.MemberByID(ctx, member.ID)

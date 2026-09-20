@@ -205,6 +205,11 @@ func (s *AuthService) CompletePasswordReset(
 	if err := s.store.SetMemberPassword(ctx, request.MemberID, hash); err != nil {
 		return nil, internalError("set member password", err)
 	}
+	// Every session goes, sparing none: somebody recovering an account has no browser
+	// worth keeping, and whoever else is signed in may well be why they are here.
+	if err := s.store.DeleteSessionsFor(ctx, request.MemberID, ""); err != nil {
+		return nil, internalError("end sessions", err)
+	}
 	// One approval sets one password.
 	if err := s.store.UseResetRequest(ctx, request.UID); err != nil {
 		return nil, internalError("spend reset request", err)

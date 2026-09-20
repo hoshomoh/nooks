@@ -122,6 +122,10 @@ type Store interface {
 	// DeleteSession signs one browser out, and is not an error if it was already gone.
 	DeleteSession(ctx context.Context, tokenHash string) error
 
+	// DeleteSessionsFor signs a Member out everywhere, sparing the browser whose refresh
+	// hash is given. Empty spares none.
+	DeleteSessionsFor(ctx context.Context, memberID int64, keep string) error
+
 	// DeleteSessionTree signs a browser out, taking the access tokens that refresh
 	// token minted with it.
 	DeleteSessionTree(ctx context.Context, refreshHash string) error

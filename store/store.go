@@ -165,6 +165,9 @@ type Store interface {
 
 	CreateList(ctx context.Context, params CreateListParams) (List, error)
 
+	// CanReachList reports whether a Member may see one List, without reading them all.
+	CanReachList(ctx context.Context, memberID int64, listUID string) (bool, error)
+
 	// ListByID returns ErrNotFound when there is no such live List.
 	ListByID(ctx context.Context, id int64) (List, error)
 

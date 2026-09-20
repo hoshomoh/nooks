@@ -118,16 +118,11 @@ func (h *Handler) watchableList(r *http.Request, member store.Member) (string, b
 		return "", false
 	}
 
-	lists, err := h.store.ListsForMember(r.Context(), member.ID)
-	if err != nil {
+	reaches, err := h.store.CanReachList(r.Context(), member.ID, uid)
+	if err != nil || !reaches {
 		return "", false
 	}
-	for _, list := range lists {
-		if list.UID == uid {
-			return uid, true
-		}
-	}
-	return "", false
+	return uid, true
 }
 
 // writeStreamHeaders says this is a stream, and asks everything in between not to hold

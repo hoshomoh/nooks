@@ -486,6 +486,36 @@ func (s *sqlStore) listsWhere(
 // ListsForMember returns every live List a Member can reach: their own, everything
 // shared with the whole Instance, and everything shared with them by name — directly or
 // through a Group they are in.
+/*
+CanReachList reports whether a Member may see one List at all.
+
+The same question ListsForMember answers about every List, asked about one. A caller
+holding a uid and wanting a yes or no should not read everything a Member has ever made
+to find out: that is a full pass over their Lists to decide one thing, and it was seven
+seconds on a hundred thousand of them.
+
+Membership only, with nothing about Access tokens in it. The one caller is the event
+stream, which takes a session cookie and never a token.
+*/
+func (s *sqlStore) CanReachList(ctx context.Context, memberID int64, listUID string) (bool, error) {
+	named, err := s.SharedListIDs(ctx, memberID)
+	if err != nil {
+		return false, err
+	}
+
+	query := s.db.NewSelect().
+		Model((*listModel)(nil)).
+		ModelTableExpr("list AS list").
+		ColumnExpr("1").
+		Where("list.uid = ? AND list.deleted_at = ''", listUID)
+
+	found, err := whereListVisible(query, memberID, named).Limit(1).Exists(ctx)
+	if err != nil {
+		return false, fmt.Errorf("read list: %w", err)
+	}
+	return found, nil
+}
+
 func (s *sqlStore) ListsForMember(ctx context.Context, memberID int64) ([]List, error) {
 	named, err := s.SharedListIDs(ctx, memberID)
 	if err != nil {

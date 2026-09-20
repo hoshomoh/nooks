@@ -246,3 +246,101 @@ func TestAGroupThatReachesNothing(t *testing.T) {
 		})
 	}
 }
+
+/*
+Asking whether one Member may see one List gives the same answer as listing them all.
+
+The event stream asks this to decide whether somebody may watch a List, and it used to
+answer by reading every List the Member could reach and looking for the one. The cheap
+question has to agree with the expensive one in every case, because the expensive one is
+what the rest of the app trusts — and a yes where there should be a no is a private List
+announcing its changes to somebody.
+*/
+func TestCanReachListAgreesWithListingThemAll(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			owner := newMember(t, s)
+			jonas := addMember(t, s, "mem_jonas", "Jonas", "jonas@brunnen.lan")
+			mira := addMember(t, s, "mem_mira", "Mira", "mira@brunnen.lan")
+
+			makeList(t, s, owner, "list_private", "Private", SharingPrivate)
+			makeList(t, s, owner, "list_everyone", "Everyone", SharingInstance)
+			named := makeList(t, s, owner, "list_named", "Named", SharingSpecific)
+			viaGroup := makeList(t, s, owner, "list_group", "Via group", SharingSpecific)
+
+			if err := s.ReplaceListShares(t.Context(), named.ID, []int64{jonas.ID}, nil); err != nil {
+				t.Fatalf("ReplaceListShares: %v", err)
+			}
+			group, err := s.CreateGroup(t.Context(), "grp_flatmates", "Flatmates", createdAt)
+			if err != nil {
+				t.Fatalf("CreateGroup: %v", err)
+			}
+			if err := s.AddToGroup(t.Context(), group.ID, mira.ID); err != nil {
+				t.Fatalf("AddToGroup: %v", err)
+			}
+			if err := s.ReplaceListShares(t.Context(), viaGroup.ID, nil, []int64{group.ID}); err != nil {
+				t.Fatalf("ReplaceListShares: %v", err)
+			}
+
+			for _, who := range []Member{owner, jonas, mira} {
+				reachable := map[string]bool{}
+				lists, err := s.ListsForMember(t.Context(), who.ID)
+				if err != nil {
+					t.Fatalf("ListsForMember: %v", err)
+				}
+				for _, list := range lists {
+					reachable[list.UID] = true
+				}
+
+				for _, uid := range []string{"list_private", "list_everyone", "list_named", "list_group"} {
+					got, err := s.CanReachList(t.Context(), who.ID, uid)
+					if err != nil {
+						t.Fatalf("CanReachList: %v", err)
+					}
+					if got != reachable[uid] {
+						t.Errorf("%s and %s: CanReachList says %v, listing them all says %v",
+							who.Name, uid, got, reachable[uid])
+					}
+				}
+			}
+		})
+	}
+}
+
+// A List nobody can name is not reachable, and neither is one that was deleted.
+func TestCanReachListSaysNoToWhatIsNotThere(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			owner := newMember(t, s)
+			list := makeList(t, s, owner, "list_gone", "Gone", SharingInstance)
+
+			if err := s.DeleteList(t.Context(), list.UID, createdAt); err != nil {
+				t.Fatalf("DeleteList: %v", err)
+			}
+
+			for _, uid := range []string{"list_gone", "list_never_existed"} {
+				got, err := s.CanReachList(t.Context(), owner.ID, uid)
+				if err != nil {
+					t.Fatalf("CanReachList: %v", err)
+				}
+				if got {
+					t.Errorf("CanReachList says yes to %s", uid)
+				}
+			}
+		})
+	}
+}
+
+// makeList adds one List with the sharing given.
+func makeList(t *testing.T, s Store, owner Member, uid, name string, sharing Sharing) List {
+	t.Helper()
+	list, err := s.CreateList(t.Context(), CreateListParams{
+		UID: uid, Name: name, OwnerID: owner.ID, Sharing: sharing, CanEdit: true, At: createdAt,
+	})
+	if err != nil {
+		t.Fatalf("CreateList %s: %v", name, err)
+	}
+	return list
+}

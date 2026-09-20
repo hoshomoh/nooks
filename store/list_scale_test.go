@@ -171,3 +171,16 @@ func BenchmarkListsForMember(b *testing.B) {
 		}
 	}
 }
+
+// Whether a Member may watch one List. The event stream asks this on every page load.
+func BenchmarkCanReachList(b *testing.B) {
+	s, anna := seedBench(b, benchLists, benchItems)
+	ctx := context.Background()
+	uid := fmt.Sprintf("list_%06d", benchLists/2)
+
+	for b.Loop() {
+		if _, err := s.CanReachList(ctx, anna.ID, uid); err != nil {
+			b.Fatalf("CanReachList: %v", err)
+		}
+	}
+}

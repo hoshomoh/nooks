@@ -30,6 +30,21 @@ import (
 const shutdownGrace = 10 * time.Second
 
 /*
+maxRequestBody is the most any one request may send.
+
+Four mebibytes is far past anything a person types. A Note is markdown somebody wrote,
+an Item is a line, a List is a name; the largest honest request here is a few kilobytes,
+and the ceiling is only meant to be out of the way of it.
+
+What it stops is one request being enormous: an unbounded body is read into memory
+before anything looks at it, so a single call could exhaust a home server's RAM, and
+whatever it carried would land in the database. It does not stop somebody sending many
+ordinary requests — bounding what an Instance holds in total is a different question,
+and not one a limit here answers.
+*/
+const maxRequestBody = 4 << 20
+
+/*
 tidyEvery is how often the Instance tidies up after itself.
 
 Hours rather than minutes: both jobs are about a shape that changes slowly, and neither
@@ -66,7 +81,7 @@ func New(cfg profile.Config, s store.Store, log *slog.Logger) (*Server, error) {
 		store: s,
 		http: &http.Server{
 			Addr:              cfg.Addr,
-			Handler:           requestLogger(log, mux),
+			Handler:           requestLogger(log, boundBodies(mux)),
 			ReadHeaderTimeout: 10 * time.Second,
 		},
 		log: log,
@@ -143,6 +158,22 @@ func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
 		mux.Handle("/", app)
 	}
 	return mux, nil
+}
+
+/*
+boundBodies refuses a request that is trying to send too much.
+
+Wrapped around the whole mux rather than configured per handler: Connect, the REST
+gateway, the MCP endpoint and the event stream are four different kinds of handler, and
+a ceiling that only some of them have is one somebody will find the gap in.
+*/
+func boundBodies(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Body != nil {
+			r.Body = http.MaxBytesReader(w, r.Body, maxRequestBody)
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 // handleHealthz answers the liveness check a container runtime asks.

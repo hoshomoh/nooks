@@ -2,7 +2,6 @@
 package mcp
 
 import (
-	"context"
 	"net/http"
 
 	sdk "github.com/modelcontextprotocol/go-sdk/mcp"
@@ -74,7 +73,3 @@ func errorText(err error) *sdk.CallToolResult {
 func text(said string) *sdk.CallToolResult {
 	return &sdk.CallToolResult{Content: []sdk.Content{&sdk.TextContent{Text: said}}}
 }
-
-// ctxGrant is unused here but documents the contract: the tools read the caller from
-// the context, which withGrant put there.
-var _ = func(ctx context.Context) { _, _ = auth.GrantFrom(ctx) }

@@ -35,12 +35,19 @@ A download rather than an RPC, because that is what it is: a browser should be a
 save it, and a script should be able to `curl` it into a backup directory. Nothing about
 it is shaped for a client to parse.
 
-Admins only. It contains every Member's password hash and every List in the household,
-which is exactly what a backup has to contain and exactly why it is not everybody's.
+Admins in a browser only. It contains every Member's password hash and every List in the
+household, which is exactly what a backup has to contain and exactly why it is not
+everybody's.
+
+An Access token is refused even when the Member who cut it is an Admin. A token is that
+Member's access deliberately narrowed — to some Lists, to reading only — and a file
+holding every List and every password hash is the one thing no narrowing survives. It is
+the same boundary requireBrowser draws for every Admin RPC; this route is not an RPC, so
+it has to draw it itself.
 */
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	grant, ok := h.resolver.Grant(r.Context(), r.Header)
-	if !ok || !grant.Member.IsAdmin() {
+	if !ok || grant.Token != nil || !grant.Member.IsAdmin() {
 		// The same answer either way: whether an Instance has a backup route worth
 		// finding is not something an anonymous request gets to learn.
 		http.Error(w, "not found", http.StatusNotFound)

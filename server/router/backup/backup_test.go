@@ -13,6 +13,14 @@ import (
 
 var testClock = time.Date(2026, 8, 25, 9, 0, 0, 0, time.UTC)
 
+// served is a handler and the ways of reaching it: a browser's session, and an Access
+// token its Member cut for a script.
+type served struct {
+	handler *Handler
+	session string
+	token   string
+}
+
 // serve builds a handler over a store with one Member of the given role.
 func serve(t *testing.T, role store.Role) (*Handler, string) {
 	t.Helper()
@@ -43,6 +51,37 @@ func serve(t *testing.T, role store.Role) (*Handler, string) {
 
 	resolver := auth.NewResolver(s, func() time.Time { return testClock })
 	return NewHandler(s, resolver, func() time.Time { return testClock }), token
+}
+
+// serveWithToken is serve, plus an Access token the Member cut for themselves.
+func serveWithToken(t *testing.T, role store.Role, abilities store.TokenAbilities) served {
+	t.Helper()
+	handler, session := serve(t, role)
+
+	secret, hash, err := auth.NewToken()
+	if err != nil {
+		t.Fatalf("NewToken: %v", err)
+	}
+	member, err := handler.store.MemberByUID(t.Context(), "mem_anna")
+	if err != nil {
+		t.Fatalf("MemberByUID: %v", err)
+	}
+	if _, err := handler.store.CreateAccessToken(t.Context(), store.CreateAccessTokenParams{
+		UID: "tok_1", MemberID: member.ID, Name: "Kitchen tablet", TokenHash: hash,
+		Abilities: abilities, AllLists: true, At: testClock,
+	}); err != nil {
+		t.Fatalf("CreateAccessToken: %v", err)
+	}
+	return served{handler: handler, session: session, token: secret}
+}
+
+// askWithToken makes the request a script would, carrying an Access token.
+func askWithToken(h *Handler, token string) *httptest.ResponseRecorder {
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/backup", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	res := httptest.NewRecorder()
+	h.ServeHTTP(res, req)
+	return res
 }
 
 // ask makes the request a browser would, with or without a session.
@@ -93,5 +132,34 @@ func TestAnonymousGetsNothing(t *testing.T) {
 
 	if code := ask(h, "").Code; code != http.StatusNotFound {
 		t.Errorf("code = %d, want 404", code)
+	}
+}
+
+/*
+An Access token cut by an Admin does not download the database.
+
+A token is that Member's access deliberately narrowed, and this file holds every List in
+the household and every Member's password hash. It is the one thing no narrowing
+survives, so the door asks for a browser rather than only for an Admin — even a token
+that may reach every List and do everything to them.
+
+The route is not an RPC, so neither the Connect guards nor the parity test cover it. It
+answered a token for as long as it existed.
+*/
+func TestAnAdminsAccessTokenIsRefused(t *testing.T) {
+	it := serveWithToken(t, store.RoleAdmin, store.TokenAbilities{Read: true, Write: true, Delete: true})
+
+	res := askWithToken(it.handler, it.token)
+
+	if res.Code != http.StatusNotFound {
+		t.Errorf("code = %d, want 404 for an Access token", res.Code)
+	}
+	if res.Body.Len() > 64 {
+		t.Errorf("answered %d bytes, want nothing that looks like a database", res.Body.Len())
+	}
+
+	// The same Admin, in the browser they signed into, still gets it.
+	if allowed := ask(it.handler, it.session); allowed.Code != http.StatusOK {
+		t.Errorf("code = %d for the browser, want 200", allowed.Code)
 	}
 }

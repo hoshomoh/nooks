@@ -2,6 +2,7 @@ package store
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 )
@@ -346,3 +347,79 @@ func TestCreateItemsOfNothingIsNothing(t *testing.T) {
 		})
 	}
 }
+
+/*
+Two Items at one position come back in a settled order.
+
+Appending reads the highest position and then inserts, so two people adding to one List
+at the same moment both land on the same one. SQL says nothing about the order of rows
+whose sort key ties, so the two can swap places between reads of the List they are both
+looking at.
+
+This is a contract test and not a reproduction. Both engines happen to hand these back
+in insertion order today even with nothing to break the tie, on a table this size and
+through the index they have — so it passes with the tiebreak and without it. What it
+holds is the promise: tied or not, a List reads back the same way twice, in the order
+things arrived. It would catch a change to what this is ordered by. It would not have
+caught the tie.
+*/
+func TestItemsAtTheSamePositionKeepTheirOrder(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			owner := newMember(t, s)
+			list := withItems(t, s, owner, "Groceries", 0, 0, createdAt)
+
+			for _, label := range []string{"Bread", "Milk", "Tea"} {
+				if _, err := s.CreateItem(t.Context(), CreateItemParams{
+					UID: "item_" + label, ListID: list.ID, Label: label,
+					AddedByID: owner.ID, At: createdAt,
+				}); err != nil {
+					t.Fatalf("CreateItem %s: %v", label, err)
+				}
+			}
+			// What two simultaneous appends leave behind: one position, three Items.
+			if _, err := s.(*sqlStore).db.NewUpdate().
+				Model((*itemModel)(nil)).
+				Set("position = ?", 1024.0).
+				Where("list_id = ?", list.ID).
+				Exec(t.Context()); err != nil {
+				t.Fatalf("flatten positions: %v", err)
+			}
+			// Then somebody edits the first one. Postgres rewrites an updated row at the
+			// end of the table, so a read with nothing to break the tie hands it back
+			// last — which is the swap this is about, reached the way it happens.
+			if err := s.UpdateItem(t.Context(), "item_Bread",
+				UpdateItemParams{Quantity: ptr("2")}, createdAt); err != nil {
+				t.Fatalf("UpdateItem: %v", err)
+			}
+
+			var first []string
+			for range 5 {
+				items, err := s.ItemsOnList(t.Context(), list.ID)
+				if err != nil {
+					t.Fatalf("ItemsOnList: %v", err)
+				}
+				got := make([]string, 0, len(items))
+				for _, item := range items {
+					got = append(got, item.Label)
+				}
+				if first == nil {
+					first = got
+					continue
+				}
+				if fmt.Sprint(got) != fmt.Sprint(first) {
+					t.Fatalf("order changed between reads: %v then %v", first, got)
+				}
+			}
+
+			// The order they arrived in, which is the one a person watched happen.
+			if fmt.Sprint(first) != "[Bread Milk Tea]" {
+				t.Errorf("order = %v, want them in the order they were added", first)
+			}
+		})
+	}
+}
+
+// ptr is a pointer to a value, for the optional fields of UpdateItemParams.
+func ptr[T any](v T) *T { return &v }

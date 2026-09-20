@@ -113,7 +113,11 @@ func (s *AuthService) CompleteJoin(
 		return nil, err
 	}
 
-	// Spending the request stops one approval creating two accounts.
+	// Spent after the account is made, not before: a Visitor who picks a password the
+	// rules refuse should be able to try again rather than burn their invitation on it.
+	//
+	// What stops one approval making two accounts is the unique email, which both calls
+	// would be inserting. This stops a second, later use of the same approval.
 	if err := s.store.UseJoinRequest(ctx, request.UID, s.now()); err != nil {
 		return nil, internalError("spend join request", err)
 	}

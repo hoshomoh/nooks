@@ -189,7 +189,11 @@ func (s *sqlStore) ItemsOnList(ctx context.Context, listID int64) ([]Item, error
 	err := s.db.NewSelect().
 		Model(&rows).
 		Where("list_id = ? AND deleted_at = ''", listID).
-		Order("position ASC").
+		// id breaks a tie, because positions are not unique. Appending reads the
+		// highest position and then inserts, so two people adding to the same List at
+		// the same moment both land on it. Without a second key the two swap places
+		// between reads, and a shared List is exactly where that happens.
+		Order("position ASC", "id ASC").
 		Scan(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("read items: %w", err)
@@ -228,7 +232,7 @@ func (s *sqlStore) DatedItemsForMember(ctx context.Context, memberID int64, from
 		Where("item.deleted_at = '' AND item.done_at = '' AND item.due_on <> ''").
 		Where("list.deleted_at = ''").
 		Where("item.due_on <= ?", to).
-		Order("item.due_on ASC", "item.position ASC")
+		Order("item.due_on ASC", "item.position ASC", "item.id ASC")
 	query = whereListVisible(query, memberID, named)
 
 	if from != "" {

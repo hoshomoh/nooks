@@ -5,8 +5,10 @@ import (
 	"time"
 )
 
-// CookieName is the session cookie. It is prefixed so it cannot be set by a
-// subdomain, and named for the app so a shared host stays legible.
+// CookieName is the session cookie, named for the app so a shared host stays legible.
+//
+// No __Host- prefix, which would stop a subdomain setting it: that prefix requires
+// Secure, and an Instance on a LAN over plain HTTP is a deployment Nooks supports.
 const CookieName = "nooks_session"
 
 // SessionLifetime is how long a session lasts without signing in again. A household

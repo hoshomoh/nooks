@@ -109,3 +109,43 @@ func TestTheServerAppliesTheCeiling(t *testing.T) {
 			res.Code, res.Body.String())
 	}
 }
+
+/*
+Every answer carries the two headers that cost nothing.
+
+Asserted on the server rather than the wrapper, because a header written in a function
+nothing wraps with is a header nobody gets. The event stream is checked alongside an
+ordinary request: it takes a different path out and would be an easy one to miss.
+*/
+func TestEveryAnswerCarriesItsDefences(t *testing.T) {
+	dir := t.TempDir()
+	s, err := store.OpenSQLite(t.Context(), filepath.Join(dir, "nooks.db"))
+	if err != nil {
+		t.Fatalf("OpenSQLite: %v", err)
+	}
+	t.Cleanup(func() { _ = s.Close() })
+
+	server, err := New(profile.Config{
+		Addr: ":0", Data: dir, Driver: profile.DriverSQLite, Mode: profile.ModeDev,
+	}, s, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+
+	for _, path := range []string{"/healthz", "/api/v1/lists", "/api/v1/events"} {
+		t.Run(path, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, path, nil)
+			res := httptest.NewRecorder()
+			server.http.Handler.ServeHTTP(res, req)
+
+			for header, want := range map[string]string{
+				"X-Content-Type-Options": "nosniff",
+				"Referrer-Policy":        "same-origin",
+			} {
+				if got := res.Header().Get(header); got != want {
+					t.Errorf("%s = %q, want %q", header, got, want)
+				}
+			}
+		})
+	}
+}

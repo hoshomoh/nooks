@@ -81,7 +81,7 @@ func New(cfg profile.Config, s store.Store, log *slog.Logger) (*Server, error) {
 		store: s,
 		http: &http.Server{
 			Addr:              cfg.Addr,
-			Handler:           requestLogger(log, boundBodies(mux)),
+			Handler:           requestLogger(log, withDefences(boundBodies(mux))),
 			ReadHeaderTimeout: 10 * time.Second,
 			// A body may be capped at four mebibytes and still arrive a byte a minute,
 			// which holds a connection and the goroutine reading it for as long as the
@@ -169,6 +169,31 @@ func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
 		mux.Handle("/", app)
 	}
 	return mux, nil
+}
+
+/*
+withDefences sets the headers every answer should carry.
+
+Two of them, and both are free. nosniff stops a browser deciding for itself what a
+response is: the REST API answers some things over GET, so a Member can be sent straight
+to one, and what comes back is JSON with their own words in it. The type is always
+declared, and this says not to second-guess it.
+
+same-origin keeps a Nooks address off other people's servers. A path here names a List
+and an Item, so a request that left carrying one would be handing a stranger the shape
+of somebody's household.
+
+Two more are deliberately absent, and the defense log says why: framing, which
+self-hosters do on purpose in dashboards, and a content policy, which needs checking
+against the built app rather than guessing.
+*/
+func withDefences(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		header := w.Header()
+		header.Set("X-Content-Type-Options", "nosniff")
+		header.Set("Referrer-Policy", "same-origin")
+		next.ServeHTTP(w, r)
+	})
 }
 
 /*

@@ -3,6 +3,7 @@ import { cn } from "cn"
 import type { Member } from "@nooks/api"
 
 import { TickBox } from "./tick-box"
+import { initialsOf } from "@/lib/initials"
 
 export interface MemberPickerProps {
   /** Everybody who could be picked. */
@@ -41,7 +42,7 @@ export function MemberPicker({ members, chosen, onToggle }: MemberPickerProps) {
           )}
         >
           <span className="grid size-6 shrink-0 place-items-center rounded-full bg-chip font-mono text-[10px] text-secondary-foreground">
-            {member.name.slice(0, 2).toUpperCase()}
+            {initialsOf(member.name)}
           </span>
           <span className="text-field">{member.name}</span>
           <span className="truncate text-micro text-muted-foreground">{member.email}</span>

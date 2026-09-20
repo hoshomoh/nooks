@@ -13,6 +13,7 @@ import { formatList } from "@/lib/format"
 import { groupsQuery, membersQuery } from "@/lib/sharing-queries"
 import { useLocale } from "@/lib/use-locale"
 import { useSettingsCounts } from "@/lib/use-settings-counts"
+import { initialsOf } from "@/lib/initials"
 
 /**
  * The Groups page: cards two-up, who is in each, and what each one reaches.
@@ -123,7 +124,7 @@ function GroupCard({ group, onEdit }: GroupCardProps) {
               className="grid size-5.5 place-items-center rounded-full border-[1.5px] border-background bg-chip text-[9px] text-secondary-foreground"
               style={index > 0 ? { marginLeft: "-6px" } : undefined}
             >
-              {member.name.slice(0, 2).toUpperCase()}
+              {initialsOf(member.name)}
             </span>
           ))}
         </span>

@@ -5,6 +5,7 @@ import type { PendingJoinRequest } from "@nooks/api"
 import { Button } from "@/components/ds/button"
 import { requestClient } from "@/lib/api"
 import { useMomentLabel } from "@/lib/use-moment-label"
+import { initialsOf } from "@/lib/initials"
 
 export interface JoinRequestsProps {
   requests: PendingJoinRequest[]
@@ -91,7 +92,3 @@ interface DecideVariables {
   approve: boolean
 }
 
-/** initialsOf is the two letters an avatar carries. */
-function initialsOf(name: string): string {
-  return name.slice(0, 2).toUpperCase()
-}

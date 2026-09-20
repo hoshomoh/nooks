@@ -10,6 +10,7 @@ import { DIALOG_BODY, DIALOG_SURFACE } from "./dialog-surface"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { groupsQuery, listSharesQuery, membersQuery } from "@/lib/sharing-queries"
 import { TickBox } from "./tick-box"
+import { initialsOf } from "@/lib/initials"
 
 /** What the dialog sends back when the Member saves. */
 export interface ShareDecision {
@@ -414,7 +415,3 @@ function namesIn(group: Group): string {
   return group.members.map((member: Member) => member.name).join(", ")
 }
 
-/** initialsOf is the two letters a person's avatar carries. */
-function initialsOf(name: string): string {
-  return name.slice(0, 2).toUpperCase()
-}

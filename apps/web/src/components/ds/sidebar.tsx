@@ -8,6 +8,7 @@ import { COVERING, INERT, RAISED } from "./covering"
 import { Icon } from "./icon"
 import { ListActions } from "./list-actions"
 import { SETTINGS_HOME } from "./settings-sections"
+import { initialsOf } from "@/lib/initials"
 import { reachableCount } from "@/lib/sidebar-groups"
 
 import { Mark } from "@nooks/design/mark"
@@ -378,7 +379,3 @@ function SidebarRow({ list, active, instanceName, finished }: SidebarRowProps) {
   )
 }
 
-/** initialsOf is the two-letter avatar fallback, e.g. "Anna" → "AN". */
-function initialsOf(name: string): string {
-  return name.slice(0, 2).toUpperCase()
-}

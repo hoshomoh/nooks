@@ -19,6 +19,7 @@ import { instanceQuery } from "@/lib/queries"
 import { groupsQuery, membersQuery } from "@/lib/sharing-queries"
 import type { Translate } from "@/lib/translate"
 import { useMomentLabel } from "@/lib/use-moment-label"
+import { initialsOf } from "@/lib/initials"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 import { JoinRequests } from "./join-requests"
 import { useSettingsCounts } from "@/lib/use-settings-counts"
@@ -226,10 +227,6 @@ function groupsOf(member: Member, groups: Group[]): string {
     .join(", ")
 }
 
-/** initialsOf is the two letters an avatar carries. */
-function initialsOf(name: string): string {
-  return name.slice(0, 2).toUpperCase()
-}
 
 /**
  * addErrorOf turns a refused addition into something to read under the field.

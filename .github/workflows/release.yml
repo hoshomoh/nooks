@@ -14,15 +14,22 @@ on:
   push:
     branches: [main]
 
+# Read-only by default, and each job widens it to what that job does. The actions below
+# are pinned to major tags, so they are whatever that tag points at on the day — and the
+# way that has gone wrong elsewhere is a tag moved to point at something else. What a
+# compromised action could reach is then bounded by the job it runs in rather than by
+# the most a release needs anywhere.
 permissions:
-  contents: write
-  pull-requests: write
-  packages: write
+  contents: read
 
 jobs:
   please:
     name: Release PR
     runs-on: ubuntu-latest
+    # Writes the tag and the release, and keeps the release pull request up to date.
+    permissions:
+      contents: write
+      pull-requests: write
     outputs:
       # Only true on the push that merged the release pull request.
       released: ${{ steps.release.outputs.release_created }}
@@ -39,6 +46,9 @@ jobs:
     needs: please
     if: needs.please.outputs.released == 'true'
     runs-on: ubuntu-latest
+    # Attaches files to the release that already exists. It writes nothing else.
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -115,6 +125,11 @@ jobs:
     needs: please
     if: needs.please.outputs.released == 'true'
     runs-on: ubuntu-latest
+    # Reads the tag it was told to build, and pushes to the registry. It does not write
+    # to the repository at all.
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
         with:

@@ -12,19 +12,35 @@ exporter, and the backups are incomplete for months before anybody finds out.
 
 ## Taking one
 
-Settings → About → Export everything, as an admin. What downloads is a real SQLite file.
+Settings → About → Export everything, as an admin. What downloads is a real SQLite file,
+named for the day you took it.
 
-Or over the API, with an access token:
+An access token cannot do this, even one cut by an admin. A token is that admin's access
+deliberately narrowed — to some lists, to reading only — and a file holding every list
+and every password hash is the one thing no narrowing survives. The export is an
+admin signed in through a browser, and nothing else.
+
+For a backup on a timer, take it on the machine itself. This is the same copy the export
+makes, and it is safe to run while the instance is using the database:
 
 ```bash
-curl -H "Authorization: Bearer $NOOKS_TOKEN" \
-  -o nooks-backup.db https://nooks.example/api/v1/backup
+sqlite3 /var/lib/nooks/nooks.db "VACUUM INTO '/backups/nooks-$(date +%F).db'"
 ```
+
+Copying `nooks.db` with `cp` while the instance is running is not the same thing and can
+give you a file that will not open.
 
 ## Putting one back
 
-Stop the instance, put the file where `--data` points, and start it again. There is no
-importer because nothing was ever converted.
+Stop the instance. Put the file in the directory `--data` points at — `./data` unless you
+changed it — **named `nooks.db`**, replacing what is there. Start it again.
+
+The name matters more than it looks. The file you downloaded is called something like
+`nooks-2026-03-14.db`, and an instance that does not find `nooks.db` does not complain:
+it creates an empty one and shows you first-run setup, with your backup sitting beside it
+untouched.
+
+There is no importer because nothing was ever converted.
 
 ## On postgres
 

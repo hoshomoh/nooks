@@ -289,7 +289,10 @@ func (s *ListService) nameMembers(
 		}
 		member, err := s.store.MemberByID(ctx, id)
 		if err != nil {
-			// A Member who is gone leaves rows behind. The row simply stops naming them.
+			// Only ever reached for whoever ticked something: done_by_id is SET NULL, so
+			// that row outlives them and stops naming them. A row they added does not —
+			// added_by_id is ON DELETE CASCADE and the row goes with them. See
+			// TestRemovingAMemberTakesTheirListsAndTheirItems.
 			if errors.Is(err, store.ErrNotFound) {
 				continue
 			}

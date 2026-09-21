@@ -2,6 +2,7 @@ package store
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 )
@@ -205,6 +206,57 @@ func TestMarkMemberSignedIn(t *testing.T) {
 			}
 			if !after.LastSignedInAt.Equal(signedIn) {
 				t.Errorf("LastSignedInAt = %v, want %v", after.LastSignedInAt, signedIn)
+			}
+		})
+	}
+}
+
+/*
+What removing a Member takes with them.
+
+Not a wish, a record. `list.owner_id` and `item.added_by_id` are both ON DELETE CASCADE,
+so removing somebody deletes every List they started and every Item they ever added,
+including the ones on other people's Lists that those people are still using.
+
+Pinned here because two things in this repository assume the opposite. The Settings
+dialog told an Admin that what somebody added stays on its lists, and `rowNamesFor` has
+a branch for a row whose Member is gone — which `added_by_id` can never reach, because
+the row goes with them. Whichever way that is settled, it should be settled on purpose
+and this test should fail when it is.
+*/
+func TestRemovingAMemberTakesTheirListsAndTheirItems(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			anna := newMember(t, s)
+			jonas := addMember(t, s, "mem_jonas", "Jonas", "jonas@brunnen.lan")
+
+			hers := makeList(t, s, anna, "list_hers", "Groceries", SharingInstance)
+			his := makeList(t, s, jonas, "list_his", "Flat jobs", SharingInstance)
+			addItem(t, s, hers, anna, "item_milk", "Milk")
+			addItem(t, s, his, anna, "item_bins", "Bins")
+			addItem(t, s, his, jonas, "item_recycling", "Recycling")
+
+			if err := s.DeleteMember(t.Context(), anna.ID); err != nil {
+				t.Fatalf("DeleteMember: %v", err)
+			}
+
+			// The List she owned, which the whole Instance could see.
+			if _, err := s.ListByUID(t.Context(), hers.UID); !errors.Is(err, ErrNotFound) {
+				t.Errorf("her List is %v, and this test is what says that is deliberate", err)
+			}
+
+			// His List survives. What she put on it does not.
+			items, err := s.ItemsOnList(t.Context(), his.ID)
+			if err != nil {
+				t.Fatalf("ItemsOnList: %v", err)
+			}
+			left := make([]string, 0, len(items))
+			for _, item := range items {
+				left = append(left, item.Label)
+			}
+			if fmt.Sprint(left) != "[Recycling]" {
+				t.Errorf("his List holds %v, want only what he added himself", left)
 			}
 		})
 	}

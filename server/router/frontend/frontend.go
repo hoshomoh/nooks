@@ -10,10 +10,14 @@
 package frontend
 
 import (
+	"bytes"
+	"crypto/sha256"
 	"embed"
+	"encoding/base64"
 	"fmt"
 	"io/fs"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -70,6 +74,7 @@ func serveIndex(w http.ResponseWriter, r *http.Request, dist fs.FS) {
 		http.Error(w, "app is not built into this binary", http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Content-Security-Policy", policyFor(page))
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Cache-Control", htmlCacheControl)
 	// A zero modtime tells ServeContent not to negotiate freshness; the
@@ -90,4 +95,52 @@ func cacheControlFor(name string) string {
 func fileExists(dist fs.FS, name string) bool {
 	info, err := fs.Stat(dist, name)
 	return err == nil && !info.IsDir()
+}
+
+/*
+The policy the app is served under.
+
+Everything comes from this origin. Nooks loads no script, style, font or image from
+anywhere else and talks to nothing but itself, so saying so costs nothing and means that
+a way to inject a script into a page would still have nowhere to load one from.
+
+style-src allows inline because the menus and popovers position themselves by writing a
+style attribute, which is what style-src governs. Pinning those would mean pinning a
+number that moves with the pointer.
+*/
+const policyRules = "default-src 'self'; " +
+	"style-src 'self' 'unsafe-inline'; " +
+	"img-src 'self' data: blob:; " +
+	"font-src 'self' data:; " +
+	"connect-src 'self'; " +
+	"object-src 'none'; " +
+	"base-uri 'self'; " +
+	"form-action 'self'"
+
+// inlineScript finds a script written into the page rather than loaded by it.
+var inlineScript = regexp.MustCompile(`(?s)<script(?:\s[^>]*)?>(.*?)</script>`)
+
+/*
+policyFor writes the policy for one page, naming the scripts written into it.
+
+The app carries one: it reads the chosen theme and sets it before anything is painted,
+which is a thing that has to happen inline or the first frame is the wrong colour. A
+policy that refused it would leave that frame wrong on every load, and nothing would say
+why.
+
+Hashed from the page being served rather than written down somewhere else. A hash kept
+apart from what it describes is a hash that goes stale, and the failure is a blank app
+in somebody's house with a console message they will never see.
+*/
+func policyFor(page []byte) string {
+	policy := policyRules + "; script-src 'self'"
+
+	for _, found := range inlineScript.FindAllSubmatch(page, -1) {
+		if len(bytes.TrimSpace(found[1])) == 0 {
+			continue
+		}
+		sum := sha256.Sum256(found[1])
+		policy += " 'sha256-" + base64.StdEncoding.EncodeToString(sum[:]) + "'"
+	}
+	return policy
 }

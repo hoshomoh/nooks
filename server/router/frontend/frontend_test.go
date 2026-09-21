@@ -1,6 +1,8 @@
 package frontend
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
 	"io/fs"
 	"net/http"
 	"net/http/httptest"
@@ -79,5 +81,78 @@ func TestSaysWhenTheAppWasNeverBuilt(t *testing.T) {
 	}
 	if body := rec.Body.String(); !strings.Contains(body, "not built into this binary") {
 		t.Errorf("body = %q, want it to say the app is missing", body)
+	}
+}
+
+/*
+The policy names the scripts the page actually carries.
+
+The app writes one into the page — it sets the chosen theme before the first paint — and
+a policy that did not name it would leave that frame the wrong colour on every load,
+with only a console message to say why. Hashing the page being served is what stops the
+two drifting apart, so this checks the hash is of that page and not of a copy of it.
+*/
+func TestThePolicyNamesThePageItIsServing(t *testing.T) {
+	const page = `<!doctype html><html><head>` +
+		`<script>document.documentElement.className = "dark"</script>` +
+		`<script type="module" src="/assets/app.js"></script>` +
+		`</head><body></body></html>`
+
+	policy := policyFor([]byte(page))
+
+	sum := sha256.Sum256([]byte(`document.documentElement.className = "dark"`))
+	want := "'sha256-" + base64.StdEncoding.EncodeToString(sum[:]) + "'"
+	if !strings.Contains(policy, want) {
+		t.Errorf("policy = %q, want it to name %s", policy, want)
+	}
+
+	// The one with a src is loaded, not written in, so 'self' already covers it.
+	if strings.Count(policy, "'sha256-") != 1 {
+		t.Errorf("policy = %q, want exactly the one inline script named", policy)
+	}
+}
+
+// Nothing may be loaded from anywhere else, and nothing may be written into the page
+// that the page did not already carry.
+func TestThePolicyShutsTheDoors(t *testing.T) {
+	policy := policyFor([]byte(`<!doctype html><html></html>`))
+
+	for _, want := range []string{
+		"default-src 'self'",
+		"script-src 'self'",
+		"connect-src 'self'",
+		"object-src 'none'",
+		"base-uri 'self'",
+		"form-action 'self'",
+	} {
+		if !strings.Contains(policy, want) {
+			t.Errorf("policy = %q, want %q in it", policy, want)
+		}
+	}
+	if strings.Contains(policy, "script-src 'self' 'unsafe-inline'") {
+		t.Error("script-src allows any inline script, which is the whole thing this stops")
+	}
+}
+
+// A page with nothing written into it names no hashes.
+func TestAPageWithNoInlineScriptNamesNone(t *testing.T) {
+	policy := policyFor([]byte(`<html><head><script src="/a.js"></script></head></html>`))
+
+	if strings.Contains(policy, "sha256-") {
+		t.Errorf("policy = %q, want no hash for a page that carries no inline script", policy)
+	}
+}
+
+// The page is served under it, not merely able to produce one.
+func TestTheIndexIsServedWithThePolicy(t *testing.T) {
+	dist := fstest.MapFS{
+		"index.html": &fstest.MapFile{Data: []byte(`<html><body>nooks</body></html>`)},
+	}
+
+	res := httptest.NewRecorder()
+	handlerFor(dist).ServeHTTP(res, httptest.NewRequest(http.MethodGet, "/lists/list_x", nil))
+
+	if got := res.Header().Get("Content-Security-Policy"); !strings.Contains(got, "default-src 'self'") {
+		t.Errorf("Content-Security-Policy = %q, want the page served under a policy", got)
 	}
 }

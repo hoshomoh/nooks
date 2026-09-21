@@ -194,3 +194,55 @@ func TestGroupMembershipTellsWhoeverItMoved(t *testing.T) {
 		}
 	}
 }
+
+/*
+Removing somebody changes what everybody else can see.
+
+Their Lists go with them, and those Lists could have been shared with anybody. Nothing
+told the people left: the Admin who clicked had their own screen refreshed by the app,
+and everyone else kept a sidebar full of Lists that no longer exist until they reloaded.
+*/
+func TestRemovingAMemberTellsTheOnesWhoStay(t *testing.T) {
+	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
+	if err != nil {
+		t.Fatalf("OpenSQLite: %v", err)
+	}
+	t.Cleanup(func() { _ = s.Close() })
+
+	member := func(uid, name string, role store.Role) store.Member {
+		t.Helper()
+		m, err := s.CreateMember(t.Context(), store.CreateMemberParams{
+			UID: uid, Name: name, Email: uid + "@brunnen.lan", Role: role,
+			PasswordHash: "hash", CreatedAt: testClock,
+		})
+		if err != nil {
+			t.Fatalf("CreateMember %s: %v", name, err)
+		}
+		return m
+	}
+	anna := member("mem_anna", "Anna", store.RoleAdmin)
+	jonas := member("mem_jonas", "Jonas", store.RoleMember)
+	mira := member("mem_mira", "Mira", store.RoleMember)
+
+	told := &heard{}
+	svc := NewMemberService(s, func() time.Time { return testClock }, nil).WithAnnouncer(told)
+
+	if _, err := svc.RemoveMember(auth.WithMember(t.Context(), anna),
+		connect.NewRequest(&apiv1.RemoveMemberRequest{MemberUid: mira.UID})); err != nil {
+		t.Fatalf("RemoveMember: %v", err)
+	}
+
+	for _, who := range []struct {
+		what string
+		id   int64
+		want bool
+	}{
+		{"the admin who did it", anna.ID, true},
+		{"everybody else still here", jonas.ID, true},
+		{"the member who was removed", mira.ID, false},
+	} {
+		if got := slices.Contains(told.listsFor, who.id); got != who.want {
+			t.Errorf("%s: told = %v, want %v (told %v)", who.what, got, who.want, told.listsFor)
+		}
+	}
+}

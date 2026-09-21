@@ -313,6 +313,7 @@ func (s *MemberService) SetMemberRole(
 		return nil, internalError("set member role", err)
 	}
 	member.Role = role
+
 	return connect.NewResponse(&apiv1.SetMemberRoleResponse{Member: memberToProto(member)}), nil
 }
 
@@ -344,6 +345,24 @@ func (s *MemberService) RemoveMember(
 
 	if err := s.store.DeleteMember(ctx, member.ID); err != nil {
 		return nil, internalError("remove member", err)
+	}
+
+	/*
+	 * Everyone left, rather than a worked-out set.
+	 *
+	 * What goes with a removed Member could have been shared with anybody — the whole
+	 * Instance, named Members, or a Group they were in — and their Lists are deleted
+	 * outright rather than merely put out of reach. Working out exactly whose sidebar
+	 * changed means reading every List they owned and every share on each.
+	 *
+	 * Removing somebody is a rare thing an Admin does on purpose, and a household is
+	 * not a number that runs away. One refetch each is cheaper than a set that is
+	 * subtly wrong.
+	 */
+	if s.announce != nil {
+		if remaining, err := everyone(ctx, s.store); err == nil && len(remaining) > 0 {
+			s.announce.ListsChanged(remaining)
+		}
 	}
 	return connect.NewResponse(&apiv1.RemoveMemberResponse{}), nil
 }

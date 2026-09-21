@@ -38,8 +38,9 @@ func (s *ListService) ListDatedItems(
 		return connect.NewResponse(&apiv1.ListDatedItemsResponse{}), nil
 	}
 
-	// The store already limits these to Lists the Member can reach; this read names
-	// them, and is the same one accessTo would use.
+	// The store limits these to Lists the Member can reach. This read is what limits
+	// them to the Lists a token names as well, so the skip below is the narrowing and
+	// not only the naming.
 	reachable, err := s.reachableLists(ctx, grant)
 	if err != nil {
 		return nil, err

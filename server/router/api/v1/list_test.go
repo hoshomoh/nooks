@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"testing"
 	"time"
 
@@ -1336,4 +1337,31 @@ func drewNames(lists []*apiv1.List) []string {
 		out = append(out, list.GetName())
 	}
 	return out
+}
+
+// A token that names one List is a key to that List. Today and the calendar read across
+// every List at once, which is exactly where a narrowing is easy to leave out.
+func TestDatedItemsStayInsideWhatATokenNames(t *testing.T) {
+	f := newListFixture(t)
+	groceries := f.createList(t, f.anna, "Groceries")
+	private := f.createList(t, f.anna, "Doctor")
+
+	f.addDatedItem(t, groceries, "Order the bread", "2026-09-05")
+	f.addDatedItem(t, private, "Blood test results", "2026-09-05")
+
+	ctx := f.withToken(t, f.anna, store.TokenAbilities{Read: true}, groceries)
+	res, err := f.svc.ListDatedItems(ctx, connect.NewRequest(&apiv1.ListDatedItemsRequest{
+		To: "2026-09-30",
+	}))
+	if err != nil {
+		t.Fatalf("ListDatedItems: %v", err)
+	}
+
+	labels := make([]string, 0, len(res.Msg.GetItems()))
+	for _, item := range res.Msg.GetItems() {
+		labels = append(labels, item.GetItem().GetLabel())
+	}
+	if !slices.Equal(labels, []string{"Order the bread"}) {
+		t.Errorf("a token naming only Groceries was shown %v", labels)
+	}
 }

@@ -303,3 +303,113 @@ func panelFor(t *testing.T, s Store, member Member) []string {
 	}
 	return out
 }
+
+/*
+A request nobody has answered stays where the person waiting can be helped.
+
+Nooks sends no mail, so Activity is the only place a join or reset request appears. It
+used to be the newest fifty entries and nothing else, swept to the same fifty — so a
+request that fifty other things happened after was first invisible and then deleted,
+while its row sat pending in its own table for ever. The Member who asked to be let back
+in waits, and no Admin has anywhere left to see that they asked.
+*/
+func TestAnUnansweredRequestOutlivesTheLimit(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			admin := newMember(t, s)
+
+			// The request, then a great deal of ordinary noise on top of it.
+			asked := entry(t, s, admin.ID, "act_asked", ActivityResetRequest, createdAt)
+			burySomeone(t, s, admin.ID)
+
+			if _, err := s.DeleteUnreadableActivity(t.Context()); err != nil {
+				t.Fatalf("DeleteUnreadableActivity: %v", err)
+			}
+
+			if !among(t, s, admin.ID, asked.UID) {
+				t.Error("the unanswered request is not where an Admin would look for it")
+			}
+		})
+	}
+}
+
+// An answered one is history and goes with the rest, or the panel never empties.
+func TestAnAnsweredRequestIsSweptLikeAnythingElse(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			admin := newMember(t, s)
+
+			decided := entry(t, s, admin.ID, "act_decided", ActivityResetRequest, createdAt)
+			if err := s.ResolveActivity(t.Context(), decided.TargetUID, OutcomeApproved); err != nil {
+				t.Fatalf("ResolveActivity: %v", err)
+			}
+			burySomeone(t, s, admin.ID)
+
+			if _, err := s.DeleteUnreadableActivity(t.Context()); err != nil {
+				t.Fatalf("DeleteUnreadableActivity: %v", err)
+			}
+
+			if among(t, s, admin.ID, decided.UID) {
+				t.Error("a decided request is history and was kept anyway")
+			}
+		})
+	}
+}
+
+// burySomeone puts more than a panel's worth of ordinary entries on top of whatever is
+// already there.
+func burySomeone(t *testing.T, s Store, memberID int64) {
+	t.Helper()
+	for i := range ActivityLimit + 10 {
+		entry(t, s, memberID, "act_noise_"+strconv.Itoa(i), ActivityListShared,
+			createdAt.Add(time.Duration(i+1)*time.Minute))
+	}
+}
+
+// among reports whether an entry is in what the Member would be shown.
+func among(t *testing.T, s Store, memberID int64, uid string) bool {
+	t.Helper()
+	entries, err := s.ActivityFor(t.Context(), memberID)
+	if err != nil {
+		t.Fatalf("ActivityFor: %v", err)
+	}
+	for _, one := range entries {
+		if one.UID == uid {
+			return true
+		}
+	}
+	return false
+}
+
+/*
+The panel stays a panel when requests are what is filling it.
+
+Preferring waiting requests would be a way to make the panel as long as somebody liked:
+the join endpoint answers strangers and nothing rate-limits it, so every unanswered
+request being kept for ever and shown for ever is a worse thing than the one it fixes.
+The cap holds either way — waiting requests win their place in it, they do not remove it.
+*/
+func TestTheLimitHoldsEvenWhenEverythingIsWaiting(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			admin := newMember(t, s)
+
+			for i := range ActivityLimit + 10 {
+				entry(t, s, admin.ID, "act_asked_"+strconv.Itoa(i), ActivityJoinRequest,
+					createdAt.Add(time.Duration(i)*time.Minute))
+			}
+
+			entries, err := s.ActivityFor(t.Context(), admin.ID)
+			if err != nil {
+				t.Fatalf("ActivityFor: %v", err)
+			}
+			if len(entries) != ActivityLimit {
+				t.Errorf("got %d entries, want no more than the %d a panel holds",
+					len(entries), ActivityLimit)
+			}
+		})
+	}
+}

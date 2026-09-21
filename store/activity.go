@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/uptrace/bun"
@@ -102,12 +103,21 @@ One statement, numbering each Member's entries newest first and removing what fa
 the end. The window function is the same on both drivers.
 */
 func (s *sqlStore) DeleteUnreadableActivity(ctx context.Context) (int64, error) {
+	/*
+	 * Everything past the end, except a request nobody has answered.
+	 *
+	 * An undecided request is not history. It is somebody locked out or waiting for an
+	 * account, and Activity is the only place it appears — Nooks sends no mail. Sweeping
+	 * one away leaves the row pending in its own table for ever with nothing anywhere
+	 * that shows it, and the person waiting is never told either way.
+	 */
 	const beyondTheLimit = `
 		SELECT id FROM (
 			SELECT id, ROW_NUMBER() OVER (
 				PARTITION BY member_id ORDER BY created_at DESC, id DESC
 			) AS place
 			FROM activity
+			WHERE NOT (outcome = '' AND kind IN ('JOIN_REQUEST', 'RESET_REQUEST'))
 		) AS ranked WHERE ranked.place > ?`
 
 	result, err := s.db.NewDelete().
@@ -125,11 +135,21 @@ func (s *sqlStore) DeleteUnreadableActivity(ctx context.Context) (int64, error) 
 	return gone, nil
 }
 
-// ActivityFor returns what is waiting for one Member, newest first.
+/*
+ActivityFor returns what is waiting for one Member, newest first.
+
+The newest ActivityLimit, plus every request nobody has answered however old it is. A
+decision somebody is waiting on does not stop mattering because fifty other things
+happened after it, and Activity is the only place it appears — so falling off the end
+would leave the request pending in its own table and invisible everywhere.
+
+Two reads rather than one clever one: the window function that would express it in a
+single statement is harder to read than the thing it does.
+*/
 func (s *sqlStore) ActivityFor(ctx context.Context, memberID int64) ([]Activity, error) {
-	var rows []activityModel
+	var recent []activityModel
 	err := s.db.NewSelect().
-		Model(&rows).
+		Model(&recent).
 		Where("member_id = ?", memberID).
 		Order("created_at DESC", "id DESC").
 		Limit(ActivityLimit).
@@ -138,14 +158,55 @@ func (s *sqlStore) ActivityFor(ctx context.Context, memberID int64) ([]Activity,
 		return nil, fmt.Errorf("read activity: %w", err)
 	}
 
-	entries := make([]Activity, 0, len(rows))
-	for _, row := range rows {
-		entry, err := row.toActivity()
-		if err != nil {
-			return nil, err
-		}
-		entries = append(entries, entry)
+	var waiting []activityModel
+	err = s.db.NewSelect().
+		Model(&waiting).
+		Where("member_id = ? AND outcome = '' AND kind IN (?)", memberID,
+			bun.In([]ActivityKind{ActivityJoinRequest, ActivityResetRequest})).
+		Order("created_at DESC", "id DESC").
+		Scan(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("read waiting activity: %w", err)
 	}
+
+	return merged(waiting, recent)
+}
+
+/*
+merged reads the sets as one panel: ActivityLimit entries, earlier sets first.
+
+Still a panel rather than a ledger. Waiting requests are offered first so that noise
+cannot push one out, and the cap still holds afterwards — otherwise somebody looping the
+unauthenticated join endpoint would make the panel as long as they liked, and every
+entry in it permanent.
+*/
+func merged(sets ...[]activityModel) ([]Activity, error) {
+	seen := make(map[int64]bool)
+	entries := make([]Activity, 0, ActivityLimit)
+
+	for _, rows := range sets {
+		for _, row := range rows {
+			if len(entries) == ActivityLimit {
+				break
+			}
+			if seen[row.ID] {
+				continue
+			}
+			seen[row.ID] = true
+			entry, err := row.toActivity()
+			if err != nil {
+				return nil, err
+			}
+			entries = append(entries, entry)
+		}
+	}
+
+	sort.Slice(entries, func(a, b int) bool {
+		if entries[a].CreatedAt.Equal(entries[b].CreatedAt) {
+			return entries[a].ID > entries[b].ID
+		}
+		return entries[a].CreatedAt.After(entries[b].CreatedAt)
+	})
 	return entries, nil
 }
 

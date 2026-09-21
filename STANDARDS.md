@@ -167,8 +167,11 @@ Otherwise:
 
 ## 6. Commits and review
 
-**Before every commit**, run `./scripts/ci.sh`. It is exactly what CI runs, in the same
-order. Discovering a break after pushing is the same information, slower and noisier.
+**Before every commit**, run `./scripts/ci.sh`. It runs every check that can run on your
+machine, in the order CI runs them. Two cannot: building and booting the container needs
+Docker, and scanning the dependencies needs the network and a tool the script has no
+business installing. It says so when it finishes. Discovering a break after pushing is
+the same information, slower and noisier.
 
 **Before every push**, run `./scripts/preflight.sh`. It checks out `HEAD` somewhere
 else, installs from the lockfile and runs the same script there — so what passes is what

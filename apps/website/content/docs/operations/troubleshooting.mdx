@@ -10,7 +10,8 @@ server-sent events on one long-lived connection, and a proxy that buffers respon
 holds every event until the connection closes, which looks exactly like live updates
 being broken rather than delayed.
 
-The headers that fix it are on [the reverse proxy page](/docs/deploy/reverse-proxy).
+The proxy settings that fix it are on
+[the reverse proxy page](/docs/deploy/reverse-proxy).
 The quick check: open two browsers, tick something in one, and watch the other. If it
 arrives on reload but not before, it is buffering.
 
@@ -34,13 +35,20 @@ Give it an absolute path in whatever starts it.
 
 ## Postgres: too many connections
 
-Small hosts often cap connections lower than you expect. Nooks holds a pool; the host
-counts every one of them, alongside whatever else is connected.
+Small hosts often cap connections lower than you expect. Nooks holds a pool and does not
+currently bound it, so under a burst the host counts every connection it opens alongside
+whatever else is connected.
 
-Lower the cap in the connection string:
+There is no Nooks setting for this yet. Raise `max_connections` on the server, or put a
+pooler such as PgBouncer in front of it.
 
-```
-postgres://nooks:...@localhost:5432/nooks?sslmode=disable&pool_max_conns=4
+Do not try to cap it in the connection string. Nooks talks to Postgres through pgx's
+`database/sql` driver, which is not pgxpool, so `pool_max_conns` is not one of its
+parameters — it is passed on to the server as a setting, and the server refuses to start
+the session:
+
+```text
+FATAL: unrecognized configuration parameter "pool_max_conns"
 ```
 
 ## A token gets 404 for a list that exists
@@ -54,8 +62,8 @@ Check the token's scope in **Settings → Access tokens**.
 ## A temporary password is not accepted
 
 It is shown once and never stored in clear, so if it was mistyped when it was passed on
-there is no way to look it up. Approve a reset in **Settings → Requests**, or remove and
-re-add the account.
+there is no way to look it up. Approve a reset in **Settings → Members**, where anything
+waiting on an admin is listed, or remove and re-add the account.
 
 ## Still stuck
 

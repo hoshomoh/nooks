@@ -44,6 +44,36 @@ jobs:
       - name: Formatted
         run: test -z "$(gofmt -l cmd internal server store)"
 
+  # Neither ecosystem was scanned for known vulnerabilities by anything, so an advisory
+  # against a dependency would have arrived silently. Nooks is a thing people run on
+  # their own machines, where nobody is watching a feed on their behalf.
+  security:
+    name: Security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      # Symbol level: it fails on a vulnerability this code actually reaches, not on one
+      # sitting unused in a module. That is the difference between a check people fix
+      # and a check people learn to ignore.
+      - name: Go dependencies
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # High and above. Lower than that is mostly transitive build tooling that never
+      # reaches a browser, and a gate that cries wolf is a gate somebody turns off.
+      - name: Node dependencies
+        run: pnpm audit --audit-level=high
+
   proto:
     name: Proto
     runs-on: ubuntu-latest

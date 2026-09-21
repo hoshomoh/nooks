@@ -22,6 +22,8 @@ func OpenPostgres(ctx context.Context, dsn string) (Store, error) {
 
 	store, err := open(ctx, db, postgresDialect(), "postgres")
 	if err != nil {
+		// As in sqlite.go: the handle is going nowhere and its close error would bury
+		// the one worth reading.
 		_ = db.Close()
 		return nil, err
 	}

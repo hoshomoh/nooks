@@ -30,6 +30,8 @@ func OpenSQLite(ctx context.Context, path string) (Store, error) {
 
 	store, err := open(ctx, db, sqliteDialect(), "sqlite")
 	if err != nil {
+		// The open failed, so this handle is going nowhere; its own close error would
+		// only bury the one worth reading.
 		_ = db.Close()
 		return nil, err
 	}

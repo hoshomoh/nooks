@@ -314,6 +314,11 @@ func (s *MemberService) SetMemberRole(
 	}
 	member.Role = role
 
+	// Their browser read who it was signed in as when the tab opened and has held the
+	// answer ever since, so this is the only thing that will tell it otherwise.
+	if s.announce != nil {
+		s.announce.MemberChanged(member.ID)
+	}
 	return connect.NewResponse(&apiv1.SetMemberRoleResponse{Member: memberToProto(member)}), nil
 }
 

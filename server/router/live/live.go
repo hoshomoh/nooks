@@ -180,6 +180,18 @@ func (p *Publisher) ListsChanged(audience []int64) {
 	p.broker.Publish(events.Event{Kind: events.KindListsChanged}, audience)
 }
 
+/*
+MemberChanged announces that a Member's own account changed.
+
+An Admin changing somebody's role is the case: the app reads who it is signed in as once
+and holds it for the life of the tab, so without this a Member promoted to Admin never
+sees the screens they were just given, and one demoted goes on being offered buttons
+that the Instance refuses.
+*/
+func (p *Publisher) MemberChanged(memberID int64) {
+	p.broker.Publish(events.Event{Kind: events.KindMemberChanged}, []int64{memberID})
+}
+
 // ActivityArrived announces that something is waiting in a Member's panel.
 func (p *Publisher) ActivityArrived(memberID int64) {
 	p.broker.Publish(events.Event{Kind: events.KindActivity}, []int64{memberID})

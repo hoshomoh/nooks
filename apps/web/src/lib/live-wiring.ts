@@ -22,7 +22,7 @@ export interface LiveWiring {
 }
 
 export function wireLiveUpdates(queryClient: QueryClient): LiveWiring {
-  const stop = liveStore.onEvent((event) => void act(queryClient, event))
+  const stop = liveStore.onEvent((event) => void actOn(queryClient, event))
   return {
     navigated: (pathname) => liveStore.watch(listUidIn(pathname)),
     stop,
@@ -30,19 +30,28 @@ export function wireLiveUpdates(queryClient: QueryClient): LiveWiring {
 }
 
 /**
- * act re-reads whatever the change affected.
+ * actOn re-reads whatever the change affected.
  *
  * The event says what changed rather than what it changed to, so this asks the same API
  * the screen always asks. A live update can never show somebody something the API would
  * not have given them.
+ *
+ * Exported for the same reason listUidIn is: which keys a kind invalidates is the whole
+ * of this wiring, and it is worth being able to read it back.
  */
-async function act(queryClient: QueryClient, event: LiveEvent): Promise<void> {
+export async function actOn(queryClient: QueryClient, event: LiveEvent): Promise<void> {
   switch (event.kind) {
     case "activity":
       await queryClient.invalidateQueries({ queryKey: ["activity"] })
       return
     case "presence":
       // Presence is read from the store itself; nothing on the server to re-read.
+      return
+    case "member.changed":
+      // Who we are signed in as is read once and held for the life of the tab, on
+      // purpose: it does not change because somebody ticked the milk. When it does
+      // change, this is the only thing that says so.
+      await queryClient.invalidateQueries({ queryKey: ["current-member"] })
       return
     default:
       await refreshLists(queryClient)

@@ -22,6 +22,8 @@ type Announcer interface {
 	// reaches the audience as it stands afterwards, so they are the one group it
 	// cannot reach.
 	ListsChanged(audience []int64)
+	// MemberChanged is for a Member whose own account changed under them.
+	MemberChanged(memberID int64)
 	ActivityArrived(memberID int64)
 }
 

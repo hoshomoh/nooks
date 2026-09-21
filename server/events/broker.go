@@ -22,6 +22,10 @@ const (
 	KindActivity Kind = "activity"
 	// KindPresence means who is looking at a List changed.
 	KindPresence Kind = "presence"
+	// KindMemberChanged means the signed-in Member's own account changed under them,
+	// which nothing else would tell their browser: it reads itself once and keeps the
+	// answer for the life of the tab.
+	KindMemberChanged Kind = "member.changed"
 )
 
 // Event is one thing that happened.

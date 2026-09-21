@@ -6,7 +6,12 @@
  * useSyncExternalStore rather than synchronising with an effect.
  */
 
-export type LiveKind = "list.changed" | "lists.changed" | "activity" | "presence"
+export type LiveKind =
+  | "list.changed"
+  | "lists.changed"
+  | "activity"
+  | "presence"
+  | "member.changed"
 
 /** One change, as the Instance describes it. */
 export interface LiveEvent {

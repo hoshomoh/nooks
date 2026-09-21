@@ -16,9 +16,10 @@ import (
 
 // heard records what a service announced, so a test can ask who was told.
 type heard struct {
-	listChanged []string
-	listsFor    []int64
-	activityFor []int64
+	listChanged   []string
+	listsFor      []int64
+	memberChanged []int64
+	activityFor   []int64
 }
 
 func (h *heard) ListChanged(_ context.Context, list store.List) {
@@ -27,6 +28,10 @@ func (h *heard) ListChanged(_ context.Context, list store.List) {
 
 func (h *heard) ListsChanged(audience []int64) {
 	h.listsFor = append(h.listsFor, audience...)
+}
+
+func (h *heard) MemberChanged(memberID int64) {
+	h.memberChanged = append(h.memberChanged, memberID)
 }
 
 func (h *heard) ActivityArrived(memberID int64) {
@@ -244,5 +249,53 @@ func TestRemovingAMemberTellsTheOnesWhoStay(t *testing.T) {
 		if got := slices.Contains(told.listsFor, who.id); got != who.want {
 			t.Errorf("%s: told = %v, want %v (told %v)", who.what, got, who.want, told.listsFor)
 		}
+	}
+}
+
+/*
+A Member whose role changed is told, because nothing else would.
+
+The app reads who it is signed in as once and holds it for the life of the tab — on
+purpose, since it does not change because somebody ticked the milk. So without this, a
+Member promoted to Admin never sees the screens they were just given, and one demoted
+goes on being offered buttons the Instance refuses, both until they happen to reload.
+Refused, so nothing leaks; wrong for as long as the tab stays open.
+*/
+func TestChangingARoleTellsTheMemberItHappenedTo(t *testing.T) {
+	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
+	if err != nil {
+		t.Fatalf("OpenSQLite: %v", err)
+	}
+	t.Cleanup(func() { _ = s.Close() })
+
+	member := func(uid, name string, role store.Role) store.Member {
+		t.Helper()
+		m, err := s.CreateMember(t.Context(), store.CreateMemberParams{
+			UID: uid, Name: name, Email: uid + "@brunnen.lan", Role: role,
+			PasswordHash: "hash", CreatedAt: testClock,
+		})
+		if err != nil {
+			t.Fatalf("CreateMember %s: %v", name, err)
+		}
+		return m
+	}
+	anna := member("mem_anna", "Anna", store.RoleAdmin)
+	jonas := member("mem_jonas", "Jonas", store.RoleMember)
+
+	told := &heard{}
+	svc := NewMemberService(s, func() time.Time { return testClock }, nil).WithAnnouncer(told)
+
+	if _, err := svc.SetMemberRole(auth.WithMember(t.Context(), anna),
+		connect.NewRequest(&apiv1.SetMemberRoleRequest{
+			MemberUid: jonas.UID, Role: apiv1.Role_ROLE_ADMIN,
+		})); err != nil {
+		t.Fatalf("SetMemberRole: %v", err)
+	}
+
+	if !slices.Contains(told.memberChanged, jonas.ID) {
+		t.Errorf("told %v their account changed, want Jonas (%d)", told.memberChanged, jonas.ID)
+	}
+	if slices.Contains(told.memberChanged, anna.ID) {
+		t.Error("the admin who made the change was told their own account changed")
 	}
 }

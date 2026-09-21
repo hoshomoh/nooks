@@ -139,6 +139,24 @@ func (s *sqlStore) SetMemberProfile(ctx context.Context, id int64, name, email s
 // What they added stays where it is: an Item on a shared List belongs to the List, and
 // deleting the person who typed it would delete somebody else's shopping.
 func (s *sqlStore) DeleteMember(ctx context.Context, id int64) error {
+	/*
+	 * The Lists they put things on, read before the delete takes those things away.
+	 *
+	 * item.added_by_id is ON DELETE CASCADE, so their Items go out from under the
+	 * database rather than through any path in this package. Nothing recounts, and a
+	 * List somebody else owns is then left saying "7 things to get" with three on it,
+	 * for good, until somebody happens to tick one.
+	 */
+	var touched []int64
+	err := s.db.NewSelect().
+		Model((*itemModel)(nil)).
+		ColumnExpr("DISTINCT list_id").
+		Where("added_by_id = ?", id).
+		Scan(ctx, &touched)
+	if err != nil {
+		return fmt.Errorf("read the lists a member added to: %w", err)
+	}
+
 	result, err := s.db.NewDelete().
 		Model((*memberModel)(nil)).
 		Where("id = ?", id).
@@ -146,7 +164,17 @@ func (s *sqlStore) DeleteMember(ctx context.Context, id int64) error {
 	if err != nil {
 		return fmt.Errorf("delete member: %w", err)
 	}
-	return requireOneRow(result, "member")
+	if err := requireOneRow(result, "member"); err != nil {
+		return err
+	}
+
+	// Their own Lists went with them, and recounting one that is gone updates nothing.
+	for _, listID := range touched {
+		if err := s.recount(ctx, listID); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // Members returns everyone on the Instance, by name — who a List can be shared with.

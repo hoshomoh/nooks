@@ -5,14 +5,23 @@ import (
 	"go/parser"
 	"go/token"
 	"io/fs"
+	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
 )
 
-// theTree is the Go in this repository, from this package's own directory.
+// theTree is the hand-written Go in this repository, from this package's own directory.
+//
+// generated is left out because it is not written by anybody: the protos are the source
+// and the comments in there are the generator's.
 var theTree = []string{"../../cmd", "../../internal", "../../server", "../../store"}
+
+const (
+	generated = "proto"
+	module    = "github.com/hoshomoh/nooks"
+)
 
 /*
 A doc comment says the name of the thing it documents.
@@ -76,6 +85,49 @@ func TestADocCommentNamesWhatItDocuments(t *testing.T) {
 				"insertion leaves whatever it belonged to with none",
 				path, strings.Join(names, ", "), opens)
 		}
+	}
+}
+
+/*
+TestTheTreeIsAllOfIt fails when a package nothing above looks at joins the module.
+
+theTree is a list, and a list goes out of date. A new top-level directory would be
+audited by nothing and the test above would go on passing, which is how a guard becomes
+furniture.
+
+Asked of the toolchain rather than of the filesystem. The module is exactly the Go that
+matters: a nested module of somebody's reading material sitting in the working directory
+is not part of it, and scanning for .go files cannot tell the difference.
+*/
+func TestTheTreeIsAllOfIt(t *testing.T) {
+	// From the root, not from here: ./... is relative to where it runs, and here is one
+	// package.
+	listing := exec.CommandContext(t.Context(), "go", "list", "./...")
+	listing.Dir = filepath.Join("..", "..")
+	listed, err := listing.Output()
+	if err != nil {
+		t.Fatalf("go list: %v", err)
+	}
+
+	walked := make(map[string]bool, len(theTree))
+	for _, root := range theTree {
+		walked[strings.TrimPrefix(root, "../../")] = true
+	}
+
+	packages := strings.Fields(string(listed))
+	if len(packages) < 10 {
+		t.Fatalf("the module has %d packages, too few to be reading all of it", len(packages))
+	}
+	for _, pkg := range packages {
+		within := strings.TrimPrefix(pkg, module+"/")
+		if within == module {
+			continue
+		}
+		top := strings.SplitN(within, "/", 2)[0]
+		if walked[top] || top == generated {
+			continue
+		}
+		t.Errorf("%s is in the module and theTree does not walk %s/", pkg, top)
 	}
 }
 

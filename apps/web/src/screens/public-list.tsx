@@ -147,7 +147,7 @@ function PublicRow({ item, dueLabel, reached, onReach }: PublicRowProps) {
           {item.label}
         </span>
         {item.quantity && (
-          <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-[11.5px] text-muted-foreground">
+          <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-badge text-muted-foreground">
             {item.quantity}
           </span>
         )}

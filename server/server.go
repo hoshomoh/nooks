@@ -101,16 +101,24 @@ func New(cfg profile.Config, s store.Store, log *slog.Logger) (*Server, error) {
 
 // newMux wires every route an Instance answers.
 func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
-	// Every request passes through the resolver, which attaches the signed-in Member
-	// when there is one. It never rejects: first run, sign-in and the Public list are
-	// all legitimately anonymous.
 	// One broker per process. Nooks is one binary on one machine, so there is nothing
 	// to coordinate between.
 	broker := events.NewBroker()
 	publisher := live.NewPublisher(s, broker)
 
-	// The resolver is the only thing that sees a token presented, so it is what tells a
-	// Member their key has started being used.
+	/*
+	 * Every route that can carry a signed-in Member goes through the resolver: the
+	 * Connect handlers by interceptor, the REST mux by middleware, and the event
+	 * stream, MCP and backup by holding it themselves. Health and the app itself do
+	 * not, having no notion of one.
+	 *
+	 * It never rejects. First run, signing in and the Public list are all legitimately
+	 * anonymous, so who is asking and whether they may are two questions and this
+	 * answers only the first.
+	 *
+	 * It is also the only thing that sees a token presented, which is what lets it tell
+	 * a Member their key has started being used.
+	 */
 	tokenActivity := v1.NewTokenActivity(s, nil, nil).WithAnnouncer(publisher)
 	resolver := auth.NewResolver(s, nil).WithTokenWatcher(tokenActivity)
 	interceptors := connect.WithInterceptors(resolver.Interceptor())

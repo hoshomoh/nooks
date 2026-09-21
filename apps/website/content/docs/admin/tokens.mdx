@@ -41,14 +41,25 @@ Running the instance. Adding a member, deciding a request, changing instance set
 minting another token, changing a password — all of it needs a signed-in browser. No
 access token can do any of it, over REST or over MCP.
 
+Nor can it export the database, even one cut by an admin. A token is that admin's access
+narrowed, and a file holding every list and every password hash is the one thing no
+narrowing survives — see [Back up](/docs/operations/back-up).
+
 An admin can revoke another member's token but cannot read it or create one in their
 name. An admin is somebody who runs the instance, not somebody who can act as you.
 
 ## Watching what it does
 
-Every change a token makes is attributed to it in the list's history — *Anna · via
-Kitchen tablet* — naming the member and then what it came through. The token's own
-activity is on its page.
+Every change a token makes is attributed to it in the list's history — *Anna, via
+Kitchen tablet* — naming the member and then what it came through.
+
+**Settings → Access tokens** says when each one was last used, or that it never has
+been. A token has no page of its own: what there is to know about one is who it belongs
+to, what it reaches, and when it was last seen.
+
+Two things reach the activity panel: a token's first use, and one being revoked by
+somebody other than its owner. Neither is something to find out from a script that has
+quietly stopped working.
 
 ## Using it
 

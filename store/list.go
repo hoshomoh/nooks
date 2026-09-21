@@ -90,7 +90,13 @@ func (s *sqlStore) CreateList(ctx context.Context, params CreateListParams) (Lis
 	if err != nil {
 		return List{}, err
 	}
-	// Indexing happens with the write, so nothing can exist without being findable.
+	// Indexed after the row is in, not with it: these are two statements and there is no
+	// transaction around them. A failed index therefore leaves a List that exists and
+	// cannot be searched for, and answers the caller as though nothing was made.
+	//
+	// CreateItems takes the other view on the same question — it reports the index
+	// failure and keeps the Items, on the grounds that losing somebody's words is worse
+	// than losing their searchability. The two should agree; see the log.
 	if err := s.indexList(ctx, list); err != nil {
 		return List{}, err
 	}

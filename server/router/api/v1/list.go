@@ -18,6 +18,10 @@ import (
 // Instance nobody is watching does anyway.
 type Announcer interface {
 	ListChanged(ctx context.Context, list store.List)
+	// ListsChanged is for the Members a change took a List away from. ListChanged
+	// reaches the audience as it stands afterwards, so they are the one group it
+	// cannot reach.
+	ListsChanged(audience []int64)
 	ActivityArrived(memberID int64)
 }
 
@@ -52,6 +56,42 @@ func (s *ListService) WithAnnouncer(a Announcer) *ListService {
 func (s *ListService) announceListChanged(ctx context.Context, list store.List) {
 	if s.announce != nil {
 		s.announce.ListChanged(ctx, list)
+	}
+}
+
+/*
+announceLostReach tells whoever can no longer see a List that their sidebar changed.
+
+before is the audience read before the change. Anybody in it who is not in the audience
+now has had the List taken away, and nothing else would tell them: they would keep it in
+their sidebar until a query went stale or they reloaded, and clicking it would give them
+an error about a List that was theirs to read a moment ago.
+
+Silent on failure, like ListChanged and for the same reason — a change that was made and
+saved is not undone by failing to announce it, and the browser re-reads on its own next
+time it asks for anything.
+*/
+func (s *ListService) announceLostReach(ctx context.Context, list store.List, before []int64) {
+	if s.announce == nil || len(before) == 0 {
+		return
+	}
+	audience, err := AudienceOf(ctx, s.store, list)
+	if err != nil {
+		return
+	}
+
+	reaches := make(map[int64]bool, len(audience))
+	for _, id := range audience {
+		reaches[id] = true
+	}
+	lost := make([]int64, 0, len(before))
+	for _, id := range before {
+		if !reaches[id] {
+			lost = append(lost, id)
+		}
+	}
+	if len(lost) > 0 {
+		s.announce.ListsChanged(lost)
 	}
 }
 
@@ -389,6 +429,14 @@ func (s *ListService) SetListSharing(
 		return nil, connect.NewError(connect.CodeInvalidArgument,
 			errors.New("say who the list is shared with"))
 	}
+
+	// Read before anything is written: afterwards there is no way to know who this used
+	// to reach, and they are the ones the announcement below is for.
+	reachedBefore, err := AudienceOf(ctx, s.store, list)
+	if err != nil {
+		return nil, err
+	}
+
 	if err := s.store.SetListSharing(ctx, list.UID, sharing, req.Msg.GetCanEdit(), s.now()); err != nil {
 		return nil, internalError("share list", err)
 	}
@@ -407,6 +455,7 @@ func (s *ListService) SetListSharing(
 	list.CanEdit = req.Msg.GetCanEdit()
 	// Who can reach it changed, so the sidebars that show it did too.
 	s.announceListChanged(ctx, list)
+	s.announceLostReach(ctx, list, reachedBefore)
 	return connect.NewResponse(&apiv1.SetListSharingResponse{
 		List: listToProto(list, member, false, 0, 0),
 	}), nil

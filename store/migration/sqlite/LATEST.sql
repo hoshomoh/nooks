@@ -83,7 +83,9 @@ CREATE TABLE list (
   can_edit   BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TEXT    NOT NULL,
   updated_at TEXT    NOT NULL,
-  -- Deleting is soft: a List removed by mistake is recoverable until it is purged.
+  -- Deleting is soft: the row stays with a date on it and every read skips it. There
+  -- is no way back through the app and nothing sweeps these away, so a deleted List
+  -- is invisible and stays until the Instance is reset.
   deleted_at TEXT    NOT NULL DEFAULT '',
   -- Archiving is not deleting: out of the sidebar, still searchable and restorable.
   -- A property of the List, so a shared one leaves everybody's sidebar together.

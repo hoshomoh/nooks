@@ -134,10 +134,20 @@ func (s *sqlStore) SetMemberProfile(ctx context.Context, id int64, name, email s
 	return requireOneRow(result, "member")
 }
 
-// DeleteMember removes an account.
-//
-// What they added stays where it is: an Item on a shared List belongs to the List, and
-// deleting the person who typed it would delete somebody else's shopping.
+/*
+DeleteMember removes an account and everything of theirs.
+
+Their Lists go with them, and so does everything they put on anybody else's: both
+list.owner_id and item.added_by_id are ON DELETE CASCADE, so removing one person takes
+Items off Lists that other people own and are still using. The dialog says as much —
+"Nothing of theirs is left behind" — because saying anything softer would be untrue.
+
+Whether that is the right behaviour is a question nobody has answered yet. Deleting
+somebody's shopping off a shared List because the person who typed it has left is not
+obviously right, and the alternatives — a nullable owner, reassigning to an Admin,
+refusing while they still own something — each cost something. Until then this is what
+happens, and this says so.
+*/
 func (s *sqlStore) DeleteMember(ctx context.Context, id int64) error {
 	/*
 	 * The Lists they put things on, read before the delete takes those things away.

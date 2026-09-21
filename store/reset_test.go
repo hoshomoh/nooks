@@ -2,6 +2,7 @@ package store
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -67,5 +68,49 @@ func TestResetInstanceEmptiesEverything(t *testing.T) {
 	}
 	if len(hits) != 0 {
 		t.Errorf("got %d hits, want nothing left to find", len(hits))
+	}
+}
+
+/*
+Every table an Instance keeps data in is one a reset empties.
+
+tablesInDeleteOrder is written out rather than left to cascade, and its own comment says
+why: a table with no foreign key would otherwise survive a delete that promised to take
+everything. Nothing checked that. A table added in a migration and forgotten here would
+outlive the reset in silence, on a machine somebody is handing on, and what it held would
+be whatever that table is for.
+
+Asked of the database rather than of the migrations, so a table that exists is covered
+whether or not anybody remembered to write it down twice.
+*/
+func TestAResetEmptiesEveryTableThereIs(t *testing.T) {
+	s := openSQLiteForTest(t)
+
+	var found []string
+	err := s.(*sqlStore).db.NewRaw(
+		`SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name`,
+	).Scan(t.Context(), &found)
+	if err != nil {
+		t.Fatalf("read the table list: %v", err)
+	}
+
+	emptied := map[string]bool{}
+	for _, table := range tablesInDeleteOrder {
+		emptied[table] = true
+	}
+
+	for _, table := range found {
+		switch {
+		// The ledger of which migrations have run is not the Instance's data. Clearing
+		// it would make a reset re-run every migration against a schema that has them.
+		case table == "schema_migration":
+		// SQLite's own bookkeeping, and the tables FTS5 keeps behind search_index.
+		// Emptying the virtual table empties these with it.
+		case strings.HasPrefix(table, "sqlite_"), strings.HasPrefix(table, "search_index_"):
+		case emptied[table]:
+		default:
+			t.Errorf("%s survives a reset: add it to tablesInDeleteOrder, or say why it is not "+
+				"an Instance's data", table)
+		}
 	}
 }

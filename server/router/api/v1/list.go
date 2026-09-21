@@ -328,7 +328,7 @@ func (s *ListService) CreateList(
 	ctx context.Context,
 	req *connect.Request[apiv1.CreateListRequest],
 ) (*connect.Response[apiv1.CreateListResponse], error) {
-	member, err := requireMember(ctx)
+	member, err := requireWriter(ctx)
 	if err != nil {
 		return nil, err
 	}

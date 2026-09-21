@@ -56,7 +56,7 @@ func (s *ActivityService) MarkActivityRead(
 	ctx context.Context,
 	_ *connect.Request[apiv1.MarkActivityReadRequest],
 ) (*connect.Response[apiv1.MarkActivityReadResponse], error) {
-	member, err := requireMember(ctx)
+	member, err := requireWriter(ctx)
 	if err != nil {
 		return nil, err
 	}

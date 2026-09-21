@@ -315,6 +315,27 @@ func requireDeletion(ctx context.Context) error {
 	return nil
 }
 
+// errCannotWrite refuses a change by a token that was only cut to read.
+var errCannotWrite = connect.NewError(connect.CodePermissionDenied,
+	errors.New("this access token can only read"))
+
+// requireWriter is requireMember for a change, and refuses a read-only token.
+//
+// accessTo asks this about a change to a List that already exists. This is for the two
+// changes that are not to one: making a List, and clearing the unread count. Neither
+// has a List to be reached, so neither goes past accessTo, and without this a token cut
+// to read would still be able to make them.
+func requireWriter(ctx context.Context) (store.Member, error) {
+	grant, err := requireGrant(ctx)
+	if err != nil {
+		return store.Member{}, err
+	}
+	if !grant.MayWrite() {
+		return store.Member{}, errCannotWrite
+	}
+	return grant.Member, nil
+}
+
 // errNotABrowser refuses an account-level change made with a token.
 var errNotABrowser = connect.NewError(connect.CodePermissionDenied,
 	errors.New("an access token cannot change an account"))

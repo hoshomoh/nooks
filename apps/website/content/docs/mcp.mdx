@@ -134,20 +134,28 @@ authenticates with a bearer token and nothing else.
 
 ## Check it worked
 
-Before blaming the client, ask the instance directly. This is the same request a client
-makes to list the tools:
+Before blaming the client, ask the instance directly. This is the first request a client
+makes, and it is enough to tell the address and the token apart:
 
 ```bash
 curl -s -X POST https://nooks.example/mcp \
   -H "Authorization: Bearer PASTE_YOUR_TOKEN_HERE" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize",
+       "params":{"protocolVersion":"2025-06-18","capabilities":{},
+                 "clientInfo":{"name":"curl","version":"1"}}}'
 ```
 
-A working token answers with a long list of tool names. `not signed in` means the
-instance was reached and the token was refused, which is the more useful of the two
+A working token answers with `"serverInfo":{"name":"nooks"...}`. `not signed in` means
+the instance was reached and the token was refused, which is the more useful of the two
 failures — the address is right and only the credential is wrong.
+
+Listing the tools takes more than one request. MCP opens a session first, so
+`tools/list` on its own is answered with *"invalid during session initialization"* — that
+is the protocol working, not your token failing. A client is the easier way to see the
+list; by hand it is `initialize`, then the `Mcp-Session-Id` it returns sent back on a
+`notifications/initialized` and then on `tools/list`.
 
 ## When it does not work
 

@@ -184,3 +184,81 @@ func BenchmarkCanReachList(b *testing.B) {
 		}
 	}
 }
+
+/*
+What Today, Upcoming and the calendar cost.
+
+All three are views over DatedItemsForMember, which takes a lower and an upper bound and
+no limit at all. Today passes no lower bound on purpose, so that everything overdue is
+gathered rather than left behind whatever day it was — which means the answer grows with
+how long the household has been going, not with what is on today.
+
+These say what that costs, and how much comes back, because a read that is quick and
+answers with thirty thousand rows is still a read nobody wants: it goes over the wire and
+into somebody's phone.
+
+On a hundred thousand Items, Today was 4.7s for 30,083 rows and a week of Upcoming was
+114ms for 667. That is 0.15ms a row either way — the same constant, so the cost is what
+comes back rather than the work of finding it. A partial index on the dated, undone
+Items was tried and moved nothing, which is the evidence for that rather than an
+argument for it. What Today needs is a bound, and what that bound should be is a
+question about what somebody with thirty thousand overdue things should see.
+*/
+func BenchmarkDatedItemsToday(b *testing.B) {
+	s, anna := seedBench(b, benchLists, benchItems)
+	dateThem(b, s)
+	ctx := context.Background()
+
+	rows := 0
+	b.ResetTimer()
+	for b.Loop() {
+		items, err := s.DatedItemsForMember(ctx, anna.ID, "", benchToday)
+		if err != nil {
+			b.Fatalf("DatedItemsForMember: %v", err)
+		}
+		rows = len(items)
+	}
+	b.ReportMetric(float64(rows), "rows")
+}
+
+// BenchmarkDatedItemsWeek is Upcoming: a bounded window rather than everything behind.
+func BenchmarkDatedItemsWeek(b *testing.B) {
+	s, anna := seedBench(b, benchLists, benchItems)
+	dateThem(b, s)
+	ctx := context.Background()
+
+	rows := 0
+	b.ResetTimer()
+	for b.Loop() {
+		items, err := s.DatedItemsForMember(ctx, anna.ID, benchToday, benchWeekOut)
+		if err != nil {
+			b.Fatalf("DatedItemsForMember: %v", err)
+		}
+		rows = len(items)
+	}
+	b.ReportMetric(float64(rows), "rows")
+}
+
+const (
+	benchToday   = "2026-09-16"
+	benchWeekOut = "2026-09-23"
+)
+
+// dateThem spreads a due date over a third of the Items, most of them already past,
+// which is the shape a List that has been used for a while has.
+func dateThem(b *testing.B, s Store) {
+	b.Helper()
+
+	db := s.(*sqlStore).db
+	// printf carries the sign, which a bare concatenation does not: "+-360 days" is not
+	// a modifier SQLite knows, and it answers NULL rather than complaining.
+	const spread = `UPDATE item
+		SET due_on = date('2026-09-16', printf('%+d days', (id % 400) - 360))
+		WHERE id % 3 = 0`
+	if _, err := db.ExecContext(context.Background(), spread); err != nil {
+		b.Fatalf("spread due dates: %v", err)
+	}
+	if err := s.Analyse(context.Background()); err != nil {
+		b.Fatalf("Analyse: %v", err)
+	}
+}

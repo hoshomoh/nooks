@@ -143,7 +143,11 @@ fi
 printf '\033[2m   %s: %ss\033[0m\n' "$step_name" "$(($(date +%s) - step_at))"
 
 if [ "$groups" = "$ALL_GROUPS" ]; then
-  printf '\n\033[1;32m✓ everything CI runs passes in %ss\033[0m\n' "$(($(date +%s) - started))"
+  # Named rather than implied. Two CI jobs cannot run here: the image needs Docker, and
+  # the dependency scan needs the network and a tool this script has no business
+  # installing. A banner that said "everything" would be wrong about both.
+  printf '\n\033[1;32m✓ every check that runs here passes in %ss\033[0m\n' "$(($(date +%s) - started))"
+  printf '\033[2m  CI also builds the image and scans dependencies.\033[0m\n'
 else
   printf '\n\033[1;32m✓ %s passes in %ss\033[0m\n' "$groups" "$(($(date +%s) - started))"
   printf '\033[2m  CI still runs the rest.\033[0m\n'

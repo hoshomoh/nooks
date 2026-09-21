@@ -61,7 +61,7 @@ Requires Go, Node and pnpm. `pnpm install` brings its own pinned `buf` — there
 globally.
 
 ```bash
-./scripts/ci.sh                     # everything CI runs — do this before committing
+./scripts/ci.sh                     # every check that runs locally — do this before committing
 
 pnpm install                        # dependencies, including buf
 

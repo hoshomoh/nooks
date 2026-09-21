@@ -54,6 +54,27 @@ describe("gathering what was ticked", () => {
     expect(earlier).toBe(3)
   })
 
+  /*
+   * The line that says how many are left has to be able to reach them.
+   *
+   * It used to be a plain span: "23 completed earlier", with nothing behind it and no
+   * way anywhere in the app to see those 23. Ticking is meant to put an Item somewhere
+   * rather than delete it, and that line was where they went to disappear.
+   */
+  it("keeps every day when asked for every day, so nothing is left behind a count", () => {
+    const ticks = [
+      ticked("Today one", "2026-09-16T08:00:00Z"),
+      ticked("Yesterday one", "2026-09-15T08:00:00Z"),
+      ticked("Older one", "2026-09-14T08:00:00Z"),
+      ticked("Oldest", "2026-01-02T09:00:00Z"),
+    ]
+
+    const { days, earlier } = groupDone(ticks, ticks.length)
+
+    expect(earlier).toBe(0)
+    expect(labels(days).flat()).toHaveLength(ticks.length)
+  })
+
   it("counts an Item nobody can date rather than inventing a day for it", () => {
     const { days, earlier } = groupDone([
       ticked("Bread", "2026-09-16T08:12:00Z"),

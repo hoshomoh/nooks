@@ -171,7 +171,16 @@ export function ListScreen() {
   const openItem = list.items.find((item) => item.uid === openItemUid)
   const open = list.items.filter((item) => !item.done)
   const done = list.items.filter((item) => item.done)
-  const doneDays = groupDone(done)
+  /*
+   * Whether the older ticks have been asked for.
+   *
+   * Two days keep their own heading and the rest sit behind one line. That line used to
+   * be the end of the road: it said how many were there and nothing reached them, which
+   * is the one thing ticking must not do — DESIGN.md §6 says an Item must still visibly
+   * go somewhere rather than be deleted.
+   */
+  const [showingEarlier, setShowingEarlier] = useState(false)
+  const doneDays = groupDone(done, showingEarlier ? done.length : undefined)
   const { dayName, clock } = useDoneDayLabels()
   const canEdit = list.list?.isOwner || list.list?.canEdit
 
@@ -366,9 +375,13 @@ export function ListScreen() {
                 {/* Everything older than those days, behind one line rather than
                     unrolling a year of ticks under somebody who opened the section. */}
                 {doneDays.earlier > 0 && (
-                  <span className="px-2 py-1.5 text-meta text-muted-foreground">
+                  <button
+                    type="button"
+                    onClick={() => setShowingEarlier(true)}
+                    className="flex min-h-row items-center rounded-md px-2 py-1.5 -mx-2 text-left text-meta text-muted-foreground transition-colors hover:bg-secondary"
+                  >
                     {t("list.doneEarlierLine", { count: doneDays.earlier })}
-                  </span>
+                  </button>
                 )}
               </DoneSection>
             )}

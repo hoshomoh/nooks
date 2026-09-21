@@ -35,6 +35,9 @@ export const SHOWN_DAYS = 2
  *
  * An Item nobody can date counts towards `earlier` rather than inventing a day for it:
  * the line says how many are not shown, which is true either way.
+ *
+ * shownDays is an argument rather than a constant because the line that says how many
+ * are left has to be able to reach them. Pass enough days and `earlier` is nothing.
  */
 export function groupDone(items: readonly Item[], shownDays: number = SHOWN_DAYS): DoneGrouping {
   const byDay = new Map<string, { at: Date; items: Item[] }>()

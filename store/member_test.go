@@ -261,3 +261,47 @@ func TestRemovingAMemberTakesTheirListsAndTheirItems(t *testing.T) {
 		})
 	}
 }
+
+/*
+Taking somebody else's email by editing a profile is refused the same way as by creating
+an account.
+
+Both are the database's unique index reporting itself, and both are read back out of the
+driver's error text — which SQLite and Postgres word differently, so the reading is
+checked on each. Creating had a test and editing had none. Without it a Member who
+retypes an address somebody already has is handed an internal failure with the
+constraint name in it, rather than being told the address is taken.
+*/
+func TestSetMemberProfileRejectsATakenEmail(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			if _, err := s.CreateMember(t.Context(), anna()); err != nil {
+				t.Fatalf("CreateMember: %v", err)
+			}
+
+			other := anna()
+			other.UID = "mem_jonas"
+			other.Name = "Jonas"
+			other.Email = "jonas@brunnen.lan"
+			jonas, err := s.CreateMember(t.Context(), other)
+			if err != nil {
+				t.Fatalf("CreateMember: %v", err)
+			}
+
+			err = s.SetMemberProfile(t.Context(), jonas.ID, "Jonas", anna().Email)
+			if !errors.Is(err, ErrEmailTaken) {
+				t.Errorf("SetMemberProfile onto a taken email = %v, want ErrEmailTaken", err)
+			}
+
+			// His own is still his: a refused write changes nothing.
+			read, err := s.MemberByID(t.Context(), jonas.ID)
+			if err != nil {
+				t.Fatalf("MemberByID: %v", err)
+			}
+			if read.Email != "jonas@brunnen.lan" {
+				t.Errorf("Email = %q, want the one he had", read.Email)
+			}
+		})
+	}
+}

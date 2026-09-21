@@ -144,6 +144,12 @@ CREATE TABLE item (
 );
 
 CREATE INDEX idx_item_list_id ON item (list_id, position);
+-- One per count, holding only the rows that count belongs to, so recount is a range scan
+-- that never opens a row. Without them a tick on a crowded List cost time proportional
+-- to the whole List, twice.
+CREATE INDEX idx_item_open_on_list ON item (list_id) WHERE deleted_at = '' AND done_at = '';
+CREATE INDEX idx_item_done_on_list ON item (list_id) WHERE deleted_at = '' AND done_at <> '';
+
 CREATE INDEX idx_item_due_on ON item (due_on);
 
 -- Pinning is per-Member and never affects anyone else's sidebar.

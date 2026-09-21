@@ -622,8 +622,12 @@ recount rewrites how much is on one List.
 
 Counted rather than adjusted. A counter kept by adding and subtracting drifts the first
 time a path forgets to adjust it or a write is retried, and the number a Member reads
-beside a name is then wrong until somebody notices. Counting one List reads one index,
-so being right costs nothing worth saving.
+beside a name is then wrong until somebody notices.
+
+What makes that affordable is an index per count holding only the rows that count is
+about — idx_item_open_on_list and idx_item_done_on_list — so each is a range scan that
+never opens a row. Without them this was proportional to everything on the List, twice,
+on every add, tick and delete. See BenchmarkTickOnACrowdedList.
 */
 func (s *sqlStore) recount(ctx context.Context, listID int64) error {
 	const open = `(SELECT COUNT(*) FROM item WHERE item.list_id = ? AND item.deleted_at = '' AND item.done_at = '')`

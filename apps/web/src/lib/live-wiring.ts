@@ -53,7 +53,14 @@ export async function actOn(queryClient: QueryClient, event: LiveEvent): Promise
       // change, this is the only thing that says so.
       await queryClient.invalidateQueries({ queryKey: ["current-member"] })
       return
+    case "list.changed":
+    case "lists.changed":
+      await refreshLists(queryClient)
+      return
     default:
+      // A kind this tab has never heard of, from an Instance newer than it. Re-reading
+      // the Lists is the safe guess and beats throwing; naming the known kinds above
+      // is what keeps this branch meaning only that.
       await refreshLists(queryClient)
   }
 }

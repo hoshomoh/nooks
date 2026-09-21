@@ -87,7 +87,10 @@ the happy path stays at the left margin.
 **Standardised handling, never silent.**
 
 - Go: return `error` as the last value, wrap with `%w` and context (`fmt.Errorf("load list %s: %w", uid,
-  err)`). Never `_ = err`. Panics are for programmer errors at startup, never for request handling.
+  err)`). Discard one only where it cannot change what happens — closing a handle you are already
+  abandoning, or a best-effort tidy-up on a path that is failing anyway — and say why where that is not
+  obvious from the line above it. `_ = err` with no reason is the thing this forbids, not the form.
+  Panics are for programmer errors at startup, never for request handling.
 - TypeScript: throw `Error` subclasses or return a typed result; never swallow in an empty `catch`.
   React Query owns retry and error state — do not hand-roll it per component.
 

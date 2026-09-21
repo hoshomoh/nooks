@@ -63,7 +63,14 @@ function flatten(node: Catalogue, prefix = ""): Set<string> {
  */
 function keysAskedFor(): Set<string> {
   const asked = new Set<string>()
-  for (const file of globSync("src/**/*.{ts,tsx}", { exclude: (f) => f.includes(".test.") })) {
+  // Filtered here rather than by the glob's exclude callback, which is given a file's
+  // name and not its path — a predicate written against a path matches nothing and says
+  // nothing about it.
+  const ours = globSync("src/**/*.{ts,tsx}")
+    .map((file) => String(file))
+    .filter((file) => !file.includes(".test."))
+
+  for (const file of ours) {
     const source = readFileSync(file, "utf8")
     for (const call of source.matchAll(/\bt\(([^()]*)\)/g)) {
       for (const quoted of call[1].matchAll(/"([a-z][A-Za-z0-9]*(?:\.[A-Za-z0-9_]+)+)"/g)) {

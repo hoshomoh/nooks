@@ -20,9 +20,12 @@ const HERE = "src/test/session.test.ts"
  * So `startNewSession` does both, and this is what keeps the halves together.
  */
 describe("who may end a session", () => {
-  const sources = globSync("src/**/*.{ts,tsx}", {
-    exclude: (file) => file.includes(".test."),
-  })
+  // Filtered after the glob, not by its exclude callback: that is given a file's name
+  // rather than its path, so a predicate written against a path silently matches
+  // nothing and the scan quietly reads what it meant to skip.
+  const sources = globSync("src/**/*.{ts,tsx}")
+    .map((file) => String(file))
+    .filter((file) => !file.includes(".test."))
 
   // A move or a rename that left the names above pointing at nothing would turn this
   // into furniture that passes because it is looking at an empty list.

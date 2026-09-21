@@ -69,6 +69,12 @@ jobs:
       # this an endpoint answers 501 while working perfectly in the app.
       - name: Every RPC has a gateway adapter
         run: ./scripts/check-gateway.sh
+      # The other half of the same rule: an adapter gives an RPC its handler, the
+      # annotation gives it its route, and an RPC missing either is reachable from the
+      # app and from nothing else. This ran only when somebody remembered to run
+      # scripts/ci.sh, which is not a check.
+      - name: Every RPC has a REST route
+        run: ./scripts/check-annotations.sh
       # The protos are the contract every client is built against. A change that would
       # break one stops here rather than in somebody's build.
       # Against what the change was made from, which is not the same ref in both cases.

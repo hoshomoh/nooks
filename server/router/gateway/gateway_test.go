@@ -244,3 +244,65 @@ func passwordHash(plain string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(plain), bcrypt.DefaultCost)
 	return string(hash), err
 }
+
+/*
+The refresh route answers the cookie it documents.
+
+The adapters build the Connect request the services expect, and one that built an empty
+one handed every service an empty header. RefreshAccess reads the refresh cookie, so
+POST /api/v1/auth/refresh — annotated, adapted, and in the published reference —
+answered "not signed in" to a caller holding a good one, always, for everybody.
+
+A REST caller signs in, is handed an access token worth an hour, and needs this to get
+the next one. Without it the only way on is to sign in again, which means keeping the
+password around: worse than the thing the split exists to avoid.
+*/
+func TestTheRefreshRouteAnswersTheCookieItDocuments(t *testing.T) {
+	i := newInstance(t)
+	access, refresh := i.signIn("a-long-enough-password")
+
+	res := i.callWithCookie(http.MethodPost, "/api/v1/auth/refresh", refresh, "{}")
+	if res.Code != http.StatusOK {
+		t.Fatalf("code = %d, want the documented route to answer: %s",
+			res.Code, strings.TrimSpace(res.Body.String()))
+	}
+
+	var answered struct {
+		AccessToken string `json:"accessToken"`
+	}
+	if err := json.Unmarshal(res.Body.Bytes(), &answered); err != nil {
+		t.Fatalf("read the answer: %v", err)
+	}
+	if answered.AccessToken == "" {
+		t.Fatal("no access token came back")
+	}
+	if answered.AccessToken == access {
+		t.Error("the same access token came back, so refreshing bought nothing")
+	}
+
+	// It is a working credential, not just a string.
+	if code := i.call(http.MethodGet, "/api/v1/lists", answered.AccessToken, "").Code; code != http.StatusOK {
+		t.Errorf("code = %d, want the refreshed token to work", code)
+	}
+}
+
+// Without the cookie it must still refuse, or the route would be a way in for anybody.
+func TestTheRefreshRouteRefusesWithoutTheCookie(t *testing.T) {
+	i := newInstance(t)
+	i.signIn("a-long-enough-password")
+
+	if code := i.call(http.MethodPost, "/api/v1/auth/refresh", "", "{}").Code; code != http.StatusUnauthorized {
+		t.Errorf("code = %d, want unauthorized with no refresh cookie", code)
+	}
+}
+
+// callWithCookie is call with a cookie instead of a bearer token.
+func (i *instance) callWithCookie(method, path string, cookie *http.Cookie, body string) *httptest.ResponseRecorder {
+	i.t.Helper()
+	req := httptest.NewRequest(method, path, strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.AddCookie(cookie)
+	res := httptest.NewRecorder()
+	i.handler.ServeHTTP(res, req)
+	return res
+}

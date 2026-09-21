@@ -69,12 +69,45 @@ the same Grant whichever door it came through — this only answers who is holdi
 func attachGrant(resolver *auth.Resolver) runtime.Middleware {
 	return func(next runtime.HandlerFunc) runtime.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request, params map[string]string) {
-			if grant, ok := resolver.Grant(r.Context(), r.Header); ok {
-				r = r.WithContext(auth.WithGrant(r.Context(), grant))
+			ctx := withHeaders(r.Context(), r.Header)
+			if grant, ok := resolver.Grant(ctx, r.Header); ok {
+				ctx = auth.WithGrant(ctx, grant)
 			}
-			next(w, r, params)
+			next(w, r.WithContext(ctx), params)
 		}
 	}
+}
+
+// headerKey is unexported, so the only headers a service can be handed this way are the
+// ones a request actually arrived with.
+type headerKey struct{}
+
+func withHeaders(ctx context.Context, header http.Header) context.Context {
+	return context.WithValue(ctx, headerKey{}, header)
+}
+
+/*
+requestFrom builds the Connect request a service expects, carrying what the REST call
+arrived with.
+
+The services are written for Connect and read headers off the request. An adapter that
+built an empty one left every such service seeing nothing: RefreshAccess reads the
+refresh cookie, so the documented POST /api/v1/auth/refresh answered "not signed in" to
+a caller holding a perfectly good one, and would have gone on doing that for any RPC
+that started reading a header.
+*/
+func requestFrom[T any](ctx context.Context, msg *T) *connect.Request[T] {
+	request := connect.NewRequest(msg)
+	header, ok := ctx.Value(headerKey{}).(http.Header)
+	if !ok {
+		return request
+	}
+	for name, values := range header {
+		for _, value := range values {
+			request.Header().Add(name, value)
+		}
+	}
+	return request
 }
 
 /*

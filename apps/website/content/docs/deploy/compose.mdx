@@ -28,6 +28,12 @@ services:
       - nooks-data:/var/lib/nooks
     environment:
       NOOKS_SECURE_COOKIES: "false"
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/nooks", "--health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
 
 volumes:
   nooks-data:

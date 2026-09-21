@@ -29,6 +29,27 @@ describe("a Note on a row", () => {
     expect(screen.queryByRole("link")).not.toBeInTheDocument()
   })
 
+  /*
+   * The reason a link is not a target here is that the row is already one. The reason it
+   * matters is this: a Note is written by one Member and read by everybody the List
+   * reaches, and markdown will carry any address at all.
+   *
+   * `documentFrom` keeps `javascript:` in the document — it parses, it does not sanitise
+   * — so what stops it being a live anchor is that this draws spans. TipTap's own render
+   * refuses a disallowed scheme too, and the editor is the only other place a Note is
+   * drawn, but that is a dependency's default rather than anything written down here.
+   */
+  it("gives a hostile address nowhere to be an address", () => {
+    const { container } = render(
+      <NotePreview runs={previewOf("[click me](javascript:alert(1))").runs} />,
+    )
+
+    expect(screen.getByText("click me")).toBeInTheDocument()
+    expect(screen.queryByRole("link")).not.toBeInTheDocument()
+    expect(container.querySelector("[href]")).toBeNull()
+    expect(container.innerHTML).not.toContain("javascript:")
+  })
+
   it("shows nothing at all for a Note that says nothing", () => {
     const { container } = render(<NotePreview runs={previewOf("- [ ] ").runs} />)
 

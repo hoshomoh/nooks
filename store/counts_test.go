@@ -84,3 +84,54 @@ func TestRemovingAMemberLeavesTheCountsTrue(t *testing.T) {
 		t.Errorf("open count says %d and the List holds %d", after.OpenCount, len(items))
 	}
 }
+
+// A batch spanning two Lists would order the Items against the wrong one and leave the
+// other's counts behind, neither of them visibly, so it is refused rather than allowed.
+func TestItemsAreAddedToOneListAtATime(t *testing.T) {
+	at := time.Date(2026, 8, 25, 9, 0, 0, 0, time.UTC)
+
+	s, err := OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
+	if err != nil {
+		t.Fatalf("OpenSQLite: %v", err)
+	}
+	t.Cleanup(func() { _ = s.Close() })
+
+	anna, err := s.CreateMember(t.Context(), CreateMemberParams{
+		UID: "mem_anna", Name: "Anna", Email: "anna@brunnen.lan", Role: RoleAdmin,
+		PasswordHash: "hash", CreatedAt: at,
+	})
+	if err != nil {
+		t.Fatalf("CreateMember: %v", err)
+	}
+	first, err := s.CreateList(t.Context(), CreateListParams{
+		UID: "lst_one", Name: "Groceries", OwnerID: anna.ID, At: at,
+	})
+	if err != nil {
+		t.Fatalf("CreateList: %v", err)
+	}
+	second, err := s.CreateList(t.Context(), CreateListParams{
+		UID: "lst_two", Name: "Bike", OwnerID: anna.ID, At: at,
+	})
+	if err != nil {
+		t.Fatalf("CreateList: %v", err)
+	}
+
+	_, err = s.CreateItems(t.Context(), []CreateItemParams{
+		{UID: "itm_1", ListID: first.ID, Label: "Tomatoes", AddedByID: anna.ID, At: at},
+		{UID: "itm_2", ListID: second.ID, Label: "Inner tube", AddedByID: anna.ID, At: at},
+	})
+	if err == nil {
+		t.Fatal("a batch spanning two lists was accepted")
+	}
+
+	// Refused whole: neither List has anything on it, and neither count moved.
+	for _, uid := range []string{"lst_one", "lst_two"} {
+		list, err := s.ListByUID(t.Context(), uid)
+		if err != nil {
+			t.Fatalf("ListByUID %s: %v", uid, err)
+		}
+		if list.OpenCount != 0 {
+			t.Errorf("%s says %d open after a refused batch", uid, list.OpenCount)
+		}
+	}
+}

@@ -121,6 +121,12 @@ func (s *sqlStore) CreateItems(ctx context.Context, params []CreateItemParams) (
 		if p.Label == "" {
 			return nil, errors.New("store: item label is required")
 		}
+		// One List, which the position read and the recount below both take from the
+		// first of them. A batch spanning two would order the Items against the wrong
+		// List and leave the other's counts behind, neither of them visibly.
+		if p.ListID != params[0].ListID {
+			return nil, errors.New("store: items must be added to one list at a time")
+		}
 	}
 
 	tx, err := s.db.BeginTx(ctx, nil)

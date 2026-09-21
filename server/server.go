@@ -127,7 +127,7 @@ func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
 		Auth:     authService,
 		Instance: v1.NewInstanceService(s),
 		List:     v1.NewListService(s, nil, nil).WithAnnouncer(publisher),
-		Member:   v1.NewMemberService(s, nil, nil),
+		Member:   v1.NewMemberService(s, nil, nil).WithAnnouncer(publisher),
 		Public:   v1.NewPublicService(s),
 		Request:  v1.NewRequestService(s, nil),
 		Token:    v1.NewTokenService(s, nil, nil, nil).WithActivity(tokenActivity),

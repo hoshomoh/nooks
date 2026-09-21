@@ -129,3 +129,68 @@ func TestSharingTellsNobodyTheyLostAList(t *testing.T) {
 		t.Errorf("told %v they lost a list when one was only shared", told.listsFor)
 	}
 }
+
+/*
+Joining or leaving a Group changes which Lists somebody reaches.
+
+A List shared with a Group is not itself changed by somebody entering or leaving it, so
+the ListChanged that normally carries the news is never sent. Nothing else was sent
+either, which left both the person who gained a List and the person who lost one looking
+at a sidebar that was wrong until they reloaded.
+*/
+func TestGroupMembershipTellsWhoeverItMoved(t *testing.T) {
+	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
+	if err != nil {
+		t.Fatalf("OpenSQLite: %v", err)
+	}
+	t.Cleanup(func() { _ = s.Close() })
+
+	member := func(uid, name string, role store.Role) store.Member {
+		t.Helper()
+		m, err := s.CreateMember(t.Context(), store.CreateMemberParams{
+			UID: uid, Name: name, Email: uid + "@brunnen.lan", Role: role,
+			PasswordHash: "hash", CreatedAt: testClock,
+		})
+		if err != nil {
+			t.Fatalf("CreateMember %s: %v", name, err)
+		}
+		return m
+	}
+	anna := member("mem_anna", "Anna", store.RoleAdmin)
+	jonas := member("mem_jonas", "Jonas", store.RoleMember)
+	mira := member("mem_mira", "Mira", store.RoleMember)
+
+	told := &heard{}
+	svc := NewMemberService(s, func() time.Time { return testClock },
+		func() (string, error) { return "grp_1", nil }).WithAnnouncer(told)
+
+	as := auth.WithMember(t.Context(), anna)
+	made, err := svc.CreateGroup(as, connect.NewRequest(&apiv1.CreateGroupRequest{
+		Name: "Flat", MemberUids: []string{jonas.UID},
+	}))
+	if err != nil {
+		t.Fatalf("CreateGroup: %v", err)
+	}
+	told.listsFor = nil
+
+	// Jonas out, Mira in. Anna was never in it and is not moved by this.
+	if _, err := svc.SetGroupMembers(as, connect.NewRequest(&apiv1.SetGroupMembersRequest{
+		GroupUid: made.Msg.GetGroup().GetUid(), MemberUids: []string{mira.UID},
+	})); err != nil {
+		t.Fatalf("SetGroupMembers: %v", err)
+	}
+
+	for _, moved := range []struct {
+		who  string
+		id   int64
+		want bool
+	}{
+		{"Jonas, who left", jonas.ID, true},
+		{"Mira, who joined", mira.ID, true},
+		{"Anna, who was never in it", anna.ID, false},
+	} {
+		if got := slices.Contains(told.listsFor, moved.id); got != moved.want {
+			t.Errorf("%s: told = %v, want %v (told %v)", moved.who, got, moved.want, told.listsFor)
+		}
+	}
+}

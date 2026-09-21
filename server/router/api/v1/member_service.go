@@ -18,9 +18,10 @@ import (
 // A Group carries no permissions of its own: it is a shortcut for sharing, so that "the
 // flatmates" is one thing to pick rather than three.
 type MemberService struct {
-	store  store.Store
-	now    func() time.Time
-	newUID func() (string, error)
+	store    store.Store
+	now      func() time.Time
+	newUID   func() (string, error)
+	announce Announcer
 }
 
 // NewMemberService builds the service, with the clock and identifiers injected so a
@@ -33,6 +34,13 @@ func NewMemberService(s store.Store, now func() time.Time, newUID func() (string
 		newUID = newMemberUID
 	}
 	return &MemberService{store: s, now: now, newUID: newUID}
+}
+
+// WithAnnouncer wires the live stream in. Without one the service still works and
+// nobody is told anything, which is what every test but one wants.
+func (s *MemberService) WithAnnouncer(a Announcer) *MemberService {
+	s.announce = a
+	return s
 }
 
 // ListMembers returns everyone on the Instance.
@@ -152,8 +160,30 @@ func (s *MemberService) SetGroupMembers(
 		return nil, err
 	}
 
+	// Read before the replace: afterwards there is no way to know who was in it.
+	was, err := s.store.GroupMemberIDs(ctx, group.ID)
+	if err != nil {
+		return nil, internalError("read group members", err)
+	}
+
 	if err := s.store.ReplaceGroupMembers(ctx, group.ID, ids); err != nil {
 		return nil, internalError("set group members", err)
+	}
+
+	/*
+	 * Joining or leaving a Group changes which Lists somebody reaches, and nothing else
+	 * tells them. A List shared with a Group is not itself changed by this, so the
+	 * ListChanged that would normally carry the news is never sent.
+	 *
+	 * Both directions: whoever left has lost whatever the Group reached, and whoever
+	 * joined has gained it. Somebody whose membership did not change is left alone.
+	 * Announced whether or not the Group reaches a List, because the answer costs a
+	 * read and being told to look again costs one refetch.
+	 */
+	if s.announce != nil {
+		if changed := differing(was, ids); len(changed) > 0 {
+			s.announce.ListsChanged(changed)
+		}
 	}
 
 	filled, err := s.groupToProto(ctx, group)
@@ -385,4 +415,29 @@ func (s *MemberService) UpdateOwnProfile(
 	return connect.NewResponse(&apiv1.UpdateOwnProfileResponse{
 		Member: memberToProto(updated),
 	}), nil
+}
+
+// differing is the Members in one set and not the other, either way round.
+func differing(was, now []int64) []int64 {
+	in := func(ids []int64) map[int64]bool {
+		held := make(map[int64]bool, len(ids))
+		for _, id := range ids {
+			held[id] = true
+		}
+		return held
+	}
+	before, after := in(was), in(now)
+
+	changed := make([]int64, 0, len(was)+len(now))
+	for _, id := range was {
+		if !after[id] {
+			changed = append(changed, id)
+		}
+	}
+	for _, id := range now {
+		if !before[id] {
+			changed = append(changed, id)
+		}
+	}
+	return changed
 }

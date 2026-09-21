@@ -38,8 +38,8 @@ versions are in `go.mod` and `.nvmrc`. Docker runs exactly these steps for you, 
 why the image needs none of them on the machine that runs it.
 
 Open [localhost:8081](http://localhost:8081). The first person to arrive creates their account and names
-the instance. Everybody else asks to join, and an admin approves — there is no public
-signup unless you turn it on.
+the instance. Everybody else asks to join and an admin approves: asking is open to
+anybody who can reach the instance, and approving is the part that is not.
 
 ## The first list
 
@@ -52,8 +52,11 @@ with something rather than a sign-in form. It was written by Nooks rather than b
 anybody, which is what makes it safe to publish before an admin has decided anything.
 Contributor names are off, as they are everywhere by default.
 
-Delete the list, or unpublish it in **Settings → General**, and the front door goes back
-to asking who you are. See [the public page](/docs/admin/instance).
+The page carries a quiet link for a visitor to ask for an account, which is worth
+knowing before the instance is reachable from outside.
+
+Delete the list, or unpublish it in **Settings → Public list**, and the front door goes
+back to asking who you are.
 
 ## What it writes
 

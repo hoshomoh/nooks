@@ -89,7 +89,6 @@ func (s *sqlStore) CreateActivity(ctx context.Context, params CreateActivityPara
 // not attention.
 const ActivityLimit = 50
 
-// ActivityFor returns what is waiting for one Member, newest first.
 /*
 DeleteUnreadableActivity removes entries nothing can reach, and says how many went.
 
@@ -126,6 +125,7 @@ func (s *sqlStore) DeleteUnreadableActivity(ctx context.Context) (int64, error) 
 	return gone, nil
 }
 
+// ActivityFor returns what is waiting for one Member, newest first.
 func (s *sqlStore) ActivityFor(ctx context.Context, memberID int64) ([]Activity, error) {
 	var rows []activityModel
 	err := s.db.NewSelect().

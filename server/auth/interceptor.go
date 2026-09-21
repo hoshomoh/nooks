@@ -190,7 +190,7 @@ func (r *Resolver) Member(ctx context.Context, token string) (store.Member, bool
 	return member, true
 }
 
-// tokenFromHeader pulls the session token out of request headers. http.Request is
+// cookieToken pulls the session token out of request headers. http.Request is
 // borrowed purely for its cookie parsing.
 func cookieToken(header http.Header) string {
 	cookie, err := (&http.Request{Header: header}).Cookie(CookieName)

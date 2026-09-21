@@ -61,11 +61,10 @@ func (s *ListService) activity() activityRecorder {
 	return activityRecorder{store: s.store, now: s.now, newUID: s.newUID, announce: s.announce}
 }
 
-// ListLists returns every List the signed-in Member can reach.
 /*
-DEFAULT_PAGE_SIZE is how many Lists a page holds when a caller does not say.
+defaultPageSize is how many Lists a page holds when a caller does not say.
 
-MAX_PAGE_SIZE is the ceiling. The page size is the server's promise about how much work
+maxPageSize is the ceiling. The page size is the server's promise about how much work
 one read is, so a caller asking for a million rows gets the ceiling rather than the
 promise broken.
 */
@@ -413,7 +412,6 @@ func (s *ListService) SetListSharing(
 	}), nil
 }
 
-// DeleteList removes a List and the Items on it.
 /*
 SetListArchived puts a List out of the sidebar, or brings it back.
 
@@ -454,6 +452,7 @@ func (s *ListService) SetListArchived(
 	}), nil
 }
 
+// DeleteList removes a List and the Items on it.
 func (s *ListService) DeleteList(
 	ctx context.Context,
 	req *connect.Request[apiv1.DeleteListRequest],

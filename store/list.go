@@ -97,7 +97,6 @@ func (s *sqlStore) CreateList(ctx context.Context, params CreateListParams) (Lis
 	return list, nil
 }
 
-// ListByUID finds a live List by its public identifier.
 // ListByID reads one List by internal identity, for a caller holding an Item that names
 // its List that way.
 func (s *sqlStore) ListByID(ctx context.Context, id int64) (List, error) {
@@ -112,6 +111,7 @@ func (s *sqlStore) ListByID(ctx context.Context, id int64) (List, error) {
 	return row.toList()
 }
 
+// ListByUID finds a live List by its public identifier.
 func (s *sqlStore) ListByUID(ctx context.Context, uid string) (List, error) {
 	row := new(listModel)
 	err := s.db.NewSelect().Model(row).Where("uid = ? AND deleted_at = ''", uid).Scan(ctx)
@@ -483,9 +483,6 @@ func (s *sqlStore) listsWhere(
 	return toListPage(rows, total, atLeast)
 }
 
-// ListsForMember returns every live List a Member can reach: their own, everything
-// shared with the whole Instance, and everything shared with them by name — directly or
-// through a Group they are in.
 /*
 CanReachList reports whether a Member may see one List at all.
 
@@ -516,6 +513,9 @@ func (s *sqlStore) CanReachList(ctx context.Context, memberID int64, listUID str
 	return found, nil
 }
 
+// ListsForMember returns every live List a Member can reach: their own, everything
+// shared with the whole Instance, and everything shared with them by name — directly or
+// through a Group they are in.
 func (s *sqlStore) ListsForMember(ctx context.Context, memberID int64) ([]List, error) {
 	named, err := s.SharedListIDs(ctx, memberID)
 	if err != nil {

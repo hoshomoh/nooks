@@ -45,7 +45,14 @@ export function SettingsMembersScreen() {
   const [secret, setSecret] = useState<TemporarySecret | null>(null)
   const [removing, setRemoving] = useState<Member | null>(null)
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: ["members"] })
+  /*
+   * Everything, not only the people.
+   *
+   * Removing somebody takes their Lists and their Items with them — see
+   * TestRemovingAMemberTakesTheirListsAndTheirItems — so a sidebar that only re-read the
+   * member list would go on offering Lists that are no longer there.
+   */
+  const refresh = () => queryClient.invalidateQueries()
 
   const add = useMutation({
     mutationFn: (fresh: NewMember) => memberClient.addMember(fresh),

@@ -6,11 +6,15 @@ import { parseMoment } from "./dates"
  * The completed Items of a List, gathered by the day they were ticked.
  *
  * A count on its own cannot answer the question a Member actually has, which is which
- * three of the twenty were today. Grouping by day answers it, and keeps a record of who
- * ticked what: a tick is somebody doing something, not a row changing colour.
+ * three of the twenty were today. Grouping by day answers it, and says who ticked what
+ * where that can still be said: a tick is somebody doing something, not a row changing
+ * colour, and one made by somebody since removed carries the time alone rather than
+ * somebody else's name.
  *
- * Only the most recent days are kept. A List a household has used for a year has a year
- * of ticks in it, and a section that grows without end is one nobody opens twice.
+ * The most recent days are what a List opens with. A List a household has used for a
+ * year has a year of ticks in it, and a section that grows without end is one nobody
+ * opens twice — but the line saying how many are behind it opens them, so this takes
+ * the number of days as an argument rather than deciding it.
  */
 export interface DoneDay {
   /** The local calendar day, as yyyy-mm-dd. Stable to sort and to key on. */

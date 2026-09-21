@@ -73,25 +73,6 @@ export function markerOf(line: string): LineMarker {
   return { kind: "paragraph", length: 0 }
 }
 
-/** The shorthand each block type is written with, shown in the / menu. */
-export const SHORTHAND: Record<Exclude<BlockKind, "paragraph" | "todo-done">, string> = {
-  heading: "###",
-  todo: "- [ ]",
-  quote: ">",
-  code: "```",
-  rule: "---",
-}
-
-/** What inserting a block type from the / menu puts at the start of the line. */
-export const INSERTION: Record<Exclude<BlockKind, "paragraph" | "todo-done">, string> = {
-  heading: "### ",
-  todo: "- [ ] ",
-  quote: "> ",
-  code: "```\n\n```",
-  // A divider is the whole line, so inserting one leaves the caret on the next.
-  rule: "---\n",
-}
-
 /**
  * toggleTodo flips a checklist line between done and not done, leaving anything else
  * alone. Ticking in the Note is the same act as ticking in the list.

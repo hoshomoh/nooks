@@ -9,16 +9,6 @@ import type { LocaleCode } from "@/i18n/locales"
  * renders in one language while the rest of the page is in another.
  */
 
-export type FormatNumberOptions = Intl.NumberFormatOptions
-
-export function formatNumber(
-  value: number,
-  locale: LocaleCode,
-  options: FormatNumberOptions = {},
-): string {
-  return new Intl.NumberFormat(locale, options).format(value)
-}
-
 /**
  * formatCurrency renders an amount with its currency, e.g. "€12.50" or "12,50 €"
  * depending on the language.

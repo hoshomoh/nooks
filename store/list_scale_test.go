@@ -262,3 +262,43 @@ func dateThem(b *testing.B, s Store) {
 		b.Fatalf("Analyse: %v", err)
 	}
 }
+
+/*
+What one tick costs on a List that has a great deal on it.
+
+The counts beside a List are written onto it, and recount rewrites them by counting
+rather than by adding and subtracting — a counter kept by arithmetic drifts the first
+time a path forgets to adjust it, and the number a Member reads is then wrong with
+nothing to notice. The comment on recount says being right this way "costs nothing worth
+saving", which until now was an argument rather than a number.
+
+It runs on every add, every tick and every delete, and it counts the whole List twice.
+So the thing to know is whether that stays small as a List grows, because ticking is the
+thing a household does most.
+*/
+func BenchmarkTickOnACrowdedList(b *testing.B) {
+	for _, items := range []int{10, 100, 1_000, 10_000, 100_000} {
+		b.Run(fmt.Sprintf("%d_items", items), func(b *testing.B) {
+			s, anna := seedOneList(b, items)
+			ctx := context.Background()
+
+			// A different Item each time, so nothing is measuring a no-op.
+			at := time.Date(2026, 9, 16, 9, 0, 0, 0, time.UTC)
+			turn := 0
+			b.ResetTimer()
+			for b.Loop() {
+				turn++
+				uid := fmt.Sprintf("item_%06d", turn%items)
+				if err := s.SetItemDone(ctx, uid, anna.ID, at); err != nil {
+					b.Fatalf("SetItemDone: %v", err)
+				}
+			}
+		})
+	}
+}
+
+// seedOneList fills a single List, which is the shape that makes recount work hardest.
+func seedOneList(b *testing.B, items int) (Store, Member) {
+	b.Helper()
+	return seedBench(b, 1, items)
+}

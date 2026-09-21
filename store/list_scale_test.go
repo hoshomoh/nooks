@@ -302,3 +302,34 @@ func seedOneList(b *testing.B, items int) (Store, Member) {
 	b.Helper()
 	return seedBench(b, 1, items)
 }
+
+/*
+What reading one List costs as it fills up.
+
+ItemsOnList takes no bound: GetList answers with every Item there is, and so does the
+MCP get_list an assistant calls. The parked question is whether that should page, and
+this is the number that question is about.
+
+A List grows in one direction only — ticking collapses an Item to the foot rather than
+removing it — so the size here is not a stress test. It is a weekly shop kept for a few
+years.
+*/
+func BenchmarkReadOneList(b *testing.B) {
+	for _, items := range []int{100, 1_000, 10_000, 100_000} {
+		b.Run(fmt.Sprintf("%d_items", items), func(b *testing.B) {
+			s, _ := seedOneList(b, items)
+			ctx := context.Background()
+
+			rows := 0
+			b.ResetTimer()
+			for b.Loop() {
+				read, err := s.ItemsOnList(ctx, 1)
+				if err != nil {
+					b.Fatalf("ItemsOnList: %v", err)
+				}
+				rows = len(read)
+			}
+			b.ReportMetric(float64(rows), "rows")
+		})
+	}
+}

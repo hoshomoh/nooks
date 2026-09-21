@@ -90,6 +90,42 @@ func (s *sqlStore) CreateActivity(ctx context.Context, params CreateActivityPara
 const ActivityLimit = 50
 
 // ActivityFor returns what is waiting for one Member, newest first.
+/*
+DeleteUnreadableActivity removes entries nothing can reach, and says how many went.
+
+ActivityFor hands back the newest ActivityLimit for a Member and nothing else. There is
+no call that returns an older one and no screen that shows it, so an entry past the
+fiftieth is already gone as far as anybody is concerned — it is only still occupying a
+row. This is not a decision about how long to keep history; it is deleting what is
+already unreadable.
+
+One statement, numbering each Member's entries newest first and removing what falls past
+the end. The window function is the same on both drivers.
+*/
+func (s *sqlStore) DeleteUnreadableActivity(ctx context.Context) (int64, error) {
+	const beyondTheLimit = `
+		SELECT id FROM (
+			SELECT id, ROW_NUMBER() OVER (
+				PARTITION BY member_id ORDER BY created_at DESC, id DESC
+			) AS place
+			FROM activity
+		) AS ranked WHERE ranked.place > ?`
+
+	result, err := s.db.NewDelete().
+		Model((*activityModel)(nil)).
+		Where("id IN (?)", bun.SafeQuery(beyondTheLimit, ActivityLimit)).
+		Exec(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("delete unreadable activity: %w", err)
+	}
+
+	gone, err := result.RowsAffected()
+	if err != nil {
+		return 0, nil
+	}
+	return gone, nil
+}
+
 func (s *sqlStore) ActivityFor(ctx context.Context, memberID int64) ([]Activity, error) {
 	var rows []activityModel
 	err := s.db.NewSelect().

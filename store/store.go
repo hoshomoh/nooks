@@ -130,6 +130,10 @@ type Store interface {
 	// token minted with it.
 	DeleteSessionTree(ctx context.Context, refreshHash string) error
 
+	// DeleteUnreadableActivity removes Activity entries past what ActivityFor returns,
+	// which nothing can read.
+	DeleteUnreadableActivity(ctx context.Context) (int64, error)
+
 	// DeleteExpiredSessions clears out Sessions past their expiry.
 	DeleteExpiredSessions(ctx context.Context, now time.Time) (int64, error)
 

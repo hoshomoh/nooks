@@ -301,6 +301,15 @@ func (s *Server) tidyUp(ctx context.Context) {
 		s.log.Info("cleared expired sessions", "count", gone)
 	}
 
+	// Past what the panel can show. The read hands back the newest fifty for a Member,
+	// so these are rows nobody has been able to reach since the fifty-first arrived.
+	switch gone, err := s.store.DeleteUnreadableActivity(ctx); {
+	case err != nil:
+		s.log.Warn("could not clear unreadable activity", "error", err)
+	case gone > 0:
+		s.log.Info("cleared activity nothing could read", "count", gone)
+	}
+
 	if err := s.store.Analyse(ctx); err != nil {
 		s.log.Warn("could not refresh database statistics", "error", err)
 	}

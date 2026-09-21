@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"strconv"
 	"testing"
 	"time"
@@ -206,4 +207,99 @@ func TestResolvingLeavesOtherEntriesAlone(t *testing.T) {
 			}
 		})
 	}
+}
+
+/*
+Sweeping Activity leaves every entry anybody can read, and removes the rest.
+
+Nothing had ever deleted one. The panel shows the newest fifty for a Member, so entry
+fifty-one has no call that returns it and no screen that shows it, and every change to
+every List had been adding rows nobody could reach for the life of the Instance.
+
+Checked by reading the panel before and after: what it shows must not move.
+*/
+func TestSweepingActivityChangesNothingAnybodyCanSee(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			anna := newMember(t, s)
+			jonas := addMember(t, s, "mem_jonas", "Jonas", "jonas@brunnen.lan")
+
+			// Comfortably past the limit for one of them, and under it for the other.
+			for i := range ActivityLimit + 20 {
+				addActivity(t, s, anna, fmt.Sprintf("anna %03d", i), createdAt.Add(time.Duration(i)*time.Minute))
+			}
+			for i := range 3 {
+				addActivity(t, s, jonas, fmt.Sprintf("jonas %03d", i), createdAt.Add(time.Duration(i)*time.Minute))
+			}
+
+			before := panelFor(t, s, anna)
+			theirs := panelFor(t, s, jonas)
+
+			gone, err := s.DeleteUnreadableActivity(t.Context())
+			if err != nil {
+				t.Fatalf("DeleteUnreadableActivity: %v", err)
+			}
+			if gone != 20 {
+				t.Errorf("removed %d, want the 20 past the limit", gone)
+			}
+
+			if after := panelFor(t, s, anna); fmt.Sprint(after) != fmt.Sprint(before) {
+				t.Errorf("the panel moved:\n before %v\n after  %v", before, after)
+			}
+			// Somebody under the limit keeps everything.
+			if after := panelFor(t, s, jonas); fmt.Sprint(after) != fmt.Sprint(theirs) {
+				t.Errorf("a Member under the limit lost entries: %v, want %v", after, theirs)
+			}
+		})
+	}
+}
+
+// Sweeping an Instance with nothing to sweep removes nothing.
+func TestSweepingActivityTwiceRemovesNothingTheSecondTime(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			anna := newMember(t, s)
+			for i := range ActivityLimit + 5 {
+				addActivity(t, s, anna, fmt.Sprintf("entry %03d", i), createdAt.Add(time.Duration(i)*time.Minute))
+			}
+
+			if _, err := s.DeleteUnreadableActivity(t.Context()); err != nil {
+				t.Fatalf("first sweep: %v", err)
+			}
+			gone, err := s.DeleteUnreadableActivity(t.Context())
+			if err != nil {
+				t.Fatalf("second sweep: %v", err)
+			}
+			if gone != 0 {
+				t.Errorf("the second sweep removed %d, want nothing left to remove", gone)
+			}
+		})
+	}
+}
+
+// addActivity puts one entry in front of one Member.
+func addActivity(t *testing.T, s Store, member Member, text string, at time.Time) {
+	t.Helper()
+	if _, err := s.CreateActivity(t.Context(), CreateActivityParams{
+		UID: "act_" + text, MemberID: member.ID, Kind: ActivityListShared,
+		Text: text, At: at,
+	}); err != nil {
+		t.Fatalf("CreateActivity %s: %v", text, err)
+	}
+}
+
+// panelFor is what a Member would see, as text.
+func panelFor(t *testing.T, s Store, member Member) []string {
+	t.Helper()
+	entries, err := s.ActivityFor(t.Context(), member.ID)
+	if err != nil {
+		t.Fatalf("ActivityFor: %v", err)
+	}
+	out := make([]string, 0, len(entries))
+	for _, entry := range entries {
+		out = append(out, entry.Text)
+	}
+	return out
 }

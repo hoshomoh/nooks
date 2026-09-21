@@ -85,3 +85,23 @@ function dayKey(at: Date): string {
   const day = String(at.getDate()).padStart(2, "0")
   return `${at.getFullYear()}-${month}-${day}`
 }
+
+/**
+ * doneAttribution is the key and values for the line under a ticked Item.
+ *
+ * `done_by_id` is ON DELETE SET NULL, so a tick made by somebody who has since been
+ * removed comes back with nobody's name on it. Falling back to whoever added the Item
+ * put their name against a tick they did not make — on a shared List, in front of the
+ * household, and wrong. The time on its own is the most that can be said truthfully.
+ */
+export interface DoneAttribution {
+  key: "list.doneBy" | "list.doneWhen"
+  values: { name?: string; when: string }
+}
+
+export function doneAttribution(doneByName: string, when: string): DoneAttribution {
+  if (!doneByName) {
+    return { key: "list.doneWhen", values: { when } }
+  }
+  return { key: "list.doneBy", values: { name: doneByName, when } }
+}

@@ -1,7 +1,8 @@
+import { readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
 import type { Item } from "@nooks/api"
 
-import { groupDone } from "./done-groups"
+import { doneAttribution, groupDone } from "./done-groups"
 
 /** ticked is an Item completed at a moment, which is all this reads. */
 function ticked(label: string, doneAt: string): Item {
@@ -99,5 +100,43 @@ describe("gathering what was ticked", () => {
     ])
 
     expect(days).toHaveLength(1)
+  })
+})
+
+describe("who a tick is attributed to", () => {
+  /*
+   * These two reach t() through a variable, so the catalogue guard in
+   * src/test/strings.test.ts cannot see them — it reads keys from inside the call, on
+   * purpose, because plenty of strings are key-shaped without being keys. Checked here
+   * instead, beside where they are chosen.
+   */
+  it("names keys the catalogue has", () => {
+    const catalogue = JSON.parse(
+      readFileSync("src/i18n/locales/en.json", "utf8"),
+    ) as { list: Record<string, string> }
+
+    for (const name of ["doneBy", "doneWhen"]) {
+      expect(catalogue.list, `list.${name} is chosen in code`).toHaveProperty(name)
+    }
+  })
+
+  it("names whoever ticked it", () => {
+    expect(doneAttribution("Jonas", "14:32")).toEqual({
+      key: "list.doneBy",
+      values: { name: "Jonas", when: "14:32" },
+    })
+  })
+
+  /*
+   * `done_by_id` is ON DELETE SET NULL, so a tick by somebody who has since left comes
+   * back with nobody's name on it. It used to fall back to whoever added the Item,
+   * which put their name against a tick they did not make — on a shared List, in front
+   * of the household. The time alone is the most that can be said truthfully.
+   */
+  it("says only when, for a tick nobody can be named for", () => {
+    expect(doneAttribution("", "14:32")).toEqual({
+      key: "list.doneWhen",
+      values: { when: "14:32" },
+    })
   })
 })

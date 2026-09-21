@@ -147,6 +147,7 @@
     "tryAgain": "Try again",
     "discardMine": "Discard mine",
     "doneBy": "{{name}} · {{when}}",
+    "doneWhen": "{{when}}",
     "doneEarlierLine": "{{count}} completed earlier",
     "statusAll": "All",
     "statusActive": "Active",

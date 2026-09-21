@@ -34,7 +34,7 @@ import { useDueLabel } from "@/lib/use-due-label"
 import { useLocale } from "@/lib/use-locale"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useLive } from "@/lib/use-live"
-import { groupDone } from "@/lib/done-groups"
+import { doneAttribution, type DoneAttribution, groupDone } from "@/lib/done-groups"
 import { useDoneDayLabels } from "@/lib/use-done-day-labels"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 import { Sharing, type Item } from "@nooks/api"
@@ -355,10 +355,7 @@ export function ListScreen() {
                         key={item.uid}
                         label={item.label}
                         quantity={item.quantity}
-                        addedByName={t("list.doneBy", {
-                          name: item.doneByName || item.addedByName,
-                          when: clock(item.doneAt),
-                        })}
+                        addedByName={attribute(t, doneAttribution(item.doneByName, clock(item.doneAt)))}
                         done
                         hasNote={Boolean(item.note)}
                         justTicked={justTickedByAnother(item)}
@@ -464,4 +461,9 @@ function sharingKey(sharing: Sharing, canEdit: boolean): string {
  */
 function viaLabel(t: Translate, tokenName: string): string | undefined {
   return tokenName ? t("list.addedVia", { name: tokenName }) : undefined
+}
+
+/** attribute reads one of the two done lines, whichever the Item can support. */
+function attribute(t: Translate, said: DoneAttribution): string {
+  return t(said.key, said.values)
 }

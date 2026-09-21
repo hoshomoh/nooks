@@ -239,6 +239,32 @@ func TestTheRefreshTokenIsNotABearer(t *testing.T) {
 	}
 }
 
+/*
+And the other way round: an access token is not a cookie.
+
+The two checks are a pair — a cookie carries the refresh token, a bearer carries the
+access token, and each resolver path refuses the other kind. Only the first half had a
+test, and the second is one `if` in Member: without it an hour-long credential would
+quietly be given a month-long cookie's reach, and the split that exists to keep the
+long-lived one out of reach of a script would stop meaning anything.
+*/
+func TestTheAccessTokenIsNotACookie(t *testing.T) {
+	i := newInstance(t)
+	access, refresh := i.signIn("a-long-enough-password")
+
+	wearing := &http.Cookie{Name: refresh.Name, Value: access}
+	res := i.callWithCookie(http.MethodGet, "/api/v1/lists", wearing, "")
+	if res.Code != http.StatusUnauthorized {
+		t.Errorf("code = %d, want the access token refused as a cookie", res.Code)
+	}
+
+	// The same cookie name carrying the right kind still works, so the refusal above is
+	// the kind of token and not the cookie.
+	if code := i.callWithCookie(http.MethodGet, "/api/v1/lists", refresh, "").Code; code != http.StatusOK {
+		t.Errorf("code = %d, want the refresh cookie to work", code)
+	}
+}
+
 // passwordHash makes a hash the auth service will verify against.
 func passwordHash(plain string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(plain), bcrypt.DefaultCost)

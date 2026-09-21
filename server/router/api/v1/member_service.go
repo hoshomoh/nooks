@@ -322,7 +322,16 @@ func (s *MemberService) SetMemberRole(
 	return connect.NewResponse(&apiv1.SetMemberRoleResponse{Member: memberToProto(member)}), nil
 }
 
-// RemoveMember deletes an account. What they added stays on its Lists.
+/*
+RemoveMember deletes an account and everything of theirs.
+
+Their Lists go with them and so does everything they put on anybody else's — see
+store.DeleteMember, which says which columns do it and why the alternatives each cost
+something. The dialog tells the Admin as much before they press it.
+
+Refused for the last Admin and for yourself: the first would leave an Instance nobody
+can administer, and the second is the one removal nobody else can undo for you.
+*/
 func (s *MemberService) RemoveMember(
 	ctx context.Context,
 	req *connect.Request[apiv1.RemoveMemberRequest],

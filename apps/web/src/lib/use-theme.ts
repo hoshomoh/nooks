@@ -10,11 +10,14 @@ import type { ResolvedTheme, Theme } from "./theme"
  * external mutable source, and this is the API React provides for exactly that. Each
  * snapshot is a string, so it is stable by value and needs no memoisation.
  */
-export function useTheme(): {
+/** What a screen gets back: what was chosen, what that resolved to, and how to change it. */
+export type ThemeControl = {
   theme: Theme
   resolved: ResolvedTheme
   setTheme: (theme: Theme) => void
-} {
+}
+
+export function useTheme(): ThemeControl {
   const theme = useSyncExternalStore(
     themeStore.subscribe,
     themeStore.getTheme,

@@ -57,10 +57,15 @@ export type ClassListLike = {
   toggle(token: string, force?: boolean): boolean
 }
 
+/** What applyTheme writes to: an element, or the part of one a test can stand up. */
+export type ThemeTarget = {
+  classList: ClassListLike
+}
+
 /**
  * applyTheme puts the resolved theme on the given element. shadcn's dark variant is
  * `&:is(.dark *)`, so the class is the whole contract — see DESIGN.md §16.
  */
-export function applyTheme(root: { classList: ClassListLike }, resolved: ResolvedTheme): void {
+export function applyTheme(root: ThemeTarget, resolved: ResolvedTheme): void {
   root.classList.toggle("dark", resolved === "dark")
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 )
@@ -330,6 +331,72 @@ func BenchmarkReadOneList(b *testing.B) {
 				rows = len(read)
 			}
 			b.ReportMetric(float64(rows), "rows")
+		})
+	}
+}
+
+/*
+What happens when several people write to one crowded List at once.
+
+SQLite takes one writer at a time. WAL keeps readers out of its way, and the connection
+is opened with busy_timeout(5000), so a writer that finds the lock held waits up to five
+seconds rather than failing. Nothing bounds how many connections database/sql opens, so
+how many writers contend is however many requests are in flight.
+
+Under five seconds of waiting the write is simply slow. Over it, the write is lost:
+SQLITE_BUSY comes back, `internalError` wraps it, and the Member is shown "database is
+locked (5)" with whatever they typed gone.
+
+On a List of fifty thousand, each writer adding twenty in a burst, this reports none
+lost at two writers and a few percent lost at eight. Sixteen, measured the same way,
+loses around a tenth of them.
+
+So it queues at household size and starts dropping writes somewhere above it. What moves
+that threshold is how long one write holds the lock, which is why the counting indexes
+in 0016 matter here as well as to whoever is doing the ticking.
+
+The burst matters: one write each and the lock is handed over before anybody has to
+wait, which reports nothing and would be a benchmark measuring the wrong thing.
+*/
+func BenchmarkWritersOnOneList(b *testing.B) {
+	const burst = 20
+
+	for _, writers := range []int{2, 8} {
+		b.Run(fmt.Sprintf("%d_writers", writers), func(b *testing.B) {
+			s, anna := seedOneList(b, 50_000)
+			ctx := context.Background()
+			at := time.Date(2026, 9, 16, 9, 0, 0, 0, time.UTC)
+
+			lost := 0
+			turn := 0
+			b.ResetTimer()
+			for b.Loop() {
+				turn++
+				var wg sync.WaitGroup
+				var mu sync.Mutex
+				// A burst each rather than one apiece: the lock has to stay contended
+				// for longer than it takes to hand over, which is the case this is
+				// about — several people adding a shop, not one tick each.
+				for w := range writers {
+					wg.Add(1)
+					go func(w int) {
+						defer wg.Done()
+						for i := range burst {
+							uid := fmt.Sprintf("added_%d_%d_%d", turn, w, i)
+							_, err := s.CreateItem(ctx, CreateItemParams{
+								UID: uid, ListID: 1, Label: "thing", AddedByID: anna.ID, At: at,
+							})
+							if err != nil {
+								mu.Lock()
+								lost++
+								mu.Unlock()
+							}
+						}
+					}(w)
+				}
+				wg.Wait()
+			}
+			b.ReportMetric(float64(lost), "lost")
 		})
 	}
 }

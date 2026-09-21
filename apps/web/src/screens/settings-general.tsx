@@ -19,6 +19,7 @@ import { SettingsShell } from "@/components/ds/settings-shell"
 import { LOCALES, DEFAULT_LOCALE } from "@/i18n/locales"
 import { authClient, instanceClient, memberClient } from "@/lib/api"
 import { instanceSettingsQuery } from "@/lib/instance-queries"
+import { startNewSession } from "@/lib/new-session"
 import type { Theme } from "@/lib/theme"
 import type { Translate } from "@/lib/translate"
 import { useLocale } from "@/lib/use-locale"
@@ -89,8 +90,9 @@ function AccountSection() {
   const signOut = useMutation({
     mutationFn: () => authClient.signOut({}),
     onSuccess: async () => {
-      // Everything in the cache belongs to the Member who is leaving.
-      queryClient.clear()
+      // Everything in the cache belongs to the Member who is leaving, the copy on disk
+      // included: signing out on a shared tablet is the moment it matters most.
+      startNewSession(queryClient)
       await navigate({ to: "/sign-in" })
     },
   })

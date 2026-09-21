@@ -16,6 +16,7 @@ import { aboutQuery } from "@/lib/about-queries"
 import { instanceClient } from "@/lib/api"
 import { readableBytes } from "@/lib/bytes"
 import { messageFrom } from "@/lib/errors"
+import { startNewSession } from "@/lib/new-session"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 import { useMomentLabel } from "@/lib/use-moment-label"
 import { useSettingsCounts } from "@/lib/use-settings-counts"
@@ -166,7 +167,9 @@ function DeleteInstance({ name }: DeleteInstanceProps) {
         instanceName: confirmation.typedName,
       }),
     onSuccess: async () => {
-      queryClient.clear()
+      // The copy on disk as well: an Instance wiped back to first run should not leave
+      // the household's lists readable in the browser that wiped it.
+      startNewSession(queryClient)
       await navigate({ to: "/" })
     },
   })

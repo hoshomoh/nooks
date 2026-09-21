@@ -2,6 +2,7 @@ package v1
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -281,5 +282,48 @@ func TestAPasswordResetEndsEverySession(t *testing.T) {
 
 	if _, err := s.SessionByTokenHash(t.Context(), theirs); !errors.Is(err, store.ErrNotFound) {
 		t.Errorf("a browser signed in before the reset is still signed in: %v", err)
+	}
+}
+
+/*
+Finishing a join must answer the same way whatever the reason it cannot be finished.
+
+GetJoinRequest reports every unfinished state as pending, and that is tested. CompleteJoin
+is the other half of the same ceremony and is reachable by the same stranger: if it
+refused an ignored request differently from one that never existed, the pair would be an
+oracle for which identifiers are real, which is what the reporting-as-pending exists to
+prevent.
+*/
+func TestCompleteJoinRefusesEveryUnapprovedStateAlike(t *testing.T) {
+	svc, s := newAuthService(t)
+	completeSetup(t, svc)
+
+	pending := requestJoin(t, svc)
+
+	ignored := requestJoin(t, svc)
+	if err := s.DecideJoinRequest(t.Context(), ignored, store.StatusIgnored, testClock); err != nil {
+		t.Fatalf("DecideJoinRequest: %v", err)
+	}
+
+	refusalFor := func(t *testing.T, uid string) string {
+		t.Helper()
+		_, err := svc.CompleteJoin(t.Context(), connect.NewRequest(&apiv1.CompleteJoinRequest{
+			RequestUid: uid, Name: "Til", Password: goodPassword,
+		}))
+		if err == nil {
+			t.Fatalf("CompleteJoin accepted %q", uid)
+		}
+		return fmt.Sprintf("%v: %s", connect.CodeOf(err), err)
+	}
+
+	unknown := refusalFor(t, "never-existed")
+	for _, one := range []struct{ what, uid string }{
+		{"a request still waiting for an admin", pending},
+		{"a request an admin ignored", ignored},
+	} {
+		if got := refusalFor(t, one.uid); got != unknown {
+			t.Errorf("%s is refused as %q, and an identifier that never existed as %q",
+				one.what, got, unknown)
+		}
 	}
 }

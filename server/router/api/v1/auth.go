@@ -405,7 +405,8 @@ func (s *AuthService) activity() activityRecorder {
 	return activityRecorder{store: s.store, now: s.now, newUID: s.newUID, announce: s.announce}
 }
 
-// memberToProto converts a stored Member to its wire form. It never copies the hash.
+// memberToProto converts a stored Member to its wire form. It never copies the hash,
+// which TestListMembersNeverCarriesAStoredHash holds it to.
 func memberToProto(m store.Member) *apiv1.Member {
 	out := &apiv1.Member{
 		Uid:                m.UID,

@@ -53,6 +53,29 @@ describe("the list row", () => {
     expect(onOpen).not.toHaveBeenCalled()
   })
 
+  /*
+   * A List shared read-only shows what was done and does not offer to change it.
+   *
+   * The checkbox drew itself whatever it was given. On a read-only List the Member
+   * could press it, the request went, and the Instance refused — a control that looked
+   * live and was not. The note sheet and the note page had both been gating theirs on
+   * the same answer all along; the row was the one that had not.
+   */
+  it("does not offer to tick when there is nothing to tick with", async () => {
+    render(<ListRow label="Milk" done labels={labels} />)
+
+    // Base UI draws a checkbox as a span with the state in ARIA rather than as a
+    // native input, so this is what "disabled" is on one.
+    const box = screen.getByRole("checkbox")
+    expect(box).toHaveAttribute("aria-disabled", "true")
+
+    // Still says what happened to the Item, which is what read-only is for.
+    expect(box).toBeChecked()
+
+    await userEvent.click(box)
+    expect(box).toBeChecked()
+  })
+
   // The settle animation is for somebody else's tick, so without this the Member's own
   // is the one action in the app that answers with nothing.
   it("answers the Member's own tick, and only that much", () => {

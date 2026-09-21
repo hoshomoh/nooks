@@ -133,7 +133,14 @@ export function ListRow({
           <button type="button" onClick={onOpen} aria-label={labels.open} className={COVERING} />
         )}
 
-        <Checkbox checked={done} justTicked={justTicked} onCheckedChange={onToggle} />
+        {/* Nothing to tick with is a checkbox that says what the Item is and does not
+            pretend to be a control: a read-only List still shows what was done. */}
+        <Checkbox
+          checked={done}
+          justTicked={justTicked}
+          onCheckedChange={onToggle}
+          disabled={!onToggle}
+        />
 
         <span className={cn(RAISED, "flex min-w-0 items-baseline gap-2.5")}>
           <EditableTitle

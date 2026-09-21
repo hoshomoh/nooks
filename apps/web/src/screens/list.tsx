@@ -277,7 +277,11 @@ export function ListScreen() {
                     overdue={isOverdue(item.dueOn, from)}
                     justTicked={justTickedByAnother(item)}
                     hasNote={Boolean(item.note)}
-                    onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
+                    onToggle={
+                      canEdit
+                        ? (next) => setDone.mutate({ itemUid: item.uid, done: next })
+                        : undefined
+                    }
                     onOpen={() => showItem(item.uid)}
                     onRename={
                       canEdit
@@ -358,7 +362,11 @@ export function ListScreen() {
                         done
                         hasNote={Boolean(item.note)}
                         justTicked={justTickedByAnother(item)}
-                        onToggle={(next) => setDone.mutate({ itemUid: item.uid, done: next })}
+                        onToggle={
+                          canEdit
+                            ? (next) => setDone.mutate({ itemUid: item.uid, done: next })
+                            : undefined
+                        }
                         onOpen={() => showItem(item.uid)}
                         onRename={
                           canEdit

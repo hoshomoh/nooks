@@ -19,8 +19,10 @@ type aboutArgs struct{}
 // addInstanceTools registers what has been happening and what is running.
 func addInstanceTools(server *sdk.Server, services v1.Services) {
 	sdk.AddTool(server, &sdk.Tool{
-		Name:        "list_activity",
-		Description: "What has happened recently on the lists the caller can reach, newest first.",
+		Name: "list_activity",
+		Description: "What is waiting for the caller, newest first. A shared list is only " +
+			"named when the caller's token reaches it; requests to join and password " +
+			"resets name no list and are shown whatever the token reaches.",
 	}, func(ctx context.Context, _ *sdk.CallToolRequest, _ listActivityArgs) (*sdk.CallToolResult, any, error) {
 		return answer(ctx, services.Activity.ListActivity, &apiv1.ListActivityRequest{},
 			func(res *apiv1.ListActivityResponse) string {

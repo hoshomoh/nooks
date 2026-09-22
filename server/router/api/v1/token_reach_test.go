@@ -46,7 +46,7 @@ var reachableByToken = map[string]string{
 	"ListService.GetListShares":   "reading who a List reaches",
 
 	// What is going on, and who is here.
-	"ActivityService.ListActivity":     "what has happened on the Lists it reaches",
+	"ActivityService.ListActivity":     "what is waiting, narrowed to the Lists it reaches",
 	"ActivityService.MarkActivityRead": "clearing the count it just read",
 	"MemberService.ListMembers":        "names, to say who added what and to share with",
 	"MemberService.ListGroups":         "the same, for sharing with several at once",

@@ -7,6 +7,7 @@ import (
 	"connectrpc.com/connect"
 
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
+	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
 )
 
@@ -26,29 +27,74 @@ func NewActivityService(s store.Store, now func() time.Time) *ActivityService {
 	return &ActivityService{store: s, now: now}
 }
 
-// ListActivity returns what is waiting for the signed-in Member, newest first.
+/*
+ListActivity returns what is waiting for the signed-in Member, newest first.
+
+An entry naming a List is left out when the caller is a token that does not reach it.
+The token model says "a List it does not name is invisible to it", and without this a
+token cut for the shopping list was told "Jonas shared Finances with you" — the name of
+a List it cannot open, and of the person who owns it.
+
+The count is worked out after that, not before. A number covering entries the caller
+cannot see would say how many there are, which is the thing being kept back.
+*/
 func (s *ActivityService) ListActivity(
 	ctx context.Context,
 	_ *connect.Request[apiv1.ListActivityRequest],
 ) (*connect.Response[apiv1.ListActivityResponse], error) {
-	member, err := requireMember(ctx)
+	grant, err := requireGrant(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	entries, err := s.store.ActivityFor(ctx, member.ID)
+	entries, err := s.store.ActivityFor(ctx, grant.Member.ID)
 	if err != nil {
 		return nil, internalError("read activity", err)
 	}
 
+	named, err := s.listsNamedBy(ctx, grant)
+	if err != nil {
+		return nil, err
+	}
+
 	response := &apiv1.ListActivityResponse{Activity: make([]*apiv1.Activity, 0, len(entries))}
 	for _, entry := range entries {
+		if named != nil && entry.Kind == store.ActivityListShared && !named[entry.TargetUID] {
+			continue
+		}
 		response.Activity = append(response.Activity, activityToProto(entry))
 		if entry.Unread() {
 			response.UnreadCount++
 		}
 	}
 	return connect.NewResponse(response), nil
+}
+
+/*
+listsNamedBy is the Lists a token names, by uid, or nil when the caller narrows nothing.
+
+Nil rather than an empty set, so a browser and a token cut for every List cost no read
+at all and are not accidentally filtered down to nothing.
+*/
+func (s *ActivityService) listsNamedBy(
+	ctx context.Context,
+	grant auth.Grant,
+) (map[string]bool, error) {
+	if _, limited := grant.ReachIDs(); !limited {
+		return nil, nil
+	}
+
+	lists, err := s.store.ListsForMember(ctx, grant.Member.ID)
+	if err != nil {
+		return nil, internalError("read lists", err)
+	}
+	named := make(map[string]bool, len(lists))
+	for _, list := range lists {
+		if grant.Reaches(list.ID) {
+			named[list.UID] = true
+		}
+	}
+	return named, nil
 }
 
 // MarkActivityRead marks everything the Member has now seen.

@@ -594,7 +594,6 @@ func TestANoteIsStoredAndReturnedAsWritten(t *testing.T) {
 	}
 }
 
-// The row shows the Note's own first line and a count of the rest — never a summary.
 /*
 The Note reaches a client whole, so the client can show what it says.
 

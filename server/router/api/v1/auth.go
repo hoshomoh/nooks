@@ -372,7 +372,6 @@ func passwordError(err error) error {
 	return internalError("hash password", err)
 }
 
-// internalError wraps a failure the caller can do nothing about.
 /*
 internalError is what a caller is told when the Instance itself failed.
 

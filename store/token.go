@@ -10,10 +10,6 @@ import (
 	"github.com/uptrace/bun"
 )
 
-// Permission is what a token may do.
-//
-// Two levels, not a matrix. A token is a key somebody cuts for a script; anything finer
-// would be a permission system a household has to administer.
 /*
 TokenAbilities is what a token may do, as three separate answers.
 

@@ -1599,9 +1599,6 @@ components:
                     description: |-
                         The mutable display label chosen at first run, e.g. "Brunnen Street". Empty
                          until first run completes.
-                version:
-                    type: string
-                    description: The build of Nooks that is running, e.g. "1.0.2".
                 needsSetup:
                     type: boolean
                     description: True until the first Admin exists. The app shows first run rather than sign in.

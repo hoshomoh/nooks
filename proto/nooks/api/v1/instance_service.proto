@@ -139,8 +139,12 @@ message GetInstanceResponse {
   // until first run completes.
   string name = 1;
 
-  // The build of Nooks that is running, e.g. "1.0.2".
-  string version = 2;
+  // Held the running build until it was taken out. This message answers anybody who can
+  // reach the Instance, and nothing read the field: About takes its version from
+  // GetInstanceAbout, which needs a session. A scanner sorting instances by the version
+  // they run was the only caller it had.
+  reserved 2;
+  reserved "version";
 
   // True until the first Admin exists. The app shows first run rather than sign in.
   bool needs_setup = 3;

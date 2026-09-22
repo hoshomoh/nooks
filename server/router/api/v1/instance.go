@@ -43,7 +43,6 @@ func (s *InstanceService) GetInstance(
 
 	return connect.NewResponse(&apiv1.GetInstanceResponse{
 		Name:          settings.Name,
-		Version:       version.String(),
 		NeedsSetup:    settings.NeedsSetup(),
 		PublicSignup:  settings.PublicSignup,
 		DefaultLocale: settings.DefaultLocale,

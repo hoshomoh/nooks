@@ -631,8 +631,6 @@ type GetInstanceResponse struct {
 	// The mutable display label chosen at first run, e.g. "Brunnen Street". Empty
 	// until first run completes.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The build of Nooks that is running, e.g. "1.0.2".
-	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
 	// True until the first Admin exists. The app shows first run rather than sign in.
 	NeedsSetup bool `protobuf:"varint,3,opt,name=needs_setup,json=needsSetup,proto3" json:"needs_setup,omitempty"`
 	// Nothing reads this yet: asking for an account always leaves a request for an
@@ -678,13 +676,6 @@ func (*GetInstanceResponse) Descriptor() ([]byte, []int) {
 func (x *GetInstanceResponse) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *GetInstanceResponse) GetVersion() string {
-	if x != nil {
-		return x.Version
 	}
 	return ""
 }
@@ -754,14 +745,13 @@ const file_nooks_api_v1_instance_service_proto_rawDesc = "" +
 	"\bsettings\x18\x01 \x01(\v2\x1e.nooks.api.v1.InstanceSettingsR\bsettings\"\\\n" +
 	"\x1eUpdateInstanceSettingsResponse\x12:\n" +
 	"\bsettings\x18\x01 \x01(\v2\x1e.nooks.api.v1.InstanceSettingsR\bsettings\"\x14\n" +
-	"\x12GetInstanceRequest\"\xb0\x01\n" +
+	"\x12GetInstanceRequest\"\xa5\x01\n" +
 	"\x13GetInstanceResponse\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
-	"\aversion\x18\x02 \x01(\tR\aversion\x12\x1f\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1f\n" +
 	"\vneeds_setup\x18\x03 \x01(\bR\n" +
 	"needsSetup\x12#\n" +
 	"\rpublic_signup\x18\x04 \x01(\bR\fpublicSignup\x12%\n" +
-	"\x0edefault_locale\x18\x05 \x01(\tR\rdefaultLocale2\xb0\x05\n" +
+	"\x0edefault_locale\x18\x05 \x01(\tR\rdefaultLocaleJ\x04\b\x02\x10\x03R\aversion2\xb0\x05\n" +
 	"\x0fInstanceService\x12l\n" +
 	"\vGetInstance\x12 .nooks.api.v1.GetInstanceRequest\x1a!.nooks.api.v1.GetInstanceResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v1/instance\x12\x8d\x01\n" +
 	"\x13GetInstanceSettings\x12(.nooks.api.v1.GetInstanceSettingsRequest\x1a).nooks.api.v1.GetInstanceSettingsResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/instance/settings\x12\x99\x01\n" +

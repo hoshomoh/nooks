@@ -3,12 +3,15 @@ package v1
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
 	"connectrpc.com/connect"
+	"google.golang.org/protobuf/encoding/prototext"
 
 	"github.com/hoshomoh/nooks/internal/password"
+	"github.com/hoshomoh/nooks/internal/version"
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/store"
 )
@@ -42,8 +45,42 @@ func TestGetInstanceBeforeFirstRun(t *testing.T) {
 	if got.Msg.GetName() != "" {
 		t.Errorf("Name = %q on a fresh Instance, want empty", got.Msg.GetName())
 	}
-	if got.Msg.GetVersion() == "" {
-		t.Error("Version is empty, want the running build")
+}
+
+/*
+What a Visitor reads about the Instance carries no build number.
+
+GetInstance is answered without a session, because the sign-in page and the public list
+both need it before anybody has signed in. It used to carry the running version, which
+nothing read: the About screen takes its version from GetInstanceAbout, which needs one.
+So the only caller it had was whatever was scanning for instances on a version with a
+known fault.
+
+Marshalled and searched rather than checked field by field, for the reason
+TestListMembersNeverCarriesAStoredHash gives: the mistake this catches is a field
+somebody adds without thinking about who reads this message. Naming the fields it knows
+would let the next one straight through.
+
+The proto reserves the number and the name, so putting the old field back does not
+compile. This is for the one that comes back under a different name.
+
+Its weakness, stated rather than left to be discovered: under test the build reads
+"dev", which is short enough to appear inside an ordinary word. It holds here because
+fakeStore answers with empty fields, so there is nothing else in the message for it to
+match. A fixture that starts returning a name would need a build string chosen to be
+distinctive, the way theHash is in secrets_test.go.
+*/
+func TestGetInstanceTellsAVisitorNothingAboutTheBuild(t *testing.T) {
+	svc := NewInstanceService(&fakeStore{})
+
+	got, err := svc.GetInstance(t.Context(), connect.NewRequest(&apiv1.GetInstanceRequest{}))
+	if err != nil {
+		t.Fatalf("GetInstance: %v", err)
+	}
+
+	said := prototext.Format(got.Msg)
+	if running := version.String(); strings.Contains(said, running) {
+		t.Errorf("GetInstance answers %q, which carries the build %q", said, running)
 	}
 }
 

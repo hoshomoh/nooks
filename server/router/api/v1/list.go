@@ -376,6 +376,9 @@ func (s *ListService) CreateList(
 	if err := requireText(req.Msg.GetName(), "a name"); err != nil {
 		return nil, err
 	}
+	if err := withinLimit(req.Msg.GetName(), "a list name", limitListName); err != nil {
+		return nil, err
+	}
 
 	uid, err := s.newUID()
 	if err != nil {
@@ -403,6 +406,9 @@ func (s *ListService) RenameList(
 		return nil, err
 	}
 	if err := requireText(req.Msg.GetName(), "a name"); err != nil {
+		return nil, err
+	}
+	if err := withinLimit(req.Msg.GetName(), "a list name", limitListName); err != nil {
 		return nil, err
 	}
 	if err := s.store.RenameList(ctx, list.UID, req.Msg.GetName(), s.now()); err != nil {

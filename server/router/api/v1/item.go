@@ -27,6 +27,9 @@ func (s *ListService) CreateItem(
 	if err := requireText(req.Msg.GetLabel(), "something to add"); err != nil {
 		return nil, err
 	}
+	if err := itemTextWithinLimits(req.Msg.GetLabel(), req.Msg.GetQuantity(), ""); err != nil {
+		return nil, err
+	}
 	if err := validDueOn(req.Msg.GetDueOn()); err != nil {
 		return nil, err
 	}
@@ -69,6 +72,11 @@ func (s *ListService) UpdateItem(
 		if err := requireText(req.Msg.GetLabel(), "something to call it"); err != nil {
 			return nil, err
 		}
+	}
+	if err := itemTextWithinLimits(
+		req.Msg.GetLabel(), req.Msg.GetQuantity(), req.Msg.GetNote(),
+	); err != nil {
+		return nil, err
 	}
 	if req.Msg.DueOn != nil {
 		if err := validDueOn(req.Msg.GetDueOn()); err != nil {
@@ -365,4 +373,22 @@ func textUnchanged(msg *apiv1.UpdateItemRequest, item store.Item) error {
 			errors.New("somebody else wrote in this note while you were writing"))
 	}
 	return nil
+}
+
+/*
+itemTextWithinLimits holds the three things a Member writes on an Item to a length.
+
+Together rather than one call each at two call sites, because they are one question:
+whether what arrived is something somebody could have meant. An empty value is within
+every limit, so the optional fields pass this without being asked whether they were
+sent.
+*/
+func itemTextWithinLimits(label, quantity, note string) error {
+	if err := withinLimit(label, "an item", limitItemLabel); err != nil {
+		return err
+	}
+	if err := withinLimit(quantity, "a quantity", limitItemQuantity); err != nil {
+		return err
+	}
+	return withinLimit(note, "a note", limitItemNote)
 }

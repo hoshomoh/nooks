@@ -137,6 +137,9 @@ func (s *TokenService) CreateAccessToken(
 	}
 
 	name := strings.TrimSpace(req.Msg.GetName())
+	if err := withinLimit(name, "a token name", limitTokenName); err != nil {
+		return nil, err
+	}
 	if err := requireText(name, "a name"); err != nil {
 		return nil, err
 	}

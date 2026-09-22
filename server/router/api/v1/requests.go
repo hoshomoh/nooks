@@ -51,6 +51,15 @@ func (s *AuthService) RequestJoin(
 	if err := requireText(msg.GetEmail(), "an email"); err != nil {
 		return nil, err
 	}
+	if err := withinLimit(msg.GetName(), "a name", limitMemberName); err != nil {
+		return nil, err
+	}
+	if err := withinLimit(msg.GetEmail(), "an email", limitMemberEmail); err != nil {
+		return nil, err
+	}
+	if err := withinLimit(msg.GetMessage(), "a message", limitJoinMessage); err != nil {
+		return nil, err
+	}
 
 	uid, err := s.newUID()
 	if err != nil {

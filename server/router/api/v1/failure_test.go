@@ -11,6 +11,8 @@ import (
 	"testing"
 
 	"connectrpc.com/connect"
+
+	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 )
 
 /*
@@ -128,4 +130,105 @@ func TestAFailureCarriesNoCause(t *testing.T) {
 	if connectErr.Meta().Get(errorRefHeader) == "" {
 		t.Error("no reference travelled, so nobody can find the log line")
 	}
+}
+
+/*
+Every field a Member writes into is bounded, and the bound is enforced.
+
+Nothing bounded any of them. A request is capped at four mebibytes, so a List could be
+named with four mebibytes of text and every screen that draws that name would try to.
+
+Each case sends one character past the limit through the path that field actually
+arrives on, because a constant nothing reads is a limit in name only. The paths differ
+enough that this cannot be a loop over a table of field names: an Item's label arrives
+on CreateItem, an instance name on CompleteSetup, a message on RequestJoin.
+*/
+func TestEveryWrittenFieldIsBounded(t *testing.T) {
+	over := func(limit int) string { return strings.Repeat("a", limit+1) }
+
+	t.Run("item label, quantity and note", func(t *testing.T) {
+		f := newListFixture(t)
+		uid := f.createList(t, f.anna, "Groceries")
+
+		for _, one := range []struct {
+			what string
+			req  *apiv1.CreateItemRequest
+		}{
+			{"label", &apiv1.CreateItemRequest{ListUid: uid, Label: over(limitItemLabel)}},
+			{"quantity", &apiv1.CreateItemRequest{
+				ListUid: uid, Label: "Bread", Quantity: over(limitItemQuantity),
+			}},
+		} {
+			t.Run(one.what, func(t *testing.T) {
+				_, err := f.svc.CreateItem(f.as(t, f.anna), connect.NewRequest(one.req))
+				if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
+					t.Errorf("code = %v, want invalid_argument", got)
+				}
+			})
+		}
+
+		t.Run("note", func(t *testing.T) {
+			item, err := f.svc.CreateItem(f.as(t, f.anna), connect.NewRequest(
+				&apiv1.CreateItemRequest{ListUid: uid, Label: "Bread"},
+			))
+			if err != nil {
+				t.Fatalf("CreateItem: %v", err)
+			}
+			note := over(limitItemNote)
+			_, err = f.svc.UpdateItem(f.as(t, f.anna), connect.NewRequest(
+				&apiv1.UpdateItemRequest{ItemUid: item.Msg.GetItem().GetUid(), Note: &note},
+			))
+			if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
+				t.Errorf("code = %v, want invalid_argument", got)
+			}
+		})
+	})
+
+	t.Run("list name", func(t *testing.T) {
+		f := newListFixture(t)
+		_, err := f.svc.CreateList(f.as(t, f.anna), connect.NewRequest(
+			&apiv1.CreateListRequest{Name: over(limitListName)},
+		))
+		if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
+			t.Errorf("code = %v, want invalid_argument", got)
+		}
+	})
+
+	t.Run("join request name, email and message", func(t *testing.T) {
+		for _, one := range []struct {
+			what string
+			req  *apiv1.RequestJoinRequest
+		}{
+			{"name", &apiv1.RequestJoinRequest{
+				Name: over(limitMemberName), Email: "til@example.com",
+			}},
+			{"email", &apiv1.RequestJoinRequest{
+				Name: "Til", Email: over(limitMemberEmail),
+			}},
+			{"message", &apiv1.RequestJoinRequest{
+				Name: "Til", Email: "til@example.com", Message: over(limitJoinMessage),
+			}},
+		} {
+			t.Run(one.what, func(t *testing.T) {
+				svc, _ := newAuthService(t)
+				completeSetup(t, svc)
+
+				_, err := svc.RequestJoin(t.Context(), connect.NewRequest(one.req))
+				if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
+					t.Errorf("code = %v, want invalid_argument", got)
+				}
+			})
+		}
+	})
+
+	t.Run("instance name at first run", func(t *testing.T) {
+		svc, _ := newAuthService(t)
+		_, err := svc.CompleteSetup(t.Context(), connect.NewRequest(&apiv1.CompleteSetupRequest{
+			Name: "Anna", Email: "anna@brunnen.lan", Password: goodPassword,
+			InstanceName: over(limitInstanceName),
+		}))
+		if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
+			t.Errorf("code = %v, want invalid_argument", got)
+		}
+	})
 }

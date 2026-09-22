@@ -81,3 +81,43 @@ func TestAReadOnlyTokenCannotChangeAnything(t *testing.T) {
 		})
 	}
 }
+
+/*
+The other half of that rule is not held: a token cut with read off reads anyway.
+
+`read` is accepted by CreateAccessToken, written to `can_read`, handed back in the
+token's abilities so the settings screen draws it as chosen, and described in the
+published API reference as "see lists and items". Nothing consults it. There is
+MayWrite and MayDelete on Grant and no MayRead, and Abilities.Read is read nowhere
+outside the row it is stored in.
+
+So a Member who cuts a token that may add but not look gets one that looks. The token
+still cannot exceed its Member, which is why this is not an escalation — but it exceeds
+what the Member asked of it, and the three-way model exists precisely so that asking is
+worth something.
+
+This test asserts the hole rather than the rule, because closing it is a decision
+about whether a write-only token is a thing Nooks offers at all: Usable() is
+`Read || Write`, so today it is offered. Whoever decides comes here, and the guard
+worth adding with the fix is that every field of TokenAbilities is consulted by some
+Grant method — which is what would have caught this.
+*/
+func TestTheReadAbilityDecidesNothing(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Shopping")
+
+	token := store.AccessToken{
+		ID: 1, UID: "tok_write_only", MemberID: f.anna.ID, Name: "may add, not look",
+		Abilities: store.TokenAbilities{Read: false, Write: true},
+		AllLists:  true, CreatedAt: testClock,
+	}
+	ctx := auth.WithGrant(t.Context(), auth.NewTokenGrant(f.anna, token, nil))
+
+	res, err := f.svc.GetList(ctx, connect.NewRequest(&apiv1.GetListRequest{ListUid: uid}))
+	if err != nil {
+		t.Fatalf("read is enforced now, so this test has outlived the hole it records — delete it and say what a write-only token may do: %v", err)
+	}
+	if res.Msg.GetList().GetName() != "Shopping" {
+		t.Errorf("read the List as %q, want Shopping", res.Msg.GetList().GetName())
+	}
+}

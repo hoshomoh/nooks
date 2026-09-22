@@ -20,7 +20,9 @@ TokenAbilities is what a token may do, as three separate answers.
 Not a level, because a level forces an order the real question does not have: a recipe
 importer reads and never writes, a shopping shortcut writes and should never delete.
 
-Read has to be on. A token that cannot read anything is a key that opens nothing.
+Read is not enforced, and Usable() is why it cannot simply be made so: a token may be
+cut with write alone, and one cut with read off reads anyway. See
+TestTheReadAbilityDecidesNothing.
 */
 type TokenAbilities struct {
 	Read   bool

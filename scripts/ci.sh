@@ -87,6 +87,7 @@ if wants proto; then
   # behind with nothing saying so.
   step "rest bindings"
   ./scripts/check-annotations.sh
+  ./scripts/check-rpc-comments.sh
 
   step "gateway adapters"
   ./scripts/check-gateway.sh

@@ -105,6 +105,11 @@ jobs:
       # scripts/ci.sh, which is not a check.
       - name: Every RPC has a REST route
         run: ./scripts/check-annotations.sh
+      # The comment above an rpc is generated into the Go stubs, the TypeScript client and
+      # openapi.yaml, which the published reference is built from — so one above the wrong
+      # rpc is wrong on the page a stranger reads.
+      - name: Every RPC comment names its RPC
+        run: ./scripts/check-rpc-comments.sh
       # The protos are the contract every client is built against. A change that would
       # break one stops here rather than in somebody's build.
       # Against what the change was made from, which is not the same ref in both cases.

@@ -50,6 +50,8 @@ Instance; everyone else joins by asking, and an Admin approves.
 | `--driver` | `NOOKS_DRIVER` | `sqlite` | `sqlite` or `postgres` |
 | `--dsn` | `NOOKS_DSN` | — | Postgres connection string; unused for SQLite |
 | `--mode` | `NOOKS_MODE` | `prod` | `dev` expects the Vite server to serve the app |
+| `--secure-cookies` | `NOOKS_SECURE_COOKIES` | off | Marks session cookies `Secure`. Turn it on behind TLS |
+| `--log-level` | `NOOKS_LOG_LEVEL` | `info` | `debug`, `info`, `warn` or `error` |
 
 ### Backing it up
 

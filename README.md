@@ -52,6 +52,7 @@ Instance; everyone else joins by asking, and an Admin approves.
 | `--mode` | `NOOKS_MODE` | `prod` | `dev` expects the Vite server to serve the app |
 | `--secure-cookies` | `NOOKS_SECURE_COOKIES` | off | Marks session cookies `Secure`. Turn it on behind TLS |
 | `--log-level` | `NOOKS_LOG_LEVEL` | `info` | `debug`, `info`, `warn` or `error` |
+| `--db-max-conns` | `NOOKS_DB_MAX_CONNS` | `10` | How many connections to open to Postgres at once. Unused for SQLite |
 
 ### Backing it up
 

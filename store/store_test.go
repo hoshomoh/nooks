@@ -41,6 +41,23 @@ func openSQLiteForTest(t *testing.T) Store {
 
 // openPostgresForTest connects to the server named by the environment, and drops the
 // schema first so each test starts from nothing.
+// openPostgresWithConns opens Postgres with a chosen pool bound, skipping without one.
+func openPostgresWithConns(t *testing.T, maxConns int) *sqlStore {
+	t.Helper()
+	opened := openPostgresForTest(t)
+	if maxConns == 0 {
+		return opened.(*sqlStore)
+	}
+
+	dsn := os.Getenv("NOOKS_TEST_POSTGRES_DSN")
+	s, err := OpenPostgres(t.Context(), dsn, maxConns)
+	if err != nil {
+		t.Fatalf("OpenPostgres: %v", err)
+	}
+	t.Cleanup(func() { _ = s.Close() })
+	return s.(*sqlStore)
+}
+
 func openPostgresForTest(t *testing.T) Store {
 	t.Helper()
 	dsn := os.Getenv(postgresDSNEnv)
@@ -48,7 +65,7 @@ func openPostgresForTest(t *testing.T) Store {
 		t.Skipf("%s is not set", postgresDSNEnv)
 	}
 
-	s, err := OpenPostgres(t.Context(), dsn)
+	s, err := OpenPostgres(t.Context(), dsn, 0)
 	if err != nil {
 		t.Fatalf("OpenPostgres: %v", err)
 	}
@@ -204,7 +221,7 @@ func TestOpenRejectsMissingTarget(t *testing.T) {
 	if _, err := OpenSQLite(t.Context(), ""); err == nil {
 		t.Error("OpenSQLite with an empty path succeeded, want an error")
 	}
-	if _, err := OpenPostgres(t.Context(), ""); err == nil {
+	if _, err := OpenPostgres(t.Context(), "", 0); err == nil {
 		t.Error("OpenPostgres with an empty dsn succeeded, want an error")
 	}
 }

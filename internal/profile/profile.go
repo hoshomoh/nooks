@@ -12,6 +12,7 @@ import (
 	"log/slog"
 	"net"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -55,6 +56,9 @@ type Config struct {
 	// It cannot be detected here: behind a reverse proxy the server itself sees plain
 	// HTTP even though the Member does not.
 	SecureCookies bool
+	// DBMaxConns bounds how many connections are opened to Postgres at once. Unused for
+	// SQLite, which is a file rather than a server.
+	DBMaxConns int
 }
 
 // ErrHelp reports that the caller asked for usage rather than a running server.
@@ -82,6 +86,12 @@ func Parse(args []string, env func(string) string, out io.Writer) (Config, error
 	mode := set.String("mode", envOr(env, "NOOKS_MODE", string(ModeProd)), "prod or dev")
 	secure := set.Bool("secure-cookies", envOr(env, "NOOKS_SECURE_COOKIES", "") == "true",
 		"mark session cookies Secure; set this when the instance is served over HTTPS")
+	// Zero means nothing was asked for, and the store puts its own default on it. The
+	// number lives there, next to the pool it bounds, rather than being written here as
+	// well: `internal` knows nothing of `store`, and a second copy of a default is a
+	// default that drifts.
+	maxConns := set.Int("db-max-conns", envInt(env, "NOOKS_DB_MAX_CONNS"),
+		"most connections to open to postgres at once, or 0 for the default")
 	level := set.String("log-level", envOr(env, "NOOKS_LOG_LEVEL", "info"),
 		"debug, info, warn or error")
 
@@ -97,6 +107,7 @@ func Parse(args []string, env func(string) string, out io.Writer) (Config, error
 		Mode:   Mode(strings.TrimSpace(*mode)),
 
 		SecureCookies: *secure,
+		DBMaxConns:    *maxConns,
 	}
 
 	parsedLevel, err := parseLevel(strings.TrimSpace(*level))
@@ -143,6 +154,16 @@ func (c Config) validate() error {
 // SQLitePath is where the Instance keeps its single file.
 func (c Config) SQLitePath() string {
 	return filepath.Join(c.Data, "nooks.db")
+}
+
+// envInt reads a whole number from the environment, or zero when it is unset or is not
+// one. Zero is "nothing was asked for" everywhere this is used.
+func envInt(env func(string) string, key string) int {
+	value, err := strconv.Atoi(strings.TrimSpace(env(key)))
+	if err != nil {
+		return 0
+	}
+	return value
 }
 
 // envOr returns the environment value for key, or fallback when it is unset or blank.

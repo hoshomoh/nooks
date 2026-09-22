@@ -81,3 +81,45 @@ func TestParseRequiresEnvLookup(t *testing.T) {
 		t.Fatal("Parse with a nil env succeeded, want an error")
 	}
 }
+
+/*
+The pool bound is carried from the flag to the Config, and zero means unasked.
+
+A flag nothing reads is the fault this audit has found three times: the signup toggle,
+a token's read ability, and allow_join all decided nothing while being stored and drawn.
+This is the half that can be checked here. That the store then honours it is
+TestThePoolIsBounded, beside the pool.
+*/
+func TestDBMaxConnsIsRead(t *testing.T) {
+	env := func(string) string { return "" }
+
+	asked, err := Parse([]string{"--db-max-conns", "25"}, env, io.Discard)
+	if err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+	if asked.DBMaxConns != 25 {
+		t.Errorf("DBMaxConns = %d, want the 25 that was asked for", asked.DBMaxConns)
+	}
+
+	unasked, err := Parse(nil, env, io.Discard)
+	if err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+	if unasked.DBMaxConns != 0 {
+		t.Errorf("DBMaxConns = %d with nothing asked for, want 0 so the store decides",
+			unasked.DBMaxConns)
+	}
+
+	fromEnv, err := Parse(nil, func(key string) string {
+		if key == "NOOKS_DB_MAX_CONNS" {
+			return "40"
+		}
+		return ""
+	}, io.Discard)
+	if err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+	if fromEnv.DBMaxConns != 40 {
+		t.Errorf("DBMaxConns = %d from the environment, want 40", fromEnv.DBMaxConns)
+	}
+}

@@ -81,7 +81,7 @@ func openStore(ctx context.Context, cfg profile.Config) (store.Store, error) {
 	case profile.DriverSQLite:
 		return store.OpenSQLite(ctx, cfg.SQLitePath())
 	case profile.DriverPostgres:
-		return store.OpenPostgres(ctx, cfg.DSN)
+		return store.OpenPostgres(ctx, cfg.DSN, cfg.DBMaxConns)
 	default:
 		return nil, fmt.Errorf("unknown driver %q", cfg.Driver)
 	}

@@ -28,10 +28,14 @@ type Handler struct {
 	store    store.Store
 	broker   *events.Broker
 	resolver *auth.Resolver
+	// beat is how often the connection is kept alive and the session looked at again.
+	// A field rather than the constant so a test can reach that tick without waiting
+	// out a real one.
+	beat time.Duration
 }
 
 func NewHandler(s store.Store, broker *events.Broker, resolver *auth.Resolver) *Handler {
-	return &Handler{store: s, broker: broker, resolver: resolver}
+	return &Handler{store: s, broker: broker, resolver: resolver, beat: heartbeat}
 }
 
 // wireEvent is what a browser receives.
@@ -78,7 +82,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	})
 	defer sub.Close()
 
-	ticker := time.NewTicker(heartbeat)
+	ticker := time.NewTicker(h.beat)
 	defer ticker.Stop()
 
 	for {
@@ -94,6 +98,16 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			flusher.Flush()
 		case <-ticker.C:
+			// The session is checked again, not only when the stream opened. A stream
+			// outlives almost everything: nothing on this side closes one, and the
+			// heartbeat below keeps it through any proxy that would have timed it out,
+			// so without this a signed-out browser goes on being told what changed and
+			// who is reading it. CompletePasswordReset says what that is worth when
+			// it ends every session: "whoever else is signed in may well be why they
+			// are here".
+			if _, ok := h.member(r); !ok {
+				return
+			}
 			if _, err := fmt.Fprint(w, ": beat\n\n"); err != nil {
 				return
 			}

@@ -266,6 +266,46 @@ func TestClosingTheBrowserEndsTheSubscription(t *testing.T) {
 }
 
 /*
+A stream does not outlive the session that opened it.
+
+Nothing on this side ends a stream: the handler holds the connection until the browser
+goes away, and the heartbeat keeps it through any proxy that would have closed an idle
+one. So a stream authorised once at open would go on saying what changed and who is
+reading it to a browser that had signed out, for as long as it stayed connected.
+
+That matters most where the code says so itself. CompletePasswordReset deletes every
+session, sparing none, because "whoever else is signed in may well be why they are
+here". The one thing it could not end was the stream they already had open.
+
+What arrives is only that something changed, never what it changed to, plus the first
+names of whoever is reading a List. An activity oracle rather than a content leak, on
+an account its owner believes they have taken back.
+
+The beat is shortened rather than waited out, and the session deleted the way
+CompletePasswordReset ends them.
+*/
+func TestAStreamEndsWhenTheSessionDoes(t *testing.T) {
+	i := newInstance(t)
+	i.handler.beat = 10 * time.Millisecond
+
+	lines, stop, code := i.open("", i.session)
+	defer stop()
+
+	i.keepPublishing(events.Event{Kind: events.KindActivity}, i.member.ID)
+	waitFor(t, lines, "activity")
+
+	if err := i.store.DeleteSessionsFor(t.Context(), i.member.ID, ""); err != nil {
+		t.Fatalf("DeleteSessionsFor: %v", err)
+	}
+
+	select {
+	case <-code:
+	case <-time.After(3 * time.Second):
+		t.Fatal("the stream is still open after every session was deleted")
+	}
+}
+
+/*
 streamRecorder is a ResponseWriter that streams.
 
 httptest.ResponseRecorder buffers, so nothing can be read from it until the handler has

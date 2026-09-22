@@ -272,3 +272,43 @@ func TestUnpublishingThePublicList(t *testing.T) {
 		})
 	}
 }
+
+/*
+First run can be claimed once, on either driver.
+
+The claim is what stops two people both becoming the first Admin, and the reason it is a
+row rather than a re-count inside a transaction is exactly that the driver matters.
+Re-counting is enough on SQLite, which serialises writers, and not on Postgres under
+READ COMMITTED, where neither transaction sees the other's row. So is
+`INSERT ... WHERE NOT EXISTS`. What holds on both is a primary key refusing the second
+one, which is what this asks of each.
+
+Sequential rather than concurrent, because what is being tested is the contract: the
+second caller is told it did not claim. `TestOnlyOnePersonCanCompleteFirstRun` races four
+callers through the service, and answers 4 of 4 without this.
+*/
+func TestFirstRunIsClaimedOnce(t *testing.T) {
+	at := time.Date(2026, time.March, 3, 9, 30, 0, 0, time.UTC)
+
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+
+			first, err := s.ClaimFirstRun(t.Context(), at)
+			if err != nil {
+				t.Fatalf("ClaimFirstRun: %v", err)
+			}
+			if !first {
+				t.Fatal("the first caller did not claim first run")
+			}
+
+			second, err := s.ClaimFirstRun(t.Context(), at.Add(time.Millisecond))
+			if err != nil {
+				t.Fatalf("ClaimFirstRun again: %v", err)
+			}
+			if second {
+				t.Error("the second caller claimed first run as well, which is the race")
+			}
+		})
+	}
+}

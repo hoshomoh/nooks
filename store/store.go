@@ -98,6 +98,10 @@ type Store interface {
 	// CountMembers reports how many Members exist.
 	CountMembers(ctx context.Context) (int, error)
 
+	// ClaimFirstRun takes first run and reports whether this caller got it. Exactly one
+	// caller ever can, which is what stops two people both becoming the first Admin.
+	ClaimFirstRun(ctx context.Context, at time.Time) (bool, error)
+
 	// Stats counts what the Instance holds, for the About page.
 	Stats(ctx context.Context) (InstanceStats, error)
 

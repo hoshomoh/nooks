@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -122,6 +123,73 @@ func TestCompleteSetupCannotHappenTwice(t *testing.T) {
 	}))
 	if got := connect.CodeOf(err); got != connect.CodeFailedPrecondition {
 		t.Errorf("second CompleteSetup code = %v, want failed_precondition", got)
+	}
+}
+
+/*
+Two people completing first run at once, and only one Instance to own.
+
+checkSetupIsOpen counts Members and finds none, then bcrypt hashes a password, which is
+deliberately slow. Two requests arriving inside those couple of hundred milliseconds
+both passed the count, and with different emails both became Admins. Losing was silent:
+somebody told the Instance is already set up redeploys, where somebody who completes
+setup has no reason to look at the members list.
+
+It is the one moment an Instance is defenceless, because the setup page answers anybody
+until it is used. Something scanning the internet that reaches a fresh deployment inside
+that window used to become an Admin of it.
+
+Run concurrently rather than in sequence, because in sequence it passed before the fix:
+the second caller found a Member and was refused for the ordinary reason. The race is
+the test.
+*/
+func TestOnlyOnePersonCanCompleteFirstRun(t *testing.T) {
+	svc, s := newAuthService(t)
+
+	const racers = 4
+	start := make(chan struct{})
+	answers := make(chan error, racers)
+	var running sync.WaitGroup
+
+	for i := range racers {
+		running.Add(1)
+		go func() {
+			defer running.Done()
+			<-start
+			_, err := svc.CompleteSetup(t.Context(), connect.NewRequest(&apiv1.CompleteSetupRequest{
+				Name:         fmt.Sprintf("Owner %d", i),
+				Email:        fmt.Sprintf("owner%d@brunnen.lan", i),
+				Password:     goodPassword,
+				InstanceName: fmt.Sprintf("Instance %d", i),
+			}))
+			answers <- err
+		}()
+	}
+
+	close(start)
+	running.Wait()
+	close(answers)
+
+	won := 0
+	for err := range answers {
+		if err == nil {
+			won++
+			continue
+		}
+		if got := connect.CodeOf(err); got != connect.CodeFailedPrecondition {
+			t.Errorf("a loser was refused with %v, want failed_precondition", got)
+		}
+	}
+	if won != 1 {
+		t.Errorf("%d of %d completed first run, want exactly one", won, racers)
+	}
+
+	members, err := s.Members(t.Context())
+	if err != nil {
+		t.Fatalf("Members: %v", err)
+	}
+	if len(members) != 1 {
+		t.Errorf("the Instance has %d Admins, want the one who got there first", len(members))
 	}
 }
 

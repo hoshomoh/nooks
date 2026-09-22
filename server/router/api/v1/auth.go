@@ -81,6 +81,25 @@ func (s *AuthService) CompleteSetup(
 		return nil, err
 	}
 
+	/*
+	 * Claimed before the password is hashed, which is where the race lived.
+	 *
+	 * checkSetupIsOpen counts Members and finds none. Hashing is bcrypt and
+	 * deliberately slow, so a couple of hundred milliseconds used to pass between that
+	 * answer and the insert, and two requests arriving inside it both passed. With
+	 * different emails both became Admins, and the one who lost was never told.
+	 *
+	 * The claim is a row nothing can insert twice, so the second caller is refused here
+	 * and the slow part happens once the race is already decided.
+	 */
+	claimed, err := s.store.ClaimFirstRun(ctx, s.now())
+	if err != nil {
+		return nil, internalError("claim first run", err)
+	}
+	if !claimed {
+		return nil, errAlreadySetUp
+	}
+
 	member, err := s.createMember(ctx, createMemberInput{
 		name:     msg.GetName(),
 		email:    msg.GetEmail(),
@@ -226,6 +245,11 @@ func (s *AuthService) ReplacePassword(
 	return connect.NewResponse(&apiv1.ReplacePasswordResponse{Member: memberToProto(updated)}), nil
 }
 
+// errAlreadySetUp refuses first run to everybody but whoever got there first, whether
+// they are late by a Member or by a hundred milliseconds.
+var errAlreadySetUp = connect.NewError(connect.CodeFailedPrecondition,
+	errors.New("this instance has already been set up"))
+
 // checkSetupIsOpen rejects first run when it has already happened, or when the form is
 // incomplete. Once an Instance has an Admin this closes permanently — otherwise whoever
 // reached it next could seize it.
@@ -235,8 +259,7 @@ func (s *AuthService) checkSetupIsOpen(ctx context.Context, msg *apiv1.CompleteS
 		return internalError("count members", err)
 	}
 	if count > 0 {
-		return connect.NewError(connect.CodeFailedPrecondition,
-			errors.New("this instance has already been set up"))
+		return errAlreadySetUp
 	}
 	if err := requireText(msg.GetName(), "a name"); err != nil {
 		return err

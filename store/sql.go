@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
@@ -24,6 +25,7 @@ const (
 	settingPublicShowNames  = "instance.public_show_names"
 	settingPublicShowMeta   = "instance.public_show_meta"
 	settingPublicAllowJoin  = "instance.public_allow_join"
+	settingSetupClaimedAt   = "instance.setup_claimed_at"
 )
 
 /*
@@ -90,6 +92,44 @@ func (s *sqlStore) Close() error {
 		return fmt.Errorf("close %s store: %w", s.name, err)
 	}
 	return nil
+}
+
+/*
+ClaimFirstRun takes first run, and reports whether this caller is the one who got it.
+
+CompleteSetup used to count Members, find none, and only then hash a password. Hashing
+is bcrypt and deliberately slow, so a couple of hundred milliseconds sat between the
+check and the insert, and two requests arriving inside it both passed. With different
+emails both became Admins, and losing was silent: an owner who is told the Instance is
+already set up redeploys, where an owner who completes setup has no reason to look at
+the members list.
+
+It matters at the one moment an Instance is defenceless. The setup page answers anybody
+until it is used, so something scanning the internet that reaches a fresh deployment in
+that window becomes an Admin of it.
+
+An insert that cannot collide, because `key` is the settings table's primary key: the
+second one affects no rows and is told so, on SQLite and Postgres alike. Re-counting
+inside a transaction would have been enough on SQLite, which serialises writers, and not
+on Postgres under READ COMMITTED, where neither transaction sees the other's row.
+
+Claimed before the hash rather than after, so the slow part happens once the race is
+already over.
+*/
+func (s *sqlStore) ClaimFirstRun(ctx context.Context, at time.Time) (bool, error) {
+	result, err := s.db.NewInsert().
+		Model(&settingModel{Key: settingSetupClaimedAt, Value: formatTime(at)}).
+		On("CONFLICT (key) DO NOTHING").
+		Exec(ctx)
+	if err != nil {
+		return false, fmt.Errorf("claim first run: %w", err)
+	}
+
+	claimed, err := result.RowsAffected()
+	if err != nil {
+		return false, fmt.Errorf("read whether first run was claimed: %w", err)
+	}
+	return claimed == 1, nil
 }
 
 // settingsFromValues turns stored rows into InstanceSettings. A missing key is not an

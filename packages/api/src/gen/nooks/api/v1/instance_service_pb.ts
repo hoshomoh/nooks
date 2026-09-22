@@ -200,7 +200,8 @@ export type InstanceSettings = Message<"nooks.api.v1.InstanceSettings"> & {
   name: string;
 
   /**
-   * When false, every account starts as a join request an Admin approves.
+   * Carried and drawn as a toggle, and nothing reads it yet: asking for an account
+   * always leaves a request for an Admin. What keeps the door shut is the approval.
    *
    * @generated from field: bool public_signup = 2;
    */
@@ -331,7 +332,8 @@ export type GetInstanceResponse = Message<"nooks.api.v1.GetInstanceResponse"> & 
   needsSetup: boolean;
 
   /**
-   * When false, every account starts as a join request an Admin approves.
+   * Nothing reads this yet: asking for an account always leaves a request for an
+   * Admin, whatever it says. What keeps the door shut is the approval.
    *
    * @generated from field: bool public_signup = 4;
    */

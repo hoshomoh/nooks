@@ -107,7 +107,8 @@ message InstanceSettings {
   // What the Instance calls itself, e.g. "Brunnen Street".
   string name = 1;
 
-  // When false, every account starts as a join request an Admin approves.
+  // Carried and drawn as a toggle, and nothing reads it yet: asking for an account
+  // always leaves a request for an Admin. What keeps the door shut is the approval.
   bool public_signup = 2;
 
   PublicListSettings public_list = 3;
@@ -144,7 +145,8 @@ message GetInstanceResponse {
   // True until the first Admin exists. The app shows first run rather than sign in.
   bool needs_setup = 3;
 
-  // When false, every account starts as a join request an Admin approves.
+  // Nothing reads this yet: asking for an account always leaves a request for an
+  // Admin, whatever it says. What keeps the door shut is the approval.
   bool public_signup = 4;
 
   // The language a Visitor reads this Instance in. Reachable without authentication

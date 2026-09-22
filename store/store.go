@@ -17,7 +17,9 @@ type InstanceSettings struct {
 	// Empty until first run completes.
 	Name string
 
-	// PublicSignup, when false, makes every account a Join request an Admin approves.
+	// PublicSignup is stored and returned, and no path reads it: asking for an account
+	// always leaves a Join request an Admin approves. What keeps the door shut is the
+	// approval. See TestSignupSettingDecidesNothing.
 	PublicSignup bool
 
 	// DefaultLocale is the language of anything nobody chose a language for: the public

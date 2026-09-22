@@ -327,3 +327,37 @@ func TestCompleteJoinRefusesEveryUnapprovedStateAlike(t *testing.T) {
 		}
 	}
 }
+
+// The Public signup setting decides nothing, and this is what says so out loud.
+//
+// It is stored, returned and drawn as a toggle, but no path reads it: asking for an
+// account always leaves a request for an Admin. Whoever wires it up has to come here
+// and say what the other setting means, rather than leaving the field comments and the
+// website describing a door that was never there.
+func TestSignupSettingDecidesNothing(t *testing.T) {
+	for _, publicSignup := range []bool{false, true} {
+		t.Run(fmt.Sprintf("publicSignup=%v", publicSignup), func(t *testing.T) {
+			svc, s := newAuthService(t)
+			completeSetup(t, svc)
+
+			settings, err := s.InstanceSettings(t.Context())
+			if err != nil {
+				t.Fatalf("InstanceSettings: %v", err)
+			}
+			settings.PublicSignup = publicSignup
+			if err := s.SaveInstanceSettings(t.Context(), settings); err != nil {
+				t.Fatalf("SaveInstanceSettings: %v", err)
+			}
+
+			uid := requestJoin(t, svc)
+			got, err := svc.GetJoinRequest(t.Context(), connect.NewRequest(&apiv1.GetJoinRequestRequest{RequestUid: uid}))
+			if err != nil {
+				t.Fatalf("GetJoinRequest: %v", err)
+			}
+			if got.Msg.GetStatus() != apiv1.RequestStatus_REQUEST_STATUS_PENDING {
+				t.Errorf("with publicSignup %v the request is %v, want pending: the approval is what keeps the door shut, not the setting",
+					publicSignup, got.Msg.GetStatus())
+			}
+		})
+	}
+}

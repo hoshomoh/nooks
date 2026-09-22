@@ -1607,7 +1607,9 @@ components:
                     description: True until the first Admin exists. The app shows first run rather than sign in.
                 publicSignup:
                     type: boolean
-                    description: When false, every account starts as a join request an Admin approves.
+                    description: |-
+                        Nothing reads this yet: asking for an account always leaves a request for an
+                         Admin, whatever it says. What keeps the door shut is the approval.
                 defaultLocale:
                     type: string
                     description: |-
@@ -1752,7 +1754,9 @@ components:
                     description: What the Instance calls itself, e.g. "Brunnen Street".
                 publicSignup:
                     type: boolean
-                    description: When false, every account starts as a join request an Admin approves.
+                    description: |-
+                        Carried and drawn as a toggle, and nothing reads it yet: asking for an account
+                         always leaves a request for an Admin. What keeps the door shut is the approval.
                 publicList:
                     $ref: '#/components/schemas/PublicListSettings'
                 defaultLocale:

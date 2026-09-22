@@ -67,9 +67,12 @@ cd apps/web && pnpm test              # Unit tests
 cd apps/web && pnpm release           # Build SPA into server/router/frontend/dist
 
 # Protocol Buffers
-cd proto && buf generate         # Regenerate Go + TypeScript + OpenAPI
-cd proto && buf lint             # Lint proto files
-cd proto && buf format -w        # Format proto files
+# Through pnpm, because buf is a workspace dependency and is not on PATH otherwise.
+# generate also writes the TypeScript barrel, which buf alone does not: without it a
+# new .proto compiles and typechecks and then fails at bundle time on a missing export.
+pnpm generate                    # Regenerate Go + TypeScript + OpenAPI, and the barrel
+pnpm proto:lint                  # Lint proto files
+pnpm proto:format                # Format proto files
 ```
 
 ## Code Map

@@ -233,7 +233,7 @@ func TestRemovingAMemberTellsTheOnesWhoStay(t *testing.T) {
 	svc := NewMemberService(s, func() time.Time { return testClock }, nil).WithAnnouncer(told)
 
 	if _, err := svc.RemoveMember(auth.WithMember(t.Context(), anna),
-		connect.NewRequest(&apiv1.RemoveMemberRequest{MemberUid: mira.UID})); err != nil {
+		connect.NewRequest(&apiv1.RemoveMemberRequest{MemberUid: mira.UID, DeleteTheirLists: true})); err != nil {
 		t.Fatalf("RemoveMember: %v", err)
 	}
 

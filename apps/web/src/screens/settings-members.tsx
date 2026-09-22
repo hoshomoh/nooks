@@ -11,6 +11,7 @@ import {
 } from "@/components/ds/add-member-dialog"
 import { Button } from "@/components/ds/button"
 import { ConfirmDialog } from "@/components/ds/confirm-dialog"
+import { SelectField, type SelectOption } from "@/components/ds/select-field"
 import { Menu, MenuItem, MenuSeparator } from "@/components/ds/menu"
 import { SettingsShell } from "@/components/ds/settings-shell"
 import { memberClient } from "@/lib/api"
@@ -71,8 +72,22 @@ export function SettingsMembersScreen() {
     onSuccess: refresh,
   })
 
+  /*
+   * What becomes of the Lists somebody started, chosen while removing them.
+   *
+   * DELETE_THEIR_LISTS rather than an empty name: the Instance refuses a removal that
+   * says neither, so the destructive answer is one somebody gave rather than one a
+   * dropped field produced.
+   */
+  const [heir, setHeir] = useState("")
+
   const remove = useMutation({
-    mutationFn: (memberUid: string) => memberClient.removeMember({ memberUid }),
+    mutationFn: (memberUid: string) =>
+      memberClient.removeMember(
+        heir === DELETE_THEIR_LISTS
+          ? { memberUid, deleteTheirLists: true }
+          : { memberUid, giveListsToUid: heir },
+      ),
     onSuccess: refresh,
   })
 
@@ -109,7 +124,13 @@ export function SettingsMembersScreen() {
             groups={groups}
             isSignedIn={member.uid === signedIn?.uid}
             onSetRole={(role) => setRole.mutate({ memberUid: member.uid, role })}
-            onRemove={() => setRemoving(member)}
+            onRemove={() => {
+              // Reset with the dialog rather than keeping the last answer: the choice
+              // is about this person's Lists, and a picker that opens on what was
+              // chosen for somebody else is a picker that gets confirmed by habit.
+              setHeir(signedIn?.uid ?? DELETE_THEIR_LISTS)
+              setRemoving(member)
+            }}
           />
         ))}
       </div>
@@ -136,15 +157,55 @@ export function SettingsMembersScreen() {
 
       <ConfirmDialog
         open={removing !== null}
-        onOpenChange={(open) => !open && setRemoving(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setRemoving(null)
+          }
+        }}
         title={t("members.removeTitle", { name: removing?.name ?? "" })}
         blurb={t("members.removeBlurb")}
         confirmLabel={t("members.removeConfirm")}
         destructive
         onConfirm={() => removing && remove.mutate(removing.uid)}
-      />
+      >
+        <SelectField
+          label={t("members.removeListsLabel")}
+          value={heir}
+          onValueChange={setHeir}
+          options={heirOptions(members, removing, signedIn?.uid ?? "", t)}
+        />
+      </ConfirmDialog>
     </SettingsShell>
   )
+}
+
+/** DELETE_THEIR_LISTS is the one option in the picker that is not a person. */
+const DELETE_THEIR_LISTS = "delete"
+
+/**
+ * Who a removed Member's Lists may be given to, and the one answer that is nobody.
+ *
+ * Everybody but the person leaving, because a List cannot be left with the row that is
+ * about to stop being a person. Deleting is last: it is the answer that cannot be
+ * undone, and a list of people reads better than a list of people with a warning in
+ * the middle of it.
+ */
+function heirOptions(
+  members: Member[],
+  removing: Member | null,
+  signedInUid: string,
+  t: Translate,
+): SelectOption[] {
+  const people = members
+    .filter((member) => member.uid !== removing?.uid)
+    // Whoever is doing the removing first, because that is what the picker opens on and
+    // a default further down the list reads as though something chose it at random.
+    .sort((a, b) => Number(b.uid === signedInUid) - Number(a.uid === signedInUid))
+    .map((member) => ({
+      value: member.uid,
+      label: t("members.removeGiveTo", { name: member.name }),
+    }))
+  return [...people, { value: DELETE_THEIR_LISTS, label: t("members.removeDeleteLists") }]
 }
 
 interface MemberRoleVariables {

@@ -60,6 +60,20 @@ func newMemberFixture(t *testing.T) memberFixture {
 	}
 }
 
+// listOwnedBy gives a Member a List of their own, so that removing them has something
+// to decide about.
+func (f memberFixture) listOwnedBy(t *testing.T, owner store.Member, name string) string {
+	t.Helper()
+	list, err := f.store.CreateList(t.Context(), store.CreateListParams{
+		UID: "list_" + name, Name: name, OwnerID: owner.ID,
+		Sharing: store.SharingInstance, CanEdit: true, At: testClock,
+	})
+	if err != nil {
+		t.Fatalf("CreateList: %v", err)
+	}
+	return list.UID
+}
+
 func (f memberFixture) as(t *testing.T, member store.Member) context.Context {
 	t.Helper()
 	return auth.WithMember(t.Context(), member)
@@ -229,7 +243,7 @@ func TestRemovingAMember(t *testing.T) {
 	f := newMemberFixture(t)
 
 	if _, err := f.svc.RemoveMember(f.as(t, f.anna), connect.NewRequest(
-		&apiv1.RemoveMemberRequest{MemberUid: f.jonas.UID},
+		&apiv1.RemoveMemberRequest{MemberUid: f.jonas.UID, DeleteTheirLists: true},
 	)); err != nil {
 		t.Fatalf("RemoveMember: %v", err)
 	}
@@ -243,12 +257,71 @@ func TestRemovingAMember(t *testing.T) {
 	}
 }
 
+/*
+Removing somebody says what becomes of the Lists they started, or it is refused.
+
+Their own Lists used to go by cascade, so there was nothing to ask. The row now stays,
+which leaves those Lists nothing's job until somebody takes it, and the two answers are
+not interchangeable: one hands a household its shopping list, the other deletes it with
+everything on it.
+
+Refused when neither is given rather than defaulting. A field a caller forgot must not
+be the field that decides to destroy something, and the app cannot send neither by
+accident because the picker has no empty state.
+*/
+func TestRemovingAMemberSaysWhatBecomesOfTheirLists(t *testing.T) {
+	for _, one := range []struct {
+		what string
+		req  *apiv1.RemoveMemberRequest
+	}{
+		{"neither", &apiv1.RemoveMemberRequest{}},
+		{"both", &apiv1.RemoveMemberRequest{GiveListsToUid: "mem_anna", DeleteTheirLists: true}},
+	} {
+		t.Run(one.what, func(t *testing.T) {
+			f := newMemberFixture(t)
+			one.req.MemberUid = f.jonas.UID
+
+			_, err := f.svc.RemoveMember(f.as(t, f.anna), connect.NewRequest(one.req))
+			if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
+				t.Errorf("code = %v, want invalid_argument", got)
+			}
+		})
+	}
+}
+
+/*
+The Lists somebody started can be handed to whoever is left.
+
+The half of the question that had no answer before: a cascade cannot give anything to
+anybody, so this is what stops a household losing its shopping list when the person who
+happened to start it moves out.
+*/
+func TestAMembersListsCanBeGivenAway(t *testing.T) {
+	f := newMemberFixture(t)
+
+	uid := f.listOwnedBy(t, f.jonas, "Flat jobs")
+
+	if _, err := f.svc.RemoveMember(f.as(t, f.anna), connect.NewRequest(
+		&apiv1.RemoveMemberRequest{MemberUid: f.jonas.UID, GiveListsToUid: f.anna.UID},
+	)); err != nil {
+		t.Fatalf("RemoveMember: %v", err)
+	}
+
+	list, err := f.store.ListByUID(t.Context(), uid)
+	if err != nil {
+		t.Fatalf("his List is gone: %v", err)
+	}
+	if list.OwnerID != f.anna.ID {
+		t.Errorf("owner is %d, want Anna (%d)", list.OwnerID, f.anna.ID)
+	}
+}
+
 // The one removal nobody could undo.
 func TestAnAdminCannotRemoveThemselves(t *testing.T) {
 	f := newMemberFixture(t)
 
 	_, err := f.svc.RemoveMember(f.as(t, f.anna), connect.NewRequest(
-		&apiv1.RemoveMemberRequest{MemberUid: f.anna.UID},
+		&apiv1.RemoveMemberRequest{MemberUid: f.anna.UID, DeleteTheirLists: true},
 	))
 	if got := connect.CodeOf(err); got != connect.CodeFailedPrecondition {
 		t.Errorf("code = %v, want failed_precondition", got)

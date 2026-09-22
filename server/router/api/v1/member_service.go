@@ -323,6 +323,73 @@ func (s *MemberService) SetMemberRole(
 }
 
 /*
+errPickWhatBecomesOfTheirLists refuses a removal that did not say.
+
+Naming nobody and not asking for deletion is a request that forgot, and the answer to a
+request that forgot must not be the one that destroys a household's shopping.
+*/
+var errPickWhatBecomesOfTheirLists = connect.NewError(connect.CodeInvalidArgument,
+	errors.New("say who the lists they started go to, or that they are to be deleted"))
+
+// errCannotDoBoth refuses a removal that asked for both at once.
+var errCannotDoBoth = connect.NewError(connect.CodeInvalidArgument,
+	errors.New("their lists go to somebody or are deleted, not both"))
+
+// errCannotInheritThemselves refuses handing somebody's Lists to the person leaving.
+var errCannotInheritThemselves = connect.NewError(connect.CodeInvalidArgument,
+	errors.New("their lists cannot be given to the member being removed"))
+
+/*
+settleTheirLists does what the Admin said with the Lists a removed Member started.
+
+Their own Lists used to go by cascade, because removing a Member deleted the row. The
+row now stays, so that what they added to everybody else's Lists is not carried off with
+it, and that leaves these Lists nothing's job until somebody takes it.
+
+Giving them away is one statement. Deleting them is soft, where the cascade was hard, so
+what was on one is still in the database rather than gone from it.
+
+Done before the Member is emptied, while the row is still theirs to find the Lists by.
+*/
+func (s *MemberService) settleTheirLists(
+	ctx context.Context,
+	member store.Member,
+	msg *apiv1.RemoveMemberRequest,
+) error {
+	givingTo := msg.GetGiveListsToUid()
+	deleting := msg.GetDeleteTheirLists()
+
+	switch {
+	case givingTo == "" && !deleting:
+		return errPickWhatBecomesOfTheirLists
+	case givingTo != "" && deleting:
+		return errCannotDoBoth
+	}
+
+	if deleting {
+		owned, err := s.store.ListsOwnedBy(ctx, member.ID)
+		if err != nil {
+			return internalError("read the lists a member owns", err)
+		}
+		for _, list := range owned {
+			if err := s.store.DeleteList(ctx, list.UID, s.now()); err != nil {
+				return internalError("delete a removed member's list", err)
+			}
+		}
+		return nil
+	}
+
+	heir, err := s.memberByUID(ctx, givingTo)
+	if err != nil {
+		return err
+	}
+	if heir.ID == member.ID {
+		return errCannotInheritThemselves
+	}
+	return s.store.GiveListsTo(ctx, member.ID, heir.ID)
+}
+
+/*
 RemoveMember deletes an account and everything of theirs.
 
 Their Lists go with them and so does everything they put on anybody else's — see
@@ -357,25 +424,8 @@ func (s *MemberService) RemoveMember(
 		return nil, errLastAdmin
 	}
 
-	/*
-	 * Their Lists first, while the row is still theirs to find them by.
-	 *
-	 * These used to go by cascade, because removing a Member deleted the row. The row
-	 * now stays, so that what they added to everybody else's Lists is not carried off
-	 * with it, which means the Lists they own are nothing's job until something takes
-	 * it. Deleted here so that removing somebody does what it has always done.
-	 *
-	 * Soft, like every other deletion of a List, where the cascade was not. What is on
-	 * one is then still in the database rather than gone from it.
-	 */
-	owned, err := s.store.ListsOwnedBy(ctx, member.ID)
-	if err != nil {
-		return nil, internalError("read the lists a member owns", err)
-	}
-	for _, list := range owned {
-		if err := s.store.DeleteList(ctx, list.UID, s.now()); err != nil {
-			return nil, internalError("delete a removed member's list", err)
-		}
+	if err := s.settleTheirLists(ctx, member, req.Msg); err != nil {
+		return nil, err
 	}
 
 	if err := s.store.RemoveMember(ctx, member.ID, s.now()); err != nil {

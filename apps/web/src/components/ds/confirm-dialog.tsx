@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "./button"
@@ -18,6 +19,14 @@ export interface ConfirmDialogProps {
   confirmLabel: string
   /** Outlined, never filled — deleting is not the page's primary action. */
   destructive?: boolean
+  /**
+   * A control the decision needs, drawn under the blurb.
+   *
+   * Most confirmations are a question with two answers and carry none. Removing a Member
+   * is the one that cannot be: what becomes of the Lists they started is a second
+   * decision, and asking it anywhere but here would be asking it after the fact.
+   */
+  children?: ReactNode
   onConfirm: () => void
 }
 
@@ -29,6 +38,7 @@ export function ConfirmDialog({
   blurb,
   confirmLabel,
   destructive,
+  children,
   onConfirm,
 }: ConfirmDialogProps) {
   const { t } = useTranslation()
@@ -42,6 +52,7 @@ export function ConfirmDialog({
         <header className="flex flex-col gap-2 px-6.5 pt-6 pb-5">
           <h2 className="text-dialog">{title}</h2>
           <p className="text-field text-secondary-foreground">{blurb}</p>
+          {children}
         </header>
 
         <footer className="flex items-center gap-3 border-t border-hair px-6.5 py-3.5">

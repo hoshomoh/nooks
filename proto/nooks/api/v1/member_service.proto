@@ -158,6 +158,18 @@ message SetMemberRoleResponse {
 
 message RemoveMemberRequest {
   string member_uid = 1;
+
+  // Who the Lists they started are given to. Whoever removes somebody is the one who
+  // knows which of the household actually uses the shopping list, so this is a choice
+  // rather than always the Admin doing it.
+  string give_lists_to_uid = 2;
+
+  // Delete those Lists instead, with everything anybody has put on them.
+  //
+  // Exactly one of these two is required. Deleting is not what a caller gets by leaving
+  // a field out: a request naming neither is refused, so the destructive answer is one
+  // somebody gave rather than one they forgot to.
+  bool delete_their_lists = 3;
 }
 
 message RemoveMemberResponse {}

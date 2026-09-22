@@ -594,6 +594,28 @@ func (s *sqlStore) SetListArchived(ctx context.Context, uid string, memberID int
 }
 
 /*
+GiveListsTo hands every List one Member owns to another.
+
+One statement rather than a read and a loop of writes: the Lists are being moved because
+their owner is being removed, and a half-finished move would leave some of them owned by
+a row that is about to stop being a person.
+
+Already-deleted Lists are left where they are. Somebody who inherits a household's
+shopping has not asked to inherit what was thrown away.
+*/
+func (s *sqlStore) GiveListsTo(ctx context.Context, fromMemberID, toMemberID int64) error {
+	_, err := s.db.NewUpdate().
+		Model((*listModel)(nil)).
+		Set("owner_id = ?", toMemberID).
+		Where("owner_id = ? AND deleted_at = ''", fromMemberID).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("give lists to another member: %w", err)
+	}
+	return nil
+}
+
+/*
 ListsOwnedBy is the Lists a Member started, whatever they shared them with.
 
 Needed since removing a Member stopped deleting their row: list.owner_id is ON DELETE

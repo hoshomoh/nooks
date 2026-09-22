@@ -749,10 +749,20 @@ func (x *SetMemberRoleResponse) GetMember() *Member {
 }
 
 type RemoveMemberRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	MemberUid     string                 `protobuf:"bytes,1,opt,name=member_uid,json=memberUid,proto3" json:"member_uid,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	MemberUid string                 `protobuf:"bytes,1,opt,name=member_uid,json=memberUid,proto3" json:"member_uid,omitempty"`
+	// Who the Lists they started are given to. Whoever removes somebody is the one who
+	// knows which of the household actually uses the shopping list, so this is a choice
+	// rather than always the Admin doing it.
+	GiveListsToUid string `protobuf:"bytes,2,opt,name=give_lists_to_uid,json=giveListsToUid,proto3" json:"give_lists_to_uid,omitempty"`
+	// Delete those Lists instead, with everything anybody has put on them.
+	//
+	// Exactly one of these two is required. Deleting is not what a caller gets by leaving
+	// a field out: a request naming neither is refused, so the destructive answer is one
+	// somebody gave rather than one they forgot to.
+	DeleteTheirLists bool `protobuf:"varint,3,opt,name=delete_their_lists,json=deleteTheirLists,proto3" json:"delete_their_lists,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *RemoveMemberRequest) Reset() {
@@ -790,6 +800,20 @@ func (x *RemoveMemberRequest) GetMemberUid() string {
 		return x.MemberUid
 	}
 	return ""
+}
+
+func (x *RemoveMemberRequest) GetGiveListsToUid() string {
+	if x != nil {
+		return x.GiveListsToUid
+	}
+	return ""
+}
+
+func (x *RemoveMemberRequest) GetDeleteTheirLists() bool {
+	if x != nil {
+		return x.DeleteTheirLists
+	}
+	return false
 }
 
 type RemoveMemberResponse struct {
@@ -873,10 +897,12 @@ const file_nooks_api_v1_member_service_proto_rawDesc = "" +
 	"member_uid\x18\x01 \x01(\tR\tmemberUid\x12&\n" +
 	"\x04role\x18\x02 \x01(\x0e2\x12.nooks.api.v1.RoleR\x04role\"E\n" +
 	"\x15SetMemberRoleResponse\x12,\n" +
-	"\x06member\x18\x01 \x01(\v2\x14.nooks.api.v1.MemberR\x06member\"4\n" +
+	"\x06member\x18\x01 \x01(\v2\x14.nooks.api.v1.MemberR\x06member\"\x8d\x01\n" +
 	"\x13RemoveMemberRequest\x12\x1d\n" +
 	"\n" +
-	"member_uid\x18\x01 \x01(\tR\tmemberUid\"\x16\n" +
+	"member_uid\x18\x01 \x01(\tR\tmemberUid\x12)\n" +
+	"\x11give_lists_to_uid\x18\x02 \x01(\tR\x0egiveListsToUid\x12,\n" +
+	"\x12delete_their_lists\x18\x03 \x01(\bR\x10deleteTheirLists\"\x16\n" +
 	"\x14RemoveMemberResponse2\xd7\a\n" +
 	"\rMemberService\x12k\n" +
 	"\vListMembers\x12 .nooks.api.v1.ListMembersRequest\x1a!.nooks.api.v1.ListMembersResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/members\x12g\n" +

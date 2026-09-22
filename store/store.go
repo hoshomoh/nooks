@@ -206,6 +206,10 @@ type Store interface {
 	// by ListsForMember: it is out of the way, not gone.
 	SetListArchived(ctx context.Context, uid string, memberID int64, at time.Time) error
 
+	// GiveListsTo hands every List one Member owns to another, in one statement. Used
+	// when somebody is removed and their Lists are to be kept.
+	GiveListsTo(ctx context.Context, fromMemberID, toMemberID int64) error
+
 	// ListsOwnedBy is the Lists a Member started. Read when they are removed, since
 	// their row now stays and their Lists no longer go with it.
 	ListsOwnedBy(ctx context.Context, memberID int64) ([]List, error)

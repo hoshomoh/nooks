@@ -26,13 +26,28 @@ const TONES: Record<string, string> = {
 /**
  * How many releases the page carries.
  *
- * A project that ships small fixes often has a changelog that is mostly archaeology
- * within a year, and a page nobody scrolls is a page nobody reads. What somebody
- * arrives here to answer is "what changed since the version I am on", and that is
- * always near the top. Everything before it is on the releases page, which is already
- * paginated and already the canonical record.
+ * What somebody arrives here to answer is "what changed since the version I am on",
+ * which is near the top, and a page nobody scrolls is a page nobody reads. Everything
+ * further back is on the releases page, which is already paginated and already the
+ * canonical record.
+ *
+ * Ten rather than six because LINES below bounds each entry: a release contributes at
+ * most five lines however many commits went into it, so the length of this page is now
+ * something this file decides rather than something the size of a release decides. It
+ * was six when one release could be a hundred and twenty-two lines on its own.
  */
-const SHOWN = 6
+const SHOWN = 10
+
+/**
+ * How many lines of one release the page draws.
+ *
+ * A release gathers however many commits went into it, and a big one can carry sixty.
+ * Drawn in full they push every release under them off the screen, so the page stops
+ * answering the question it exists for: what changed since the version I am on. Five is
+ * enough to see the shape of a release and decide whether to read the rest, which is on
+ * GitHub with the binaries beside it.
+ */
+const LINES = 5
 
 export default async function Changelog() {
   const published = await releases()
@@ -103,7 +118,7 @@ function Entry({ release }: { release: Release }) {
       </div>
 
       <div className="flex min-w-0 flex-1 basis-95 flex-col gap-3.5">
-        {release.changes.map((change, index) => (
+        {release.changes.slice(0, LINES).map((change, index) => (
           <div key={index} className="flex items-baseline gap-3 text-chrome leading-[1.55]">
             <span
               className={`w-13.5 flex-none font-mono text-micro tracking-wide uppercase ${
@@ -115,6 +130,18 @@ function Entry({ release }: { release: Release }) {
             <span className="text-secondary-foreground">{change.text}</span>
           </div>
         ))}
+
+        {/* Sits in the same column as the lines it continues, so it reads as the end of
+            the list rather than as a second thing. The release's own tag page, not the
+            index: somebody following this wants the rest of this release. */}
+        {release.changes.length > LINES && (
+          <a
+            href={`${SOURCE}/releases/tag/${release.version}`}
+            className="self-start text-chrome text-muted-foreground underline underline-offset-3 hover:text-foreground"
+          >
+            {release.changes.length - LINES} more in {release.version}
+          </a>
+        )}
       </div>
     </div>
   )

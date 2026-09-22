@@ -91,4 +91,42 @@ describe("how much the page carries", () => {
     const versions = readReleases(many(3)).map((release) => release.version)
     expect(versions).toEqual(["v1.3.0", "v1.2.0", "v1.1.0"])
   })
+
+  /*
+   * A version reads as the git tag of the same release.
+   *
+   * The changelog page shows the first few lines of a big release and links the rest to
+   * that release on GitHub, at `/releases/tag/<version>`. So the string this parser
+   * builds is half of an address, and the other half is what release-please tagged.
+   * Drop the `v` and every one of those links is a 404, with nothing failing here or at
+   * build time to say so: `check-links.mjs` compares internal links against built pages
+   * and never leaves the site.
+   *
+   * The release-please heading is written two ways in the real file, with a compare
+   * link and without, and 1.0.0 is the one without. Both have to come out tagged.
+   */
+  it("reads as the tag the release was made under", () => {
+    const written = [
+      "# Changelog",
+      "",
+      "## [1.4.1](https://github.com/hoshomoh/nooks/compare/v1.4.0...v1.4.1) (2026-09-16)",
+      "",
+      "### Fixed",
+      "",
+      "* a thing",
+      "",
+      "## 1.0.0 (2026-09-13)",
+      "",
+      "### New",
+      "",
+      "* the first one",
+      "",
+    ].join("\n")
+
+    const versions = readReleases(written).map((release) => release.version)
+    expect(versions).toEqual(["v1.4.1", "v1.0.0"])
+    for (const version of versions) {
+      expect(version, `${version} is not shaped like a tag`).toMatch(/^v\d+\.\d+\.\d+$/)
+    }
+  })
 })

@@ -61,8 +61,10 @@ type AuthServiceClient interface {
 	// ReplacePassword sets a new password for the signed-in Member. A Member who was
 	// given a temporary password must call this before they can use Nooks.
 	ReplacePassword(ctx context.Context, in *ReplacePasswordRequest, opts ...grpc.CallOption) (*ReplacePasswordResponse, error)
-	// RequestJoin asks an Admin for an account. It is how a Visitor gets in when public
-	// signup is off, which is the default.
+	// RequestJoin asks an Admin for an account. Every account begins this way: the request
+	// waits in Activity until an Admin approves it and hands over a temporary password.
+	// Anybody who can reach the Instance may ask; the approval is what keeps the door
+	// shut.
 	RequestJoin(ctx context.Context, in *RequestJoinRequest, opts ...grpc.CallOption) (*RequestJoinResponse, error)
 	// GetJoinRequest reports whether an Admin has decided yet. The Visitor's browser
 	// remembers the request id and comes back to the same address.
@@ -235,8 +237,10 @@ type AuthServiceServer interface {
 	// ReplacePassword sets a new password for the signed-in Member. A Member who was
 	// given a temporary password must call this before they can use Nooks.
 	ReplacePassword(context.Context, *ReplacePasswordRequest) (*ReplacePasswordResponse, error)
-	// RequestJoin asks an Admin for an account. It is how a Visitor gets in when public
-	// signup is off, which is the default.
+	// RequestJoin asks an Admin for an account. Every account begins this way: the request
+	// waits in Activity until an Admin approves it and hands over a temporary password.
+	// Anybody who can reach the Instance may ask; the approval is what keeps the door
+	// shut.
 	RequestJoin(context.Context, *RequestJoinRequest) (*RequestJoinResponse, error)
 	// GetJoinRequest reports whether an Admin has decided yet. The Visitor's browser
 	// remembers the request id and comes back to the same address.

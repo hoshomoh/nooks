@@ -756,8 +756,10 @@ export const AuthService: GenService<{
     output: typeof ReplacePasswordResponseSchema;
   },
   /**
-   * RequestJoin asks an Admin for an account. It is how a Visitor gets in when public
-   * signup is off, which is the default.
+   * RequestJoin asks an Admin for an account. Every account begins this way: the request
+   * waits in Activity until an Admin approves it and hands over a temporary password.
+   * Anybody who can reach the Instance may ask; the approval is what keeps the door
+   * shut.
    *
    * @generated from rpc nooks.api.v1.AuthService.RequestJoin
    */

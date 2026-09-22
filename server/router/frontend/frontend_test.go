@@ -124,6 +124,7 @@ func TestThePolicyShutsTheDoors(t *testing.T) {
 		"object-src 'none'",
 		"base-uri 'self'",
 		"form-action 'self'",
+		"frame-ancestors 'none'",
 	} {
 		if !strings.Contains(policy, want) {
 			t.Errorf("policy = %q, want %q in it", policy, want)

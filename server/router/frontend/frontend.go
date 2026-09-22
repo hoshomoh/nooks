@@ -107,6 +107,11 @@ a way to inject a script into a page would still have nowhere to load one from.
 style-src allows inline because the menus and popovers position themselves by writing a
 style attribute, which is what style-src governs. Pinning those would mean pinning a
 number that moves with the pointer.
+
+frame-ancestors is 'none' rather than 'self'. Nothing here frames this page, so 'self'
+would allow something no part of the app needs, and one frame is all the attack takes: a
+page loads this one invisibly, lines its own buttons up over the Member's, and collects
+the presses. What they think they are dismissing is what deletes a List.
 */
 const policyRules = "default-src 'self'; " +
 	"style-src 'self' 'unsafe-inline'; " +
@@ -115,6 +120,7 @@ const policyRules = "default-src 'self'; " +
 	"connect-src 'self'; " +
 	"object-src 'none'; " +
 	"base-uri 'self'; " +
+	"frame-ancestors 'none'; " +
 	"form-action 'self'"
 
 // inlineScript finds a script written into the page rather than loaded by it.

@@ -413,6 +413,41 @@ func TestAnAssistantCanFindWhatItArchived(t *testing.T) {
 }
 
 /*
+An archived List stays searchable, which archive_list tells an assistant it does.
+
+"It keeps its items and stays searchable, this is not deleting" is what the tool says,
+and an assistant repeats it to whoever asked. It is true by nothing: neither the store's
+Search nor the service filters archived Lists out, so the claim holds because no one has
+written the filter rather than because anything keeps them from it.
+
+Filtering archived Lists out of search is a reasonable thing for somebody to want, and
+doing it would make the sentence above false in the one place a machine reads it and
+acts. So the claim is held here instead.
+*/
+func TestAnArchivedListStaysSearchable(t *testing.T) {
+	i := newInstance(t)
+	i.withItem("Tarpaulin", "")
+	session := i.connect(i.tokenFor(store.TokenAbilities{Read: true, Write: true}))
+
+	if _, err := session.CallTool(t.Context(), &sdk.CallToolParams{
+		Name: "archive_list", Arguments: map[string]any{"list_uid": i.listUID, "archived": true},
+	}); err != nil {
+		t.Fatalf("archive_list: %v", err)
+	}
+
+	found, err := session.CallTool(t.Context(), &sdk.CallToolParams{
+		Name: "search", Arguments: map[string]any{"query": "Tarpaulin"},
+	})
+	if err != nil {
+		t.Fatalf("search: %v", err)
+	}
+	if !strings.Contains(said(found), "Tarpaulin") {
+		t.Errorf("search after archiving = %q, want the Item still found: archive_list "+
+			"tells an assistant that archiving is not deleting", said(found))
+	}
+}
+
+/*
 A rewritten Note can be refused rather than overwriting somebody.
 
 The API offers this and the tool did not, which left an assistant as the one caller that

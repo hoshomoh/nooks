@@ -40,9 +40,10 @@ arrive creates the owner account and names the instance.
 ./scripts/ci.sh
 ```
 
-Everything CI runs, in the same order: the Go build, vet, tests and formatting; proto
-lint, format and a breaking-change check against `main`; the web typecheck, lint and
-tests; the app build; and what a first visit costs.
+Everything CI runs, in the same order: the Go build, vet, tests and formatting; the
+protos, the bindings generated from them and a breaking-change check against `main`;
+the shared package; the web app and the website, each linted, typechecked and tested;
+the app build; and what a first visit costs.
 
 It takes a few minutes. It is faster than finding out from CI, and much faster than
 finding out from somebody using it.

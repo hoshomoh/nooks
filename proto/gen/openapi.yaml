@@ -769,6 +769,7 @@ paths:
         get:
             tags:
                 - ListService
+            description: GetList returns one List and its Items, in their manual order.
             operationId: ListService_GetList
             parameters:
                 - name: listUid
@@ -792,6 +793,7 @@ paths:
         delete:
             tags:
                 - ListService
+            description: DeleteList removes a List and the Items on it. Only its owner may.
             operationId: ListService_DeleteList
             parameters:
                 - name: listUid
@@ -847,9 +849,9 @@ paths:
             tags:
                 - ListService
             description: |-
-                DeleteList removes a List and the Items on it. Only its owner may.
-                 Puts a List out of the sidebar, or brings it back. Archiving is not deleting: what
-                 is archived keeps its Items and can be restored.
+                SetListArchived puts a List out of the sidebar, or brings it back. Only its owner
+                 may: archiving a shared List takes it out of everybody's sidebar. Archiving is not
+                 deleting — what is archived keeps its Items and can be restored.
             operationId: ListService_SetListArchived
             parameters:
                 - name: listUid
@@ -1306,8 +1308,8 @@ paths:
             tags:
                 - ListService
             description: |-
-                GetList returns one List and its Items, in their manual order.
-                 The four groups a sidebar draws, each capped and each saying how many there are.
+                GetSidebar returns the four groups a sidebar draws, each capped and each saying how
+                 many there are.
 
                  Its own call rather than a page of ListLists: a sidebar is four bounded reads with
                  four totals, and asking for that as pages would be four round trips to draw one
@@ -1819,7 +1821,9 @@ components:
                     description: False means whoever it is shared with may see and print it, but not tick or add.
                 isOwner:
                     type: boolean
-                    description: Whether the signed-in Member owns it. Only an owner may rename, share or delete.
+                    description: |-
+                        Whether the signed-in Member owns it. Only an owner may rename, share, archive or
+                         delete it.
                 isPinned:
                     type: boolean
                     description: Whether the signed-in Member has pinned it to their own sidebar.

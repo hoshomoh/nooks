@@ -85,13 +85,14 @@ type ListServiceClient interface {
 	// and ordered as asked. What a page holds is the server's own promise about how much
 	// work one read is, so a caller asking for more than the ceiling gets the ceiling.
 	ListLists(context.Context, *connect.Request[v1.ListListsRequest]) (*connect.Response[v1.ListListsResponse], error)
-	// GetList returns one List and its Items, in their manual order.
-	// The four groups a sidebar draws, each capped and each saying how many there are.
+	// GetSidebar returns the four groups a sidebar draws, each capped and each saying how
+	// many there are.
 	//
 	// Its own call rather than a page of ListLists: a sidebar is four bounded reads with
 	// four totals, and asking for that as pages would be four round trips to draw one
 	// column.
 	GetSidebar(context.Context, *connect.Request[v1.GetSidebarRequest]) (*connect.Response[v1.GetSidebarResponse], error)
+	// GetList returns one List and its Items, in their manual order.
 	GetList(context.Context, *connect.Request[v1.GetListRequest]) (*connect.Response[v1.GetListResponse], error)
 	// GetItem returns one Item, including its Note in full.
 	//
@@ -107,10 +108,11 @@ type ListServiceClient interface {
 	SetListSharing(context.Context, *connect.Request[v1.SetListSharingRequest]) (*connect.Response[v1.SetListSharingResponse], error)
 	// GetListShares returns who a List reaches by name, for the share dialog.
 	GetListShares(context.Context, *connect.Request[v1.GetListSharesRequest]) (*connect.Response[v1.GetListSharesResponse], error)
-	// DeleteList removes a List and the Items on it. Only its owner may.
-	// Puts a List out of the sidebar, or brings it back. Archiving is not deleting: what
-	// is archived keeps its Items and can be restored.
+	// SetListArchived puts a List out of the sidebar, or brings it back. Only its owner
+	// may: archiving a shared List takes it out of everybody's sidebar. Archiving is not
+	// deleting — what is archived keeps its Items and can be restored.
 	SetListArchived(context.Context, *connect.Request[v1.SetListArchivedRequest]) (*connect.Response[v1.SetListArchivedResponse], error)
+	// DeleteList removes a List and the Items on it. Only its owner may.
 	DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error)
 	// DuplicateList copies a List and the Items still open on it.
 	//
@@ -395,13 +397,14 @@ type ListServiceHandler interface {
 	// and ordered as asked. What a page holds is the server's own promise about how much
 	// work one read is, so a caller asking for more than the ceiling gets the ceiling.
 	ListLists(context.Context, *connect.Request[v1.ListListsRequest]) (*connect.Response[v1.ListListsResponse], error)
-	// GetList returns one List and its Items, in their manual order.
-	// The four groups a sidebar draws, each capped and each saying how many there are.
+	// GetSidebar returns the four groups a sidebar draws, each capped and each saying how
+	// many there are.
 	//
 	// Its own call rather than a page of ListLists: a sidebar is four bounded reads with
 	// four totals, and asking for that as pages would be four round trips to draw one
 	// column.
 	GetSidebar(context.Context, *connect.Request[v1.GetSidebarRequest]) (*connect.Response[v1.GetSidebarResponse], error)
+	// GetList returns one List and its Items, in their manual order.
 	GetList(context.Context, *connect.Request[v1.GetListRequest]) (*connect.Response[v1.GetListResponse], error)
 	// GetItem returns one Item, including its Note in full.
 	//
@@ -417,10 +420,11 @@ type ListServiceHandler interface {
 	SetListSharing(context.Context, *connect.Request[v1.SetListSharingRequest]) (*connect.Response[v1.SetListSharingResponse], error)
 	// GetListShares returns who a List reaches by name, for the share dialog.
 	GetListShares(context.Context, *connect.Request[v1.GetListSharesRequest]) (*connect.Response[v1.GetListSharesResponse], error)
-	// DeleteList removes a List and the Items on it. Only its owner may.
-	// Puts a List out of the sidebar, or brings it back. Archiving is not deleting: what
-	// is archived keeps its Items and can be restored.
+	// SetListArchived puts a List out of the sidebar, or brings it back. Only its owner
+	// may: archiving a shared List takes it out of everybody's sidebar. Archiving is not
+	// deleting — what is archived keeps its Items and can be restored.
 	SetListArchived(context.Context, *connect.Request[v1.SetListArchivedRequest]) (*connect.Response[v1.SetListArchivedResponse], error)
+	// DeleteList removes a List and the Items on it. Only its owner may.
 	DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error)
 	// DuplicateList copies a List and the Items still open on it.
 	//

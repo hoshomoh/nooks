@@ -14,8 +14,8 @@ service ListService {
     option (google.api.http) = {get: "/api/v1/lists"};
   }
 
-  // GetList returns one List and its Items, in their manual order.
-  // The four groups a sidebar draws, each capped and each saying how many there are.
+  // GetSidebar returns the four groups a sidebar draws, each capped and each saying how
+  // many there are.
   //
   // Its own call rather than a page of ListLists: a sidebar is four bounded reads with
   // four totals, and asking for that as pages would be four round trips to draw one
@@ -24,6 +24,7 @@ service ListService {
     option (google.api.http) = {get: "/api/v1/sidebar"};
   }
 
+  // GetList returns one List and its Items, in their manual order.
   rpc GetList(GetListRequest) returns (GetListResponse) {
     option (google.api.http) = {get: "/api/v1/lists/{list_uid}"};
   }
@@ -66,9 +67,9 @@ service ListService {
     option (google.api.http) = {get: "/api/v1/lists/{list_uid}/shares"};
   }
 
-  // DeleteList removes a List and the Items on it. Only its owner may.
-  // Puts a List out of the sidebar, or brings it back. Archiving is not deleting: what
-  // is archived keeps its Items and can be restored.
+  // SetListArchived puts a List out of the sidebar, or brings it back. Only its owner
+  // may: archiving a shared List takes it out of everybody's sidebar. Archiving is not
+  // deleting — what is archived keeps its Items and can be restored.
   rpc SetListArchived(SetListArchivedRequest) returns (SetListArchivedResponse) {
     option (google.api.http) = {
       post: "/api/v1/lists/{list_uid}/archived"
@@ -76,6 +77,7 @@ service ListService {
     };
   }
 
+  // DeleteList removes a List and the Items on it. Only its owner may.
   rpc DeleteList(DeleteListRequest) returns (DeleteListResponse) {
     option (google.api.http) = {delete: "/api/v1/lists/{list_uid}"};
   }
@@ -175,7 +177,8 @@ message List {
   // False means whoever it is shared with may see and print it, but not tick or add.
   bool can_edit = 4;
 
-  // Whether the signed-in Member owns it. Only an owner may rename, share or delete.
+  // Whether the signed-in Member owns it. Only an owner may rename, share, archive or
+  // delete it.
   bool is_owner = 5;
 
   // Whether the signed-in Member has pinned it to their own sidebar.

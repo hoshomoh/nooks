@@ -42,7 +42,8 @@ export type List = Message<"nooks.api.v1.List"> & {
   canEdit: boolean;
 
   /**
-   * Whether the signed-in Member owns it. Only an owner may rename, share or delete.
+   * Whether the signed-in Member owns it. Only an owner may rename, share, archive or
+   * delete it.
    *
    * @generated from field: bool is_owner = 5;
    */
@@ -1299,8 +1300,8 @@ export const ListService: GenService<{
     output: typeof ListListsResponseSchema;
   },
   /**
-   * GetList returns one List and its Items, in their manual order.
-   * The four groups a sidebar draws, each capped and each saying how many there are.
+   * GetSidebar returns the four groups a sidebar draws, each capped and each saying how
+   * many there are.
    *
    * Its own call rather than a page of ListLists: a sidebar is four bounded reads with
    * four totals, and asking for that as pages would be four round trips to draw one
@@ -1314,6 +1315,8 @@ export const ListService: GenService<{
     output: typeof GetSidebarResponseSchema;
   },
   /**
+   * GetList returns one List and its Items, in their manual order.
+   *
    * @generated from rpc nooks.api.v1.ListService.GetList
    */
   getList: {
@@ -1376,9 +1379,9 @@ export const ListService: GenService<{
     output: typeof GetListSharesResponseSchema;
   },
   /**
-   * DeleteList removes a List and the Items on it. Only its owner may.
-   * Puts a List out of the sidebar, or brings it back. Archiving is not deleting: what
-   * is archived keeps its Items and can be restored.
+   * SetListArchived puts a List out of the sidebar, or brings it back. Only its owner
+   * may: archiving a shared List takes it out of everybody's sidebar. Archiving is not
+   * deleting — what is archived keeps its Items and can be restored.
    *
    * @generated from rpc nooks.api.v1.ListService.SetListArchived
    */
@@ -1388,6 +1391,8 @@ export const ListService: GenService<{
     output: typeof SetListArchivedResponseSchema;
   },
   /**
+   * DeleteList removes a List and the Items on it. Only its owner may.
+   *
    * @generated from rpc nooks.api.v1.ListService.DeleteList
    */
   deleteList: {

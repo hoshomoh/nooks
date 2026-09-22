@@ -248,7 +248,8 @@ type List struct {
 	Sharing Sharing                `protobuf:"varint,3,opt,name=sharing,proto3,enum=nooks.api.v1.Sharing" json:"sharing,omitempty"`
 	// False means whoever it is shared with may see and print it, but not tick or add.
 	CanEdit bool `protobuf:"varint,4,opt,name=can_edit,json=canEdit,proto3" json:"can_edit,omitempty"`
-	// Whether the signed-in Member owns it. Only an owner may rename, share or delete.
+	// Whether the signed-in Member owns it. Only an owner may rename, share, archive or
+	// delete it.
 	IsOwner bool `protobuf:"varint,5,opt,name=is_owner,json=isOwner,proto3" json:"is_owner,omitempty"`
 	// Whether the signed-in Member has pinned it to their own sidebar.
 	IsPinned bool `protobuf:"varint,6,opt,name=is_pinned,json=isPinned,proto3" json:"is_pinned,omitempty"`

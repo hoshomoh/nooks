@@ -71,9 +71,28 @@ describe("markdown survives being edited", () => {
 })
 
 describe("markdown the design does not have", () => {
-  // A Member's words matter more than the shape they arrived in.
+  /*
+   * A Member's words matter more than the shape they arrived in.
+   *
+   * A bullet list, because that is the block type Nooks has no drawing for. `markerOf`
+   * has no `- ` among its prefixes, so `- milk` falls through to a paragraph whose
+   * marker length is zero, and the dash stays part of the words. A `- ` prefix added
+   * there would consume the marker and the Member would lose it.
+   *
+   * This used to say `| a | table |` and stopped meaning anything when tables became
+   * one of the seven blocks the design draws. It passed either way, because a single
+   * pipe row with no separator under it is not a table to begin with: it is text with
+   * pipes in it, which would survive whatever the design did.
+   *
+   * The MCP `update_item` tool promises this to an assistant in as many words, so that
+   * an assistant writing a shopping list knows the characters are kept rather than
+   * dropped: "Bullet and numbered lists are not rendered and survive as the literal
+   * characters typed, so use a checklist instead."
+   */
   it("keeps the text of a block type Nooks cannot draw", () => {
-    expect(roundTrip("| a | table |")).toBe("| a | table |")
+    expect(documentFrom("- milk").content?.[0]?.type).toBe("paragraph")
+    expect(roundTrip("- milk")).toBe("- milk")
+    expect(roundTrip("1. milk")).toBe("1. milk")
   })
 
   // Every heading is the one size the design has, so a bigger one comes back as that.

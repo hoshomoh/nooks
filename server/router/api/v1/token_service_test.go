@@ -79,6 +79,10 @@ func TestCuttingATokenHandsTheSecretOverOnce(t *testing.T) {
 
 // A key to no door. Refusing is kinder than handing somebody a secret that answers
 // nothing.
+//
+// Which refusal it is, not only that there was one: naming no Lists and saying nothing
+// about abilities are two different requests to get wrong, and both answer
+// invalid_argument. A test that stopped at the code would pass with either check gone.
 func TestATokenHasToReachSomething(t *testing.T) {
 	f := newListFixture(t)
 
@@ -89,6 +93,9 @@ func TestATokenHasToReachSomething(t *testing.T) {
 	))
 	if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
 		t.Errorf("code = %v, want invalid_argument", got)
+	}
+	if got := fmt.Sprint(err); !strings.Contains(got, "say which lists") {
+		t.Errorf("refused with %q, want it to ask which Lists the token may reach", got)
 	}
 }
 
@@ -394,8 +401,13 @@ func TestATokenForAllListsReachesOnesMadeLater(t *testing.T) {
 	}
 }
 
-// A token that reaches nothing is a key to no door.
-func TestATokenMustReachSomething(t *testing.T) {
+// A token nobody chose the shape of is a token nobody can reason about later.
+//
+// Named for what it asks. It sends neither abilities nor Lists and the abilities are
+// checked first, so it was standing in for TestATokenHasToReachSomething above under a
+// name that said so: with the abilities check gone it would fall through to the Lists
+// one, get invalid_argument from that instead, and pass.
+func TestATokenMustSayWhatItMayDo(t *testing.T) {
 	f := newListFixture(t)
 
 	_, err := f.tokens(t).CreateAccessToken(f.as(t, f.anna), connect.NewRequest(
@@ -403,5 +415,8 @@ func TestATokenMustReachSomething(t *testing.T) {
 	))
 	if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
 		t.Errorf("code = %v, want invalid_argument", got)
+	}
+	if got := fmt.Sprint(err); !strings.Contains(got, "say what the token may do") {
+		t.Errorf("refused with %q, want it to ask what the token may do", got)
 	}
 }

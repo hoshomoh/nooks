@@ -292,11 +292,17 @@ func (s *Server) keepHouse(ctx context.Context) {
 }
 
 /*
-tidyUp clears out what has expired and has the database look at itself again.
+tidyUp clears out what has aged out and has the database look at itself again.
 
-Both are logged and carried on with rather than returned. A session row that outlives
-its expiry is already refused on sight, and statistics going stale makes an Instance
-slower rather than wrong; neither is a reason to stop serving the shopping list.
+Every one of them is logged and carried on with rather than returned, and none is worth
+stopping for. A session row that outlives its expiry is already refused on sight, an
+Activity row past the fifty the panel draws is unreachable either way, a request nobody
+has asked about in a month is history the entry beside it already keeps, and statistics
+going stale makes an Instance slower rather than wrong. None of that is a reason to stop
+serving the shopping list.
+
+Counted in none of the prose above, deliberately. This said "both" while doing three
+things, having been written when it did two.
 */
 func (s *Server) tidyUp(ctx context.Context) {
 	// Expiry is enforced when a session is read, so these rows change nothing about who
@@ -318,6 +324,18 @@ func (s *Server) tidyUp(ctx context.Context) {
 		s.log.Warn("could not clear unreadable activity", "error", err)
 	case gone > 0:
 		s.log.Info("cleared activity nothing could read", "count", gone)
+	}
+
+	// Answered, and long enough ago that nobody is still asking about it. What happened
+	// is kept by the Activity entry beside it either way. A request nobody has answered
+	// is never swept, whatever age it reaches, which is the rule that keeps somebody
+	// locked out from waiting on a decision no Admin can see.
+	before := time.Now().Add(-store.DecidedRequestLifetime)
+	switch gone, err := s.store.DeleteDecidedRequests(ctx, before); {
+	case err != nil:
+		s.log.Warn("could not clear decided requests", "error", err)
+	case gone > 0:
+		s.log.Info("cleared requests decided long ago", "count", gone)
 	}
 
 	if err := s.store.Analyse(ctx); err != nil {

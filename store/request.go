@@ -84,6 +84,49 @@ func (s *sqlStore) CreateJoinRequest(ctx context.Context, params CreateJoinReque
 	return row.toJoinRequest()
 }
 
+/*
+DecidedRequestLifetime is how long an answered request is kept before it goes.
+
+A request that has been approved or ignored is history, and history here is already kept
+by the Activity entry beside it, which carries what happened and what was decided. The
+row itself is only needed until nobody could reasonably still be asking about it.
+
+Thirty days, matching how long a deleted List is recoverable, because they are the same
+kind of promise: a month is long enough to notice a mistake and short enough that the
+table does not grow for the life of the Instance.
+*/
+const DecidedRequestLifetime = 30 * 24 * time.Hour
+
+/*
+DeleteDecidedRequests clears out requests an Admin answered long enough ago, and reports
+how many went.
+
+A request nobody has answered is never touched, whatever age it reaches. That is the
+rule pass 39 was written for: Activity is the only place a join or a reset appears, and
+sweeping one leaves somebody locked out waiting on a decision no Admin can see.
+*/
+func (s *sqlStore) DeleteDecidedRequests(ctx context.Context, before time.Time) (int64, error) {
+	cutoff := formatTime(before)
+
+	var swept int64
+	for _, model := range []any{(*joinRequestModel)(nil), (*resetRequestModel)(nil)} {
+		result, err := s.db.NewDelete().
+			Model(model).
+			Where("status <> ? AND decided_at <> '' AND decided_at <= ?",
+				string(StatusPending), cutoff).
+			Exec(ctx)
+		if err != nil {
+			return swept, fmt.Errorf("delete decided requests: %w", err)
+		}
+		gone, err := result.RowsAffected()
+		if err != nil {
+			return swept, fmt.Errorf("rows affected: %w", err)
+		}
+		swept += gone
+	}
+	return swept, nil
+}
+
 // PendingJoinRequests lists the requests waiting for an Admin, oldest first.
 func (s *sqlStore) PendingJoinRequests(ctx context.Context) ([]JoinRequest, error) {
 	var rows []joinRequestModel

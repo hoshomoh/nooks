@@ -180,3 +180,98 @@ func TestRequestNotFound(t *testing.T) {
 		})
 	}
 }
+
+/*
+An answered request is swept eventually, and an unanswered one never is.
+
+The second half is the one that matters and it is why this is a rule rather than a
+retention setting. nooks sends no email, so a join or a reset appears in exactly one
+place: the Activity panel. A sweep that took an undecided request would leave somebody
+locked out waiting on a decision no Admin can see, which is what pass 39 found the last
+time a sweep here was written without that rule in it.
+
+What is swept is history the Activity entry beside it already carries: what happened,
+and what an Admin decided about it.
+*/
+func TestOnlyAnAnsweredRequestIsSwept(t *testing.T) {
+	// The cutoff, worked out the way tidyUp works it out, so this reads like the caller
+	// rather than like the query.
+	cutoffAt := func(now time.Time) time.Time { return now.Add(-DecidedRequestLifetime) }
+	longAfter := cutoffAt(createdAt.Add(DecidedRequestLifetime).Add(time.Hour))
+
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			member := newMember(t, s)
+
+			waiting, err := s.CreateJoinRequest(t.Context(), joinParams())
+			if err != nil {
+				t.Fatalf("CreateJoinRequest: %v", err)
+			}
+
+			answered := joinParams()
+			answered.UID = "req_mara"
+			answered.Email = "mara@example.com"
+			decided, err := s.CreateJoinRequest(t.Context(), answered)
+			if err != nil {
+				t.Fatalf("CreateJoinRequest: %v", err)
+			}
+			if err := s.DecideJoinRequest(t.Context(), decided.UID, StatusIgnored, createdAt); err != nil {
+				t.Fatalf("DecideJoinRequest: %v", err)
+			}
+
+			reset, err := s.CreateResetRequest(t.Context(), "req_reset", member.ID, createdAt)
+			if err != nil {
+				t.Fatalf("CreateResetRequest: %v", err)
+			}
+			if err := s.DecideResetRequest(t.Context(), reset.UID, StatusApproved, createdAt); err != nil {
+				t.Fatalf("DecideResetRequest: %v", err)
+			}
+
+			gone, err := s.DeleteDecidedRequests(t.Context(), longAfter)
+			if err != nil {
+				t.Fatalf("DeleteDecidedRequests: %v", err)
+			}
+			if gone != 2 {
+				t.Errorf("swept %d, want the answered join and the answered reset", gone)
+			}
+
+			// The one nobody answered, however long it has been waiting.
+			if _, err := s.JoinRequestByUID(t.Context(), waiting.UID); err != nil {
+				t.Errorf("the request nobody answered is %v, and sweeping it is the fault "+
+					"this rule exists for", err)
+			}
+			if _, err := s.JoinRequestByUID(t.Context(), decided.UID); !errors.Is(err, ErrNotFound) {
+				t.Errorf("the answered request is %v, want it swept", err)
+			}
+		})
+	}
+}
+
+// Nothing is swept before its time, or a mistake stops being recoverable early.
+func TestAnAnsweredRequestIsKeptForItsMonth(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+
+			request, err := s.CreateJoinRequest(t.Context(), joinParams())
+			if err != nil {
+				t.Fatalf("CreateJoinRequest: %v", err)
+			}
+			if err := s.DecideJoinRequest(t.Context(), request.UID, StatusIgnored, createdAt); err != nil {
+				t.Fatalf("DecideJoinRequest: %v", err)
+			}
+
+			// An hour short of the month, from the caller's side.
+			anHourEarly := createdAt.Add(DecidedRequestLifetime).Add(-time.Hour).
+				Add(-DecidedRequestLifetime)
+			gone, err := s.DeleteDecidedRequests(t.Context(), anHourEarly)
+			if err != nil {
+				t.Fatalf("DeleteDecidedRequests: %v", err)
+			}
+			if gone != 0 {
+				t.Errorf("swept %d an hour before the month was up, want none", gone)
+			}
+		})
+	}
+}

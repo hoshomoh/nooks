@@ -150,6 +150,10 @@ type Store interface {
 	// CreateJoinRequest records a Visitor's request for an account.
 	CreateJoinRequest(ctx context.Context, params CreateJoinRequestParams) (JoinRequest, error)
 
+	// DeleteDecidedRequests clears out requests answered before the given moment, and
+	// reports how many went. One nobody has answered is never touched.
+	DeleteDecidedRequests(ctx context.Context, before time.Time) (int64, error)
+
 	// PendingJoinRequests lists what is waiting for an Admin, oldest first.
 	PendingJoinRequests(ctx context.Context) ([]JoinRequest, error)
 

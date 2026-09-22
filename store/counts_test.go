@@ -70,8 +70,8 @@ func TestRemovingAMemberLeavesTheCountsTrue(t *testing.T) {
 		t.Fatalf("open count = %d before anybody left, want 3", before.OpenCount)
 	}
 
-	if err := s.DeleteMember(t.Context(), jonas.ID); err != nil {
-		t.Fatalf("DeleteMember: %v", err)
+	if err := s.RemoveMember(t.Context(), jonas.ID, createdAt); err != nil {
+		t.Fatalf("RemoveMember: %v", err)
 	}
 
 	items, err := s.ItemsOnList(t.Context(), list.ID)
@@ -232,8 +232,8 @@ func TestTheCountsAgreeAfterEveryThingThatChangesThem(t *testing.T) {
 			}
 		}},
 		{"the Member who added things removed", func() {
-			if err := s.DeleteMember(t.Context(), jonas.ID); err != nil {
-				t.Fatalf("DeleteMember: %v", err)
+			if err := s.RemoveMember(t.Context(), jonas.ID, createdAt); err != nil {
+				t.Fatalf("RemoveMember: %v", err)
 			}
 		}},
 	} {

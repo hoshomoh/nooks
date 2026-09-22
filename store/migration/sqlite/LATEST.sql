@@ -21,7 +21,11 @@ CREATE TABLE member (
   must_change_password BOOLEAN NOT NULL DEFAULT FALSE,
   created_at           TEXT    NOT NULL,
   -- Empty until the Member has signed in at least once.
-  last_signed_in_at    TEXT    NOT NULL DEFAULT ''
+  last_signed_in_at    TEXT    NOT NULL DEFAULT '',
+  -- Set when an Admin removes them. The row stays so that what they added to other
+  -- people's Lists is not carried off by a cascade; everything that made it a person
+  -- is emptied. Every read of the member list filters on this being empty.
+  removed_at           TEXT    NOT NULL DEFAULT ''
 );
 
 -- A signed-in browser. Only the hash of the token is stored, so a stolen database does

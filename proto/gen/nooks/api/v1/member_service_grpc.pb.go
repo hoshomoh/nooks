@@ -55,8 +55,9 @@ type MemberServiceClient interface {
 	AddMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*AddMemberResponse, error)
 	// SetMemberRole makes somebody an Admin, or stops them being one.
 	SetMemberRole(ctx context.Context, in *SetMemberRoleRequest, opts ...grpc.CallOption) (*SetMemberRoleResponse, error)
-	// RemoveMember deletes an account and everything of theirs: the Lists they started,
-	// and whatever they added to anybody else's. Nothing of theirs is left behind.
+	// RemoveMember closes an account and deletes the Lists they started. What they added
+	// to anybody else's Lists stays, with their name gone from it: a household's shopping
+	// is not one person's to take away by leaving.
 	RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*RemoveMemberResponse, error)
 	// UpdateOwnProfile changes the signed-in Member's own name and email.
 	//
@@ -179,8 +180,9 @@ type MemberServiceServer interface {
 	AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error)
 	// SetMemberRole makes somebody an Admin, or stops them being one.
 	SetMemberRole(context.Context, *SetMemberRoleRequest) (*SetMemberRoleResponse, error)
-	// RemoveMember deletes an account and everything of theirs: the Lists they started,
-	// and whatever they added to anybody else's. Nothing of theirs is left behind.
+	// RemoveMember closes an account and deletes the Lists they started. What they added
+	// to anybody else's Lists stays, with their name gone from it: a household's shopping
+	// is not one person's to take away by leaving.
 	RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error)
 	// UpdateOwnProfile changes the signed-in Member's own name and email.
 	//

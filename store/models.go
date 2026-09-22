@@ -35,6 +35,7 @@ type memberModel struct {
 	MustChangePassword bool   `bun:"must_change_password,notnull"`
 	CreatedAt          string `bun:"created_at,notnull"`
 	LastSignedInAt     string `bun:"last_signed_in_at,notnull"`
+	RemovedAt          string `bun:"removed_at,notnull"`
 }
 
 type sessionModel struct {
@@ -57,6 +58,10 @@ func (m memberModel) toMember() (Member, error) {
 	if err != nil {
 		return Member{}, err
 	}
+	removedAt, err := parseTime(m.RemovedAt)
+	if err != nil {
+		return Member{}, err
+	}
 	return Member{
 		ID:                 m.ID,
 		UID:                m.UID,
@@ -67,6 +72,7 @@ func (m memberModel) toMember() (Member, error) {
 		MustChangePassword: m.MustChangePassword,
 		CreatedAt:          createdAt,
 		LastSignedInAt:     lastSignedInAt,
+		RemovedAt:          removedAt,
 	}, nil
 }
 

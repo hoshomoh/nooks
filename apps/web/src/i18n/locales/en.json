@@ -387,7 +387,7 @@
     "makeMember": "Remove admin",
     "remove": "Remove from {{name}}",
     "removeTitle": "Remove {{name}}?",
-    "removeBlurb": "Their account goes, and so does everything they made: the lists they started, and whatever they added to anybody else's. Nothing of theirs is left behind.",
+    "removeBlurb": "Their account goes, and so do the lists they started. What they added to everybody else's lists stays, without their name on it.",
     "removeConfirm": "Remove",
     "addTitle": "Add a member",
     "addBlurb": "They get a temporary password you read out once. nooks sends no mail, so how it reaches them is up to you.",

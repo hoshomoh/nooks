@@ -220,6 +220,26 @@ func (s *sqlStore) MarkTokenUsed(ctx context.Context, id int64, at time.Time) er
 	return nil
 }
 
+/*
+deleteTokensFor stops every key a Member cut.
+
+Called when they are removed. Their row stays, so that what they added to other people's
+Lists is not carried off with them, and that is exactly why this has to be written down:
+access_token.member_id is ON DELETE CASCADE, so these used to go because the row went.
+A key is a credential rather than history, and a credential belonging to somebody who
+has been removed is the one thing about them that must not survive.
+*/
+func (s *sqlStore) deleteTokensFor(ctx context.Context, memberID int64) error {
+	_, err := s.db.NewDelete().
+		Model((*accessTokenModel)(nil)).
+		Where("member_id = ?", memberID).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("delete access tokens for member: %w", err)
+	}
+	return nil
+}
+
 // DeleteAccessToken revokes a token. Its scope goes with it.
 func (s *sqlStore) DeleteAccessToken(ctx context.Context, id int64) error {
 	result, err := s.db.NewDelete().

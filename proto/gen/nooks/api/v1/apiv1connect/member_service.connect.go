@@ -77,8 +77,9 @@ type MemberServiceClient interface {
 	AddMember(context.Context, *connect.Request[v1.AddMemberRequest]) (*connect.Response[v1.AddMemberResponse], error)
 	// SetMemberRole makes somebody an Admin, or stops them being one.
 	SetMemberRole(context.Context, *connect.Request[v1.SetMemberRoleRequest]) (*connect.Response[v1.SetMemberRoleResponse], error)
-	// RemoveMember deletes an account and everything of theirs: the Lists they started,
-	// and whatever they added to anybody else's. Nothing of theirs is left behind.
+	// RemoveMember closes an account and deletes the Lists they started. What they added
+	// to anybody else's Lists stays, with their name gone from it: a household's shopping
+	// is not one person's to take away by leaving.
 	RemoveMember(context.Context, *connect.Request[v1.RemoveMemberRequest]) (*connect.Response[v1.RemoveMemberResponse], error)
 	// UpdateOwnProfile changes the signed-in Member's own name and email.
 	//
@@ -220,8 +221,9 @@ type MemberServiceHandler interface {
 	AddMember(context.Context, *connect.Request[v1.AddMemberRequest]) (*connect.Response[v1.AddMemberResponse], error)
 	// SetMemberRole makes somebody an Admin, or stops them being one.
 	SetMemberRole(context.Context, *connect.Request[v1.SetMemberRoleRequest]) (*connect.Response[v1.SetMemberRoleResponse], error)
-	// RemoveMember deletes an account and everything of theirs: the Lists they started,
-	// and whatever they added to anybody else's. Nothing of theirs is left behind.
+	// RemoveMember closes an account and deletes the Lists they started. What they added
+	// to anybody else's Lists stays, with their name gone from it: a household's shopping
+	// is not one person's to take away by leaving.
 	RemoveMember(context.Context, *connect.Request[v1.RemoveMemberRequest]) (*connect.Response[v1.RemoveMemberResponse], error)
 	// UpdateOwnProfile changes the signed-in Member's own name and email.
 	//

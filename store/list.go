@@ -593,6 +593,39 @@ func (s *sqlStore) SetListArchived(ctx context.Context, uid string, memberID int
 	})
 }
 
+/*
+ListsOwnedBy is the Lists a Member started, whatever they shared them with.
+
+Needed since removing a Member stopped deleting their row: list.owner_id is ON DELETE
+CASCADE, so their Lists used to go because the Member went, and nothing ever had to ask
+which they were. Now the row stays and the Lists are somebody's decision, so somebody
+has to be able to name them.
+
+Already-deleted Lists are left out. Removing their owner is not a reason to delete a
+List twice.
+*/
+func (s *sqlStore) ListsOwnedBy(ctx context.Context, memberID int64) ([]List, error) {
+	var rows []listModel
+	err := s.db.NewSelect().
+		Model(&rows).
+		Where("owner_id = ? AND deleted_at = ''", memberID).
+		OrderExpr(byName).
+		Scan(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("read lists owned by member: %w", err)
+	}
+
+	lists := make([]List, 0, len(rows))
+	for _, row := range rows {
+		list, err := row.toList()
+		if err != nil {
+			return nil, err
+		}
+		lists = append(lists, list)
+	}
+	return lists, nil
+}
+
 // DeleteList removes a List, and with it the Items on it. The removal is soft, so a
 // List deleted by mistake is recoverable.
 func (s *sqlStore) DeleteList(ctx context.Context, uid string, at time.Time) error {

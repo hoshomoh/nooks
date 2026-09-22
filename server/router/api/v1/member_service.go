@@ -357,7 +357,28 @@ func (s *MemberService) RemoveMember(
 		return nil, errLastAdmin
 	}
 
-	if err := s.store.DeleteMember(ctx, member.ID); err != nil {
+	/*
+	 * Their Lists first, while the row is still theirs to find them by.
+	 *
+	 * These used to go by cascade, because removing a Member deleted the row. The row
+	 * now stays, so that what they added to everybody else's Lists is not carried off
+	 * with it, which means the Lists they own are nothing's job until something takes
+	 * it. Deleted here so that removing somebody does what it has always done.
+	 *
+	 * Soft, like every other deletion of a List, where the cascade was not. What is on
+	 * one is then still in the database rather than gone from it.
+	 */
+	owned, err := s.store.ListsOwnedBy(ctx, member.ID)
+	if err != nil {
+		return nil, internalError("read the lists a member owns", err)
+	}
+	for _, list := range owned {
+		if err := s.store.DeleteList(ctx, list.UID, s.now()); err != nil {
+			return nil, internalError("delete a removed member's list", err)
+		}
+	}
+
+	if err := s.store.RemoveMember(ctx, member.ID, s.now()); err != nil {
 		return nil, internalError("remove member", err)
 	}
 

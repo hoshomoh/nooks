@@ -3,6 +3,7 @@ package store
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 )
@@ -212,19 +213,22 @@ func TestMarkMemberSignedIn(t *testing.T) {
 }
 
 /*
-What removing a Member takes with them.
+What removing a Member leaves behind, which is everything they gave anybody else.
 
-Not a wish, a record. `list.owner_id` and `item.added_by_id` are both ON DELETE CASCADE,
-so removing somebody deletes every List they started and every Item they ever added,
-including the ones on other people's Lists that those people are still using.
+This is the same test inverted. It used to record the opposite as a deliberate fact:
+`list.owner_id` and `item.added_by_id` are both ON DELETE CASCADE, so removing somebody
+deleted every List they started and reached into everybody else's Lists to delete every
+Item they had ever added. It said so, and said that two things in the repository assumed
+otherwise, and that whichever way it was settled this test should fail when it was.
 
-Pinned here because two things in this repository assume the opposite. The Settings
-dialog told an Admin that what somebody added stays on its lists, and `rowNamesFor` has
-a branch for a row whose Member is gone — which `added_by_id` can never reach, because
-the row goes with them. Whichever way that is settled, it should be settled on purpose
-and this test should fail when it is.
+It was settled. The row is emptied rather than deleted, so nothing cascades: what she
+put on his List is still on it, and the branch in `rowNamesFor` for a row whose Member is
+gone is finally reachable, because the name it finds is there and empty.
+
+What the store does not do is decide about the Lists she owned. That is the Admin's
+choice and it is made a layer up, which is why hers is still here.
 */
-func TestRemovingAMemberTakesTheirListsAndTheirItems(t *testing.T) {
+func TestRemovingAMemberLeavesWhatTheyGaveEverybodyElse(t *testing.T) {
 	for _, d := range drivers() {
 		t.Run(d.name, func(t *testing.T) {
 			s := d.open(t)
@@ -237,16 +241,12 @@ func TestRemovingAMemberTakesTheirListsAndTheirItems(t *testing.T) {
 			addItem(t, s, his, anna, "item_bins", "Bins")
 			addItem(t, s, his, jonas, "item_recycling", "Recycling")
 
-			if err := s.DeleteMember(t.Context(), anna.ID); err != nil {
-				t.Fatalf("DeleteMember: %v", err)
+			at := time.Date(2026, time.April, 1, 9, 0, 0, 0, time.UTC)
+			if err := s.RemoveMember(t.Context(), anna.ID, at); err != nil {
+				t.Fatalf("RemoveMember: %v", err)
 			}
 
-			// The List she owned, which the whole Instance could see.
-			if _, err := s.ListByUID(t.Context(), hers.UID); !errors.Is(err, ErrNotFound) {
-				t.Errorf("her List is %v, and this test is what says that is deliberate", err)
-			}
-
-			// His List survives. What she put on it does not.
+			// What she added to his List is the whole point.
 			items, err := s.ItemsOnList(t.Context(), his.ID)
 			if err != nil {
 				t.Fatalf("ItemsOnList: %v", err)
@@ -255,8 +255,40 @@ func TestRemovingAMemberTakesTheirListsAndTheirItems(t *testing.T) {
 			for _, item := range items {
 				left = append(left, item.Label)
 			}
-			if fmt.Sprint(left) != "[Recycling]" {
-				t.Errorf("his List holds %v, want only what he added himself", left)
+			if fmt.Sprint(left) != "[Bins Recycling]" {
+				t.Errorf("his List holds %v, want what she added still on it", left)
+			}
+
+			// Hers is untouched here. Deciding about it belongs to whoever removed her.
+			if _, err := s.ListByUID(t.Context(), hers.UID); err != nil {
+				t.Errorf("her List is %v, and the store does not decide about it", err)
+			}
+
+			// The row is there, and is nobody.
+			gone, err := s.MemberByID(t.Context(), anna.ID)
+			if err != nil {
+				t.Fatalf("MemberByID after removal: %v", err)
+			}
+			if !gone.Removed() {
+				t.Error("the row is not marked removed")
+			}
+			if gone.Name != "" || gone.PasswordHash != "" {
+				t.Errorf("the row still carries name %q and a password hash", gone.Name)
+			}
+			if !strings.HasSuffix(gone.Email, "@invalid") {
+				t.Errorf("email = %q, want an address nobody can hold", gone.Email)
+			}
+
+			// And is no longer a person, wherever people are counted or listed.
+			if _, err := s.MemberByUID(t.Context(), anna.UID); !errors.Is(err, ErrNotFound) {
+				t.Errorf("MemberByUID finds her: %v", err)
+			}
+			members, err := s.Members(t.Context())
+			if err != nil {
+				t.Fatalf("Members: %v", err)
+			}
+			if len(members) != 1 || members[0].UID != jonas.UID {
+				t.Errorf("Members = %v, want only Jonas", members)
 			}
 		})
 	}

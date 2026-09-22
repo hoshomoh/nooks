@@ -1,0 +1,19 @@
+-- Removing somebody leaves the row behind, emptied.
+--
+-- It used to delete it, and both item.added_by_id and list.owner_id are ON DELETE
+-- CASCADE, so removing a housemate who moved out took every List they started and
+-- reached into everybody else's Lists to take every Item they had ever added to them.
+-- The milk they put on the shared list went with them.
+--
+-- Keeping the row is what stops that, and it stops it by construction rather than by a
+-- foreign key rule somebody could set back: with the member still there, nothing
+-- cascades and there is nothing to null. What is emptied is the person. The email is
+-- rewritten to something under .invalid, which RFC 2606 reserves so it can never be a
+-- real address, and keyed by uid so two removed people cannot collide on the unique
+-- index. The name and the password hash go, so the row cannot be signed in to and
+-- carries nobody's details.
+--
+-- removed_at is what every read of the member list filters on. An Item's adder is
+-- looked up by id and deliberately still finds them, which is how a row that says only
+-- the time gets its silence: the name is there and empty.
+ALTER TABLE member ADD COLUMN removed_at TEXT NOT NULL DEFAULT '';

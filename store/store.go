@@ -90,7 +90,9 @@ type Store interface {
 
 	// DeleteMember removes an account and everything of theirs, including what they put
 	// on other people's Lists. See the implementation for which columns do it.
-	DeleteMember(ctx context.Context, id int64) error
+	// RemoveMember empties a Member's row rather than deleting it, so that what they
+	// added to other people's Lists stays. Their sessions and tokens go.
+	RemoveMember(ctx context.Context, id int64, at time.Time) error
 	MemberByID(ctx context.Context, id int64) (Member, error)
 
 	// CountMembers reports how many Members exist.
@@ -203,6 +205,10 @@ type Store interface {
 	// Member's id to archive and zero to restore. An archived List is still returned
 	// by ListsForMember: it is out of the way, not gone.
 	SetListArchived(ctx context.Context, uid string, memberID int64, at time.Time) error
+
+	// ListsOwnedBy is the Lists a Member started. Read when they are removed, since
+	// their row now stays and their Lists no longer go with it.
+	ListsOwnedBy(ctx context.Context, memberID int64) ([]List, error)
 
 	// DeleteList removes a List. The removal is soft.
 	DeleteList(ctx context.Context, uid string, at time.Time) error

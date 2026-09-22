@@ -86,7 +86,8 @@ type Store interface {
 	// SetMemberProfile changes a Member's own name and email.
 	SetMemberProfile(ctx context.Context, id int64, name, email string) error
 
-	// DeleteMember removes an account. What they added stays on its Lists.
+	// DeleteMember removes an account and everything of theirs, including what they put
+	// on other people's Lists. See the implementation for which columns do it.
 	DeleteMember(ctx context.Context, id int64) error
 	MemberByID(ctx context.Context, id int64) (Member, error)
 
@@ -131,7 +132,8 @@ type Store interface {
 	DeleteSessionTree(ctx context.Context, refreshHash string) error
 
 	// DeleteUnreadableActivity removes Activity entries past what ActivityFor returns,
-	// which nothing can read.
+	// sparing a join or reset request nobody has answered however old it is: Activity is
+	// the only place one appears, so sweeping it would lose the request itself.
 	DeleteUnreadableActivity(ctx context.Context) (int64, error)
 
 	// DeleteExpiredSessions clears out Sessions past their expiry.

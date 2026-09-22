@@ -1430,8 +1430,8 @@ components:
                     items:
                         type: string
                     description: |-
-                        The Lists it may reach. A token that names none reaches none, unless all_lists is
-                         set instead.
+                        The Lists it may reach, unless all_lists is set instead. Naming none is refused
+                         rather than answered with a token that opens nothing.
                 allLists:
                     type: boolean
                     description: |-

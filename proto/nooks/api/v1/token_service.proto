@@ -86,8 +86,8 @@ message CreateAccessTokenRequest {
   string name = 1;
   TokenAbilities abilities = 2;
 
-  // The Lists it may reach. A token that names none reaches none, unless all_lists is
-  // set instead.
+  // The Lists it may reach, unless all_lists is set instead. Naming none is refused
+  // rather than answered with a token that opens nothing.
   repeated string list_uids = 3;
 
   // Reach every List the Member can, including ones made later. Not the same as naming

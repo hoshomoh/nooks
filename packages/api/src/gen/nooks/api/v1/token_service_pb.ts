@@ -171,8 +171,8 @@ export type CreateAccessTokenRequest = Message<"nooks.api.v1.CreateAccessTokenRe
   abilities?: TokenAbilities | undefined;
 
   /**
-   * The Lists it may reach. A token that names none reaches none, unless all_lists is
-   * set instead.
+   * The Lists it may reach, unless all_lists is set instead. Naming none is refused
+   * rather than answered with a token that opens nothing.
    *
    * @generated from field: repeated string list_uids = 3;
    */

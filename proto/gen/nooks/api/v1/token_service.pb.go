@@ -292,8 +292,8 @@ type CreateAccessTokenRequest struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	Name      string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Abilities *TokenAbilities        `protobuf:"bytes,2,opt,name=abilities,proto3" json:"abilities,omitempty"`
-	// The Lists it may reach. A token that names none reaches none, unless all_lists is
-	// set instead.
+	// The Lists it may reach, unless all_lists is set instead. Naming none is refused
+	// rather than answered with a token that opens nothing.
 	ListUids []string `protobuf:"bytes,3,rep,name=list_uids,json=listUids,proto3" json:"list_uids,omitempty"`
 	// Reach every List the Member can, including ones made later. Not the same as naming
 	// them all: that would stop at the Lists that exist today.

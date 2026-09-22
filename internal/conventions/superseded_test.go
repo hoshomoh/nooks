@@ -67,14 +67,36 @@ type stranded struct {
 	opens string
 }
 
-// strandedIn finds every line comment a block comment opens directly under.
+// strandedIn finds a comment left above the one that replaced it, in either shape.
 //
-// One group, not two: the parser puts comments with no blank line between them into the
-// same group whatever their style, so this is a `//` comment followed inside one group
-// by a block comment rather than two groups in a row.
+// A line comment with a block comment opening under it is one group, not two: the parser
+// puts comments with no blank line between them into the same group whatever their
+// style.
+//
+// A block comment above a block comment is not two comments at all. A block comment runs
+// to the first closing delimiter after it, so the pair shares one, and the lexer reads
+// them as a single comment with a stray opening delimiter inside. That is what the first
+// half below looks for, and it is how the orphan above RemoveMember went unseen while
+// the one above oneMember failed in the same file on the same day.
+//
+// Nothing legitimate opens a block comment inside a block comment. This comment is
+// written in line comments for that reason: describing the shape in a block comment
+// means writing the delimiters, and writing them ends the comment early. That mistake
+// was made here first, which is the argument for the check.
 func strandedIn(file *ast.File, fileSet *token.FileSet) []stranded {
 	var found []stranded
+	opener := "/" + "*"
 	for _, group := range file.Comments {
+		for _, one := range group.List {
+			if !strings.HasPrefix(one.Text, opener) || !strings.Contains(one.Text[2:], opener) {
+				continue
+			}
+			found = append(found, stranded{
+				line:  fileSet.Position(one.Pos()).Line,
+				opens: firstWordOf(strings.TrimPrefix(one.Text, opener)),
+			})
+		}
+
 		for at := 0; at+1 < len(group.List); at++ {
 			this, next := group.List[at], group.List[at+1]
 			if !strings.HasPrefix(this.Text, "//") || !strings.HasPrefix(next.Text, "/*") {

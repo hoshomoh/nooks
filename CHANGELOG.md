@@ -1,5 +1,63 @@
 # Changelog
 
+## [1.5.0](https://github.com/hoshomoh/nooks/compare/v1.4.1...v1.5.0) (2026-09-22)
+
+
+### New
+
+* **website:** show five lines of a release, the rest on github ([ea55bcd](https://github.com/hoshomoh/nooks/commit/ea55bcd247222cf63317d35b5531e3bb6a44ac14))
+
+
+### Fixed
+
+* **api:** record what failed, which nothing did ([7e77951](https://github.com/hoshomoh/nooks/commit/7e779519bbfbe7ba45fabf57357fc577e58e7b25))
+* **api:** refresh everyone left when a member is removed ([e07e4e1](https://github.com/hoshomoh/nooks/commit/e07e4e10d042cce9ce756242aa911b03791e5c52))
+* **api:** refuse a change from a token cut to read ([e7644bf](https://github.com/hoshomoh/nooks/commit/e7644bfd00d4901758610e2e7405405e82314ceb))
+* **api:** stop a token learning that an item it cannot reach exists ([890a23c](https://github.com/hoshomoh/nooks/commit/890a23cc51894db4dfa6e73fe5d3f00bec11650b))
+* **api:** stop telling a token about lists it cannot reach ([df068ac](https://github.com/hoshomoh/nooks/commit/df068ac71d75ab2021adc695ab94d4e5e0546707))
+* **api:** tell whoever a group moved that their lists changed ([7296231](https://github.com/hoshomoh/nooks/commit/7296231b86eec7bd3ffd50ab37f2f3415daa362e))
+* **api:** tell whoever a list was taken from that it went ([94c80d5](https://github.com/hoshomoh/nooks/commit/94c80d50b0315c52970c98f745fb4b3fde12c5c9))
+* **auth:** sign other browsers out when a password changes ([5c95d3e](https://github.com/hoshomoh/nooks/commit/5c95d3e0ac301287db3bcaea2213e75e09687dfd))
+* **backup:** refuse an access token the whole database ([2d0df78](https://github.com/hoshomoh/nooks/commit/2d0df78ff57efbd078d0b1d04961a63d99085b7a))
+* **frontend:** serve the app under a content security policy ([a4eb5a7](https://github.com/hoshomoh/nooks/commit/a4eb5a742345c207e6a0139d2a733227dda90e65))
+* **gateway:** carry the request headers the services read ([aef313d](https://github.com/hoshomoh/nooks/commit/aef313d4e271fca88f2ef5941d1dffeb1b4451b4))
+* **live:** end a stream when its session does ([cb5da24](https://github.com/hoshomoh/nooks/commit/cb5da242f06e7fa3832c41a30e090a1814b0143d))
+* **mcp:** say what the API said ([94bd522](https://github.com/hoshomoh/nooks/commit/94bd522d852de30b66e946f47b222bbf6d8f9132))
+* **scripts:** stop claiming ci.sh runs everything CI runs ([f34606c](https://github.com/hoshomoh/nooks/commit/f34606c2f3b2b91fd1b609ef3c1fec5ddc14273e))
+* **server:** bound a connection that is not sending anything ([7f29227](https://github.com/hoshomoh/nooks/commit/7f292270b440c6577560897f2bb49152dc8329d3))
+* **server:** cap how much one request may send ([352c93b](https://github.com/hoshomoh/nooks/commit/352c93b388067be75811a4e20d4381df4a8e0a2f))
+* **server:** send nosniff and a referrer policy ([92a2a1a](https://github.com/hoshomoh/nooks/commit/92a2a1adb8ebbaf011a872bc165b93435c68f033))
+* **server:** sweep expired sessions, which nothing was doing ([dedac87](https://github.com/hoshomoh/nooks/commit/dedac877b403dc0300557fefa64fbb68ab9ea4e2))
+* **store:** cap how many words a search uses ([6eee763](https://github.com/hoshomoh/nooks/commit/6eee7636601e156c13ab8eab40f00c1e5b3aebff))
+* **store:** keep an unanswered request where an admin can see it ([f57de18](https://github.com/hoshomoh/nooks/commit/f57de18c519d8aed33332ecc614dfc715ea5d0b1))
+* **store:** recount the lists a removed member added to ([ca879d1](https://github.com/hoshomoh/nooks/commit/ca879d1116636b700eb3612cf986c306f90b3807))
+* **store:** refuse a batch of items spanning two lists ([48a205d](https://github.com/hoshomoh/nooks/commit/48a205d993a7feb7d8ecfada1c32713e5daff01b))
+* **store:** settle the order of items that share a position ([b670284](https://github.com/hoshomoh/nooks/commit/b670284684ccd4b7059ba2212df247c796553d8a))
+* **store:** sweep activity nothing can read ([ec1e2c2](https://github.com/hoshomoh/nooks/commit/ec1e2c2e753add4aa3cb9831f6c90b9438400262))
+* **web:** clear the stored cache when a session ends ([eac8a02](https://github.com/hoshomoh/nooks/commit/eac8a02c2c45b0ef1fb66bd25eb206ada71518e1))
+* **web:** filter the source scans by path, not by the glob's callback ([12aaf4b](https://github.com/hoshomoh/nooks/commit/12aaf4b31ad18181ecfafff7a3e7297535c81c54))
+* **web:** put back the line that was edited out of a generated component ([fe8a7af](https://github.com/hoshomoh/nooks/commit/fe8a7afcb20a2b65b51fd13c536a668899a65a4f))
+* **web:** reach the completed items the line counts ([037c004](https://github.com/hoshomoh/nooks/commit/037c004a2cc43408e8439390bf2f1f39194aff41))
+* **web:** refresh the lists that go when a member is removed ([7229f0b](https://github.com/hoshomoh/nooks/commit/7229f0bca960193d7cc1245eaf66a982270ac977))
+* **web:** say what removing a member actually takes ([8e69724](https://github.com/hoshomoh/nooks/commit/8e697243058f25307952d17ce87f060827765c30))
+* **web:** size the public page's quantity badge with its token ([dc1667f](https://github.com/hoshomoh/nooks/commit/dc1667f29cb8b1a629df77b63c39302dda7bf5f5))
+* **web:** stop crediting a tick to whoever added the item ([3a671cd](https://github.com/hoshomoh/nooks/commit/3a671cdcebaf8abe9872fb35feb1bca341ea4660))
+* **web:** stop offering a tick on a list that is read-only ([300f069](https://github.com/hoshomoh/nooks/commit/300f069d322edd49554f459081f066a4f6dbc7a7))
+* **web:** tell a member their role changed under them ([8e75b8c](https://github.com/hoshomoh/nooks/commit/8e75b8cc940b4c2b00bf6dbdcc870a73d57a4a07))
+
+
+### Changed
+
+* **api:** read one list to authorise an item, not all of them ([745e28a](https://github.com/hoshomoh/nooks/commit/745e28a0dd1916686435ff444643af69de7a9fdc))
+* **events:** gather presence once, not once per watcher ([f2ede4e](https://github.com/hoshomoh/nooks/commit/f2ede4e8f101eb9e74d74a8d99dd6c1649ca5845))
+* **live:** ask whether one list can be watched, not which ones can ([15950f9](https://github.com/hoshomoh/nooks/commit/15950f94136e0b09195d0cde2181c7e8a8669a18))
+* **mcp:** drop a variable that called nothing to document what tools.go documents ([83f0c29](https://github.com/hoshomoh/nooks/commit/83f0c29c30f6b4a7c5f98c661216efb019a88a7e))
+* **store:** count a list's items without opening its rows ([dd3598d](https://github.com/hoshomoh/nooks/commit/dd3598d45dbecb33807e85dfdb90fa1c38843013))
+* **web:** name the event kinds the browser knows ([a107b42](https://github.com/hoshomoh/nooks/commit/a107b42a390fcc6af2b5ee9d21a02631767ee9a1))
+* **web:** name the two types written into a signature ([73d14da](https://github.com/hoshomoh/nooks/commit/73d14da990a0d004b4a8c958e9b06396c9bde6b0))
+* **web:** remove five exports nothing calls ([9f528f7](https://github.com/hoshomoh/nooks/commit/9f528f7163adda4485d505b751cbeb08353fbc59))
+* **web:** write initialsOf once ([5a5ed04](https://github.com/hoshomoh/nooks/commit/5a5ed043a78478600e502a7b310f20bbf6f54b40))
+
 ## [1.4.1](https://github.com/hoshomoh/nooks/compare/v1.4.0...v1.4.1) (2026-09-16)
 
 

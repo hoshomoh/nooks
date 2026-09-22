@@ -76,7 +76,7 @@ A cookie is tried first: a browser that also happens to carry a token header is 
 browser, and narrowing it would be a surprise.
 */
 func (r *Resolver) Grant(ctx context.Context, header http.Header) (Grant, bool) {
-	if session := cookieToken(header); session != "" {
+	if session := SessionTokenFrom(header); session != "" {
 		if member, ok := r.Member(ctx, session); ok {
 			return Grant{Member: member, Session: HashToken(session)}, true
 		}
@@ -188,16 +188,6 @@ func (r *Resolver) Member(ctx context.Context, token string) (store.Member, bool
 		return store.Member{}, false
 	}
 	return member, true
-}
-
-// cookieToken pulls the session token out of request headers. http.Request is
-// borrowed purely for its cookie parsing.
-func cookieToken(header http.Header) string {
-	cookie, err := (&http.Request{Header: header}).Cookie(CookieName)
-	if err != nil {
-		return ""
-	}
-	return cookie.Value
 }
 
 // bearerToken reads an access token from the Authorization header.

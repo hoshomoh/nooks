@@ -172,13 +172,15 @@ func (s *AuthService) SignOut(
 	req *connect.Request[apiv1.SignOutRequest],
 ) (*connect.Response[apiv1.SignOutResponse], error) {
 	res := connect.NewResponse(&apiv1.SignOutResponse{})
-	res.Header().Add("Set-Cookie", auth.ExpiredCookie(s.secure).String())
+	for _, expired := range auth.ExpiredCookies(s.secure) {
+		res.Header().Add("Set-Cookie", expired.String())
+	}
 
 	// The whole tree, not just the cookie: an access token that outlived the session it
 	// came from is a credential nobody knows they still have.
 	//
 	// Signing out twice is not a failure, so a missing or unknown cookie is fine.
-	if token := cookieValue(req.Header().Get("Cookie"), auth.CookieName); token != "" {
+	if token := auth.SessionTokenFrom(req.Header()); token != "" {
 		if err := s.store.DeleteSessionTree(ctx, auth.HashToken(token)); err != nil {
 			return nil, internalError("delete session", err)
 		}
@@ -623,7 +625,7 @@ func (s *AuthService) RefreshAccess(
 	ctx context.Context,
 	req *connect.Request[apiv1.RefreshAccessRequest],
 ) (*connect.Response[apiv1.RefreshAccessResponse], error) {
-	presented := cookieValue(req.Header().Get("Cookie"), auth.CookieName)
+	presented := auth.SessionTokenFrom(req.Header())
 	if presented == "" {
 		return nil, errNotSignedIn
 	}

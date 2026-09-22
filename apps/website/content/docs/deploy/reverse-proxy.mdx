@@ -39,7 +39,15 @@ nooks.example {
 ## Tell Nooks it is behind TLS
 
 Set `NOOKS_SECURE_COOKIES=true`. The session cookie is then marked `Secure`, so a
-browser will never send it over plain HTTP.
+browser will never send it over plain HTTP, and it is renamed to `__Host-nooks_session`.
+
+That prefix is a promise to the browser: refuse this cookie unless it came from exactly
+this host, over HTTPS, with no domain set. It is what stops something on a neighbouring
+subdomain of yours planting a session cookie for everybody on the parent domain.
+
+Because the name changes, everybody signed in at the moment you turn it on signs in once
+more. Nothing has gone wrong; the browser is holding a cookie under the old name and the
+instance is now asking for the new one.
 
 Nooks does not work this out for itself and does not read `X-Forwarded-Proto`. Behind a
 proxy the server sees plain HTTP even though the person using it does not, and a

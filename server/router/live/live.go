@@ -118,11 +118,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // member resolves the session cookie, the same way every other request does.
 func (h *Handler) member(r *http.Request) (store.Member, bool) {
-	cookie, err := r.Cookie(auth.CookieName)
-	if err != nil {
+	token := auth.SessionTokenFrom(r.Header)
+	if token == "" {
 		return store.Member{}, false
 	}
-	return h.resolver.Member(r.Context(), cookie.Value)
+	return h.resolver.Member(r.Context(), token)
 }
 
 // watchableList is the List the browser says it is looking at, if the Member may see it.

@@ -5,11 +5,48 @@ import (
 	"time"
 )
 
-// CookieName is the session cookie, named for the app so a shared host stays legible.
-//
-// No __Host- prefix, which would stop a subdomain setting it: that prefix requires
-// Secure, and an Instance on a LAN over plain HTTP is a deployment Nooks supports.
-const CookieName = "nooks_session"
+/*
+The session cookie, under the two names it can have.
+
+`__Host-` tells a browser to refuse the cookie unless it came from this exact host over
+HTTPS with no Domain set, which is what stops a hostile subdomain planting a session for
+everybody on the parent domain. The prefix is only meaningful with Secure, and an
+Instance on a LAN over plain HTTP is a deployment this supports, so the name follows the
+setting rather than being fixed.
+
+Two names is a cost, and it is paid where they are read: a browser sends the one it has,
+so every read has to accept either. It is also why turning secure cookies on signs
+everybody out once, which is a name change rather than anything going wrong.
+*/
+const (
+	CookieName       = "nooks_session"
+	SecureCookieName = "__Host-" + CookieName
+)
+
+// CookieNameFor is the name the cookie takes for this deployment.
+func CookieNameFor(secure bool) string {
+	if secure {
+		return SecureCookieName
+	}
+	return CookieName
+}
+
+/*
+SessionTokenFrom reads the session token out of whichever cookie a browser sent.
+
+Either name, because which one it holds depends on when it last signed in rather than on
+how the Instance is configured now. A browser that still has the plain cookie after
+secure cookies were turned on is answered once and then given the prefixed one.
+*/
+func SessionTokenFrom(header http.Header) string {
+	request := &http.Request{Header: header}
+	for _, name := range []string{SecureCookieName, CookieName} {
+		if cookie, err := request.Cookie(name); err == nil && cookie.Value != "" {
+			return cookie.Value
+		}
+	}
+	return ""
+}
 
 // SessionLifetime is how long a session lasts without signing in again. A household
 // device should not be asked every week.
@@ -30,7 +67,7 @@ const AccessLifetime = time.Hour
 // is a deployment fact the server knows and this package does not.
 func NewCookie(token string, expires time.Time, secure bool) *http.Cookie {
 	return &http.Cookie{
-		Name:  CookieName,
+		Name:  CookieNameFor(secure),
 		Value: token,
 		Path:  "/",
 		// HttpOnly: no script needs the token, and it stops an XSS bug becoming an
@@ -44,15 +81,31 @@ func NewCookie(token string, expires time.Time, secure bool) *http.Cookie {
 	}
 }
 
-// ExpiredCookie builds the cookie that clears a session.
-func ExpiredCookie(secure bool) *http.Cookie {
-	return &http.Cookie{
-		Name:     CookieName,
-		Value:    "",
-		Path:     "/",
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-		Secure:   secure,
-		MaxAge:   -1,
+/*
+ExpiredCookies clear a session, under both names.
+
+Both, because signing out has to clear whichever one the browser is holding, and after
+secure cookies are turned on that may still be the plain one. Clearing only the current
+name would leave the other in the browser, which is the shape of a cookie nobody can get
+rid of.
+
+The plain name is cleared without Secure, because a browser on plain HTTP refuses a
+Secure cookie outright and would keep the one being cleared.
+*/
+func ExpiredCookies(secure bool) []*http.Cookie {
+	expired := func(name string, markSecure bool) *http.Cookie {
+		return &http.Cookie{
+			Name:     name,
+			Value:    "",
+			Path:     "/",
+			HttpOnly: true,
+			SameSite: http.SameSiteLaxMode,
+			Secure:   markSecure,
+			MaxAge:   -1,
+		}
 	}
+	if !secure {
+		return []*http.Cookie{expired(CookieName, false)}
+	}
+	return []*http.Cookie{expired(SecureCookieName, true), expired(CookieName, false)}
 }

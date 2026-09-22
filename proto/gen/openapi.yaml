@@ -127,8 +127,8 @@ paths:
             description: |-
                 RequestJoin asks an Admin for an account. Every account begins this way: the request
                  waits in Activity until an Admin approves it and hands over a temporary password.
-                 Anybody who can reach the Instance may ask; the approval is what keeps the door
-                 shut.
+                 Refused where the Instance has signup off; where it is on, anybody who can reach the
+                 Instance may ask and the approval is what decides.
             operationId: AuthService_RequestJoin
             requestBody:
                 content:
@@ -1605,8 +1605,8 @@ components:
                 publicSignup:
                     type: boolean
                     description: |-
-                        Nothing reads this yet: asking for an account always leaves a request for an
-                         Admin, whatever it says. What keeps the door shut is the approval.
+                        Whether this Instance is accepting requests to join. Read without a session
+                         because the sign-in screen decides whether to offer the link from it.
                 defaultLocale:
                     type: string
                     description: |-
@@ -1752,8 +1752,10 @@ components:
                 publicSignup:
                     type: boolean
                     description: |-
-                        Carried and drawn as a toggle, and nothing reads it yet: asking for an account
-                         always leaves a request for an Admin. What keeps the door shut is the approval.
+                        Whether a stranger may ask for an account at all. Off and RequestJoin is refused,
+                         and the sign-in screen stops offering it. On and anybody who can reach the Instance
+                         may ask, which is where a new Instance starts. The approval is still what decides
+                         an account; this decides who may ask for one.
                 publicList:
                     $ref: '#/components/schemas/PublicListSettings'
                 defaultLocale:

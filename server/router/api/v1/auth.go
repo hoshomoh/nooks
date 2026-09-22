@@ -93,7 +93,10 @@ func (s *AuthService) CompleteSetup(
 	}
 
 	settings := store.InstanceSettings{
-		Name:             msg.GetInstanceName(),
+		Name: msg.GetInstanceName(),
+		// Open, which is what a fresh Instance has always done. The approval is still
+		// what decides an account; this decides whether anybody may ask for one.
+		PublicSignup:     true,
 		SetupCompletedAt: s.now(),
 	}
 	if err := s.store.SaveInstanceSettings(ctx, settings); err != nil {

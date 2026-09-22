@@ -328,15 +328,21 @@ func TestCompleteJoinRefusesEveryUnapprovedStateAlike(t *testing.T) {
 	}
 }
 
-// The Public signup setting decides nothing, and this is what says so out loud.
-//
-// It is stored, returned and drawn as a toggle, but no path reads it: asking for an
-// account always leaves a request for an Admin. Whoever wires it up has to come here
-// and say what the other setting means, rather than leaving the field comments and the
-// website describing a door that was never there.
-func TestSignupSettingDecidesNothing(t *testing.T) {
-	for _, publicSignup := range []bool{false, true} {
-		t.Run(fmt.Sprintf("publicSignup=%v", publicSignup), func(t *testing.T) {
+/*
+The Public signup setting decides whether a stranger may ask for an account.
+
+It was stored, returned and drawn as a toggle, and read by nothing: asking always left a
+request for an Admin whichever way it was set, so an Admin who turned it off was told
+something happened and nothing did. This is the test that used to say so, inverted.
+
+Off refuses outright rather than accepting and discarding. A closed door says nothing
+about who lives here, so there is nothing to conceal by pretending otherwise, and
+somebody sent by a housemate should be told to ask them rather than left waiting for an
+approval that will never come.
+*/
+func TestSignupSettingDecidesWhoMayAsk(t *testing.T) {
+	for _, open := range []bool{true, false} {
+		t.Run(fmt.Sprintf("publicSignup=%v", open), func(t *testing.T) {
 			svc, s := newAuthService(t)
 			completeSetup(t, svc)
 
@@ -344,19 +350,35 @@ func TestSignupSettingDecidesNothing(t *testing.T) {
 			if err != nil {
 				t.Fatalf("InstanceSettings: %v", err)
 			}
-			settings.PublicSignup = publicSignup
+			settings.PublicSignup = open
 			if err := s.SaveInstanceSettings(t.Context(), settings); err != nil {
 				t.Fatalf("SaveInstanceSettings: %v", err)
 			}
 
-			uid := requestJoin(t, svc)
-			got, err := svc.GetJoinRequest(t.Context(), connect.NewRequest(&apiv1.GetJoinRequestRequest{RequestUid: uid}))
+			res, err := svc.RequestJoin(t.Context(), connect.NewRequest(&apiv1.RequestJoinRequest{
+				Name: "Til", Email: "til@example.com",
+			}))
+
+			if !open {
+				if got := connect.CodeOf(err); got != connect.CodePermissionDenied {
+					t.Fatalf("with signup off RequestJoin answered %v, want permission_denied", got)
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatalf("with signup on RequestJoin: %v", err)
+			}
+			got, err := svc.GetJoinRequest(t.Context(), connect.NewRequest(
+				&apiv1.GetJoinRequestRequest{RequestUid: res.Msg.GetRequestUid()},
+			))
 			if err != nil {
 				t.Fatalf("GetJoinRequest: %v", err)
 			}
 			if got.Msg.GetStatus() != apiv1.RequestStatus_REQUEST_STATUS_PENDING {
-				t.Errorf("with publicSignup %v the request is %v, want pending: the approval is what keeps the door shut, not the setting",
-					publicSignup, got.Msg.GetStatus())
+				t.Errorf("the request is %v, want pending: the approval is still what "+
+					"decides an account, the setting only decides who may ask",
+					got.Msg.GetStatus())
 			}
 		})
 	}

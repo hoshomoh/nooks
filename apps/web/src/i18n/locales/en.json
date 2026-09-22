@@ -611,7 +611,7 @@
     "name": "Name",
     "nameBlurb": "Shows in the sidebar, on the public page and on printed lists.",
     "publicSignup": "Public signup",
-    "publicSignupBlurb": "Off means anybody asking for an account waits for an admin to approve them. Off is the default, and usually the right answer.",
+    "publicSignupBlurb": "On lets anybody who can reach this instance ask for an account, and you approve or ignore each one. Off hides the link and refuses the request.",
     "language": "Default language",
     "languageBlurb": "Used for the public page, printed sheets, and anyone who has not chosen one of their own."
   },

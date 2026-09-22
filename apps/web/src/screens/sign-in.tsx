@@ -44,9 +44,14 @@ export function SignIn() {
         </Link>
       }
       footerRight={
-        <Link to="/join" className="text-shared">
-          {t("auth.signIn.join")}
-        </Link>
+        // Offered only where it leads somewhere. With signup off the Instance refuses
+        // the request, and a link that ends in a refusal is the control that invites a
+        // change nothing will accept.
+        instance.publicSignup ? (
+          <Link to="/join" className="text-shared">
+            {t("auth.signIn.join")}
+          </Link>
+        ) : null
       }
     >
       <form

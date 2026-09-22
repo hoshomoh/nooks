@@ -12,15 +12,38 @@ import (
 	"github.com/hoshomoh/nooks/store"
 )
 
-// RequestJoin asks an Admin for an account.
+// errSignupClosed refuses a Visitor an Instance is not accepting requests from.
 //
-// It always reports success. Whether that email already has an account is not the
-// Visitor's business, and answering differently would turn this into a way to discover
-// who lives here.
+// Refused rather than silently dropped, unlike an email that already has an account: a
+// closed door is a fact about the Instance and tells a Visitor nothing about who lives
+// here, so there is nothing to conceal and somebody asked to join by a housemate should
+// be told to ask them instead.
+var errSignupClosed = connect.NewError(connect.CodePermissionDenied,
+	errors.New("this instance is not accepting requests to join"))
+
+/*
+RequestJoin asks an Admin for an account.
+
+Refused outright when the Instance has signup off. That setting was stored and drawn and
+read by nothing until it was wired up here, so an Admin who turned it off was told
+something happened and nothing did.
+
+With it on, this always reports success. Whether that email already has an account is
+not the Visitor's business, and answering differently would turn this into a way to
+discover who lives here.
+*/
 func (s *AuthService) RequestJoin(
 	ctx context.Context,
 	req *connect.Request[apiv1.RequestJoinRequest],
 ) (*connect.Response[apiv1.RequestJoinResponse], error) {
+	settings, err := s.store.InstanceSettings(ctx)
+	if err != nil {
+		return nil, internalError("read instance settings", err)
+	}
+	if !settings.PublicSignup {
+		return nil, errSignupClosed
+	}
+
 	msg := req.Msg
 	if err := requireText(msg.GetName(), "a name"); err != nil {
 		return nil, err

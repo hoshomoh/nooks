@@ -353,8 +353,10 @@ type InstanceSettings struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// What the Instance calls itself, e.g. "Brunnen Street".
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Carried and drawn as a toggle, and nothing reads it yet: asking for an account
-	// always leaves a request for an Admin. What keeps the door shut is the approval.
+	// Whether a stranger may ask for an account at all. Off and RequestJoin is refused,
+	// and the sign-in screen stops offering it. On and anybody who can reach the Instance
+	// may ask, which is where a new Instance starts. The approval is still what decides
+	// an account; this decides who may ask for one.
 	PublicSignup bool                `protobuf:"varint,2,opt,name=public_signup,json=publicSignup,proto3" json:"public_signup,omitempty"`
 	PublicList   *PublicListSettings `protobuf:"bytes,3,opt,name=public_list,json=publicList,proto3" json:"public_list,omitempty"`
 	// The language of anything nobody chose a language for: the public page, a printed
@@ -633,8 +635,8 @@ type GetInstanceResponse struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// True until the first Admin exists. The app shows first run rather than sign in.
 	NeedsSetup bool `protobuf:"varint,3,opt,name=needs_setup,json=needsSetup,proto3" json:"needs_setup,omitempty"`
-	// Nothing reads this yet: asking for an account always leaves a request for an
-	// Admin, whatever it says. What keeps the door shut is the approval.
+	// Whether this Instance is accepting requests to join. Read without a session
+	// because the sign-in screen decides whether to offer the link from it.
 	PublicSignup bool `protobuf:"varint,4,opt,name=public_signup,json=publicSignup,proto3" json:"public_signup,omitempty"`
 	// The language a Visitor reads this Instance in. Reachable without authentication
 	// because the public page needs it before anybody has signed in.

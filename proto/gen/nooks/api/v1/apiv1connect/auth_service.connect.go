@@ -90,8 +90,8 @@ type AuthServiceClient interface {
 	ReplacePassword(context.Context, *connect.Request[v1.ReplacePasswordRequest]) (*connect.Response[v1.ReplacePasswordResponse], error)
 	// RequestJoin asks an Admin for an account. Every account begins this way: the request
 	// waits in Activity until an Admin approves it and hands over a temporary password.
-	// Anybody who can reach the Instance may ask; the approval is what keeps the door
-	// shut.
+	// Refused where the Instance has signup off; where it is on, anybody who can reach the
+	// Instance may ask and the approval is what decides.
 	RequestJoin(context.Context, *connect.Request[v1.RequestJoinRequest]) (*connect.Response[v1.RequestJoinResponse], error)
 	// GetJoinRequest reports whether an Admin has decided yet. The Visitor's browser
 	// remembers the request id and comes back to the same address.
@@ -292,8 +292,8 @@ type AuthServiceHandler interface {
 	ReplacePassword(context.Context, *connect.Request[v1.ReplacePasswordRequest]) (*connect.Response[v1.ReplacePasswordResponse], error)
 	// RequestJoin asks an Admin for an account. Every account begins this way: the request
 	// waits in Activity until an Admin approves it and hands over a temporary password.
-	// Anybody who can reach the Instance may ask; the approval is what keeps the door
-	// shut.
+	// Refused where the Instance has signup off; where it is on, anybody who can reach the
+	// Instance may ask and the approval is what decides.
 	RequestJoin(context.Context, *connect.Request[v1.RequestJoinRequest]) (*connect.Response[v1.RequestJoinResponse], error)
 	// GetJoinRequest reports whether an Admin has decided yet. The Visitor's browser
 	// remembers the request id and comes back to the same address.

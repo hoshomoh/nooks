@@ -758,8 +758,8 @@ export const AuthService: GenService<{
   /**
    * RequestJoin asks an Admin for an account. Every account begins this way: the request
    * waits in Activity until an Admin approves it and hands over a temporary password.
-   * Anybody who can reach the Instance may ask; the approval is what keeps the door
-   * shut.
+   * Refused where the Instance has signup off; where it is on, anybody who can reach the
+   * Instance may ask and the approval is what decides.
    *
    * @generated from rpc nooks.api.v1.AuthService.RequestJoin
    */

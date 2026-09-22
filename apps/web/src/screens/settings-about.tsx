@@ -208,7 +208,7 @@ function DeleteInstance({ name }: DeleteInstanceProps) {
         nameLabel={t("danger.typeName", { name })}
         confirmLabel={t("danger.deleteAction")}
         onConfirm={(confirmation) => remove.mutate(confirmation)}
-        error={remove.error ? messageFrom(remove.error) : undefined}
+        error={remove.error ? messageFrom(t, remove.error) : undefined}
         pending={remove.isPending}
       />
     </section>

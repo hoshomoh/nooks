@@ -81,7 +81,7 @@ export function Setup() {
           required
         />
 
-        <FormError message={messageFrom(completeSetup.error)} />
+        <FormError message={messageFrom(t, completeSetup.error)} />
 
         <Button type="submit" disabled={completeSetup.isPending} className="self-start">
           {completeSetup.isPending ? t("auth.setup.submitting") : t("auth.setup.submit")}

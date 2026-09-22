@@ -199,6 +199,9 @@
   },
   "error": {
     "unreachable": "Something went wrong reaching the server.",
+    "saveFailed": "That did not save. Nothing was changed, so it is safe to try again. (ref {{ref}})",
+    "loadFailed": "That could not be loaded. Nothing was changed. (ref {{ref}})",
+    "internal": "Something inside this instance failed. Nothing you can do will fix it from here. (ref {{ref}})",
     "cannotReach": "Can't reach the server.",
     "screenTitle": "That didn't load",
     "screenBody": "The server did not answer. Nothing you have written is lost — try again.",

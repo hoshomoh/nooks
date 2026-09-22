@@ -2,9 +2,12 @@ package v1
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"connectrpc.com/connect"
@@ -406,14 +409,92 @@ it took; it does not say that it failed or why, so an Instance that cannot reach
 database writes one ordinary-looking line per attempt and the person running it has
 nothing to read. Whoever is self-hosting has no other window into this.
 
-The cause still reaches the caller as well, which is a separate question: it carries
-table names, file paths and whatever the database driver felt like saying. Answering
-without it means writing what a Member should read instead, and DESIGN.md §11 has
-opinions about that. Written down in the defense log rather than guessed at here.
+The cause stays in that log and goes no further. It used to travel to the caller, which
+meant a Member, or a stranger asking for a password reset, could be shown a table name,
+the path to the database file, or `dial tcp 10.0.0.5:5432: connection refused`.
+
+What travels instead is a kind and a reference. The kind is what the app looks up to
+draw a sentence in the Member's own language, because a string written here would be
+English wherever it was read. The reference is how whoever runs the Instance finds the
+matching log line, which on a machine they own is a thing they can actually do.
 */
 func internalError(what string, err error) error {
-	slog.Error("request failed", "doing", what, "error", err)
-	return connect.NewError(connect.CodeInternal, fmt.Errorf("%s: %w", what, err))
+	ref := newErrorRef()
+	kind := kindOf(what)
+	slog.Error("request failed", "doing", what, "kind", kind, "ref", ref, "error", err)
+
+	// The message carries no cause, and `what` is a verb and a noun with nothing of the
+	// machine in it. A caller that is not the app, over REST or MCP, gets something it
+	// can quote rather than a bare code.
+	failure := connect.NewError(connect.CodeInternal,
+		fmt.Errorf("could not %s (ref %s)", what, ref))
+	failure.Meta().Set(errorKindHeader, kind)
+	failure.Meta().Set(errorRefHeader, ref)
+	return failure
+}
+
+// What the app reads off a failure to decide what to say, and what to quote back.
+//
+// Written lowercase, which is how the app reads them: Go canonicalises a header name on
+// the way out and the browser lowercases it on the way in, so the two agree whatever
+// case is written here, and agreeing in the source as well is worth more than matching
+// the shape HTTP happens to put on the wire.
+const (
+	errorKindHeader = "nooks-error-kind"
+	errorRefHeader  = "nooks-error-ref"
+)
+
+// The kinds, which are what a Member can do about it rather than what went wrong.
+const (
+	// kindSaveFailed means their change did not happen.
+	kindSaveFailed = "save-failed"
+	// kindLoadFailed means something could not be read, and nothing was changed.
+	kindLoadFailed = "load-failed"
+)
+
+/*
+loads are the words an internalError description opens with when nothing was written.
+
+Read off the description rather than passed at each of the hundred and thirty-seven call
+sites, which would be a hundred and thirty-seven chances to pass the wrong one. The
+descriptions already lead with a verb because they were written to read as "could not
+read the member"; this says which of those verbs mean a read.
+
+A verb that is not here is treated as a write, which is the safe way round: telling
+somebody their change may not have happened when it did is recoverable, and telling them
+it happened when it did not is not. TestEveryFailureSaysWhichKindItIs holds every
+description in the tree to using a verb this knows, so a new one is a decision somebody
+makes rather than a default they fall into.
+*/
+var loads = map[string]bool{
+	"read":   true,
+	"count":  true,
+	"list":   true,
+	"search": true,
+}
+
+// kindOf says whether a failure doing this left the Member's work where it was.
+func kindOf(what string) string {
+	verb, _, _ := strings.Cut(what, " ")
+	if loads[verb] {
+		return kindLoadFailed
+	}
+	return kindSaveFailed
+}
+
+/*
+newErrorRef is the short handle a failure is quoted by.
+
+Short because somebody reads it off a screen and types it into a search. Random rather
+than a counter: a counter would say how many times the Instance has failed, which is
+nobody's business but the operator's and is not what this is for.
+*/
+func newErrorRef() string {
+	raw := make([]byte, 3)
+	if _, err := rand.Read(raw); err != nil {
+		return "unknown"
+	}
+	return hex.EncodeToString(raw)
 }
 
 // requireText rejects a blank field, naming what was wanted.

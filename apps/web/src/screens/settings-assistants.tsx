@@ -182,7 +182,7 @@ export function SettingsAssistantsScreen() {
                       {t("assistants.createNote")}
                     </span>
                   </div>
-                  {create.isError && <FormError message={messageFrom(create.error)} />}
+                  {create.isError && <FormError message={messageFrom(t, create.error)} />}
                 </div>
               </>
             )}

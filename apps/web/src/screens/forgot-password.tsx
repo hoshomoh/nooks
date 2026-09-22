@@ -79,7 +79,7 @@ function AskForReset({ onSent }: AskForResetProps) {
           required
         />
 
-        <FormError message={messageFrom(requestReset.error)} />
+        <FormError message={messageFrom(t, requestReset.error)} />
 
         <Button type="submit" disabled={requestReset.isPending} className="self-start">
           {requestReset.isPending ? t("auth.join.submitting") : t("auth.join.submit")}
@@ -163,7 +163,7 @@ function CheckResetRequest({ requestUid, onStartOver }: CheckResetRequestProps) 
           required
         />
 
-        <FormError message={messageFrom(completeReset.error)} />
+        <FormError message={messageFrom(t, completeReset.error)} />
 
         <Button type="submit" disabled={completeReset.isPending} className="self-start">
           {completeReset.isPending ? t("auth.replacePassword.submitting") : t("auth.reset.submit")}

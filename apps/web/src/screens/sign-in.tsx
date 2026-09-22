@@ -78,7 +78,7 @@ export function SignIn() {
           required
         />
 
-        <FormError message={messageFrom(signIn.error)} />
+        <FormError message={messageFrom(t, signIn.error)} />
 
         <Button type="submit" disabled={signIn.isPending} className="self-start">
           {signIn.isPending ? t("auth.signIn.submitting") : t("action.signIn")}

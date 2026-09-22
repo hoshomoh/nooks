@@ -60,7 +60,7 @@ export function ReplacePassword() {
           required
         />
 
-        <FormError message={messageFrom(replacePassword.error)} />
+        <FormError message={messageFrom(t, replacePassword.error)} />
 
         <Button type="submit" disabled={replacePassword.isPending} className="self-start">
           {replacePassword.isPending ? t("auth.replacePassword.submitting") : t("auth.replacePassword.submit")}

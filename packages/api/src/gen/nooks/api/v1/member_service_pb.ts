@@ -428,7 +428,8 @@ export const MemberService: GenService<{
     output: typeof SetMemberRoleResponseSchema;
   },
   /**
-   * RemoveMember deletes an account. What they added stays on its Lists.
+   * RemoveMember deletes an account and everything of theirs: the Lists they started,
+   * and whatever they added to anybody else's. Nothing of theirs is left behind.
    *
    * @generated from rpc nooks.api.v1.MemberService.RemoveMember
    */

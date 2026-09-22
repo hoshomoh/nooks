@@ -57,7 +57,8 @@ service MemberService {
     };
   }
 
-  // RemoveMember deletes an account. What they added stays on its Lists.
+  // RemoveMember deletes an account and everything of theirs: the Lists they started,
+  // and whatever they added to anybody else's. Nothing of theirs is left behind.
   rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {
     option (google.api.http) = {delete: "/api/v1/members/{member_uid}"};
   }

@@ -77,7 +77,8 @@ type MemberServiceClient interface {
 	AddMember(context.Context, *connect.Request[v1.AddMemberRequest]) (*connect.Response[v1.AddMemberResponse], error)
 	// SetMemberRole makes somebody an Admin, or stops them being one.
 	SetMemberRole(context.Context, *connect.Request[v1.SetMemberRoleRequest]) (*connect.Response[v1.SetMemberRoleResponse], error)
-	// RemoveMember deletes an account. What they added stays on its Lists.
+	// RemoveMember deletes an account and everything of theirs: the Lists they started,
+	// and whatever they added to anybody else's. Nothing of theirs is left behind.
 	RemoveMember(context.Context, *connect.Request[v1.RemoveMemberRequest]) (*connect.Response[v1.RemoveMemberResponse], error)
 	// UpdateOwnProfile changes the signed-in Member's own name and email.
 	//
@@ -219,7 +220,8 @@ type MemberServiceHandler interface {
 	AddMember(context.Context, *connect.Request[v1.AddMemberRequest]) (*connect.Response[v1.AddMemberResponse], error)
 	// SetMemberRole makes somebody an Admin, or stops them being one.
 	SetMemberRole(context.Context, *connect.Request[v1.SetMemberRoleRequest]) (*connect.Response[v1.SetMemberRoleResponse], error)
-	// RemoveMember deletes an account. What they added stays on its Lists.
+	// RemoveMember deletes an account and everything of theirs: the Lists they started,
+	// and whatever they added to anybody else's. Nothing of theirs is left behind.
 	RemoveMember(context.Context, *connect.Request[v1.RemoveMemberRequest]) (*connect.Response[v1.RemoveMemberResponse], error)
 	// UpdateOwnProfile changes the signed-in Member's own name and email.
 	//

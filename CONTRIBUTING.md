@@ -73,7 +73,10 @@ with yours.
 
 ## Conventions worth knowing before you start
 
-- **One verb for creating things: Add.** Never New, Create, Issue, or Generate.
+- **One verb for creating things a Member reads: Add.** Add a member, add a token, add
+  a list. Never New, Create, Issue or Generate in anything on screen. This is DESIGN.md
+  §13, about words rather than identifiers: Go constructors are ordinary Go, and
+  `NewAuthService` and `CreateList` are what they should be called.
 - **Types are named**, never written inline in a signature.
 - **`useEffect` is a last resort.** `useSyncExternalStore`, render-time computation,
   event handlers and TanStack Query cover nearly everything. There is exactly one in the

@@ -39,7 +39,9 @@ Nooks is a self-hosted household todo app. See `CONTEXT.md` for the domain gloss
   event handlers, or TanStack Query. See `STANDARDS.md` §5.
 - UI work follows `DESIGN.md`, not improvisation. Tokens live in `packages/design/foundations.css`,
   shared by the app and the website; do not introduce a colour, radius or size that is not in there.
-- One verb for creating things, everywhere: **Add**. Never New, Create, Issue, or Generate.
+- One verb for creating things a Member reads: **Add**. Never New, Create, Issue or Generate in
+  anything on screen. `DESIGN.md` §13 is about words, not identifiers. Go constructors stay
+  `NewAuthService` and `CreateList`.
 - Ask before adding heavy dependencies, changing auth or token behaviour, or altering the Docker and
   release workflows.
 

@@ -142,3 +142,40 @@ func TestAWatcherWhoIsNotKeepingUpIsNotWaitedFor(t *testing.T) {
 		t.Errorf("queued = %d, want the queue to have stopped at %d", got, queueDepth)
 	}
 }
+
+/*
+Losing a List ends the stream watching it.
+
+Presence is the one thing a stream keeps sending after access is gone. Publish works out
+its audience at the moment of the event, so somebody unshared stops being told the List
+changed. announcePresence sends to every open watch on that uid, and a watch is checked
+when it opens and never again, so somebody unshared mid-stream kept learning who else was
+reading and kept appearing to the others as present.
+
+Only the ones named, and only on that List: a Member watching something else keeps what
+they have.
+*/
+func TestLosingAListEndsTheStreamWatchingIt(t *testing.T) {
+	broker := NewBroker()
+
+	unshared := broker.Watch(WatchParams{MemberID: 1, Name: "Anna", ListUID: "list_shop"})
+	staying := broker.Watch(WatchParams{MemberID: 2, Name: "Jonas", ListUID: "list_shop"})
+	elsewhere := broker.Watch(WatchParams{MemberID: 1, Name: "Anna", ListUID: "list_jobs"})
+	t.Cleanup(staying.Close)
+	t.Cleanup(elsewhere.Close)
+
+	broker.EndWatchesOn("list_shop", []int64{1})
+
+	if _, open := <-unshared.Events; open {
+		// Drained until closed: the presence events already queued come first.
+		for range unshared.Events { //nolint:revive // draining is the assertion
+		}
+	}
+
+	if watching := broker.WatchersOf("list_shop"); len(watching) != 1 || watching[0] != "Jonas" {
+		t.Errorf("watching = %v, want only Jonas left", watching)
+	}
+	if watching := broker.WatchersOf("list_jobs"); len(watching) != 1 {
+		t.Errorf("her stream on another List was ended too: %v", watching)
+	}
+}

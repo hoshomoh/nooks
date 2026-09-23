@@ -20,6 +20,10 @@ type heard struct {
 	listsFor      []int64
 	memberChanged []int64
 	activityFor   []int64
+	// reachLostOn is the List each stream-ending was about, so a test can say that
+	// losing a List ends the stream watching it and not some other one.
+	reachLostOn  []string
+	reachLostFor []int64
 }
 
 func (h *heard) ListChanged(_ context.Context, list store.List) {
@@ -28,6 +32,11 @@ func (h *heard) ListChanged(_ context.Context, list store.List) {
 
 func (h *heard) ListsChanged(audience []int64) {
 	h.listsFor = append(h.listsFor, audience...)
+}
+
+func (h *heard) ReachLost(listUID string, members []int64) {
+	h.reachLostOn = append(h.reachLostOn, listUID)
+	h.reachLostFor = append(h.reachLostFor, members...)
 }
 
 func (h *heard) MemberChanged(memberID int64) {
@@ -114,6 +123,22 @@ func TestUnsharingTellsWhoeverLostTheList(t *testing.T) {
 	}
 	if slices.Contains(told.listsFor, f.anna.ID) {
 		t.Error("the owner was told they lost a list they still have")
+	}
+
+	/*
+	 * And the stream, which telling the browser does not close.
+	 *
+	 * Presence is checked when a watch opens and never again, so a stream left open on
+	 * a List somebody can no longer see goes on saying who else is reading it. Their
+	 * browser reconnects, and the new one is checked on the way in and finds it gone.
+	 */
+	if !slices.Contains(told.reachLostFor, f.jonas.ID) {
+		t.Errorf("ended streams for %v, want Jonas (%d) among them",
+			told.reachLostFor, f.jonas.ID)
+	}
+	if !slices.Contains(told.reachLostOn, uid) {
+		t.Errorf("ended streams on %v, want the List that was taken away (%s)",
+			told.reachLostOn, uid)
 	}
 }
 

@@ -206,6 +206,18 @@ func (p *Publisher) MemberChanged(memberID int64) {
 	p.broker.Publish(events.Event{Kind: events.KindMemberChanged}, []int64{memberID})
 }
 
+/*
+ReachLost ends the streams of Members a List was just taken away from.
+
+Their browsers are told the List is gone by ListsChanged, and reconnect on their own.
+What this closes is the stream itself, because presence is checked when a watch opens
+and never again: without it they would go on being told who else is reading a List they
+can no longer open.
+*/
+func (p *Publisher) ReachLost(listUID string, members []int64) {
+	p.broker.EndWatchesOn(listUID, members)
+}
+
 // ActivityArrived announces that something is waiting in a Member's panel.
 func (p *Publisher) ActivityArrived(memberID int64) {
 	p.broker.Publish(events.Event{Kind: events.KindActivity}, []int64{memberID})

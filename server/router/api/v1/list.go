@@ -22,6 +22,10 @@ type Announcer interface {
 	// reaches the audience as it stands afterwards, so they are the one group it
 	// cannot reach.
 	ListsChanged(audience []int64)
+	// ReachLost ends the live streams these Members have open on a List they can no
+	// longer see. ListsChanged tells their browsers; this closes the connection, which
+	// is what stops presence going on without them.
+	ReachLost(listUID string, members []int64)
 	// MemberChanged is for a Member whose own account changed under them.
 	MemberChanged(memberID int64)
 	ActivityArrived(memberID int64)
@@ -94,6 +98,9 @@ func (s *ListService) announceLostReach(ctx context.Context, list store.List, be
 	}
 	if len(lost) > 0 {
 		s.announce.ListsChanged(lost)
+		// And the stream itself, which presence would otherwise go on using: a watch is
+		// checked when it opens and never again.
+		s.announce.ReachLost(list.UID, lost)
 	}
 }
 

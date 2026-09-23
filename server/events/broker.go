@@ -128,6 +128,52 @@ func (b *Broker) drop(id int64) {
 	}
 }
 
+/*
+EndWatchesOn closes the streams these Members have open on one List.
+
+Presence is the one thing a stream keeps sending after access is lost. Publish works out
+its audience at the moment of the event, so somebody unshared stops being told the List
+changed; announcePresence sends to every open watch on that uid, and a watch is checked
+when it opens and never again. Somebody unshared while their stream is open kept
+learning who else was reading, and kept appearing to the others as present.
+
+Ending the watch rather than re-reading who may see the List on every announce: that
+read would sit on the hottest path there is, behind the one mutex every Publish waits
+for, to catch a case that only happens when sharing changes. Sharing changing is where
+this is called from.
+
+Their connection ends and the browser opens another, which is what it does whenever a
+stream drops. The new one is checked on the way in and finds the List gone.
+*/
+func (b *Broker) EndWatchesOn(listUID string, members []int64) {
+	if listUID == "" || len(members) == 0 {
+		return
+	}
+	losing := make(map[int64]bool, len(members))
+	for _, id := range members {
+		losing[id] = true
+	}
+
+	b.mu.Lock()
+	ended := false
+	for id, w := range b.watches {
+		if w.listUID != listUID || !losing[w.memberID] {
+			continue
+		}
+		delete(b.watches, id)
+		w.closed = true
+		close(w.events)
+		ended = true
+	}
+	b.mu.Unlock()
+
+	// Told after the lock is given up, because announcePresence takes it again. Only
+	// when somebody actually went: the others are being told who is left.
+	if ended {
+		b.announcePresence(listUID)
+	}
+}
+
 // Publish sends an event to the Members named.
 //
 // The audience is worked out by the caller, which is the only place that knows who may

@@ -14,7 +14,7 @@ import { ConfirmDialog } from "@/components/ds/confirm-dialog"
 import { SelectField, type SelectOption } from "@/components/ds/select-field"
 import { Menu, MenuItem, MenuSeparator } from "@/components/ds/menu"
 import { SettingsShell } from "@/components/ds/settings-shell"
-import { memberClient } from "@/lib/api"
+import { memberClient, requestClient } from "@/lib/api"
 import { pendingRequestsQuery } from "@/lib/member-queries"
 import { instanceQuery } from "@/lib/queries"
 import { groupsQuery, membersQuery } from "@/lib/sharing-queries"
@@ -23,7 +23,7 @@ import { useMomentLabel } from "@/lib/use-moment-label"
 import { Avatar } from "@/components/ds/avatar"
 import { initialsOf } from "@/lib/initials"
 import { useSignedInData } from "@/lib/use-signed-in-data"
-import { JoinRequests } from "./join-requests"
+import { PendingRequests } from "./pending-requests"
 import { useSettingsCounts } from "@/lib/use-settings-counts"
 import { IconButton } from "@/components/ds/icon-button"
 
@@ -70,6 +70,18 @@ export function SettingsMembersScreen() {
   const setRole = useMutation({
     mutationFn: ({ memberUid, role }: MemberRoleVariables) =>
       memberClient.setMemberRole({ memberUid, role }),
+    onSuccess: refresh,
+  })
+
+  // Approving a request makes a Member or lets one back in, so the table above the
+  // requests is out of date as well as the requests themselves.
+  const decideJoin = useMutation({
+    mutationFn: (answer: DecideVariables) => requestClient.decideJoinRequest(answer),
+    onSuccess: refresh,
+  })
+
+  const decideReset = useMutation({
+    mutationFn: (answer: DecideVariables) => requestClient.decideResetRequest(answer),
     onSuccess: refresh,
   })
 
@@ -136,7 +148,12 @@ export function SettingsMembersScreen() {
         ))}
       </div>
 
-      <JoinRequests requests={requests.data?.joinRequests ?? []} />
+      <PendingRequests
+        joins={requests.data?.joinRequests ?? []}
+        resets={requests.data?.resetRequests ?? []}
+        onDecideJoin={(requestUid, approve) => decideJoin.mutate({ requestUid, approve })}
+        onDecideReset={(requestUid, approve) => decideReset.mutate({ requestUid, approve })}
+      />
 
       <AddMemberDialog
         open={adding}
@@ -207,6 +224,12 @@ function heirOptions(
       label: t("members.removeGiveTo", { name: member.name }),
     }))
   return [...people, { value: DELETE_THEIR_LISTS, label: t("members.removeDeleteLists") }]
+}
+
+/** What either decision call is told. Both answer the same two questions. */
+interface DecideVariables {
+  requestUid: string
+  approve: boolean
 }
 
 interface MemberRoleVariables {

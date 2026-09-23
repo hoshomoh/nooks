@@ -405,8 +405,9 @@
     "secretBlurb": "Read it out, or write it down. It cannot be shown again — nooks keeps only a hash of it. They must replace it on first sign-in.",
     "secretDone": "Done",
     "requests": "Requests",
-    "requestsWaiting": "{{count}} waiting · from the public list",
-    "noMessage": "no message"
+    "requestsWaiting": "{{count}} waiting",
+    "noMessage": "no message",
+    "resetAsked": "forgot their password, check it is really them"
   },
   "groups": {
     "title": "Groups",

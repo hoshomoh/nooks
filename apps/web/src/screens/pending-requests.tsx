@@ -1,39 +1,47 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useTranslation } from "react-i18next"
-import type { PendingJoinRequest } from "@nooks/api"
+import type { PendingJoinRequest, PendingResetRequest } from "@nooks/api"
 
-import { Button } from "@/components/ds/button"
-import { requestClient } from "@/lib/api"
-import { useMomentLabel } from "@/lib/use-moment-label"
 import { Avatar } from "@/components/ds/avatar"
+import { Button } from "@/components/ds/button"
+import { useMomentLabel } from "@/lib/use-moment-label"
 import { initialsOf } from "@/lib/initials"
 
-export interface JoinRequestsProps {
-  requests: PendingJoinRequest[]
+export interface PendingRequestsProps {
+  joins: PendingJoinRequest[]
+  resets: PendingResetRequest[]
+  /** Answers somebody asking for an account. */
+  onDecideJoin: (requestUid: string, approve: boolean) => void
+  /** Answers somebody asking to replace a forgotten password. */
+  onDecideReset: (requestUid: string, approve: boolean) => void
 }
 
 /**
- * Who is waiting to join, under the Members table.
+ * Who is waiting for an answer, under the Members table.
  *
- * A request shows what the sender wrote, or says plainly that they wrote nothing — an
- * empty message is worth an Admin's suspicion, and hiding its absence would take that
- * signal away.
+ * Both kinds together. They are the same job — somebody an Admin has to recognise
+ * before letting them in — and splitting them would be two rules about which kind
+ * appears where. The reset requests used to appear only in the Activity panel, so an
+ * Admin who read the panel and cleared it had nowhere left to find one.
+ *
+ * A join request shows what the sender wrote, or says plainly that they wrote nothing:
+ * an empty message is worth an Admin's suspicion, and hiding its absence would take
+ * that signal away. A reset request says to check it is really them, because nooks
+ * sends no mail and there is nothing else to verify a reset against.
  *
  * **Ignore is silent.** The sender is never told, so there is nothing to confirm and
  * nothing to undo.
  */
-export function JoinRequests({ requests }: JoinRequestsProps) {
+export function PendingRequests({
+  joins,
+  resets,
+  onDecideJoin,
+  onDecideReset,
+}: PendingRequestsProps) {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
   const timeOf = useMomentLabel()
 
-  const decide = useMutation({
-    mutationFn: ({ requestUid, approve }: DecideVariables) =>
-      requestClient.decideJoinRequest({ requestUid, approve }),
-    onSuccess: () => queryClient.invalidateQueries(),
-  })
-
-  if (requests.length === 0) {
+  const waiting = joins.length + resets.length
+  if (waiting === 0) {
     return null
   }
 
@@ -42,52 +50,60 @@ export function JoinRequests({ requests }: JoinRequestsProps) {
       <div className="flex items-baseline gap-2.5">
         <span className="text-field font-semibold">{t("members.requests")}</span>
         <span className="text-micro text-muted-foreground">
-          {t("members.requestsWaiting", { count: requests.length })}
+          {t("members.requestsWaiting", { count: waiting })}
         </span>
       </div>
 
-      {requests.map((request) => (
-        <div
+      {joins.map((request) => (
+        <RequestRow
           key={request.requestUid}
-          className="grid min-h-13 grid-cols-[1fr_auto] items-center gap-4 border-t border-hair"
-        >
-          <span className="flex min-w-0 items-center gap-3">
-            <Avatar badge={initialsOf(request.name)} size="large" />
-            <span className="flex min-w-0 flex-col">
-              <span className="text-field">{request.name}</span>
-              <span className="truncate text-micro text-muted-foreground">
-                {request.email} · {request.message || t("members.noMessage")} ·{" "}
-                {timeOf(request.createdAt)}
-              </span>
-            </span>
-          </span>
+          name={request.name}
+          detail={`${request.email} · ${request.message || t("members.noMessage")} · ${timeOf(request.createdAt)}`}
+          onDecide={(approve) => onDecideJoin(request.requestUid, approve)}
+        />
+      ))}
 
-          <span className="flex shrink-0 items-center gap-2">
-            <Button
-              tone="secondary"
-              scale="compact"
-              onClick={() =>
-                decide.mutate({ requestUid: request.requestUid, approve: false })
-              }
-            >
-              {t("activity.ignore")}
-            </Button>
-            <Button
-              scale="compact"
-              onClick={() => decide.mutate({ requestUid: request.requestUid, approve: true })}
-            >
-              {t("activity.approve")}
-            </Button>
-          </span>
-        </div>
+      {resets.map((request) => (
+        <RequestRow
+          key={request.requestUid}
+          name={request.member?.name ?? ""}
+          detail={`${request.member?.email ?? ""} · ${t("members.resetAsked")} · ${timeOf(request.createdAt)}`}
+          onDecide={(approve) => onDecideReset(request.requestUid, approve)}
+        />
       ))}
     </section>
   )
 }
 
-/** What the decision mutation is told. */
-interface DecideVariables {
-  requestUid: string
-  approve: boolean
+interface RequestRowProps {
+  name: string
+  /** The second line: their address, what they want, and when they asked. */
+  detail: string
+  onDecide: (approve: boolean) => void
 }
 
+/** One person waiting, whichever they are waiting for. */
+function RequestRow({ name, detail, onDecide }: RequestRowProps) {
+  const { t } = useTranslation()
+
+  return (
+    <div className="grid min-h-13 grid-cols-[1fr_auto] items-center gap-4 border-t border-hair">
+      <span className="flex min-w-0 items-center gap-3">
+        <Avatar badge={initialsOf(name)} size="large" />
+        <span className="flex min-w-0 flex-col">
+          <span className="text-field">{name}</span>
+          <span className="truncate text-micro text-muted-foreground">{detail}</span>
+        </span>
+      </span>
+
+      <span className="flex shrink-0 items-center gap-2">
+        <Button tone="secondary" scale="compact" onClick={() => onDecide(false)}>
+          {t("activity.ignore")}
+        </Button>
+        <Button scale="compact" onClick={() => onDecide(true)}>
+          {t("activity.approve")}
+        </Button>
+      </span>
+    </div>
+  )
+}

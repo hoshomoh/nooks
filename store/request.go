@@ -68,20 +68,82 @@ type CreateJoinRequestParams struct {
 	CreatedAt time.Time
 }
 
-// CreateJoinRequest records a Visitor's request for an account.
+/*
+PendingJoinLimit is how many requests for an account may wait for an Admin at once.
+
+The join endpoint is the one write a stranger on the internet can reach, and until this
+existed a script could leave a hundred thousand rows waiting. One request per email
+bounds anybody using their own address; this bounds anybody inventing addresses.
+
+Twenty-five, half of ActivityLimit. Activity is the only place a request appears and the
+panel shows fifty entries, so a queue that could pass fifty would push requests somewhere
+no Admin can see, and a full one still leaves half the panel for everything else that
+happens on the Instance.
+*/
+const PendingJoinLimit = ActivityLimit / 2
+
+var (
+	// ErrAlreadyWaiting reports that this asker already has a request nobody has
+	// answered. Callers answer it the way they answer success, so that asking twice
+	// tells a stranger nothing.
+	ErrAlreadyWaiting = errors.New("already waiting")
+	// ErrTooManyWaiting reports that the queue is full until an Admin clears some of it.
+	ErrTooManyWaiting = errors.New("too many waiting")
+)
+
+/*
+CreateJoinRequest records a Visitor's request for an account.
+
+It reports ErrAlreadyWaiting when that email is already in the queue and ErrTooManyWaiting
+when the queue is full.
+
+Both rules are conditions on the insert rather than reads taken before it. A flood is the
+concurrent case by definition, so counting first and inserting second would let as many
+through as the server runs at once. That is the shape of the first-run race, and it is
+refused the same way.
+*/
 func (s *sqlStore) CreateJoinRequest(ctx context.Context, params CreateJoinRequestParams) (JoinRequest, error) {
-	row := &joinRequestModel{
-		UID:       params.UID,
-		Name:      params.Name,
-		Email:     normaliseEmail(params.Email),
-		Message:   params.Message,
-		Status:    string(StatusPending),
-		CreatedAt: formatTime(params.CreatedAt),
-	}
-	if _, err := s.db.NewInsert().Model(row).Returning("*").Exec(ctx); err != nil {
+	const claim = `
+		INSERT INTO join_request (uid, name, email, message, status, created_at, decided_at)
+		SELECT ?, ?, ?, ?, ?, ?, ''
+		WHERE NOT EXISTS (SELECT 1 FROM join_request WHERE email = ? AND status = ?)
+		AND (SELECT COUNT(*) FROM join_request WHERE status = ?) < ?`
+
+	email := normaliseEmail(params.Email)
+	pending := string(StatusPending)
+	result, err := s.db.NewRaw(claim,
+		params.UID, params.Name, email, params.Message, pending, formatTime(params.CreatedAt),
+		email, pending,
+		pending, PendingJoinLimit,
+	).Exec(ctx)
+	if err != nil {
 		return JoinRequest{}, fmt.Errorf("create join request: %w", err)
 	}
-	return row.toJoinRequest()
+
+	made, err := result.RowsAffected()
+	if err != nil {
+		return JoinRequest{}, fmt.Errorf("read whether the join request was made: %w", err)
+	}
+	if made == 0 {
+		return JoinRequest{}, s.whyNotJoined(ctx, email)
+	}
+	return s.JoinRequestByUID(ctx, params.UID)
+}
+
+// whyNotJoined says which of the two rules refused a request, read after the fact
+// because one statement can only report that it wrote nothing.
+func (s *sqlStore) whyNotJoined(ctx context.Context, email string) error {
+	waiting, err := s.db.NewSelect().
+		Model((*joinRequestModel)(nil)).
+		Where("email = ? AND status = ?", email, string(StatusPending)).
+		Count(ctx)
+	if err != nil {
+		return fmt.Errorf("count join requests from this email: %w", err)
+	}
+	if waiting > 0 {
+		return ErrAlreadyWaiting
+	}
+	return ErrTooManyWaiting
 }
 
 /*
@@ -190,18 +252,34 @@ func (s *sqlStore) UseJoinRequest(ctx context.Context, uid string, at time.Time)
 	return requireOneRow(result, "approved join request")
 }
 
-// CreateResetRequest records a Member's request to replace a forgotten password.
+/*
+CreateResetRequest records a Member's request to replace a forgotten password. It
+reports ErrAlreadyWaiting when that Member is already in the queue.
+
+No ceiling here, unlike the join queue: one waiting request per Member already bounds
+this table by how many Members there are, which is a number an Admin controls.
+*/
 func (s *sqlStore) CreateResetRequest(ctx context.Context, uid string, memberID int64, at time.Time) (ResetRequest, error) {
-	row := &resetRequestModel{
-		UID:       uid,
-		MemberID:  memberID,
-		Status:    string(StatusPending),
-		CreatedAt: formatTime(at),
-	}
-	if _, err := s.db.NewInsert().Model(row).Returning("*").Exec(ctx); err != nil {
+	const claim = `
+		INSERT INTO reset_request (uid, member_id, status, created_at, decided_at, expires_at)
+		SELECT ?, ?, ?, ?, '', ''
+		WHERE NOT EXISTS (SELECT 1 FROM reset_request WHERE member_id = ? AND status = ?)`
+
+	pending := string(StatusPending)
+	result, err := s.db.NewRaw(claim, uid, memberID, pending, formatTime(at), memberID, pending).
+		Exec(ctx)
+	if err != nil {
 		return ResetRequest{}, fmt.Errorf("create reset request: %w", err)
 	}
-	return row.toResetRequest()
+
+	made, err := result.RowsAffected()
+	if err != nil {
+		return ResetRequest{}, fmt.Errorf("read whether the reset request was made: %w", err)
+	}
+	if made == 0 {
+		return ResetRequest{}, ErrAlreadyWaiting
+	}
+	return s.ResetRequestByUID(ctx, uid)
 }
 
 // PendingResetRequests lists the requests waiting for an Admin, oldest first.

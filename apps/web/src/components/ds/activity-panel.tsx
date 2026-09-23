@@ -1,3 +1,4 @@
+import { Fragment } from "react"
 import { useTranslation } from "react-i18next"
 import { cn } from "cn"
 import { ActivityKind, ActivityOutcome, type Activity } from "@nooks/api"
@@ -10,26 +11,43 @@ export interface ActivityPanelProps {
   onOpen: (entry: Activity) => void
   /** Decides a request. Ignoring is silent and never tells the sender. */
   onDecide: (entry: Activity, approve: boolean) => void
+  /** Opens the Members screen, where every waiting request is listed. */
+  onSeeRequests: () => void
   /** The request being decided right now, if any. */
   deciding?: string
 }
 
 /**
+ * How many waiting requests the panel offers to decide before sending the rest on.
+ *
+ * One person asking is the ordinary case, and it keeps one-click Approve where it is.
+ * A queueful is somebody with a script, and drawing all of them buries everything else
+ * that was waiting.
+ */
+const REQUESTS_SHOWN = 3
+
+/**
  * The Activity panel, per DESIGN.md §9.
  *
- * Nooks has no mail server, so this is the only place a join request, a reset request
+ * nooks has no mail server, so this is the only place a join request, a reset request
  * or a share surfaces. That is why every entry carries its own words rather than a
  * code, and why the panel says so at the bottom: a Member who is waiting for an email
  * should find out here that none is coming.
+ *
+ * The entries scroll and the two lines around them do not. Without that the popover
+ * grows to fit fifty entries, and the footer saying no mail is coming ends up below the
+ * bottom of the screen with nothing to scroll it back.
  */
 export function ActivityPanel({
   activity,
   timeOf,
   onOpen,
   onDecide,
+  onSeeRequests,
   deciding,
 }: ActivityPanelProps) {
   const { t } = useTranslation()
+  const { hidden, lineAfter, moreWaiting } = collapse(activity)
 
   return (
     <div className="flex flex-col">
@@ -41,16 +59,30 @@ export function ActivityPanel({
       {activity.length === 0 ? (
         <p className="px-2.5 py-3 text-meta text-muted-foreground">{t("activity.empty")}</p>
       ) : (
-        activity.map((entry) => (
-          <Entry
-            key={entry.uid}
-            entry={entry}
-            when={timeOf(entry.createdAt)}
-            onOpen={onOpen}
-            onDecide={onDecide}
-            deciding={deciding === entry.uid}
-          />
-        ))
+        <div className="flex max-h-(--size-floating-list) flex-col overflow-y-auto">
+          {activity.map((entry) =>
+            hidden.has(entry.uid) ? null : (
+              <Fragment key={entry.uid}>
+                <Entry
+                  entry={entry}
+                  when={timeOf(entry.createdAt)}
+                  onOpen={onOpen}
+                  onDecide={onDecide}
+                  deciding={deciding === entry.uid}
+                />
+                {entry.uid === lineAfter && (
+                  <button
+                    type="button"
+                    onClick={onSeeRequests}
+                    className="px-2.5 py-2 text-left text-micro text-shared hover:underline"
+                  >
+                    {t("activity.moreRequests", { count: moreWaiting })}
+                  </button>
+                )}
+              </Fragment>
+            ),
+          )}
+        </div>
       )}
 
       <p className="mt-1.5 border-t border-hair px-2.5 py-2.5 text-micro text-muted-foreground">
@@ -58,6 +90,39 @@ export function ActivityPanel({
       </p>
     </div>
   )
+}
+
+/** Which entries the panel holds back, and where the line standing for them goes. */
+interface Collapsed {
+  /** Entries not drawn, by identifier. */
+  hidden: Set<string>
+  /** The entry the standing-in line follows, empty when nothing is held back. */
+  lineAfter: string
+  /** How many are held back. */
+  moreWaiting: number
+}
+
+/**
+ * Works out which waiting join requests the panel keeps.
+ *
+ * Only join requests, because the line stands in for them by opening the Members
+ * screen, which is where they are listed. A reset request has no such screen yet and
+ * cannot be flooded either: one waiting reset per Member bounds it by how many Members
+ * there are.
+ */
+function collapse(activity: Activity[]): Collapsed {
+  const waiting = activity.filter(isWaitingJoin)
+  const held = waiting.slice(REQUESTS_SHOWN)
+  return {
+    hidden: new Set(held.map((entry) => entry.uid)),
+    lineAfter: held.length === 0 ? "" : waiting[REQUESTS_SHOWN - 1].uid,
+    moreWaiting: held.length,
+  }
+}
+
+/** isWaitingJoin reports whether an entry is somebody asking for an account, undecided. */
+function isWaitingJoin(entry: Activity): boolean {
+  return entry.kind === ActivityKind.JOIN_REQUEST && entry.outcome === ActivityOutcome.UNSPECIFIED
 }
 
 interface EntryProps {
@@ -77,7 +142,7 @@ function Entry({ entry, when, onOpen, onDecide, deciding }: EntryProps) {
   return (
     <div
       className={cn(
-        "grid grid-cols-[6px_1fr] items-start gap-2.5 rounded-md p-2.5",
+        "grid shrink-0 grid-cols-[6px_1fr] items-start gap-2.5 rounded-md p-2.5",
         entry.unread && "bg-secondary",
       )}
     >

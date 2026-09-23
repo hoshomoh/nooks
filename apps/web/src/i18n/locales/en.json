@@ -347,6 +347,7 @@
     "open": "Open",
     "seeBoth": "See both",
     "ignore": "Ignore",
+    "moreRequests": "See {{count}} more in Members",
     "ignored": "Ignored, silently",
     "approved": "Approved",
     "deciding": "Approving…",

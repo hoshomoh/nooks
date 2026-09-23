@@ -21,7 +21,7 @@ interface DecideVariables {
 /**
  * The Activity control in the chrome bar, and the panel behind it.
  *
- * The dot is the only unread indicator in Nooks: there is no mail, no badge on a tab
+ * The dot is the only unread indicator here: there is no mail, no badge on a tab
  * and no toast, so this is where everything waits.
  */
 export function ActivityControl() {
@@ -63,6 +63,12 @@ export function ActivityControl() {
     // that has to catch up.
     onSuccess: () => queryClient.invalidateQueries(),
   })
+
+  // Where the panel sends an Admin when more people are waiting than it decides on.
+  const seeRequests = () => {
+    setOpen(false)
+    void navigate({ to: "/settings/members" })
+  }
 
   const follow = (entry: Activity) => {
     setOpen(false)
@@ -108,6 +114,7 @@ export function ActivityControl() {
           timeOf={timeOf}
           onOpen={follow}
           onDecide={(entry, approve) => decide.mutate({ entry, approve })}
+          onSeeRequests={seeRequests}
           deciding={decide.isPending ? decide.variables?.entry.uid : undefined}
         />
       </PopoverContent>

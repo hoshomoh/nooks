@@ -65,6 +65,10 @@ type AuthServiceClient interface {
 	// waits in Activity until an Admin approves it and hands over a temporary password.
 	// Refused where the Instance has signup off; where it is on, anybody who can reach the
 	// Instance may ask and the approval is what decides.
+	//
+	// One request may wait per email address, and the queue of waiting requests has a
+	// ceiling. Asking again under an address already waiting reports success and writes
+	// nothing; asking when the queue is full is refused until an Admin has cleared some.
 	RequestJoin(ctx context.Context, in *RequestJoinRequest, opts ...grpc.CallOption) (*RequestJoinResponse, error)
 	// GetJoinRequest reports whether an Admin has decided yet. The Visitor's browser
 	// remembers the request id and comes back to the same address.
@@ -74,6 +78,9 @@ type AuthServiceClient interface {
 	CompleteJoin(ctx context.Context, in *CompleteJoinRequest, opts ...grpc.CallOption) (*CompleteJoinResponse, error)
 	// RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
 	// the Admin checks it is really them however they like, then approves.
+	//
+	// One request may wait per Member. Asking again while one is waiting reports success
+	// and writes nothing, so the panel carries it once.
 	RequestPasswordReset(ctx context.Context, in *RequestPasswordResetRequest, opts ...grpc.CallOption) (*RequestPasswordResetResponse, error)
 	// GetResetRequest reports whether an Admin has approved a reset yet.
 	GetResetRequest(ctx context.Context, in *GetResetRequestRequest, opts ...grpc.CallOption) (*GetResetRequestResponse, error)
@@ -241,6 +248,10 @@ type AuthServiceServer interface {
 	// waits in Activity until an Admin approves it and hands over a temporary password.
 	// Refused where the Instance has signup off; where it is on, anybody who can reach the
 	// Instance may ask and the approval is what decides.
+	//
+	// One request may wait per email address, and the queue of waiting requests has a
+	// ceiling. Asking again under an address already waiting reports success and writes
+	// nothing; asking when the queue is full is refused until an Admin has cleared some.
 	RequestJoin(context.Context, *RequestJoinRequest) (*RequestJoinResponse, error)
 	// GetJoinRequest reports whether an Admin has decided yet. The Visitor's browser
 	// remembers the request id and comes back to the same address.
@@ -250,6 +261,9 @@ type AuthServiceServer interface {
 	CompleteJoin(context.Context, *CompleteJoinRequest) (*CompleteJoinResponse, error)
 	// RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
 	// the Admin checks it is really them however they like, then approves.
+	//
+	// One request may wait per Member. Asking again while one is waiting reports success
+	// and writes nothing, so the panel carries it once.
 	RequestPasswordReset(context.Context, *RequestPasswordResetRequest) (*RequestPasswordResetResponse, error)
 	// GetResetRequest reports whether an Admin has approved a reset yet.
 	GetResetRequest(context.Context, *GetResetRequestRequest) (*GetResetRequestResponse, error)

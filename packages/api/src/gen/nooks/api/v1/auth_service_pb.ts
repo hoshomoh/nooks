@@ -761,6 +761,10 @@ export const AuthService: GenService<{
    * Refused where the Instance has signup off; where it is on, anybody who can reach the
    * Instance may ask and the approval is what decides.
    *
+   * One request may wait per email address, and the queue of waiting requests has a
+   * ceiling. Asking again under an address already waiting reports success and writes
+   * nothing; asking when the queue is full is refused until an Admin has cleared some.
+   *
    * @generated from rpc nooks.api.v1.AuthService.RequestJoin
    */
   requestJoin: {
@@ -793,6 +797,9 @@ export const AuthService: GenService<{
   /**
    * RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
    * the Admin checks it is really them however they like, then approves.
+   *
+   * One request may wait per Member. Asking again while one is waiting reports success
+   * and writes nothing, so the panel carries it once.
    *
    * @generated from rpc nooks.api.v1.AuthService.RequestPasswordReset
    */

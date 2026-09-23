@@ -146,7 +146,9 @@ type Store interface {
 	// DeleteExpiredSessions clears out Sessions past their expiry.
 	DeleteExpiredSessions(ctx context.Context, now time.Time) (int64, error)
 
-	// CreateJoinRequest records a Visitor's request for an account.
+	// CreateJoinRequest records a Visitor's request for an account. It reports
+	// ErrAlreadyWaiting when that email is already in the queue, and ErrTooManyWaiting
+	// when the queue is full.
 	CreateJoinRequest(ctx context.Context, params CreateJoinRequestParams) (JoinRequest, error)
 
 	// DeleteDecidedRequests clears out requests answered before the given moment, and
@@ -165,7 +167,8 @@ type Store interface {
 	// UseJoinRequest spends an approved request, so one approval creates one account.
 	UseJoinRequest(ctx context.Context, uid string, at time.Time) error
 
-	// CreateResetRequest records a Member's request to replace a forgotten password.
+	// CreateResetRequest records a Member's request to replace a forgotten password. It
+	// reports ErrAlreadyWaiting when that Member is already in the queue.
 	CreateResetRequest(ctx context.Context, uid string, memberID int64, at time.Time) (ResetRequest, error)
 
 	// PendingResetRequests lists what is waiting for an Admin, oldest first.

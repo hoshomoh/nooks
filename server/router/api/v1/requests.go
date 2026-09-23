@@ -21,6 +21,12 @@ import (
 var errSignupClosed = connect.NewError(connect.CodePermissionDenied,
 	errors.New("this instance is not accepting requests to join"))
 
+// errTooManyRequests refuses a Visitor when the queue of people waiting for an Admin is
+// already full. Like a closed door, a full queue is a fact about the Instance and says
+// nothing about who lives here.
+var errTooManyRequests = connect.NewError(connect.CodeResourceExhausted,
+	errors.New("too many requests are already waiting for an admin; try again later"))
+
 /*
 RequestJoin asks an Admin for an account.
 
@@ -28,9 +34,16 @@ Refused outright when the Instance has signup off. That setting was stored and d
 read by nothing until it was wired up here, so an Admin who turned it off was told
 something happened and nothing did.
 
-With it on, this always reports success. Whether that email already has an account is
-not the Visitor's business, and answering differently would turn this into a way to
-discover who lives here.
+With it on, it reports success whether or not anything was written. Whether that email
+already has an account, or already has a request waiting, is not the Visitor's business,
+and answering differently would turn this into a way to discover who lives here. A full
+queue is the one refusal a Visitor can see, because that is a fact about the Instance
+rather than about anybody in it. The store holds both rules and says why.
+
+Asking again under an email already waiting gets an identifier with no request behind it,
+which stays pending for ever, the way RequestPasswordReset has always answered somebody
+with no account. Handing back the waiting request's own identifier would hand whoever
+types an address the thing that completes that account.
 */
 func (s *AuthService) RequestJoin(
 	ctx context.Context,
@@ -74,6 +87,12 @@ func (s *AuthService) RequestJoin(
 		CreatedAt: s.now(),
 	})
 	if err != nil {
+		if errors.Is(err, store.ErrTooManyWaiting) {
+			return nil, errTooManyRequests
+		}
+		if errors.Is(err, store.ErrAlreadyWaiting) {
+			return connect.NewResponse(&apiv1.RequestJoinResponse{RequestUid: uid}), nil
+		}
 		return nil, internalError("create join request", err)
 	}
 
@@ -169,6 +188,10 @@ func (s *AuthService) CompleteJoin(
 // It reports success whether or not the account exists, and returns an identifier
 // either way. An identifier with no request behind it simply stays pending forever,
 // which is both true from the asker's point of view and useless for enumeration.
+//
+// One waiting request per Member, so asking twice does not put it in the panel twice.
+// That needs no ceiling of its own: a table bounded by how many Members there are is
+// bounded by a number an Admin controls.
 func (s *AuthService) RequestPasswordReset(
 	ctx context.Context,
 	req *connect.Request[apiv1.RequestPasswordResetRequest],
@@ -192,6 +215,11 @@ func (s *AuthService) RequestPasswordReset(
 	}
 
 	if _, err := s.store.CreateResetRequest(ctx, uid, member.ID, s.now()); err != nil {
+		// Already waiting, so the panel already carries it. The same answer as a first
+		// ask, for the same reason a missing account gets one.
+		if errors.Is(err, store.ErrAlreadyWaiting) {
+			return connect.NewResponse(&apiv1.RequestPasswordResetResponse{RequestUid: uid}), nil
+		}
 		return nil, internalError("create reset request", err)
 	}
 

@@ -21,17 +21,26 @@ function entry(kind: ActivityKind, text: string, outcome = ActivityOutcome.UNSPE
   } as Activity
 }
 
+/** waitingJoins builds a queue of people asking for an account, none of them decided. */
+function waitingJoins(howMany: number): Activity[] {
+  return Array.from({ length: howMany }, (_, index) => ({
+    ...entry(ActivityKind.JOIN_REQUEST, `Asker ${index} asked to join`),
+    uid: `join-${index}`,
+  }))
+}
+
 /** show renders the panel with one entry. */
-function show(activity: Activity[], onDecide = vi.fn(), onOpen = vi.fn()) {
+function show(activity: Activity[], onDecide = vi.fn(), onOpen = vi.fn(), onSeeRequests = vi.fn()) {
   render(
     <ActivityPanel
       activity={activity}
       timeOf={() => "18:44"}
       onOpen={onOpen}
       onDecide={onDecide}
+      onSeeRequests={onSeeRequests}
     />,
   )
-  return { onDecide, onOpen }
+  return { onDecide, onOpen, onSeeRequests }
 }
 
 describe("the activity panel", () => {
@@ -87,5 +96,42 @@ describe("the activity panel", () => {
 
     expect(screen.getByRole("button", { name: "Open" })).toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "Approve" })).not.toBeInTheDocument()
+  })
+
+  // Three people asking is the ordinary case, and one-click Approve stays where it is.
+  it("decides a handful of requests without sending anybody anywhere", () => {
+    show(waitingJoins(3))
+
+    expect(screen.getAllByRole("button", { name: "Approve" })).toHaveLength(3)
+    expect(screen.queryByRole("button", { name: /more in Members/ })).not.toBeInTheDocument()
+  })
+
+  // Past a handful the first three still answer in place and the rest become one line,
+  // so somebody with a script cannot bury everything else that was waiting.
+  it("sends the rest to the Members screen", async () => {
+    const { onSeeRequests } = show(waitingJoins(9))
+
+    expect(screen.getAllByRole("button", { name: "Approve" })).toHaveLength(3)
+
+    await userEvent.click(screen.getByRole("button", { name: "See 6 more in Members" }))
+    expect(onSeeRequests).toHaveBeenCalled()
+  })
+
+  // Only requests nobody has answered are held back. A decided one is a statement, and
+  // counting it would say more people are waiting than are.
+  it("counts only what is still waiting", () => {
+    show([
+      ...waitingJoins(4),
+      entry(ActivityKind.JOIN_REQUEST, "Jonas asked to join", ActivityOutcome.APPROVED),
+    ])
+
+    expect(screen.getByRole("button", { name: "See 1 more in Members" })).toBeInTheDocument()
+  })
+
+  // A shared List is not a request, so it is drawn whatever else is waiting.
+  it("keeps everything that is not a request", () => {
+    show([...waitingJoins(9), entry(ActivityKind.LIST_SHARED, "Jonas shared a list")])
+
+    expect(screen.getByText("Jonas shared a list")).toBeInTheDocument()
   })
 })

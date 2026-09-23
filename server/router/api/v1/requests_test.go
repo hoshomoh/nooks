@@ -12,22 +12,34 @@ import (
 	"github.com/hoshomoh/nooks/store"
 )
 
-// requestJoin asks for an account and returns the request identifier.
-func requestJoin(t *testing.T, svc *AuthService) string {
+// askToJoin sends one request under a chosen email, and hands back what the Visitor was
+// told along with the identifier, so a refusal can be read as well as a success.
+func askToJoin(t *testing.T, svc *AuthService, email string) (string, error) {
 	t.Helper()
 	res, err := svc.RequestJoin(t.Context(), connect.NewRequest(&apiv1.RequestJoinRequest{
-		Name: "Til", Email: "til@example.com", Message: "It's Til, from upstairs",
+		Name: "Til", Email: email, Message: "It's Til, from upstairs",
 	}))
+	if err != nil {
+		return "", err
+	}
+	return res.Msg.GetRequestUid(), nil
+}
+
+// requestJoin asks for an account under one address and returns the request identifier.
+// One address may only have one request waiting, so a test wanting two passes two.
+func requestJoin(t *testing.T, svc *AuthService, email string) string {
+	t.Helper()
+	uid, err := askToJoin(t, svc, email)
 	if err != nil {
 		t.Fatalf("RequestJoin: %v", err)
 	}
-	return res.Msg.GetRequestUid()
+	return uid
 }
 
 func TestJoinRequestWaitsUntilApproved(t *testing.T) {
 	svc, s := newAuthService(t)
 	completeSetup(t, svc)
-	uid := requestJoin(t, svc)
+	uid := requestJoin(t, svc, "til@example.com")
 
 	before, err := svc.GetJoinRequest(t.Context(), connect.NewRequest(&apiv1.GetJoinRequestRequest{RequestUid: uid}))
 	if err != nil {
@@ -71,7 +83,7 @@ func TestUnknownJoinRequestReadsAsPending(t *testing.T) {
 func TestIgnoredJoinRequestReadsAsPending(t *testing.T) {
 	svc, s := newAuthService(t)
 	completeSetup(t, svc)
-	uid := requestJoin(t, svc)
+	uid := requestJoin(t, svc, "til@example.com")
 
 	if err := s.DecideJoinRequest(t.Context(), uid, store.StatusIgnored, testClock); err != nil {
 		t.Fatalf("DecideJoinRequest: %v", err)
@@ -89,7 +101,7 @@ func TestIgnoredJoinRequestReadsAsPending(t *testing.T) {
 func TestCompleteJoinCreatesTheAccount(t *testing.T) {
 	svc, s := newAuthService(t)
 	completeSetup(t, svc)
-	uid := requestJoin(t, svc)
+	uid := requestJoin(t, svc, "til@example.com")
 	if err := s.DecideJoinRequest(t.Context(), uid, store.StatusApproved, testClock); err != nil {
 		t.Fatalf("DecideJoinRequest: %v", err)
 	}
@@ -112,7 +124,7 @@ func TestCompleteJoinCreatesTheAccount(t *testing.T) {
 func TestCompleteJoinCannotBeReplayed(t *testing.T) {
 	svc, s := newAuthService(t)
 	completeSetup(t, svc)
-	uid := requestJoin(t, svc)
+	uid := requestJoin(t, svc, "til@example.com")
 	if err := s.DecideJoinRequest(t.Context(), uid, store.StatusApproved, testClock); err != nil {
 		t.Fatalf("DecideJoinRequest: %v", err)
 	}
@@ -133,7 +145,7 @@ func TestCompleteJoinCannotBeReplayed(t *testing.T) {
 func TestCompleteJoinNeedsAnApproval(t *testing.T) {
 	svc, _ := newAuthService(t)
 	completeSetup(t, svc)
-	uid := requestJoin(t, svc)
+	uid := requestJoin(t, svc, "til@example.com")
 
 	_, err := svc.CompleteJoin(t.Context(), connect.NewRequest(&apiv1.CompleteJoinRequest{
 		RequestUid: uid, Name: "Til", Password: goodPassword,
@@ -298,9 +310,9 @@ func TestCompleteJoinRefusesEveryUnapprovedStateAlike(t *testing.T) {
 	svc, s := newAuthService(t)
 	completeSetup(t, svc)
 
-	pending := requestJoin(t, svc)
+	pending := requestJoin(t, svc, "til@example.com")
 
-	ignored := requestJoin(t, svc)
+	ignored := requestJoin(t, svc, "jonas@example.com")
 	if err := s.DecideJoinRequest(t.Context(), ignored, store.StatusIgnored, testClock); err != nil {
 		t.Fatalf("DecideJoinRequest: %v", err)
 	}
@@ -381,5 +393,157 @@ func TestSignupSettingDecidesWhoMayAsk(t *testing.T) {
 					got.Msg.GetStatus())
 			}
 		})
+	}
+}
+
+/*
+One address cannot fill the panel.
+
+Asking twice looks exactly like asking once from outside: the same success, an
+identifier either way. What must not happen is a second row, and what must especially
+not happen is the second asker being handed the first asker's identifier, which is the
+thing that completes the account.
+*/
+func TestOneEmailWaitsOnce(t *testing.T) {
+	svc, s := newAuthService(t)
+	completeSetup(t, svc)
+
+	first, err := askToJoin(t, svc, "til@example.com")
+	if err != nil {
+		t.Fatalf("RequestJoin: %v", err)
+	}
+	second, err := askToJoin(t, svc, "til@example.com")
+	if err != nil {
+		t.Fatalf("RequestJoin again: %v", err)
+	}
+
+	if second == first {
+		t.Error("asking again handed back the first identifier, which completes that account")
+	}
+	if _, err := s.JoinRequestByUID(t.Context(), second); !errors.Is(err, store.ErrNotFound) {
+		t.Errorf("JoinRequestByUID(second) = %v, want no request behind it", err)
+	}
+
+	waiting, err := s.PendingJoinRequests(t.Context())
+	if err != nil {
+		t.Fatalf("PendingJoinRequests: %v", err)
+	}
+	if len(waiting) != 1 {
+		t.Errorf("%d requests waiting, want one", len(waiting))
+	}
+}
+
+// A different address is a different person, so asking is not refused by somebody else
+// having asked.
+func TestAnotherEmailStillWaits(t *testing.T) {
+	svc, s := newAuthService(t)
+	completeSetup(t, svc)
+
+	if _, err := askToJoin(t, svc, "til@example.com"); err != nil {
+		t.Fatalf("RequestJoin: %v", err)
+	}
+	if _, err := askToJoin(t, svc, "jonas@example.com"); err != nil {
+		t.Fatalf("RequestJoin: %v", err)
+	}
+
+	waiting, err := s.PendingJoinRequests(t.Context())
+	if err != nil {
+		t.Fatalf("PendingJoinRequests: %v", err)
+	}
+	if len(waiting) != 2 {
+		t.Errorf("%d requests waiting, want two", len(waiting))
+	}
+}
+
+/*
+The queue has an end, and the panel can still show what is in it.
+
+The ceiling is what bounds somebody inventing addresses, which the per-email rule cannot
+touch. It is the one refusal a Visitor is allowed to see: a full queue is a fact about
+the Instance, in the same way a closed door is.
+*/
+func TestTheJoinQueueHasACeiling(t *testing.T) {
+	svc, s := newAuthService(t)
+	completeSetup(t, svc)
+
+	for i := range store.PendingJoinLimit {
+		if _, err := askToJoin(t, svc, fmt.Sprintf("til-%d@example.com", i)); err != nil {
+			t.Fatalf("RequestJoin %d: %v", i, err)
+		}
+	}
+
+	_, err := askToJoin(t, svc, "one-too-many@example.com")
+	if connect.CodeOf(err) != connect.CodeResourceExhausted {
+		t.Fatalf("RequestJoin past the ceiling = %v, want resource exhausted", err)
+	}
+
+	waiting, err := s.PendingJoinRequests(t.Context())
+	if err != nil {
+		t.Fatalf("PendingJoinRequests: %v", err)
+	}
+	if len(waiting) != store.PendingJoinLimit {
+		t.Errorf("%d requests waiting, want the ceiling of %d", len(waiting), store.PendingJoinLimit)
+	}
+	if len(waiting) > store.ActivityLimit {
+		t.Errorf("%d requests waiting is more than the panel shows, so some are invisible",
+			len(waiting))
+	}
+}
+
+// Deciding one makes room, so a full queue is a thing an Admin can clear rather than a
+// door that stays shut.
+func TestDecidingAJoinRequestMakesRoom(t *testing.T) {
+	svc, s := newAuthService(t)
+	completeSetup(t, svc)
+
+	for i := range store.PendingJoinLimit {
+		if _, err := askToJoin(t, svc, fmt.Sprintf("til-%d@example.com", i)); err != nil {
+			t.Fatalf("RequestJoin %d: %v", i, err)
+		}
+	}
+
+	waiting, err := s.PendingJoinRequests(t.Context())
+	if err != nil {
+		t.Fatalf("PendingJoinRequests: %v", err)
+	}
+	if err := s.DecideJoinRequest(t.Context(), waiting[0].UID, store.StatusIgnored, testClock); err != nil {
+		t.Fatalf("DecideJoinRequest: %v", err)
+	}
+
+	if _, err := askToJoin(t, svc, "one-more@example.com"); err != nil {
+		t.Fatalf("RequestJoin after room was made: %v", err)
+	}
+}
+
+// A Member who asks twice is in the panel once, and the second identifier is as dead as
+// the one somebody with no account gets.
+func TestOneMemberResetsOnce(t *testing.T) {
+	svc, s := newAuthService(t)
+	completeSetup(t, svc)
+
+	ask := func() string {
+		t.Helper()
+		res, err := svc.RequestPasswordReset(t.Context(),
+			connect.NewRequest(&apiv1.RequestPasswordResetRequest{EmailOrName: "anna@brunnen.lan"}))
+		if err != nil {
+			t.Fatalf("RequestPasswordReset: %v", err)
+		}
+		return res.Msg.GetRequestUid()
+	}
+
+	first, second := ask(), ask()
+	if second == first {
+		t.Error("asking again handed back the first identifier, which replaces that password")
+	}
+	if _, err := s.ResetRequestByUID(t.Context(), second); !errors.Is(err, store.ErrNotFound) {
+		t.Errorf("ResetRequestByUID(second) = %v, want no request behind it", err)
+	}
+
+	waiting, err := s.PendingResetRequests(t.Context())
+	if err != nil {
+		t.Fatalf("PendingResetRequests: %v", err)
+	}
+	if len(waiting) != 1 {
+		t.Errorf("%d resets waiting, want one", len(waiting))
 	}
 }

@@ -1429,7 +1429,6 @@ components:
                         - ACTIVITY_KIND_JOIN_REQUEST
                         - ACTIVITY_KIND_RESET_REQUEST
                         - ACTIVITY_KIND_LIST_SHARED
-                        - ACTIVITY_KIND_CONFLICT
                         - ACTIVITY_KIND_TOKEN_USED
                     type: string
                     format: enum

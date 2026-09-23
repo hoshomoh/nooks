@@ -32,8 +32,13 @@ enum ActivityKind {
   ACTIVITY_KIND_RESET_REQUEST = 2;
   // ACTIVITY_KIND_LIST_SHARED is a List somebody shared with you.
   ACTIVITY_KIND_LIST_SHARED = 3;
-  // ACTIVITY_KIND_CONFLICT is two people having edited the same text.
-  ACTIVITY_KIND_CONFLICT = 4;
+  // Was two people having edited the same text. Nothing ever recorded one and the panel
+  // could not draw one, so it was a kind that could not arrive. DESIGN.md puts a
+  // conflict on the row, in the moment, in front of whoever hit it, and says nothing
+  // about this panel. Reserved rather than deleted, which does not break an older
+  // client where deleting would.
+  reserved 4;
+  reserved "ACTIVITY_KIND_CONFLICT";
   // ACTIVITY_KIND_TOKEN_USED is an access token reaching the Instance for the first
   // time, or one being stopped by somebody other than its owner.
   ACTIVITY_KIND_TOKEN_USED = 5;

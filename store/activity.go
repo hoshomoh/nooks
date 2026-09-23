@@ -19,8 +19,6 @@ const (
 	ActivityResetRequest ActivityKind = "RESET_REQUEST"
 	// ActivityListShared is a List somebody shared with you.
 	ActivityListShared ActivityKind = "LIST_SHARED"
-	// ActivityConflict is two people having edited the same text.
-	ActivityConflict ActivityKind = "CONFLICT"
 	// ActivityTokenUsed is an Access token reaching the Instance for the first time, or
 	// one being stopped by somebody other than its owner.
 	ActivityTokenUsed ActivityKind = "TOKEN_USED"

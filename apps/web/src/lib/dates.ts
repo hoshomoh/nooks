@@ -254,6 +254,18 @@ export function rangeFrom(from: Date, days: number): DueRange {
  */
 const WEEK_STARTS_ON_MONDAY = { weekStartsOn: 1 } as const
 
+/**
+ * monthName is a month written the way the design writes it: "Sep", not "Sept".
+ *
+ * Through date-fns like everything else here. The installed calendar formats its own
+ * month names with `toLocaleString`, which under en-GB gives "Sept" and changes with
+ * the runtime's ICU data, and that file is the generator's and is not to be edited.
+ * This is what the wrapper hands it instead.
+ */
+export function monthName(date: Date, locale?: DateLocale): string {
+  return format(date, "LLL", { locale })
+}
+
 /** The first and last day a month's grid covers: whole weeks, Monday first. */
 export interface DaySpan {
   start: Date

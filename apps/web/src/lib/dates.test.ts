@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import { enGB } from "date-fns/locale"
 
-import { dayHeading, daysUntil, dueLabel, isOverdue, parseDue, rangeFrom, toStored } from "./dates"
+import { dayHeading, daysUntil, dueLabel, isOverdue, parseDue, rangeFrom, toStored, monthName } from "./dates"
 import type { DateLabelOptions } from "./dates"
 
 // A Tuesday, matching the design's "Tuesday, 25 August".
@@ -92,5 +92,29 @@ describe("dayHeading", () => {
 describe("rangeFrom", () => {
   it("bounds a window of days in stored form", () => {
     expect(rangeFrom(today, 14)).toEqual({ start: "2026-08-25", end: "2026-09-08" })
+  })
+})
+
+/*
+A month is written the way the design writes it.
+
+The installed calendar formats its own month names with `toLocaleString`, which under
+en-GB renders September as "Sept" and changes with the runtime's ICU data. The design
+says "Sep", and `dates.ts` exists because of exactly that. `monthName` is what the
+wrapper hands the calendar instead of its own formatter.
+
+Every month, not one: "Sept" is the one that differs today, and which ones a runtime
+disagrees about is a thing that changes under you.
+*/
+describe("writing a month", () => {
+  it("is three letters, the way the design writes them", () => {
+    const expected = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ]
+
+    for (const [index, want] of expected.entries()) {
+      expect(monthName(new Date(Date.UTC(2026, index, 15)))).toBe(want)
+    }
   })
 })

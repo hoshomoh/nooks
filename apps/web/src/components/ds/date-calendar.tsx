@@ -1,5 +1,6 @@
 import { getDefaultClassNames, type Locale } from "react-day-picker"
 import { cn } from "cn"
+import { monthName } from "@/lib/dates"
 
 import { Calendar } from "@/components/ui/calendar"
 
@@ -34,6 +35,16 @@ export function DateCalendar({ selected, onSelect, locale }: DateCalendarProps) 
       locale={locale}
       autoFocus
       classNames={{ root: cn("w-full", defaults.root) }}
+      /*
+       * The month name comes from lib/dates.ts, like every other date here.
+       *
+       * The installed calendar formats its own with `toLocaleString`, which under en-GB
+       * renders September as "Sept" where the design says "Sep" and changes with the
+       * runtime's ICU data. Nothing asks for the dropdown caption today, so nothing
+       * calls it, which is exactly why it is worth setting now rather than the first
+       * time somebody turns one on and reads the wrong word.
+       */
+      formatters={{ formatMonthDropdown: (date) => monthName(date, locale) }}
     />
   )
 }

@@ -1,6 +1,7 @@
 package events
 
 import (
+	"slices"
 	"testing"
 	"time"
 )
@@ -359,5 +360,65 @@ func TestClosingAStreamForTheCapTellsTheList(t *testing.T) {
 	}
 	if len(event.Watchers) != 0 {
 		t.Errorf("watchers = %v, want nobody: her only stream on it was closed", event.Watchers)
+	}
+}
+
+/*
+The first to open a Note keeps it, whatever order the watches happen to be walked in.
+
+This is the test that was passing by luck. `editingOn` picked whoever a map walk reached
+first, Go randomises that per walk, and on this machine it had always chosen the same
+one. Under the race detector, on another machine, it chose the other, and the Note
+changed hands with nobody having touched anything.
+
+Asked many times over, because one run of a map walk proves nothing about the next. Anna
+opens first every time, so Anna holds it every time.
+*/
+func TestTheFirstToOpenANoteKeepsItEveryTime(t *testing.T) {
+	broker := NewBroker()
+
+	anna := broker.Watch(WatchParams{
+		MemberID: 1, Name: "Anna", ListUID: "list_shop", EditingUID: "item_bread",
+	})
+	t.Cleanup(anna.Close)
+	jonas := broker.Watch(WatchParams{
+		MemberID: 2, Name: "Jonas", ListUID: "list_shop", EditingUID: "item_bread",
+	})
+	t.Cleanup(jonas.Close)
+
+	for range 50 {
+		editing := broker.editingOn("list_shop")
+		if len(editing) != 1 {
+			t.Fatalf("%d people hold one Note, want one", len(editing))
+		}
+		if editing[0].Name != "Anna" {
+			t.Fatalf("%s holds it, and Anna opened it first", editing[0].Name)
+		}
+	}
+}
+
+/*
+Who is here comes back in a settled order.
+
+Presence is drawn. An order that came from a map walk changed between one event and the
+next with nobody arriving or leaving, so the names swapped places on screen for no
+reason. Found beside the Note fault above and the same fault underneath.
+*/
+func TestWhoIsHereComesBackInTheSameOrder(t *testing.T) {
+	broker := NewBroker()
+
+	for id, name := range map[int64]string{1: "Anna", 2: "Jonas", 3: "Til", 4: "Mira"} {
+		sub := broker.Watch(WatchParams{MemberID: id, Name: name, ListUID: "list_shop"})
+		t.Cleanup(sub.Close)
+	}
+
+	first := broker.WatchersOf("list_shop")
+	if len(first) != 4 {
+		t.Fatalf("watching = %v, want all four", first)
+	}
+	for range 50 {
+		if again := broker.WatchersOf("list_shop"); !slices.Equal(again, first) {
+			t.Fatalf("watching = %v, and was %v a moment ago with nobody moving", again, first)
+		}
 	}
 }

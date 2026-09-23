@@ -7,6 +7,7 @@ package events
 
 import (
 	"slices"
+	"strings"
 	"sync"
 )
 
@@ -288,7 +289,15 @@ type person struct {
 	name     string
 }
 
-// presentOn is who is on a List, each of them once.
+/*
+presentOn is who is on a List, each of them once, in a settled order.
+
+Sorted because the answer is drawn. Walking the watches gives whatever order Go
+randomised the map into this time, so "Anna and Jonas are here" became "Jonas and Anna
+are here" on the next event with nobody having arrived or left, and the names swapped
+places on screen. The same fault as the one that let a Note change hands, found beside
+it and fixed with it.
+*/
 func (b *Broker) presentOn(listUID string) []person {
 	seen := make(map[int64]bool)
 	here := make([]person, 0, len(b.watches))
@@ -299,6 +308,9 @@ func (b *Broker) presentOn(listUID string) []person {
 		seen[w.memberID] = true
 		here = append(here, person{memberID: w.memberID, name: w.name})
 	}
+	slices.SortFunc(here, func(a, b person) int {
+		return strings.Compare(a.name, b.name)
+	})
 	return here
 }
 
@@ -319,9 +331,11 @@ func namesExcept(here []person, except int64) []string {
 }
 
 // holder is somebody with a Note open, kept with their id so the answer each watcher
-// gets can leave them out of it.
+// gets can leave them out of it, and with the watch that claimed it so that the first
+// to arrive is a fact rather than whatever a map was walked in.
 type holder struct {
 	memberID int64
+	watchID  int64
 	Editor
 }
 
@@ -330,21 +344,29 @@ editingOn is who has a Note open on a List.
 
 One Note has one editor. Two people opening the same one is the case this exists to
 stop, and the first to arrive keeps it: whoever else opens it is told somebody is
-already there and reads instead. Ordered by nothing in particular, because a map is
-what a watch is found in, so the first seen wins and the answer is stable only in that
-exactly one of them holds it.
+already there and reads instead.
+
+First by watch identifier, which only goes up, so it is the order they opened in. It
+used to be whichever the map was walked to first, which is not an order at all: Go
+randomises it per run and per walk, so the Note could change hands between one presence
+event and the next with nobody having touched anything. The race detector caught that as
+a failing test; on this machine the map had simply been kind.
+
+Sorted before it goes out for the same reason. Two announcements carrying the same
+editors in a different order are two different events to whatever draws them.
 */
 func (b *Broker) editingOn(listUID string) []holder {
 	held := make(map[string]holder)
-	for _, w := range b.watches {
+	for id, w := range b.watches {
 		if w.listUID != listUID || w.editingUID == "" {
 			continue
 		}
-		if _, taken := held[w.editingUID]; taken {
+		if first, taken := held[w.editingUID]; taken && first.watchID < id {
 			continue
 		}
 		held[w.editingUID] = holder{
 			memberID: w.memberID,
+			watchID:  id,
 			Editor:   Editor{ItemUID: w.editingUID, Name: w.name},
 		}
 	}
@@ -353,6 +375,9 @@ func (b *Broker) editingOn(listUID string) []holder {
 	for _, one := range held {
 		editors = append(editors, one)
 	}
+	slices.SortFunc(editors, func(a, b holder) int {
+		return strings.Compare(a.ItemUID, b.ItemUID)
+	})
 	return editors
 }
 

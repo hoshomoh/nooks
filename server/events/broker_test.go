@@ -179,3 +179,65 @@ func TestLosingAListEndsTheStreamWatchingIt(t *testing.T) {
 		t.Errorf("her stream on another List was ended too: %v", watching)
 	}
 }
+
+/*
+One Note has one editor, and the claim goes when the connection does.
+
+The app saves a Note every 800ms and sends the whole thing, so two people in one Note
+means the second save goes over the first with neither of them told. Preventing that was
+chosen over reconciling it afterwards, which means somebody has to hold the Note and
+everybody else has to be told who.
+
+The first to open it keeps it. The claim lives on the watch rather than in a table of
+its own, which is what makes a closed laptop harmless: the thing holding the Note is the
+connection, and that already ends by itself.
+
+Nobody is told they are editing their own Note, because a screen that told you somebody
+was in the Note you are typing into would be telling you to stop.
+*/
+func TestOneNoteHasOneEditor(t *testing.T) {
+	broker := NewBroker()
+
+	first := broker.Watch(WatchParams{
+		MemberID: 1, Name: "Anna", ListUID: "list_shop", EditingUID: "item_bread",
+	})
+	second := broker.Watch(WatchParams{
+		MemberID: 2, Name: "Jonas", ListUID: "list_shop", EditingUID: "item_bread",
+	})
+	t.Cleanup(second.Close)
+
+	// Jonas is told Anna has it, and Anna is told about nobody.
+	if got := editorsIn(t, second.Events); len(got) != 1 || got[0].Name != "Anna" {
+		t.Errorf("Jonas was told %v, want Anna holding item_bread", got)
+	}
+	if got := editorsIn(t, first.Events); len(got) != 0 {
+		t.Errorf("Anna was told %v about a Note she has open herself", got)
+	}
+
+	// Anna closes her laptop. The Note is free, and Jonas is told so.
+	first.Close()
+	if got := editorsIn(t, second.Events); len(got) != 0 {
+		t.Errorf("after Anna's stream ended Jonas was still told %v", got)
+	}
+}
+
+// editorsIn drains what a watcher has been sent and answers with the last word on who
+// is editing, since a claim arriving produces an announcement to everybody on the List.
+func editorsIn(t *testing.T, events <-chan Event) []Editor {
+	t.Helper()
+
+	var last []Editor
+	for {
+		select {
+		case event, open := <-events:
+			if !open {
+				return last
+			}
+			if event.Kind == KindPresence {
+				last = event.Editing
+			}
+		default:
+			return last
+		}
+	}
+}

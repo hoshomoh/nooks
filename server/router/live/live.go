@@ -49,6 +49,15 @@ type wireEvent struct {
 	ListUID string `json:"listUid,omitempty"`
 	// Watchers is who is looking at that List, for a presence event.
 	Watchers []string `json:"watchers,omitempty"`
+	// Editing is who has a Note open, by Item, so everybody else reads that one rather
+	// than writing over them.
+	Editing []wireEditor `json:"editing,omitempty"`
+}
+
+// wireEditor is one person with one Note open.
+type wireEditor struct {
+	ItemUID string `json:"itemUid"`
+	Name    string `json:"name"`
 }
 
 // ServeHTTP opens the stream and holds it until the browser goes away.
@@ -75,10 +84,23 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	writeStreamHeaders(w)
 	flusher.Flush()
 
+	/*
+	 * The Note this connection has open, if any.
+	 *
+	 * Held on the watch rather than claimed and released by calls of its own, so the
+	 * stream ending is what lets it go. A laptop closed mid-edit cannot hold a Note:
+	 * the thing holding it is the connection, and that is already bounded by the
+	 * heartbeat and by the browser going away.
+	 *
+	 * Not checked against the List here. A Note on a List this Member cannot reach is
+	 * not a Note anybody is told about, because presence only ever goes to watchers of
+	 * the List it names, and this one has already been checked.
+	 */
 	sub := h.broker.Watch(events.WatchParams{
-		MemberID: member.ID,
-		Name:     member.Name,
-		ListUID:  listUID,
+		MemberID:   member.ID,
+		Name:       member.Name,
+		ListUID:    listUID,
+		EditingUID: editingFrom(r, listUID),
 	})
 	defer sub.Close()
 
@@ -139,6 +161,17 @@ func (h *Handler) watchableList(r *http.Request, member store.Member) (string, b
 	return uid, true
 }
 
+// editingFrom is the Item whose Note the browser says it has open, or nothing.
+//
+// Only meaningful alongside a List, since that is what presence is announced on: an
+// editor with no List to be announced to is nobody.
+func editingFrom(r *http.Request, listUID string) string {
+	if listUID == "" {
+		return ""
+	}
+	return r.URL.Query().Get("editing")
+}
+
 // writeStreamHeaders says this is a stream, and asks everything in between not to hold
 // it in a buffer waiting for more.
 func writeStreamHeaders(w http.ResponseWriter) {
@@ -153,10 +186,16 @@ func writeStreamHeaders(w http.ResponseWriter) {
 
 // writeEvent sends one event in the format an EventSource reads.
 func writeEvent(w http.ResponseWriter, event events.Event) error {
+	editing := make([]wireEditor, 0, len(event.Editing))
+	for _, one := range event.Editing {
+		editing = append(editing, wireEditor{ItemUID: one.ItemUID, Name: one.Name})
+	}
+
 	payload, err := json.Marshal(wireEvent{
 		Kind:     string(event.Kind),
 		ListUID:  event.ListUID,
 		Watchers: event.Watchers,
+		Editing:  editing,
 	})
 	if err != nil {
 		return err

@@ -271,6 +271,7 @@
     "addToNote": "Add to the note",
     "backToList": "Back to list",
     "escapeReturns": "Esc returns to the list",
+    "heldBy": "{{name}} is editing this note. You can read it until they are done.",
     "itemName": "Item name",
     "bold": "Bold",
     "italic": "Italic",

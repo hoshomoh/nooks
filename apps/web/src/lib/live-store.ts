@@ -20,12 +20,28 @@ export interface LiveEvent {
   listUid?: string
   /** Who is looking at that List, for a presence event. */
   watchers?: string[]
+  /** Who has a Note open, by Item. Never includes the reader. */
+  editing?: NoteEditor[]
+}
+
+/** One person with one Note open. */
+export interface NoteEditor {
+  itemUid: string
+  name: string
 }
 
 /** What a screen reads from the stream. */
 export interface LiveState {
   /** Who else is looking at the List being read. Never includes the reader. */
   watchers: string[]
+  /**
+   * Who else has a Note open on it, by Item.
+   *
+   * A Note somebody else is in is read rather than written, which is how two people are
+   * stopped from losing each other's words. Never includes the reader, so a Note this
+   * Member has open never appears here and never reads as locked to them.
+   */
+  editing: NoteEditor[]
   /** Bumped on every change, so a reader can tell that something arrived. */
   version: number
 }
@@ -39,7 +55,7 @@ export interface LiveStore {
    * Called as a Member moves between screens. Pointing it where it already points does
    * nothing, so this is safe to call on every render.
    */
-  watch: (listUid: string) => void
+  watch: (listUid: string, editingItemUid?: string) => void
   /** Called with every change, so a reader can act on it. */
   onEvent: (listener: (event: LiveEvent) => void) => () => void
 }
@@ -58,11 +74,12 @@ export interface LiveConnection {
 }
 
 /** NOBODY is the state before anything has arrived. */
-const NOBODY: LiveState = { watchers: [], version: 0 }
+const NOBODY: LiveState = { watchers: [], editing: [], version: 0 }
 
 export function createLiveStore(deps: LiveStoreDeps): LiveStore {
   let state = NOBODY
   let watching = ""
+  let editing = ""
   let connection: LiveConnection | null = null
   const listeners = new Set<() => void>()
   const eventListeners = new Set<(event: LiveEvent) => void>()
@@ -75,7 +92,11 @@ export function createLiveStore(deps: LiveStoreDeps): LiveStore {
 
   const receive = (event: LiveEvent) => {
     if (event.kind === "presence" && event.listUid === watching) {
-      state = { watchers: event.watchers ?? [], version: state.version + 1 }
+      state = {
+        watchers: event.watchers ?? [],
+        editing: event.editing ?? [],
+        version: state.version + 1,
+      }
     } else {
       state = { ...state, version: state.version + 1 }
     }
@@ -89,7 +110,7 @@ export function createLiveStore(deps: LiveStoreDeps): LiveStore {
   const reconnect = () => {
     connection?.close()
     state = NOBODY
-    connection = deps.connect(urlFor(deps.endpoint, watching))
+    connection = deps.connect(urlFor(deps.endpoint, watching, editing))
     connection.addEventListener("message", (message) => {
       const event = parseEvent(message.data)
       if (event) {
@@ -104,11 +125,19 @@ export function createLiveStore(deps: LiveStoreDeps): LiveStore {
       return () => listeners.delete(listener)
     },
     getState: () => state,
-    watch(listUid) {
-      if (listUid === watching && connection) {
+    /*
+     * Points the connection at a List, and at the Note being edited on it.
+     *
+     * Opening a Note reconnects, which is how the Instance is told it is being held:
+     * the claim lives on the connection, so a laptop closed mid-edit releases it when
+     * the stream drops rather than holding a Note for ever.
+     */
+    watch(listUid, editingItemUid = "") {
+      if (listUid === watching && editingItemUid === editing && connection) {
         return
       }
       watching = listUid
+      editing = editingItemUid
       reconnect()
       notify()
     },
@@ -119,9 +148,13 @@ export function createLiveStore(deps: LiveStoreDeps): LiveStore {
   }
 }
 
-/** urlFor names the List the stream should follow, when there is one. */
-function urlFor(endpoint: string, listUid: string): string {
-  return listUid ? `${endpoint}?list=${encodeURIComponent(listUid)}` : endpoint
+/** urlFor names the List the stream should follow, and the Note held open on it. */
+function urlFor(endpoint: string, listUid: string, editing: string): string {
+  if (!listUid) {
+    return endpoint
+  }
+  const where = `${endpoint}?list=${encodeURIComponent(listUid)}`
+  return editing ? `${where}&editing=${encodeURIComponent(editing)}` : where
 }
 
 /**

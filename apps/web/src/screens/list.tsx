@@ -72,6 +72,19 @@ export function ListScreen() {
   const palette = useCommandPalette()
   const { t } = useTranslation()
 
+  /*
+   * Whoever else has this Note open, if anybody.
+   *
+   * One Note has one editor. The first to open it keeps it and everybody else reads,
+   * which is how two people are stopped from losing each other's words: the app saves a
+   * Note every 800ms and sends the whole thing, so the second writer's copy would go
+   * over the first's without either of them being told.
+   *
+   * The claim lives on the live connection, so it is given up by closing the sheet, by
+   * navigating away, and by the stream dropping. A closed laptop cannot hold a Note.
+   */
+  const heldBy = live.editing.find((one) => one.itemUid === openItemUid)?.name
+
   // The day is read once per render rather than per row, so every date in one paint is
   // measured against the same moment.
   const from = today()
@@ -399,7 +412,8 @@ export function ListScreen() {
               item={openItem}
               crumbs={[list.list?.name ?? "", t("note.crumb")]}
               listName={list.list?.name ?? ""}
-              canEdit={Boolean(canEdit)}
+              canEdit={Boolean(canEdit) && heldBy === undefined}
+              heldBy={heldBy}
               status={autosave.isSaving ? t("note.saving") : undefined}
               onNoteChange={onNoteChange}
               onToggleDone={(done) => setDone.mutate({ itemUid: openItem.uid, done })}

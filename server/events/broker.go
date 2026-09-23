@@ -39,6 +39,16 @@ type Event struct {
 	ListUID string
 	// Watchers is who is looking at that List, for a presence event.
 	Watchers []string
+	// Editing is who has a Note open for editing on that List, by Item. Everybody else
+	// reads that Note rather than writing it, which is how two people are stopped from
+	// losing each other's words.
+	Editing []Editor
+}
+
+// Editor is one person with one Note open.
+type Editor struct {
+	ItemUID string
+	Name    string
 }
 
 // Subscription is one Member's open connection.
@@ -70,8 +80,13 @@ type watch struct {
 	// Member is somewhere that is not a List.
 	listUID string
 	name    string
-	events  chan Event
-	closed  bool
+	// editingUID is the Item whose Note this connection has open, or empty. Held on the
+	// watch rather than anywhere else, so it is released by the stream ending: a closed
+	// laptop cannot hold a Note for ever, because the thing holding it is the
+	// connection.
+	editingUID string
+	events     chan Event
+	closed     bool
 }
 
 func NewBroker() *Broker {
@@ -85,6 +100,8 @@ type WatchParams struct {
 	Name string
 	// ListUID is the List on screen, or empty.
 	ListUID string
+	// EditingUID is the Item whose Note is open for editing, or empty.
+	EditingUID string
 }
 
 // Watch opens a subscription. The caller closes it when the connection ends.
@@ -93,10 +110,11 @@ func (b *Broker) Watch(params WatchParams) Subscription {
 	b.next++
 	id := b.next
 	w := &watch{
-		memberID: params.MemberID,
-		listUID:  params.ListUID,
-		name:     params.Name,
-		events:   make(chan Event, queueDepth),
+		memberID:   params.MemberID,
+		listUID:    params.ListUID,
+		name:       params.Name,
+		editingUID: params.EditingUID,
+		events:     make(chan Event, queueDepth),
 	}
 	b.watches[id] = w
 	b.mu.Unlock()
@@ -239,6 +257,57 @@ func namesExcept(here []person, except int64) []string {
 	return names
 }
 
+// holder is somebody with a Note open, kept with their id so the answer each watcher
+// gets can leave them out of it.
+type holder struct {
+	memberID int64
+	Editor
+}
+
+/*
+editingOn is who has a Note open on a List.
+
+One Note has one editor. Two people opening the same one is the case this exists to
+stop, and the first to arrive keeps it: whoever else opens it is told somebody is
+already there and reads instead. Ordered by nothing in particular, because a map is
+what a watch is found in, so the first seen wins and the answer is stable only in that
+exactly one of them holds it.
+*/
+func (b *Broker) editingOn(listUID string) []holder {
+	held := make(map[string]holder)
+	for _, w := range b.watches {
+		if w.listUID != listUID || w.editingUID == "" {
+			continue
+		}
+		if _, taken := held[w.editingUID]; taken {
+			continue
+		}
+		held[w.editingUID] = holder{
+			memberID: w.memberID,
+			Editor:   Editor{ItemUID: w.editingUID, Name: w.name},
+		}
+	}
+
+	editors := make([]holder, 0, len(held))
+	for _, one := range held {
+		editors = append(editors, one)
+	}
+	return editors
+}
+
+// editorsExcept is those editors, leaving out the one being told. Somebody does not
+// need telling that they have their own Note open.
+func editorsExcept(editing []holder, except int64) []Editor {
+	editors := make([]Editor, 0, len(editing))
+	for _, one := range editing {
+		if one.memberID == except {
+			continue
+		}
+		editors = append(editors, one.Editor)
+	}
+	return editors
+}
+
 // announcePresence tells everyone on a List who else is now standing there.
 func (b *Broker) announcePresence(listUID string) {
 	if listUID == "" {
@@ -254,6 +323,7 @@ func (b *Broker) announcePresence(listUID string) {
 	// each of them made joining a crowded List cost the square of the crowd. See
 	// BenchmarkJoiningACrowdedList.
 	here := b.presentOn(listUID)
+	editing := b.editingOn(listUID)
 
 	for _, w := range b.watches {
 		if w.listUID != listUID {
@@ -263,6 +333,7 @@ func (b *Broker) announcePresence(listUID string) {
 			Kind:     KindPresence,
 			ListUID:  listUID,
 			Watchers: namesExcept(here, w.memberID),
+			Editing:  editorsExcept(editing, w.memberID),
 		})
 	}
 }

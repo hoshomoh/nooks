@@ -15,8 +15,15 @@ import { refreshLists } from "./refresh"
  * to re-subscribe on every navigation.
  */
 export interface LiveWiring {
-  /** Tells the stream which List is on screen, or none. */
-  navigated: (pathname: string) => void
+  /**
+   * Tells the stream which List is on screen and which Note is open on it.
+   *
+   * The Note is a search parameter rather than part of the path, because opening one is
+   * a state of the List screen rather than a place of its own. Both are read here, so
+   * the claim on a Note is made and given up by navigating, which is what opening and
+   * closing the sheet does.
+   */
+  navigated: (pathname: string, search?: string) => void
   /** Stops listening. Called by a test; the app itself never stops. */
   stop: () => void
 }
@@ -24,7 +31,8 @@ export interface LiveWiring {
 export function wireLiveUpdates(queryClient: QueryClient): LiveWiring {
   const stop = liveStore.onEvent((event) => void actOn(queryClient, event))
   return {
-    navigated: (pathname) => liveStore.watch(listUidIn(pathname)),
+    navigated: (pathname, search) =>
+      liveStore.watch(listUidIn(pathname), openItemIn(search ?? "")),
     stop,
   }
 }
@@ -71,6 +79,16 @@ export async function actOn(queryClient: QueryClient, event: LiveEvent): Promise
  * Pure, so which paths count as "on a List" can be read and tested in one place. An
  * Item's Note counts: a Member reading it is standing on that List.
  */
+/**
+ * openItemIn is the Item whose Note is open, read from the search.
+ *
+ * Exported for the same reason listUidIn is: what the stream is told about a screen is
+ * the whole of this wiring, and it is worth being able to read it back.
+ */
+export function openItemIn(search: string): string {
+  return new URLSearchParams(search).get("item") ?? ""
+}
+
 export function listUidIn(pathname: string): string {
   const match = /^\/lists\/([^/]+)/.exec(pathname)
   return match?.[1] ? decodeURIComponent(match[1]) : ""

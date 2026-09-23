@@ -49,8 +49,10 @@ const router = buildRouter(queryClient)
 // Live updates are wired outside React: the stream outlives any screen, and navigation
 // is what tells it which List is being read.
 const live = wireLiveUpdates(queryClient)
-live.navigated(window.location.pathname)
-router.subscribe("onResolved", ({ toLocation }) => live.navigated(toLocation.pathname))
+live.navigated(window.location.pathname, window.location.search)
+router.subscribe("onResolved", ({ toLocation }) =>
+  live.navigated(toLocation.pathname, toLocation.searchStr),
+)
 
 const container = document.getElementById("root")
 if (!container) {

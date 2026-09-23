@@ -22,6 +22,15 @@ export interface NoteSheetProps {
   /** Whether the Member may change anything here. */
   canEdit: boolean
   /**
+   * Who else has this Note open, if anybody.
+   *
+   * One Note has one editor and the first to open it keeps it, so this is a name to
+   * show rather than a state to argue with. canEdit is already false when it is set;
+   * this says why, because a Note that has quietly stopped accepting typing is worse
+   * than one that says who is in it.
+   */
+  heldBy?: string
+  /**
    * Called on every change. Debouncing belongs to whoever owns the saving, so this
    * component stays a renderer.
    */
@@ -63,6 +72,7 @@ export function NoteSheet({
   crumbs,
   listName,
   canEdit,
+  heldBy,
   onNoteChange,
   onToggleDone,
   onRename,
@@ -150,6 +160,12 @@ export function NoteSheet({
       {/* The room at the foot is a spacer rather than padding: this scrolls and is a
           flex container, and a flex container drops the padding on its end edge. */}
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-7.5 pt-7.5 after:block after:h-14 after:shrink-0 after:content-['']">
+        {heldBy !== undefined && (
+          <p className="rounded-md bg-secondary px-3 py-2 text-meta text-secondary-foreground">
+            {t("note.heldBy", { name: heldBy })}
+          </p>
+        )}
+
         <div className="grid grid-cols-[24px_1fr] items-start gap-3">
           <span className="mt-1">
             <Checkbox checked={item.done} onCheckedChange={onToggleDone} disabled={!canEdit} />

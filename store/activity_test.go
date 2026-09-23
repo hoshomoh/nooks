@@ -2,6 +2,7 @@ package store
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"testing"
 	"time"
@@ -409,6 +410,84 @@ func TestTheLimitHoldsEvenWhenEverythingIsWaiting(t *testing.T) {
 			if len(entries) != ActivityLimit {
 				t.Errorf("got %d entries, want no more than the %d a panel holds",
 					len(entries), ActivityLimit)
+			}
+		})
+	}
+}
+
+/*
+A request nobody has answered survives the sweep, however old it gets.
+
+The sweep removes what nothing can reach: `ActivityFor` returns the newest ActivityLimit
+and there is no call that returns an older entry, so the fifty-first is already gone as
+far as anybody is concerned. An undecided request is the exception, and it is the reason
+the exception exists. Activity is the only place a join or a reset appears, so sweeping
+one leaves the row pending in its own table with nothing anywhere that shows it, and the
+person waiting is never told either way.
+
+`ActivityFor` had a test for its half of this and the sweep had none, which is the half
+that deletes.
+*/
+func TestTheSweepKeepsARequestNobodyHasAnswered(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			anna := newMember(t, s)
+
+			// The oldest thing she has, and then enough after it to bury it.
+			waiting := entry(t, s, anna.ID, "act_waiting", ActivityJoinRequest, createdAt)
+			for i := range ActivityLimit + 20 {
+				addActivity(t, s, anna, fmt.Sprintf("anna %03d", i),
+					createdAt.Add(time.Duration(i+1)*time.Minute))
+			}
+
+			if _, err := s.DeleteUnreadableActivity(t.Context()); err != nil {
+				t.Fatalf("DeleteUnreadableActivity: %v", err)
+			}
+
+			panel, err := s.ActivityFor(t.Context(), anna.ID)
+			if err != nil {
+				t.Fatalf("ActivityFor: %v", err)
+			}
+			kept := slices.ContainsFunc(panel, func(one Activity) bool {
+				return one.UID == waiting.UID
+			})
+			if !kept {
+				t.Error("the request Anna has not answered was swept away, and Activity is " +
+					"the only place it appears")
+			}
+		})
+	}
+}
+
+// Once it is answered it is history, and history is what the sweep is for.
+func TestTheSweepRemovesADecidedRequestPastTheLimit(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			anna := newMember(t, s)
+
+			decided := entry(t, s, anna.ID, "act_decided", ActivityJoinRequest, createdAt)
+			if err := s.ResolveActivity(t.Context(), decided.TargetUID, OutcomeApproved); err != nil {
+				t.Fatalf("ResolveActivity: %v", err)
+			}
+			for i := range ActivityLimit + 20 {
+				addActivity(t, s, anna, fmt.Sprintf("anna %03d", i),
+					createdAt.Add(time.Duration(i+1)*time.Minute))
+			}
+
+			if _, err := s.DeleteUnreadableActivity(t.Context()); err != nil {
+				t.Fatalf("DeleteUnreadableActivity: %v", err)
+			}
+
+			panel, err := s.ActivityFor(t.Context(), anna.ID)
+			if err != nil {
+				t.Fatalf("ActivityFor: %v", err)
+			}
+			for _, one := range panel {
+				if one.UID == decided.UID {
+					t.Error("a request that was answered long ago is still in the panel")
+				}
 			}
 		})
 	}

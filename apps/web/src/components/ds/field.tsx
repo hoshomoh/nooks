@@ -1,4 +1,5 @@
 import { useId } from "react"
+import { useTranslation } from "react-i18next"
 import { cn } from "cn"
 
 import { Input } from "@/components/ui/input"
@@ -22,7 +23,26 @@ export type FieldProps = Omit<React.ComponentProps<typeof Input>, "id"> & {
    * announce — it is the seeing of it that is redundant, not the having.
    */
   hideLabel?: boolean
+  /**
+   * The most that may be typed here, from `lib/limits.ts`.
+   *
+   * It both stops the typing and says how much room is left, because either alone is
+   * half an answer: a field that silently stops accepting letters looks broken, and a
+   * count with nothing enforcing it is a suggestion.
+   */
+  limit?: number
 }
+
+/**
+ * How close the limit has to be before the count appears.
+ *
+ * Counted in characters left rather than as a fraction of the limit, because that is
+ * what the number has to mean: with twenty left you are about to run out whether the
+ * field holds fifty characters or sixty-four thousand. A tenth of the way from the end
+ * would put a counter under a note nobody is near filling, and under a quantity only
+ * once it was too late.
+ */
+const COUNTER_SHOWS_AT = 20
 
 /**
  * A labelled input, per DESIGN.md §7: 38px high, radius 7, 15px text, with the label
@@ -31,9 +51,13 @@ export type FieldProps = Omit<React.ComponentProps<typeof Input>, "id"> & {
  * useId rather than a caller-supplied id, so a field is always wired to its label and
  * two of them on one page cannot collide.
  */
-export function Field({ label, hint, error, hideLabel, className, ...props }: FieldProps) {
+export function Field({ label, hint, error, hideLabel, limit, className, ...props }: FieldProps) {
+  const { t } = useTranslation()
   const id = useId()
-  const describedBy = hint || error ? `${id}-description` : undefined
+  const left = roomLeft(limit, props.value)
+  // The count is read out too, so it has to be inside what describes the field rather
+  // than beside it.
+  const describedBy = hint || error || left !== undefined ? `${id}-description` : undefined
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -46,6 +70,7 @@ export function Field({ label, hint, error, hideLabel, className, ...props }: Fi
 
       <Input
         id={id}
+        maxLength={limit}
         aria-describedby={describedBy}
         aria-invalid={error ? true : undefined}
         className={cn(
@@ -59,14 +84,41 @@ export function Field({ label, hint, error, hideLabel, className, ...props }: Fi
         {...props}
       />
 
-      {(error || hint) && (
+      {(error || hint || left !== undefined) && (
         <p
           id={describedBy}
-          className={cn("text-micro", error ? "text-destructive" : "text-muted-foreground")}
+          className={cn(
+            "flex items-baseline gap-3 text-micro",
+            error ? "text-destructive" : "text-muted-foreground",
+          )}
         >
-          {error ?? hint}
+          <span className="flex-1">{error ?? hint}</span>
+          {left !== undefined && (
+            <span className="shrink-0 tabular-nums">
+              {t("field.charactersLeft", { count: left })}
+            </span>
+          )}
         </p>
       )}
     </div>
   )
+}
+
+/**
+ * How much room is left, or nothing at all while the end is still far off.
+ *
+ * Never negative. A value longer than the limit can only be one that was stored before
+ * the limit existed, since typing is stopped at it, and "minus twelve characters left"
+ * is not a sentence. Nought is true: no more may be added, and the Instance will say so
+ * on save.
+ */
+function roomLeft(limit: number | undefined, value: FieldProps["value"]): number | undefined {
+  if (limit === undefined || typeof value !== "string") {
+    return undefined
+  }
+  const left = limit - [...value].length
+  if (left > COUNTER_SHOWS_AT) {
+    return undefined
+  }
+  return Math.max(left, 0)
 }

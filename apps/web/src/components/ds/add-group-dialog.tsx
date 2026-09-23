@@ -8,6 +8,7 @@ import { Field } from "./field"
 import { MemberPicker } from "./member-picker"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { toggled } from "@/lib/toggle-uid"
+import { LIMITS } from "@/lib/limits"
 
 /** A Group as it is being made: a name, and who is in it. */
 export interface NewGroup {
@@ -80,6 +81,7 @@ function AddGroupForm({ members, onCancel, onAdd }: AddGroupFormProps) {
       <div className="flex flex-col gap-5 px-6.5 pt-5 pb-6">
         <Field
           label={t("groups.name")}
+          limit={LIMITS.groupName}
           value={name}
           onChange={(event) => setName(event.target.value)}
           autoFocus

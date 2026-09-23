@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { parseDue, toStored, type DueDate } from "@/lib/dates"
 import { answers, keysIn } from "@/lib/keycaps"
 import { useLocale } from "@/lib/use-locale"
+import { LIMITS } from "@/lib/limits"
 
 export interface ItemMenuActions {
   /** Opens the Item's sheet. */
@@ -249,6 +250,7 @@ function QuantityPanel({ quantity, onSave, onBack }: QuantityPanelProps) {
       <div className="px-1.5 pb-1.5">
         <Field
           label={t("note.quantity")}
+          limit={LIMITS.itemQuantity}
           value={value}
           onChange={(event) => setValue(event.target.value)}
           autoFocus

@@ -211,6 +211,10 @@
     "emailTaken": "Somebody here already uses that email.",
     "somethingWentWrong": "Something went wrong. Try again."
   },
+  "field": {
+    "charactersLeft": "{{count}} character left",
+    "charactersLeft_other": "{{count}} characters left"
+  },
   "views": {
     "today": "Today",
     "upcoming": "Upcoming",

@@ -11,6 +11,7 @@ import { authClient } from "@/lib/api"
 import { createStarterList } from "@/lib/starter-list"
 import { messageFrom } from "@/lib/errors"
 import { startNewSession } from "@/lib/new-session"
+import { LIMITS } from "@/lib/limits"
 
 export function Setup() {
   const navigate = useNavigate()
@@ -51,6 +52,7 @@ export function Setup() {
       >
         <Field
           label={t("auth.setup.yourName")}
+          limit={LIMITS.memberName}
           value={name}
           onChange={(event) => setName(event.target.value)}
           autoComplete="name"
@@ -58,6 +60,7 @@ export function Setup() {
         />
         <Field
           label={t("auth.setup.email")}
+          limit={LIMITS.memberEmail}
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
@@ -75,6 +78,7 @@ export function Setup() {
         />
         <Field
           label={t("auth.setup.instanceName")}
+          limit={LIMITS.instanceName}
           value={instanceName}
           onChange={(event) => setInstanceName(event.target.value)}
           hint={t("auth.setup.instanceNameHint")}

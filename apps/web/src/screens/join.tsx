@@ -12,6 +12,7 @@ import { NotePanel } from "@/components/ds/note-panel"
 import { authClient } from "@/lib/api"
 import { applyPendingTick } from "@/lib/apply-pending-tick"
 import { messageFrom } from "@/lib/errors"
+import { LIMITS } from "@/lib/limits"
 import { startNewSession } from "@/lib/new-session"
 import {
   forgetPendingRequest,
@@ -68,6 +69,7 @@ function AskToJoin({ onSent }: AskToJoinProps) {
       >
         <Field
           label={t("auth.setup.yourName")}
+          limit={LIMITS.memberName}
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder={t("auth.join.namePlaceholder")}
@@ -76,6 +78,7 @@ function AskToJoin({ onSent }: AskToJoinProps) {
         />
         <Field
           label={t("auth.setup.email")}
+          limit={LIMITS.memberEmail}
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
@@ -85,6 +88,7 @@ function AskToJoin({ onSent }: AskToJoinProps) {
         />
         <Field
           label={t("auth.join.message")}
+          limit={LIMITS.joinMessage}
           value={message}
           onChange={(event) => setMessage(event.target.value)}
           placeholder={t("auth.join.messagePlaceholder")}
@@ -174,6 +178,7 @@ function CheckJoinRequest({ requestUid, onStartOver }: CheckJoinRequestProps) {
 
         <Field
           label={t("palette.name")}
+          limit={LIMITS.memberName}
           value={name || (request.data?.name ?? "")}
           onChange={(event) => setName(event.target.value)}
           hint={t("auth.join.nameHint")}

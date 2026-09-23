@@ -15,6 +15,7 @@ import { atEndOf, momentIn, type DueDate } from "@/lib/dates"
 import type { PickableList } from "@/lib/pick-lists"
 import { toggled } from "@/lib/toggle-uid"
 import { useDueLabel } from "@/lib/use-due-label"
+import { LIMITS } from "@/lib/limits"
 
 /** What a Member asked for, to cut a token from. */
 export interface NewToken {
@@ -155,6 +156,7 @@ function AddTokenForm({ suggested, onCancel, onAdd }: AddTokenFormProps) {
       <div className={`flex flex-col gap-5 px-6.5 pt-5 pb-6 ${DIALOG_BODY}`}>
         <Field
           label={t("tokens.name")}
+          limit={LIMITS.tokenName}
           value={name}
           onChange={(event) => setName(event.target.value)}
           hint={t("tokens.nameHint")}

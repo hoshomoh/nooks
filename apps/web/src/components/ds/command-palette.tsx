@@ -28,6 +28,7 @@ import { sidebarLists } from "@/lib/sidebar-groups"
 import { refreshLists } from "@/lib/refresh"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { SETTINGS_SECTIONS, type SettingsRoute } from "./settings-sections"
+import { LIMITS } from "@/lib/limits"
 
 /**
  * ⌘K: go anywhere, and find anything.
@@ -261,6 +262,7 @@ function AddListPanel() {
 
       <Field
         label={t("palette.name")}
+        limit={LIMITS.listName}
         value={name}
         onChange={(event) => setName(event.target.value)}
         autoFocus

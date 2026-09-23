@@ -323,6 +323,15 @@ rejected 1px `--destructive`/border on `--destructive`/bg with `--destructive`. 
 36px and 280px wide. Labels are 13 / 500 `--secondary-foreground`; hints sit under the field in 12.5
 `--muted-foreground`.
 
+**A field with a limit both stops the typing and says how much room is left**, on the
+hint line and right-aligned, in the same 12.5 `--muted-foreground`. The count appears
+only once twenty characters remain, and counts characters rather than bytes. Twenty
+rather than a fraction of the limit: with twenty left you are about to run out whether
+the field holds fifty characters or sixty-four thousand, where a tenth from the end
+would draw a counter under a note nobody is near filling and under a quantity only once
+it was too late. Neither half works alone — a field that silently stops accepting
+letters looks broken, and a count with nothing enforcing it is a suggestion.
+
 ### Toggle
 
 34 × 20 track, radius 10, 16px knob, 2px padding. On: `--shared` track, knob right. Off:

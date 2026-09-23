@@ -26,6 +26,7 @@ import { useLocale } from "@/lib/use-locale"
 import { useSettingsCounts } from "@/lib/use-settings-counts"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 import { useTheme } from "@/lib/use-theme"
+import { LIMITS } from "@/lib/limits"
 
 /** The themes, in the order DESIGN.md §2 lists them. */
 const THEMES: Theme[] = ["light", "dark", "system"]
@@ -104,6 +105,7 @@ function AccountSection() {
       <SettingsRow label={t("account.name")} blurb={t("general.nameBlurb")}>
         <Field
           label={t("account.name")}
+ limit={LIMITS.memberName}
           hideLabel
           value={name}
           onChange={(event) => setName(event.target.value)}
@@ -114,6 +116,7 @@ function AccountSection() {
       <SettingsRow label={t("account.email")} blurb={t("account.emailHint")}>
         <Field
           label={t("account.email")}
+ limit={LIMITS.memberEmail}
           hideLabel
           type="email"
           value={email}
@@ -217,6 +220,7 @@ function InstanceSection() {
       <SettingsRow label={t("instance.name")} blurb={t("instance.nameBlurb")}>
         <Field
           label={t("instance.name")}
+ limit={LIMITS.instanceName}
           hideLabel
           value={draft?.name ?? ""}
           onChange={(event) => set({ name: event.target.value })}

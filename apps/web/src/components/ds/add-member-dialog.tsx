@@ -6,6 +6,7 @@ import { Field } from "./field"
 import { SecretOnce } from "./secret-once"
 import { DIALOG_SURFACE } from "./dialog-surface"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { LIMITS } from "@/lib/limits"
 
 /** What an Admin typed, to make an account from. */
 export interface NewMember {
@@ -102,12 +103,14 @@ function AddMemberForm({ error, onCancel, onAdd }: AddMemberFormProps) {
       <div className="flex flex-col gap-4.5 px-6.5 pt-5 pb-6">
         <Field
           label={t("members.name")}
+          limit={LIMITS.memberName}
           value={name}
           onChange={(event) => setName(event.target.value)}
           autoFocus
         />
         <Field
           label={t("members.email")}
+          limit={LIMITS.memberEmail}
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}

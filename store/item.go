@@ -84,24 +84,8 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 	if params.AddedByTokenID != 0 {
 		row.AddedByTokenID = &params.AddedByTokenID
 	}
-	/*
-	 * The position is worked out inside the insert rather than read and then written.
-	 *
-	 * Reading the highest and then inserting is two statements with a gap between them,
-	 * so two people adding to one List at the same moment both read the same number and
-	 * both land on it. Reads break the tie on id, so a List still comes back in arrival
-	 * order, but the tie is made and "put this after that one" has no answer while two
-	 * Items share a place.
-	 *
-	 * One statement, and the engine holds it: whichever insert runs second sees the
-	 * first one's row. COALESCE in a sub-select is only ever compared and stored here,
-	 * never scanned into Go, which is what nextPosition had to work around.
-	 */
-	insert := s.db.NewInsert().Model(row).Returning("*").
-		Value("position", "(SELECT COALESCE(MAX(position), 0.0) + ? FROM item "+
-			"WHERE list_id = ? AND deleted_at = '')", positionGap, params.ListID)
-	if _, err := insert.Exec(ctx); err != nil {
-		return Item{}, fmt.Errorf("create item: %w", err)
+	if err := s.insertAtTheEnd(ctx, row, params.ListID); err != nil {
+		return Item{}, err
 	}
 
 	item, err := row.toItem()
@@ -115,6 +99,79 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 		return Item{}, err
 	}
 	return item, nil
+}
+
+/*
+insertAtTheEnd writes one Item after every Item already on its List.
+
+The position is worked out inside the insert rather than read and then written. Reading
+the highest and then inserting is two statements with a gap between them, so two people
+adding to one List at the same moment both read the same number and both land on it.
+Reads break the tie on id, so a List still comes back in arrival order, but the tie is
+made and "put this after that one" has no answer while two Items share a place.
+
+One statement is enough on SQLite, which has one writer, so the second insert cannot
+begin until the first has finished. It is not enough on Postgres, where a statement
+reads from a snapshot taken when it started: two inserts running together both see the
+List as it was before either of them, both take the same maximum, and both land on it.
+This is what the comment here used to claim the engine prevented, and
+TestTwoItemsAddedAtOnceGetDifferentPositions found it the first time the suite ran
+against Postgres with the race detector on.
+
+So on Postgres the List's own row is locked first, which makes adding to one List
+one-at-a-time and leaves adding to different Lists as parallel as it was. SQLite needs
+no such thing and has no FOR UPDATE to do it with.
+*/
+func (s *sqlStore) insertAtTheEnd(ctx context.Context, row *itemModel, listID int64) error {
+	if s.name != postgresDriver {
+		return appendItem(ctx, s.db, row, listID)
+	}
+
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin create item: %w", err)
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	if err := lockList(ctx, tx, listID); err != nil {
+		return err
+	}
+	if err := appendItem(ctx, tx, row, listID); err != nil {
+		return err
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit create item: %w", err)
+	}
+	return nil
+}
+
+// appendItem is the insert itself, which is the same statement whether or not it is
+// running inside the transaction that holds the List.
+func appendItem(ctx context.Context, db bun.IDB, row *itemModel, listID int64) error {
+	insert := db.NewInsert().Model(row).Returning("*").
+		Value("position", "(SELECT COALESCE(MAX(position), 0.0) + ? FROM item "+
+			"WHERE list_id = ? AND deleted_at = '')", positionGap, listID)
+	if _, err := insert.Exec(ctx); err != nil {
+		return fmt.Errorf("create item: %w", err)
+	}
+	return nil
+}
+
+/*
+lockList holds one List against anybody else working out a position on it, until the
+transaction ends.
+
+Postgres only: it is the driver that needs it and the only one with the statement for
+it. The row it selects is thrown away, because it is the lock that is wanted and not the
+List. A List that does not exist takes no lock and needs none, since the insert that
+follows has a foreign key to fail on.
+*/
+func lockList(ctx context.Context, tx bun.Tx, listID int64) error {
+	_, err := tx.NewRaw("SELECT id FROM list WHERE id = ? FOR UPDATE", listID).Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("hold list %d: %w", listID, err)
+	}
+	return nil
 }
 
 /*
@@ -144,6 +201,15 @@ func (s *sqlStore) CreateItems(ctx context.Context, params []CreateItemParams) (
 		return nil, fmt.Errorf("begin create items: %w", err)
 	}
 	defer func() { _ = tx.Rollback() }()
+
+	// Read then write, with a gap, which is the shape insertAtTheEnd explains. Here the
+	// gap is inside a transaction and that is still not enough on Postgres, so the List
+	// is held for the same reason and in the same way.
+	if s.name == postgresDriver {
+		if err := lockList(ctx, tx, params[0].ListID); err != nil {
+			return nil, err
+		}
+	}
 
 	var last sql.NullFloat64
 	err = tx.NewSelect().

@@ -440,6 +440,68 @@ drag-to-reorder is what made it matter.
 Run concurrently on purpose. In sequence it passes either way, because the second read
 sees the first insert.
 */
+/*
+Two batches added at once do not land on top of each other either.
+
+The same fault as the test below, in the path that adds several Items at a time: it
+reads the highest position and then writes, which is two statements with a gap, and on
+Postgres two callers in that gap see the same List. The single-Item path had a test and
+this one did not, so the fix there would have been made and this left behind.
+*/
+func TestTwoBatchesAddedAtOnceGetDifferentPositions(t *testing.T) {
+	at := time.Date(2026, time.April, 1, 9, 0, 0, 0, time.UTC)
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			anna := newMember(t, s)
+			list := makeList(t, s, anna, "list_shop", "Shopping", SharingInstance)
+
+			const batches, each = 3, 2
+			start := make(chan struct{})
+			var adding sync.WaitGroup
+			for b := range batches {
+				adding.Add(1)
+				go func() {
+					defer adding.Done()
+					params := make([]CreateItemParams, 0, each)
+					for i := range each {
+						params = append(params, CreateItemParams{
+							UID:       fmt.Sprintf("item_%d_%d", b, i),
+							ListID:    list.ID,
+							Label:     fmt.Sprintf("Thing %d %d", b, i),
+							AddedByID: anna.ID,
+							At:        at,
+						})
+					}
+					_, _ = s.CreateItems(t.Context(), params)
+				}()
+			}
+			close(start)
+			adding.Wait()
+
+			items, err := s.ItemsOnList(t.Context(), list.ID)
+			if err != nil {
+				t.Fatalf("ItemsOnList: %v", err)
+			}
+			// How many landed is not this test's business. On SQLite a second write
+			// transaction is refused outright while the first holds the file, which is
+			// the parked question 1 and a different fault from this one. What is asked
+			// here is only that whatever did land has a place of its own.
+			if len(items) < each {
+				t.Fatalf("%d Items landed, so not even one batch got through", len(items))
+			}
+
+			places := make(map[float64]string, len(items))
+			for _, item := range items {
+				if shared, taken := places[item.Position]; taken {
+					t.Errorf("%q and %q are both at position %v", shared, item.Label, item.Position)
+				}
+				places[item.Position] = item.Label
+			}
+		})
+	}
+}
+
 func TestTwoItemsAddedAtOnceGetDifferentPositions(t *testing.T) {
 	at := time.Date(2026, time.April, 1, 9, 0, 0, 0, time.UTC)
 

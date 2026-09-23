@@ -25,6 +25,12 @@ const DefaultMaxConns = 10
 
 // OpenPostgres connects to an existing Postgres server and brings the schema up to
 // date. maxConns bounds the pool; zero takes DefaultMaxConns.
+
+// postgresDriver is how this driver is named to `open`, and is what the few places that
+// have to behave differently on Postgres compare against. One spelling, because three
+// string literals in three files is three chances to type it wrong once.
+const postgresDriver = "postgres"
+
 func OpenPostgres(ctx context.Context, dsn string, maxConns int) (Store, error) {
 	if dsn == "" {
 		return nil, fmt.Errorf("store: postgres dsn is required")
@@ -42,7 +48,7 @@ func OpenPostgres(ctx context.Context, dsn string, maxConns int) (Store, error) 
 	// than the pool may open is not a thing that can happen.
 	db.SetMaxIdleConns(maxConns)
 
-	store, err := open(ctx, db, postgresDialect(), "postgres")
+	store, err := open(ctx, db, postgresDialect(), postgresDriver)
 	if err != nil {
 		// As in sqlite.go: the handle is going nowhere and its close error would bury
 		// the one worth reading.

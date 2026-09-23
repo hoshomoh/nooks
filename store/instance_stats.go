@@ -62,7 +62,7 @@ is never a reason to fail the page.
 func (s *sqlStore) storageBytes(ctx context.Context) int64 {
 	var size int64
 	query := "SELECT page_count * page_size FROM pragma_page_count(), pragma_page_size()"
-	if s.name == "postgres" {
+	if s.name == postgresDriver {
 		query = "SELECT pg_database_size(current_database())"
 	}
 	if err := s.db.QueryRowContext(ctx, query).Scan(&size); err != nil {

@@ -44,13 +44,28 @@ func Validate(plain string) error {
 	return nil
 }
 
-// Hash validates a password and returns its hash. The cost is bcrypt's default, which
-// is chosen to be slow enough on the modest hardware a household server tends to be.
+/*
+Cost is the work bcrypt is asked for, and it is bcrypt's default: slow enough on the
+modest hardware a household server tends to be, which is the whole point of the
+algorithm.
+
+A variable rather than a constant, for the suite and nothing else. Being slow on purpose
+costs the same under the race detector, where everything is slower again, and the API
+package alone hashes enough times to pass the ten minutes `go test` allows a package
+before it gives up. That is how a commit touching no Go at all failed CI.
+
+Tests lower it, in a TestMain, and `TestNothingButATestLowersTheCostOfAPassword` holds
+every other file in the tree to leaving it alone. Lowered in a running Instance this
+would be a real weakness, so it is guarded rather than trusted.
+*/
+var Cost = bcrypt.DefaultCost
+
+// Hash validates a password and returns its hash.
 func Hash(plain string) (string, error) {
 	if err := Validate(plain); err != nil {
 		return "", err
 	}
-	hashed, err := bcrypt.GenerateFromPassword([]byte(plain), bcrypt.DefaultCost)
+	hashed, err := bcrypt.GenerateFromPassword([]byte(plain), Cost)
 	if err != nil {
 		return "", fmt.Errorf("hash password: %w", err)
 	}

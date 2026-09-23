@@ -285,3 +285,90 @@ func TestListsAreOrderedTheWayAPersonReads(t *testing.T) {
 		})
 	}
 }
+
+/*
+A deleted List comes back, findable, and only for whoever deleted it.
+
+Deleting has always been soft and nothing ever undid it, so the date a List carried was
+a promise the code did not keep. The re-indexing is the half worth asserting: DeleteList
+takes the List and every Item and Note on it out of the search index, because search
+handing back something a Member can no longer open is worse than not finding it, and a
+restore that only cleared the date would give back a List that opens and cannot be
+searched for.
+*/
+func TestADeletedListComesBackFindable(t *testing.T) {
+	at := time.Date(2026, time.April, 1, 9, 0, 0, 0, time.UTC)
+
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			anna := newMember(t, s)
+			jonas := addMember(t, s, "mem_jonas", "Jonas", "jonas@brunnen.lan")
+
+			list := makeList(t, s, anna, "list_camp", "Camping", SharingInstance)
+			addItem(t, s, list, anna, "item_tarp", "Tarpaulin")
+
+			if err := s.DeleteList(t.Context(), list.UID, at); err != nil {
+				t.Fatalf("DeleteList: %v", err)
+			}
+			if hits, err := s.Search(t.Context(), "Tarpaulin"); err != nil || len(hits) != 0 {
+				t.Fatalf("a deleted List is still searchable: %v hits, %v", len(hits), err)
+			}
+
+			// Somebody else's deleted List reads as one that never existed.
+			if err := s.RestoreList(t.Context(), list.UID, jonas.ID, at); !errors.Is(err, ErrNotFound) {
+				t.Errorf("Jonas restoring Anna's List answered %v, want ErrNotFound", err)
+			}
+
+			if err := s.RestoreList(t.Context(), list.UID, anna.ID, at); err != nil {
+				t.Fatalf("RestoreList: %v", err)
+			}
+			if _, err := s.ListByUID(t.Context(), list.UID); err != nil {
+				t.Errorf("the restored List is %v", err)
+			}
+
+			hits, err := s.Search(t.Context(), "Tarpaulin")
+			if err != nil {
+				t.Fatalf("Search: %v", err)
+			}
+			if len(hits) != 1 {
+				t.Errorf("found %d after restoring, want the Item findable again", len(hits))
+			}
+		})
+	}
+}
+
+// The window ends, and what it was protecting goes with it.
+func TestADeletedListIsPurgedAfterItsWindow(t *testing.T) {
+	at := time.Date(2026, time.April, 1, 9, 0, 0, 0, time.UTC)
+
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			anna := newMember(t, s)
+			list := makeList(t, s, anna, "list_camp", "Camping", SharingInstance)
+
+			if err := s.DeleteList(t.Context(), list.UID, at); err != nil {
+				t.Fatalf("DeleteList: %v", err)
+			}
+
+			// An hour short of the window, from the caller's side.
+			early := at.Add(DeletedListLifetime).Add(-time.Hour).Add(-DeletedListLifetime)
+			if gone, err := s.PurgeDeletedLists(t.Context(), early); err != nil || gone != 0 {
+				t.Fatalf("purged %d an hour early (%v), want none", gone, err)
+			}
+
+			late := at.Add(DeletedListLifetime).Add(time.Hour).Add(-DeletedListLifetime)
+			gone, err := s.PurgeDeletedLists(t.Context(), late)
+			if err != nil {
+				t.Fatalf("PurgeDeletedLists: %v", err)
+			}
+			if gone != 1 {
+				t.Errorf("purged %d past the window, want the one List", gone)
+			}
+			if err := s.RestoreList(t.Context(), list.UID, anna.ID, at); !errors.Is(err, ErrNotFound) {
+				t.Errorf("restoring a purged List answered %v, want ErrNotFound", err)
+			}
+		})
+	}
+}

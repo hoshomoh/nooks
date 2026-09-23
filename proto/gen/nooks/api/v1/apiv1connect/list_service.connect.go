@@ -54,6 +54,8 @@ const (
 	// ListServiceSetListArchivedProcedure is the fully-qualified name of the ListService's
 	// SetListArchived RPC.
 	ListServiceSetListArchivedProcedure = "/nooks.api.v1.ListService/SetListArchived"
+	// ListServiceRestoreListProcedure is the fully-qualified name of the ListService's RestoreList RPC.
+	ListServiceRestoreListProcedure = "/nooks.api.v1.ListService/RestoreList"
 	// ListServiceDeleteListProcedure is the fully-qualified name of the ListService's DeleteList RPC.
 	ListServiceDeleteListProcedure = "/nooks.api.v1.ListService/DeleteList"
 	// ListServiceDuplicateListProcedure is the fully-qualified name of the ListService's DuplicateList
@@ -112,6 +114,10 @@ type ListServiceClient interface {
 	// may: archiving a shared List takes it out of everybody's sidebar. Archiving is not
 	// deleting — what is archived keeps its Items and can be restored.
 	SetListArchived(context.Context, *connect.Request[v1.SetListArchivedRequest]) (*connect.Response[v1.SetListArchivedResponse], error)
+	// RestoreList brings back a List its owner deleted, with everything on it findable
+	// again. Only its owner may, and only inside the window before it is removed for
+	// good.
+	RestoreList(context.Context, *connect.Request[v1.RestoreListRequest]) (*connect.Response[v1.RestoreListResponse], error)
 	// DeleteList removes a List and the Items on it. Only its owner may.
 	DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error)
 	// DuplicateList copies a List and the Items still open on it.
@@ -210,6 +216,12 @@ func NewListServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(listServiceMethods.ByName("SetListArchived")),
 			connect.WithClientOptions(opts...),
 		),
+		restoreList: connect.NewClient[v1.RestoreListRequest, v1.RestoreListResponse](
+			httpClient,
+			baseURL+ListServiceRestoreListProcedure,
+			connect.WithSchema(listServiceMethods.ByName("RestoreList")),
+			connect.WithClientOptions(opts...),
+		),
 		deleteList: connect.NewClient[v1.DeleteListRequest, v1.DeleteListResponse](
 			httpClient,
 			baseURL+ListServiceDeleteListProcedure,
@@ -284,6 +296,7 @@ type listServiceClient struct {
 	setListSharing  *connect.Client[v1.SetListSharingRequest, v1.SetListSharingResponse]
 	getListShares   *connect.Client[v1.GetListSharesRequest, v1.GetListSharesResponse]
 	setListArchived *connect.Client[v1.SetListArchivedRequest, v1.SetListArchivedResponse]
+	restoreList     *connect.Client[v1.RestoreListRequest, v1.RestoreListResponse]
 	deleteList      *connect.Client[v1.DeleteListRequest, v1.DeleteListResponse]
 	duplicateList   *connect.Client[v1.DuplicateListRequest, v1.DuplicateListResponse]
 	setListPinned   *connect.Client[v1.SetListPinnedRequest, v1.SetListPinnedResponse]
@@ -339,6 +352,11 @@ func (c *listServiceClient) GetListShares(ctx context.Context, req *connect.Requ
 // SetListArchived calls nooks.api.v1.ListService.SetListArchived.
 func (c *listServiceClient) SetListArchived(ctx context.Context, req *connect.Request[v1.SetListArchivedRequest]) (*connect.Response[v1.SetListArchivedResponse], error) {
 	return c.setListArchived.CallUnary(ctx, req)
+}
+
+// RestoreList calls nooks.api.v1.ListService.RestoreList.
+func (c *listServiceClient) RestoreList(ctx context.Context, req *connect.Request[v1.RestoreListRequest]) (*connect.Response[v1.RestoreListResponse], error) {
+	return c.restoreList.CallUnary(ctx, req)
 }
 
 // DeleteList calls nooks.api.v1.ListService.DeleteList.
@@ -424,6 +442,10 @@ type ListServiceHandler interface {
 	// may: archiving a shared List takes it out of everybody's sidebar. Archiving is not
 	// deleting — what is archived keeps its Items and can be restored.
 	SetListArchived(context.Context, *connect.Request[v1.SetListArchivedRequest]) (*connect.Response[v1.SetListArchivedResponse], error)
+	// RestoreList brings back a List its owner deleted, with everything on it findable
+	// again. Only its owner may, and only inside the window before it is removed for
+	// good.
+	RestoreList(context.Context, *connect.Request[v1.RestoreListRequest]) (*connect.Response[v1.RestoreListResponse], error)
 	// DeleteList removes a List and the Items on it. Only its owner may.
 	DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error)
 	// DuplicateList copies a List and the Items still open on it.
@@ -518,6 +540,12 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(listServiceMethods.ByName("SetListArchived")),
 		connect.WithHandlerOptions(opts...),
 	)
+	listServiceRestoreListHandler := connect.NewUnaryHandler(
+		ListServiceRestoreListProcedure,
+		svc.RestoreList,
+		connect.WithSchema(listServiceMethods.ByName("RestoreList")),
+		connect.WithHandlerOptions(opts...),
+	)
 	listServiceDeleteListHandler := connect.NewUnaryHandler(
 		ListServiceDeleteListProcedure,
 		svc.DeleteList,
@@ -598,6 +626,8 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 			listServiceGetListSharesHandler.ServeHTTP(w, r)
 		case ListServiceSetListArchivedProcedure:
 			listServiceSetListArchivedHandler.ServeHTTP(w, r)
+		case ListServiceRestoreListProcedure:
+			listServiceRestoreListHandler.ServeHTTP(w, r)
 		case ListServiceDeleteListProcedure:
 			listServiceDeleteListHandler.ServeHTTP(w, r)
 		case ListServiceDuplicateListProcedure:
@@ -661,6 +691,10 @@ func (UnimplementedListServiceHandler) GetListShares(context.Context, *connect.R
 
 func (UnimplementedListServiceHandler) SetListArchived(context.Context, *connect.Request[v1.SetListArchivedRequest]) (*connect.Response[v1.SetListArchivedResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.SetListArchived is not implemented"))
+}
+
+func (UnimplementedListServiceHandler) RestoreList(context.Context, *connect.Request[v1.RestoreListRequest]) (*connect.Response[v1.RestoreListResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.RestoreList is not implemented"))
 }
 
 func (UnimplementedListServiceHandler) DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error) {

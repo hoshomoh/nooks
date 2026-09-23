@@ -77,6 +77,16 @@ service ListService {
     };
   }
 
+  // RestoreList brings back a List its owner deleted, with everything on it findable
+  // again. Only its owner may, and only inside the window before it is removed for
+  // good.
+  rpc RestoreList(RestoreListRequest) returns (RestoreListResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/lists/{list_uid}:restore"
+      body: "*"
+    };
+  }
+
   // DeleteList removes a List and the Items on it. Only its owner may.
   rpc DeleteList(DeleteListRequest) returns (DeleteListResponse) {
     option (google.api.http) = {delete: "/api/v1/lists/{list_uid}"};
@@ -261,6 +271,10 @@ enum ListStatus {
   LIST_STATUS_COMPLETED = 2;
   // Put out of the sidebar. Out of the other three as well.
   LIST_STATUS_ARCHIVED = 3;
+  // Deleted, and still inside the window where its owner can bring it back. Only its
+  // owner sees these: whoever it was shared with lost it from their sidebar when it
+  // went, and restoring it is not theirs to decide.
+  LIST_STATUS_DELETED = 4;
 }
 
 // How a page of Lists is arranged.
@@ -397,6 +411,14 @@ message SetListArchivedRequest {
 }
 
 message SetListArchivedResponse {
+  List list = 1;
+}
+
+message RestoreListRequest {
+  string list_uid = 1;
+}
+
+message RestoreListResponse {
   List list = 1;
 }
 

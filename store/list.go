@@ -177,6 +177,10 @@ const (
 	StatusActive    ListStatus = "ACTIVE"
 	StatusCompleted ListStatus = "COMPLETED"
 	StatusArchived  ListStatus = "ARCHIVED"
+	// StatusDeleted is a List its owner deleted and can still bring back. Only its
+	// owner sees it: whoever it was shared with has already lost it from their sidebar,
+	// and what becomes of it is not theirs to decide.
+	StatusDeleted ListStatus = "DELETED"
 )
 
 /** ListOrder is how a page of Lists is arranged. */
@@ -257,10 +261,10 @@ func (s *sqlStore) ListsPage(ctx context.Context, q ListQuery) (ListPage, error)
 	// Built twice rather than once and reused: counting wants no columns, no order and
 	// a limit of its own, and the page wants all three.
 	matching := func(query *bun.SelectQuery) *bun.SelectQuery {
-		query = query.ModelTableExpr("list AS list").Where("list.deleted_at = ''")
+		query = query.ModelTableExpr("list AS list")
 		query = whereListVisible(query, q.MemberID, named)
 		query = q.Reach.narrow(query)
-		return whereListStatus(query, q.Status)
+		return whereListStatus(query, q.Status, q.MemberID)
 	}
 
 	counting := matching(s.db.NewSelect().Model((*listModel)(nil)).ColumnExpr("1"))
@@ -302,7 +306,16 @@ put anything on yet has nothing open either, and it is not finished. Archived is
 own answer rather than a flavour of the others, so a List put away is out of active and
 completed alike.
 */
-func whereListStatus(query *bun.SelectQuery, status ListStatus) *bun.SelectQuery {
+func whereListStatus(query *bun.SelectQuery, status ListStatus, memberID int64) *bun.SelectQuery {
+	// Deleted is the one status that is about rows every other read skips, so it is the
+	// one that decides for itself which side of that line it wants. Narrowed to the
+	// owner as well: a List somebody deleted is gone from everybody else's sidebar
+	// already, and bringing it back is not theirs to do.
+	if status == StatusDeleted {
+		return query.Where("list.deleted_at <> '' AND list.owner_id = ?", memberID)
+	}
+	query = query.Where("list.deleted_at = ''")
+
 	switch status {
 	case StatusArchived:
 		return query.Where("list.archived_at <> ''")
@@ -646,6 +659,101 @@ func (s *sqlStore) ListsOwnedBy(ctx context.Context, memberID int64) ([]List, er
 		lists = append(lists, list)
 	}
 	return lists, nil
+}
+
+/*
+DeletedListLifetime is how long a deleted List can still be brought back.
+
+Deleting a List has always been soft: the row keeps a date and every read skips it.
+Nothing ever cleared that date, so there was no way back, and nothing ever swept the
+rows, so they stayed for the life of the Instance. The schema said "recoverable until it
+is purged", which was two features neither of which existed.
+
+Thirty days, the same as a decided request, because it is the same promise: long enough
+to notice the afternoon you deleted the wrong thing, short enough that a household is
+not carrying years of it.
+*/
+const DeletedListLifetime = 30 * 24 * time.Hour
+
+/*
+RestoreList brings a deleted List back, and makes it findable again.
+
+Owned, checked here rather than above, so that a List somebody else deleted and one
+that never existed answer alike. That is the same rule every other read of a List by uid
+follows, and holding it in the query is what makes the two indistinguishable.
+
+The re-indexing is the half that is easy to forget. DeleteList takes the List and every
+Item and Note on it out of the search index, because search handing back something a
+Member can no longer open would be worse than not finding it. A restore that only
+cleared the date would give back a List that exists, opens, and cannot be searched for.
+*/
+func (s *sqlStore) RestoreList(ctx context.Context, uid string, ownerID int64, at time.Time) error {
+	var row listModel
+	err := s.db.NewSelect().
+		Model(&row).
+		Where("uid = ? AND deleted_at <> '' AND owner_id = ?", uid, ownerID).
+		Scan(ctx)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrNotFound
+		}
+		return fmt.Errorf("read deleted list: %w", err)
+	}
+
+	result, err := s.db.NewUpdate().
+		Model((*listModel)(nil)).
+		Set("deleted_at = ?", "").
+		Set("updated_at = ?", formatTime(at)).
+		Where("uid = ? AND deleted_at <> '' AND owner_id = ?", uid, ownerID).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("restore list: %w", err)
+	}
+	if err := requireOneRow(result, "deleted list"); err != nil {
+		return err
+	}
+
+	list, err := row.toList()
+	if err != nil {
+		return err
+	}
+	if err := s.indexList(ctx, list); err != nil {
+		return err
+	}
+
+	items, err := s.ItemsOnList(ctx, list.ID)
+	if err != nil {
+		return err
+	}
+	for _, item := range items {
+		if err := s.indexItem(ctx, item); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+/*
+PurgeDeletedLists removes for good the Lists deleted before a given moment, and reports
+how many went.
+
+Hard, unlike every other deletion here, because this is the one that ends the promise
+the soft delete was making. What goes with the row is everything on it, by the cascades
+the schema already carries.
+*/
+func (s *sqlStore) PurgeDeletedLists(ctx context.Context, before time.Time) (int64, error) {
+	result, err := s.db.NewDelete().
+		Model((*listModel)(nil)).
+		Where("deleted_at <> '' AND deleted_at <= ?", formatTime(before)).
+		Exec(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("purge deleted lists: %w", err)
+	}
+	gone, err := result.RowsAffected()
+	if err != nil {
+		return 0, fmt.Errorf("rows affected: %w", err)
+	}
+	return gone, nil
 }
 
 // DeleteList removes a List, and with it the Items on it. The removal is soft, so a

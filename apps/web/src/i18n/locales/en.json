@@ -153,6 +153,8 @@
     "statusActive": "Active",
     "statusCompleted": "Completed",
     "statusArchived": "Archived",
+    "statusDeleted": "Deleted",
+    "restore": "Restore",
     "statusLabel": "Which lists",
     "sortUpdated": "Recently updated",
     "sortName": "Name A–Z",

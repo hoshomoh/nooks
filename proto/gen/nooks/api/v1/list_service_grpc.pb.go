@@ -28,6 +28,7 @@ const (
 	ListService_SetListSharing_FullMethodName  = "/nooks.api.v1.ListService/SetListSharing"
 	ListService_GetListShares_FullMethodName   = "/nooks.api.v1.ListService/GetListShares"
 	ListService_SetListArchived_FullMethodName = "/nooks.api.v1.ListService/SetListArchived"
+	ListService_RestoreList_FullMethodName     = "/nooks.api.v1.ListService/RestoreList"
 	ListService_DeleteList_FullMethodName      = "/nooks.api.v1.ListService/DeleteList"
 	ListService_DuplicateList_FullMethodName   = "/nooks.api.v1.ListService/DuplicateList"
 	ListService_SetListPinned_FullMethodName   = "/nooks.api.v1.ListService/SetListPinned"
@@ -78,6 +79,10 @@ type ListServiceClient interface {
 	// may: archiving a shared List takes it out of everybody's sidebar. Archiving is not
 	// deleting — what is archived keeps its Items and can be restored.
 	SetListArchived(ctx context.Context, in *SetListArchivedRequest, opts ...grpc.CallOption) (*SetListArchivedResponse, error)
+	// RestoreList brings back a List its owner deleted, with everything on it findable
+	// again. Only its owner may, and only inside the window before it is removed for
+	// good.
+	RestoreList(ctx context.Context, in *RestoreListRequest, opts ...grpc.CallOption) (*RestoreListResponse, error)
 	// DeleteList removes a List and the Items on it. Only its owner may.
 	DeleteList(ctx context.Context, in *DeleteListRequest, opts ...grpc.CallOption) (*DeleteListResponse, error)
 	// DuplicateList copies a List and the Items still open on it.
@@ -203,6 +208,16 @@ func (c *listServiceClient) SetListArchived(ctx context.Context, in *SetListArch
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SetListArchivedResponse)
 	err := c.cc.Invoke(ctx, ListService_SetListArchived_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *listServiceClient) RestoreList(ctx context.Context, in *RestoreListRequest, opts ...grpc.CallOption) (*RestoreListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RestoreListResponse)
+	err := c.cc.Invoke(ctx, ListService_RestoreList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -347,6 +362,10 @@ type ListServiceServer interface {
 	// may: archiving a shared List takes it out of everybody's sidebar. Archiving is not
 	// deleting — what is archived keeps its Items and can be restored.
 	SetListArchived(context.Context, *SetListArchivedRequest) (*SetListArchivedResponse, error)
+	// RestoreList brings back a List its owner deleted, with everything on it findable
+	// again. Only its owner may, and only inside the window before it is removed for
+	// good.
+	RestoreList(context.Context, *RestoreListRequest) (*RestoreListResponse, error)
 	// DeleteList removes a List and the Items on it. Only its owner may.
 	DeleteList(context.Context, *DeleteListRequest) (*DeleteListResponse, error)
 	// DuplicateList copies a List and the Items still open on it.
@@ -414,6 +433,9 @@ func (UnimplementedListServiceServer) GetListShares(context.Context, *GetListSha
 }
 func (UnimplementedListServiceServer) SetListArchived(context.Context, *SetListArchivedRequest) (*SetListArchivedResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetListArchived not implemented")
+}
+func (UnimplementedListServiceServer) RestoreList(context.Context, *RestoreListRequest) (*RestoreListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RestoreList not implemented")
 }
 func (UnimplementedListServiceServer) DeleteList(context.Context, *DeleteListRequest) (*DeleteListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteList not implemented")
@@ -624,6 +646,24 @@ func _ListService_SetListArchived_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ListServiceServer).SetListArchived(ctx, req.(*SetListArchivedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ListService_RestoreList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RestoreListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ListServiceServer).RestoreList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ListService_RestoreList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ListServiceServer).RestoreList(ctx, req.(*RestoreListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -850,6 +890,10 @@ var ListService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetListArchived",
 			Handler:    _ListService_SetListArchived_Handler,
+		},
+		{
+			MethodName: "RestoreList",
+			Handler:    _ListService_RestoreList_Handler,
 		},
 		{
 			MethodName: "DeleteList",

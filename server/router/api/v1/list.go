@@ -509,6 +509,47 @@ func (s *ListService) SetListArchived(
 	}), nil
 }
 
+/*
+RestoreList brings back a List its owner deleted.
+
+Deleting has always been soft and nothing ever undid it, so the date a List carried was
+a promise the code did not keep. This is the keeping of it, and the sweep that ends the
+window is the other half.
+
+A List somebody else deleted answers exactly as one that never existed, which the store
+holds by asking for the owner in the same query. Writing rather than deleting, so a
+token cut to read cannot do it and one cut to write can: bringing something back is not
+the act the delete ability exists to hold.
+*/
+func (s *ListService) RestoreList(
+	ctx context.Context,
+	req *connect.Request[apiv1.RestoreListRequest],
+) (*connect.Response[apiv1.RestoreListResponse], error) {
+	member, err := requireWriter(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.store.RestoreList(ctx, req.Msg.GetListUid(), member.ID, s.now()); err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			return nil, errListNotFound
+		}
+		return nil, internalError("restore list", err)
+	}
+
+	restored, err := s.store.ListByUID(ctx, req.Msg.GetListUid())
+	if err != nil {
+		return nil, internalError("read list", err)
+	}
+	open, done, err := s.counts(ctx, restored.ID)
+	if err != nil {
+		return nil, err
+	}
+	s.announceListChanged(ctx, restored)
+	return connect.NewResponse(&apiv1.RestoreListResponse{
+		List: s.listWithNames(ctx, restored, member, false, open, done),
+	}), nil
+}
+
 // DeleteList removes a List and the Items on it.
 func (s *ListService) DeleteList(
 	ctx context.Context,

@@ -222,6 +222,14 @@ type Store interface {
 	// their row now stays and their Lists no longer go with it.
 	ListsOwnedBy(ctx context.Context, memberID int64) ([]List, error)
 
+	// RestoreList brings back a List its owner deleted, findable again. A List owned by
+	// somebody else answers as one that is not there.
+	RestoreList(ctx context.Context, uid string, ownerID int64, at time.Time) error
+
+	// PurgeDeletedLists removes for good the Lists deleted before a moment, and reports
+	// how many went. This is the one hard deletion of a List there is.
+	PurgeDeletedLists(ctx context.Context, before time.Time) (int64, error)
+
 	// DeleteList removes a List. The removal is soft.
 	DeleteList(ctx context.Context, uid string, at time.Time) error
 

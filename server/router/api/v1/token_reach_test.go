@@ -42,6 +42,7 @@ var reachableByToken = map[string]string{
 	"ListService.DuplicateList":   "a List made from one it reaches",
 	"ListService.SetListPinned":   "an edit to a List it reaches",
 	"ListService.SetListArchived": "putting a finished List away",
+	"ListService.RestoreList":     "bringing back one its Member deleted, which is a write",
 	"ListService.SetListSharing":  "sharing a List is about a List, not an account",
 	"ListService.GetListShares":   "reading who a List reaches",
 

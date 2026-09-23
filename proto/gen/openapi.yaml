@@ -702,6 +702,7 @@ paths:
                         - LIST_STATUS_ACTIVE
                         - LIST_STATUS_COMPLETED
                         - LIST_STATUS_ARCHIVED
+                        - LIST_STATUS_DELETED
                     type: string
                     format: enum
                 - name: order
@@ -1027,6 +1028,40 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/DuplicateListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/lists/{listUid}:restore:
+        post:
+            tags:
+                - ListService
+            description: |-
+                RestoreList brings back a List its owner deleted, with everything on it findable
+                 again. Only its owner may, and only inside the window before it is removed for
+                 good.
+            operationId: ListService_RestoreList
+            parameters:
+                - name: listUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RestoreListRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RestoreListResponse'
                 default:
                     description: Default error response
                     content:
@@ -2153,6 +2188,16 @@ components:
             properties:
                 requestUid:
                     type: string
+        RestoreListRequest:
+            type: object
+            properties:
+                listUid:
+                    type: string
+        RestoreListResponse:
+            type: object
+            properties:
+                list:
+                    $ref: '#/components/schemas/List'
         RevokeAccessTokenResponse:
             type: object
             properties: {}

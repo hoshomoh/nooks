@@ -1,9 +1,9 @@
 import { ListOrder, ListStatus as StatusWire, type ListListsResponse } from "@nooks/api"
 
 /** Which Lists the table is showing. */
-export type ListStatus = "all" | "active" | "completed" | "archived"
+export type ListStatus = "all" | "active" | "completed" | "archived" | "deleted"
 
-export const LIST_STATUSES: ListStatus[] = ["all", "active", "completed", "archived"]
+export const LIST_STATUSES: ListStatus[] = ["all", "active", "completed", "archived", "deleted"]
 
 /**
  * What the table is ordered by.
@@ -46,6 +46,7 @@ const STATUS_ON_THE_WIRE: Record<ListStatus, StatusWire> = {
   active: StatusWire.ACTIVE,
   completed: StatusWire.COMPLETED,
   archived: StatusWire.ARCHIVED,
+  deleted: StatusWire.DELETED,
 }
 
 const SORT_ON_THE_WIRE: Record<ListSort, ListOrder> = {

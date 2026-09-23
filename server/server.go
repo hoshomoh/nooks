@@ -297,8 +297,9 @@ tidyUp clears out what has aged out and has the database look at itself again.
 Every one of them is logged and carried on with rather than returned, and none is worth
 stopping for. A session row that outlives its expiry is already refused on sight, an
 Activity row past the fifty the panel draws is unreachable either way, a request nobody
-has asked about in a month is history the entry beside it already keeps, and statistics
-going stale makes an Instance slower rather than wrong. None of that is a reason to stop
+has asked about in a month is history the entry beside it already keeps, a List nobody
+restored inside its window has run out of the promise that was made about it, and
+statistics going stale makes an Instance slower rather than wrong. None of that is a reason to stop
 serving the shopping list.
 
 Counted in none of the prose above, deliberately. This said "both" while doing three
@@ -336,6 +337,16 @@ func (s *Server) tidyUp(ctx context.Context) {
 		s.log.Warn("could not clear decided requests", "error", err)
 	case gone > 0:
 		s.log.Info("cleared requests decided long ago", "count", gone)
+	}
+
+	// The end of the window a soft delete was promising. Everything on the List goes
+	// with it, by the cascades the schema already carries, and this is the one hard
+	// deletion of a List there is.
+	switch gone, err := s.store.PurgeDeletedLists(ctx, time.Now().Add(-store.DeletedListLifetime)); {
+	case err != nil:
+		s.log.Warn("could not purge deleted lists", "error", err)
+	case gone > 0:
+		s.log.Info("purged lists deleted long ago", "count", gone)
 	}
 
 	if err := s.store.Analyse(ctx); err != nil {

@@ -38,7 +38,7 @@ func TestEveryFailureSaysWhichKindItIs(t *testing.T) {
 		"revoke": true, "index": true, "announce": true, "tell": true, "add": true,
 		"open": true, "close": true, "write": true, "start": true, "decide": true,
 		"record": true, "mark": true, "copy": true, "tick": true, "move": true,
-		"rename": true, "archive": true, "pin": true,
+		"rename": true, "archive": true, "pin": true, "restore": true, "purge": true,
 	}
 
 	descriptions := failureDescriptions(t)

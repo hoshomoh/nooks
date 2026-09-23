@@ -89,6 +89,10 @@ const (
 	ListStatus_LIST_STATUS_COMPLETED ListStatus = 2
 	// Put out of the sidebar. Out of the other three as well.
 	ListStatus_LIST_STATUS_ARCHIVED ListStatus = 3
+	// Deleted, and still inside the window where its owner can bring it back. Only its
+	// owner sees these: whoever it was shared with lost it from their sidebar when it
+	// went, and restoring it is not theirs to decide.
+	ListStatus_LIST_STATUS_DELETED ListStatus = 4
 )
 
 // Enum value maps for ListStatus.
@@ -98,12 +102,14 @@ var (
 		1: "LIST_STATUS_ACTIVE",
 		2: "LIST_STATUS_COMPLETED",
 		3: "LIST_STATUS_ARCHIVED",
+		4: "LIST_STATUS_DELETED",
 	}
 	ListStatus_value = map[string]int32{
 		"LIST_STATUS_UNSPECIFIED": 0,
 		"LIST_STATUS_ACTIVE":      1,
 		"LIST_STATUS_COMPLETED":   2,
 		"LIST_STATUS_ARCHIVED":    3,
+		"LIST_STATUS_DELETED":     4,
 	}
 )
 
@@ -1623,6 +1629,94 @@ func (x *SetListArchivedResponse) GetList() *List {
 	return nil
 }
 
+type RestoreListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ListUid       string                 `protobuf:"bytes,1,opt,name=list_uid,json=listUid,proto3" json:"list_uid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RestoreListRequest) Reset() {
+	*x = RestoreListRequest{}
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RestoreListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RestoreListRequest) ProtoMessage() {}
+
+func (x *RestoreListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RestoreListRequest.ProtoReflect.Descriptor instead.
+func (*RestoreListRequest) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *RestoreListRequest) GetListUid() string {
+	if x != nil {
+		return x.ListUid
+	}
+	return ""
+}
+
+type RestoreListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	List          *List                  `protobuf:"bytes,1,opt,name=list,proto3" json:"list,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RestoreListResponse) Reset() {
+	*x = RestoreListResponse{}
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RestoreListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RestoreListResponse) ProtoMessage() {}
+
+func (x *RestoreListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RestoreListResponse.ProtoReflect.Descriptor instead.
+func (*RestoreListResponse) Descriptor() ([]byte, []int) {
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *RestoreListResponse) GetList() *List {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
 type DeleteListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ListUid       string                 `protobuf:"bytes,1,opt,name=list_uid,json=listUid,proto3" json:"list_uid,omitempty"`
@@ -1632,7 +1726,7 @@ type DeleteListRequest struct {
 
 func (x *DeleteListRequest) Reset() {
 	*x = DeleteListRequest{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[23]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1644,7 +1738,7 @@ func (x *DeleteListRequest) String() string {
 func (*DeleteListRequest) ProtoMessage() {}
 
 func (x *DeleteListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[23]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1657,7 +1751,7 @@ func (x *DeleteListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteListRequest.ProtoReflect.Descriptor instead.
 func (*DeleteListRequest) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{23}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *DeleteListRequest) GetListUid() string {
@@ -1675,7 +1769,7 @@ type DeleteListResponse struct {
 
 func (x *DeleteListResponse) Reset() {
 	*x = DeleteListResponse{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[24]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1687,7 +1781,7 @@ func (x *DeleteListResponse) String() string {
 func (*DeleteListResponse) ProtoMessage() {}
 
 func (x *DeleteListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[24]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1700,7 +1794,7 @@ func (x *DeleteListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteListResponse.ProtoReflect.Descriptor instead.
 func (*DeleteListResponse) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{24}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{26}
 }
 
 type SetListPinnedRequest struct {
@@ -1713,7 +1807,7 @@ type SetListPinnedRequest struct {
 
 func (x *SetListPinnedRequest) Reset() {
 	*x = SetListPinnedRequest{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[25]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1725,7 +1819,7 @@ func (x *SetListPinnedRequest) String() string {
 func (*SetListPinnedRequest) ProtoMessage() {}
 
 func (x *SetListPinnedRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[25]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1738,7 +1832,7 @@ func (x *SetListPinnedRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetListPinnedRequest.ProtoReflect.Descriptor instead.
 func (*SetListPinnedRequest) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{25}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *SetListPinnedRequest) GetListUid() string {
@@ -1763,7 +1857,7 @@ type SetListPinnedResponse struct {
 
 func (x *SetListPinnedResponse) Reset() {
 	*x = SetListPinnedResponse{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[26]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1775,7 +1869,7 @@ func (x *SetListPinnedResponse) String() string {
 func (*SetListPinnedResponse) ProtoMessage() {}
 
 func (x *SetListPinnedResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[26]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1788,7 +1882,7 @@ func (x *SetListPinnedResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetListPinnedResponse.ProtoReflect.Descriptor instead.
 func (*SetListPinnedResponse) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{26}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{28}
 }
 
 type CreateItemRequest struct {
@@ -1803,7 +1897,7 @@ type CreateItemRequest struct {
 
 func (x *CreateItemRequest) Reset() {
 	*x = CreateItemRequest{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[27]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1815,7 +1909,7 @@ func (x *CreateItemRequest) String() string {
 func (*CreateItemRequest) ProtoMessage() {}
 
 func (x *CreateItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[27]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1828,7 +1922,7 @@ func (x *CreateItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateItemRequest.ProtoReflect.Descriptor instead.
 func (*CreateItemRequest) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{27}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *CreateItemRequest) GetListUid() string {
@@ -1868,7 +1962,7 @@ type CreateItemResponse struct {
 
 func (x *CreateItemResponse) Reset() {
 	*x = CreateItemResponse{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[28]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1880,7 +1974,7 @@ func (x *CreateItemResponse) String() string {
 func (*CreateItemResponse) ProtoMessage() {}
 
 func (x *CreateItemResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[28]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1893,7 +1987,7 @@ func (x *CreateItemResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateItemResponse.ProtoReflect.Descriptor instead.
 func (*CreateItemResponse) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{28}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *CreateItemResponse) GetItem() *Item {
@@ -1929,7 +2023,7 @@ type UpdateItemRequest struct {
 
 func (x *UpdateItemRequest) Reset() {
 	*x = UpdateItemRequest{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[29]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1941,7 +2035,7 @@ func (x *UpdateItemRequest) String() string {
 func (*UpdateItemRequest) ProtoMessage() {}
 
 func (x *UpdateItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[29]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1954,7 +2048,7 @@ func (x *UpdateItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateItemRequest.ProtoReflect.Descriptor instead.
 func (*UpdateItemRequest) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{29}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *UpdateItemRequest) GetItemUid() string {
@@ -2015,7 +2109,7 @@ type UpdateItemResponse struct {
 
 func (x *UpdateItemResponse) Reset() {
 	*x = UpdateItemResponse{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[30]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2027,7 +2121,7 @@ func (x *UpdateItemResponse) String() string {
 func (*UpdateItemResponse) ProtoMessage() {}
 
 func (x *UpdateItemResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[30]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2040,7 +2134,7 @@ func (x *UpdateItemResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateItemResponse.ProtoReflect.Descriptor instead.
 func (*UpdateItemResponse) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{30}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *UpdateItemResponse) GetItem() *Item {
@@ -2060,7 +2154,7 @@ type SetItemDoneRequest struct {
 
 func (x *SetItemDoneRequest) Reset() {
 	*x = SetItemDoneRequest{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[31]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2072,7 +2166,7 @@ func (x *SetItemDoneRequest) String() string {
 func (*SetItemDoneRequest) ProtoMessage() {}
 
 func (x *SetItemDoneRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[31]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2085,7 +2179,7 @@ func (x *SetItemDoneRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetItemDoneRequest.ProtoReflect.Descriptor instead.
 func (*SetItemDoneRequest) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{31}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *SetItemDoneRequest) GetItemUid() string {
@@ -2111,7 +2205,7 @@ type SetItemDoneResponse struct {
 
 func (x *SetItemDoneResponse) Reset() {
 	*x = SetItemDoneResponse{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[32]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2123,7 +2217,7 @@ func (x *SetItemDoneResponse) String() string {
 func (*SetItemDoneResponse) ProtoMessage() {}
 
 func (x *SetItemDoneResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[32]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2136,7 +2230,7 @@ func (x *SetItemDoneResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetItemDoneResponse.ProtoReflect.Descriptor instead.
 func (*SetItemDoneResponse) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{32}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *SetItemDoneResponse) GetItem() *Item {
@@ -2157,7 +2251,7 @@ type MoveItemRequest struct {
 
 func (x *MoveItemRequest) Reset() {
 	*x = MoveItemRequest{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[33]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2169,7 +2263,7 @@ func (x *MoveItemRequest) String() string {
 func (*MoveItemRequest) ProtoMessage() {}
 
 func (x *MoveItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[33]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2182,7 +2276,7 @@ func (x *MoveItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MoveItemRequest.ProtoReflect.Descriptor instead.
 func (*MoveItemRequest) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{33}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *MoveItemRequest) GetItemUid() string {
@@ -2207,7 +2301,7 @@ type MoveItemResponse struct {
 
 func (x *MoveItemResponse) Reset() {
 	*x = MoveItemResponse{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[34]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2219,7 +2313,7 @@ func (x *MoveItemResponse) String() string {
 func (*MoveItemResponse) ProtoMessage() {}
 
 func (x *MoveItemResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[34]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2232,7 +2326,7 @@ func (x *MoveItemResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MoveItemResponse.ProtoReflect.Descriptor instead.
 func (*MoveItemResponse) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{34}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{36}
 }
 
 type DeleteItemRequest struct {
@@ -2244,7 +2338,7 @@ type DeleteItemRequest struct {
 
 func (x *DeleteItemRequest) Reset() {
 	*x = DeleteItemRequest{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[35]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2256,7 +2350,7 @@ func (x *DeleteItemRequest) String() string {
 func (*DeleteItemRequest) ProtoMessage() {}
 
 func (x *DeleteItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[35]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2269,7 +2363,7 @@ func (x *DeleteItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteItemRequest.ProtoReflect.Descriptor instead.
 func (*DeleteItemRequest) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{35}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *DeleteItemRequest) GetItemUid() string {
@@ -2287,7 +2381,7 @@ type DeleteItemResponse struct {
 
 func (x *DeleteItemResponse) Reset() {
 	*x = DeleteItemResponse{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[36]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2299,7 +2393,7 @@ func (x *DeleteItemResponse) String() string {
 func (*DeleteItemResponse) ProtoMessage() {}
 
 func (x *DeleteItemResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[36]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2312,7 +2406,7 @@ func (x *DeleteItemResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteItemResponse.ProtoReflect.Descriptor instead.
 func (*DeleteItemResponse) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{36}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{38}
 }
 
 // SearchHit is one match.
@@ -2333,7 +2427,7 @@ type SearchHit struct {
 
 func (x *SearchHit) Reset() {
 	*x = SearchHit{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[37]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2345,7 +2439,7 @@ func (x *SearchHit) String() string {
 func (*SearchHit) ProtoMessage() {}
 
 func (x *SearchHit) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[37]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2358,7 +2452,7 @@ func (x *SearchHit) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchHit.ProtoReflect.Descriptor instead.
 func (*SearchHit) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{37}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *SearchHit) GetKind() SearchHitKind {
@@ -2406,7 +2500,7 @@ type SearchRequest struct {
 
 func (x *SearchRequest) Reset() {
 	*x = SearchRequest{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[38]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2418,7 +2512,7 @@ func (x *SearchRequest) String() string {
 func (*SearchRequest) ProtoMessage() {}
 
 func (x *SearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[38]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2431,7 +2525,7 @@ func (x *SearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchRequest.ProtoReflect.Descriptor instead.
 func (*SearchRequest) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{38}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *SearchRequest) GetQuery() string {
@@ -2450,7 +2544,7 @@ type SearchResponse struct {
 
 func (x *SearchResponse) Reset() {
 	*x = SearchResponse{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[39]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2462,7 +2556,7 @@ func (x *SearchResponse) String() string {
 func (*SearchResponse) ProtoMessage() {}
 
 func (x *SearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[39]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2475,7 +2569,7 @@ func (x *SearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchResponse.ProtoReflect.Descriptor instead.
 func (*SearchResponse) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{39}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *SearchResponse) GetHits() []*SearchHit {
@@ -2497,7 +2591,7 @@ type DatedItem struct {
 
 func (x *DatedItem) Reset() {
 	*x = DatedItem{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[40]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2509,7 +2603,7 @@ func (x *DatedItem) String() string {
 func (*DatedItem) ProtoMessage() {}
 
 func (x *DatedItem) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[40]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2522,7 +2616,7 @@ func (x *DatedItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DatedItem.ProtoReflect.Descriptor instead.
 func (*DatedItem) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{40}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *DatedItem) GetItem() *Item {
@@ -2559,7 +2653,7 @@ type ListDatedItemsRequest struct {
 
 func (x *ListDatedItemsRequest) Reset() {
 	*x = ListDatedItemsRequest{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[41]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2571,7 +2665,7 @@ func (x *ListDatedItemsRequest) String() string {
 func (*ListDatedItemsRequest) ProtoMessage() {}
 
 func (x *ListDatedItemsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[41]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2584,7 +2678,7 @@ func (x *ListDatedItemsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDatedItemsRequest.ProtoReflect.Descriptor instead.
 func (*ListDatedItemsRequest) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{41}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *ListDatedItemsRequest) GetFrom() string {
@@ -2610,7 +2704,7 @@ type ListDatedItemsResponse struct {
 
 func (x *ListDatedItemsResponse) Reset() {
 	*x = ListDatedItemsResponse{}
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[42]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2622,7 +2716,7 @@ func (x *ListDatedItemsResponse) String() string {
 func (*ListDatedItemsResponse) ProtoMessage() {}
 
 func (x *ListDatedItemsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_nooks_api_v1_list_service_proto_msgTypes[42]
+	mi := &file_nooks_api_v1_list_service_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2635,7 +2729,7 @@ func (x *ListDatedItemsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDatedItemsResponse.ProtoReflect.Descriptor instead.
 func (*ListDatedItemsResponse) Descriptor() ([]byte, []int) {
-	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{42}
+	return file_nooks_api_v1_list_service_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *ListDatedItemsResponse) GetItems() []*DatedItem {
@@ -2749,6 +2843,10 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\blist_uid\x18\x01 \x01(\tR\alistUid\x12\x1a\n" +
 	"\barchived\x18\x02 \x01(\bR\barchived\"A\n" +
 	"\x17SetListArchivedResponse\x12&\n" +
+	"\x04list\x18\x01 \x01(\v2\x12.nooks.api.v1.ListR\x04list\"/\n" +
+	"\x12RestoreListRequest\x12\x19\n" +
+	"\blist_uid\x18\x01 \x01(\tR\alistUid\"=\n" +
+	"\x13RestoreListResponse\x12&\n" +
 	"\x04list\x18\x01 \x01(\v2\x12.nooks.api.v1.ListR\x04list\".\n" +
 	"\x11DeleteListRequest\x12\x19\n" +
 	"\blist_uid\x18\x01 \x01(\tR\alistUid\"\x14\n" +
@@ -2815,13 +2913,14 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\x13SHARING_UNSPECIFIED\x10\x00\x12\x13\n" +
 	"\x0fSHARING_PRIVATE\x10\x01\x12\x14\n" +
 	"\x10SHARING_INSTANCE\x10\x02\x12\x14\n" +
-	"\x10SHARING_SPECIFIC\x10\x03*v\n" +
+	"\x10SHARING_SPECIFIC\x10\x03*\x8f\x01\n" +
 	"\n" +
 	"ListStatus\x12\x1b\n" +
 	"\x17LIST_STATUS_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x12LIST_STATUS_ACTIVE\x10\x01\x12\x19\n" +
 	"\x15LIST_STATUS_COMPLETED\x10\x02\x12\x18\n" +
-	"\x14LIST_STATUS_ARCHIVED\x10\x03*i\n" +
+	"\x14LIST_STATUS_ARCHIVED\x10\x03\x12\x17\n" +
+	"\x13LIST_STATUS_DELETED\x10\x04*i\n" +
 	"\tListOrder\x12\x1a\n" +
 	"\x16LIST_ORDER_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x12LIST_ORDER_UPDATED\x10\x01\x12\x13\n" +
@@ -2831,7 +2930,7 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\x1bSEARCH_HIT_KIND_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14SEARCH_HIT_KIND_LIST\x10\x01\x12\x18\n" +
 	"\x14SEARCH_HIT_KIND_ITEM\x10\x02\x12\x18\n" +
-	"\x14SEARCH_HIT_KIND_NOTE\x10\x032\xe2\x11\n" +
+	"\x14SEARCH_HIT_KIND_NOTE\x10\x032\xe3\x12\n" +
 	"\vListService\x12c\n" +
 	"\tListLists\x12\x1e.nooks.api.v1.ListListsRequest\x1a\x1f.nooks.api.v1.ListListsResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/api/v1/lists\x12h\n" +
 	"\n" +
@@ -2844,7 +2943,8 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"RenameList\x12\x1f.nooks.api.v1.RenameListRequest\x1a .nooks.api.v1.RenameListResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*2\x18/api/v1/lists/{list_uid}\x12\x88\x01\n" +
 	"\x0eSetListSharing\x12#.nooks.api.v1.SetListSharingRequest\x1a$.nooks.api.v1.SetListSharingResponse\"+\x82\xd3\xe4\x93\x02%:\x01*\x1a /api/v1/lists/{list_uid}/sharing\x12\x81\x01\n" +
 	"\rGetListShares\x12\".nooks.api.v1.GetListSharesRequest\x1a#.nooks.api.v1.GetListSharesResponse\"'\x82\xd3\xe4\x93\x02!\x12\x1f/api/v1/lists/{list_uid}/shares\x12\x8c\x01\n" +
-	"\x0fSetListArchived\x12$.nooks.api.v1.SetListArchivedRequest\x1a%.nooks.api.v1.SetListArchivedResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/api/v1/lists/{list_uid}/archived\x12q\n" +
+	"\x0fSetListArchived\x12$.nooks.api.v1.SetListArchivedRequest\x1a%.nooks.api.v1.SetListArchivedResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/api/v1/lists/{list_uid}/archived\x12\x7f\n" +
+	"\vRestoreList\x12 .nooks.api.v1.RestoreListRequest\x1a!.nooks.api.v1.RestoreListResponse\"+\x82\xd3\xe4\x93\x02%:\x01*\" /api/v1/lists/{list_uid}:restore\x12q\n" +
 	"\n" +
 	"DeleteList\x12\x1f.nooks.api.v1.DeleteListRequest\x1a .nooks.api.v1.DeleteListResponse\" \x82\xd3\xe4\x93\x02\x1a*\x18/api/v1/lists/{list_uid}\x12\x87\x01\n" +
 	"\rDuplicateList\x12\".nooks.api.v1.DuplicateListRequest\x1a#.nooks.api.v1.DuplicateListResponse\"-\x82\xd3\xe4\x93\x02':\x01*\"\"/api/v1/lists/{list_uid}:duplicate\x12\x84\x01\n" +
@@ -2874,7 +2974,7 @@ func file_nooks_api_v1_list_service_proto_rawDescGZIP() []byte {
 }
 
 var file_nooks_api_v1_list_service_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_nooks_api_v1_list_service_proto_msgTypes = make([]protoimpl.MessageInfo, 43)
+var file_nooks_api_v1_list_service_proto_msgTypes = make([]protoimpl.MessageInfo, 45)
 var file_nooks_api_v1_list_service_proto_goTypes = []any{
 	(Sharing)(0),                    // 0: nooks.api.v1.Sharing
 	(ListStatus)(0),                 // 1: nooks.api.v1.ListStatus
@@ -2903,26 +3003,28 @@ var file_nooks_api_v1_list_service_proto_goTypes = []any{
 	(*DuplicateListResponse)(nil),   // 24: nooks.api.v1.DuplicateListResponse
 	(*SetListArchivedRequest)(nil),  // 25: nooks.api.v1.SetListArchivedRequest
 	(*SetListArchivedResponse)(nil), // 26: nooks.api.v1.SetListArchivedResponse
-	(*DeleteListRequest)(nil),       // 27: nooks.api.v1.DeleteListRequest
-	(*DeleteListResponse)(nil),      // 28: nooks.api.v1.DeleteListResponse
-	(*SetListPinnedRequest)(nil),    // 29: nooks.api.v1.SetListPinnedRequest
-	(*SetListPinnedResponse)(nil),   // 30: nooks.api.v1.SetListPinnedResponse
-	(*CreateItemRequest)(nil),       // 31: nooks.api.v1.CreateItemRequest
-	(*CreateItemResponse)(nil),      // 32: nooks.api.v1.CreateItemResponse
-	(*UpdateItemRequest)(nil),       // 33: nooks.api.v1.UpdateItemRequest
-	(*UpdateItemResponse)(nil),      // 34: nooks.api.v1.UpdateItemResponse
-	(*SetItemDoneRequest)(nil),      // 35: nooks.api.v1.SetItemDoneRequest
-	(*SetItemDoneResponse)(nil),     // 36: nooks.api.v1.SetItemDoneResponse
-	(*MoveItemRequest)(nil),         // 37: nooks.api.v1.MoveItemRequest
-	(*MoveItemResponse)(nil),        // 38: nooks.api.v1.MoveItemResponse
-	(*DeleteItemRequest)(nil),       // 39: nooks.api.v1.DeleteItemRequest
-	(*DeleteItemResponse)(nil),      // 40: nooks.api.v1.DeleteItemResponse
-	(*SearchHit)(nil),               // 41: nooks.api.v1.SearchHit
-	(*SearchRequest)(nil),           // 42: nooks.api.v1.SearchRequest
-	(*SearchResponse)(nil),          // 43: nooks.api.v1.SearchResponse
-	(*DatedItem)(nil),               // 44: nooks.api.v1.DatedItem
-	(*ListDatedItemsRequest)(nil),   // 45: nooks.api.v1.ListDatedItemsRequest
-	(*ListDatedItemsResponse)(nil),  // 46: nooks.api.v1.ListDatedItemsResponse
+	(*RestoreListRequest)(nil),      // 27: nooks.api.v1.RestoreListRequest
+	(*RestoreListResponse)(nil),     // 28: nooks.api.v1.RestoreListResponse
+	(*DeleteListRequest)(nil),       // 29: nooks.api.v1.DeleteListRequest
+	(*DeleteListResponse)(nil),      // 30: nooks.api.v1.DeleteListResponse
+	(*SetListPinnedRequest)(nil),    // 31: nooks.api.v1.SetListPinnedRequest
+	(*SetListPinnedResponse)(nil),   // 32: nooks.api.v1.SetListPinnedResponse
+	(*CreateItemRequest)(nil),       // 33: nooks.api.v1.CreateItemRequest
+	(*CreateItemResponse)(nil),      // 34: nooks.api.v1.CreateItemResponse
+	(*UpdateItemRequest)(nil),       // 35: nooks.api.v1.UpdateItemRequest
+	(*UpdateItemResponse)(nil),      // 36: nooks.api.v1.UpdateItemResponse
+	(*SetItemDoneRequest)(nil),      // 37: nooks.api.v1.SetItemDoneRequest
+	(*SetItemDoneResponse)(nil),     // 38: nooks.api.v1.SetItemDoneResponse
+	(*MoveItemRequest)(nil),         // 39: nooks.api.v1.MoveItemRequest
+	(*MoveItemResponse)(nil),        // 40: nooks.api.v1.MoveItemResponse
+	(*DeleteItemRequest)(nil),       // 41: nooks.api.v1.DeleteItemRequest
+	(*DeleteItemResponse)(nil),      // 42: nooks.api.v1.DeleteItemResponse
+	(*SearchHit)(nil),               // 43: nooks.api.v1.SearchHit
+	(*SearchRequest)(nil),           // 44: nooks.api.v1.SearchRequest
+	(*SearchResponse)(nil),          // 45: nooks.api.v1.SearchResponse
+	(*DatedItem)(nil),               // 46: nooks.api.v1.DatedItem
+	(*ListDatedItemsRequest)(nil),   // 47: nooks.api.v1.ListDatedItemsRequest
+	(*ListDatedItemsResponse)(nil),  // 48: nooks.api.v1.ListDatedItemsResponse
 }
 var file_nooks_api_v1_list_service_proto_depIdxs = []int32{
 	0,  // 0: nooks.api.v1.List.sharing:type_name -> nooks.api.v1.Sharing
@@ -2944,56 +3046,59 @@ var file_nooks_api_v1_list_service_proto_depIdxs = []int32{
 	4,  // 16: nooks.api.v1.SetListSharingResponse.list:type_name -> nooks.api.v1.List
 	4,  // 17: nooks.api.v1.DuplicateListResponse.list:type_name -> nooks.api.v1.List
 	4,  // 18: nooks.api.v1.SetListArchivedResponse.list:type_name -> nooks.api.v1.List
-	5,  // 19: nooks.api.v1.CreateItemResponse.item:type_name -> nooks.api.v1.Item
-	5,  // 20: nooks.api.v1.UpdateItemResponse.item:type_name -> nooks.api.v1.Item
-	5,  // 21: nooks.api.v1.SetItemDoneResponse.item:type_name -> nooks.api.v1.Item
-	3,  // 22: nooks.api.v1.SearchHit.kind:type_name -> nooks.api.v1.SearchHitKind
-	41, // 23: nooks.api.v1.SearchResponse.hits:type_name -> nooks.api.v1.SearchHit
-	5,  // 24: nooks.api.v1.DatedItem.item:type_name -> nooks.api.v1.Item
-	44, // 25: nooks.api.v1.ListDatedItemsResponse.items:type_name -> nooks.api.v1.DatedItem
-	6,  // 26: nooks.api.v1.ListService.ListLists:input_type -> nooks.api.v1.ListListsRequest
-	8,  // 27: nooks.api.v1.ListService.GetSidebar:input_type -> nooks.api.v1.GetSidebarRequest
-	11, // 28: nooks.api.v1.ListService.GetList:input_type -> nooks.api.v1.GetListRequest
-	13, // 29: nooks.api.v1.ListService.GetItem:input_type -> nooks.api.v1.GetItemRequest
-	15, // 30: nooks.api.v1.ListService.CreateList:input_type -> nooks.api.v1.CreateListRequest
-	17, // 31: nooks.api.v1.ListService.RenameList:input_type -> nooks.api.v1.RenameListRequest
-	19, // 32: nooks.api.v1.ListService.SetListSharing:input_type -> nooks.api.v1.SetListSharingRequest
-	21, // 33: nooks.api.v1.ListService.GetListShares:input_type -> nooks.api.v1.GetListSharesRequest
-	25, // 34: nooks.api.v1.ListService.SetListArchived:input_type -> nooks.api.v1.SetListArchivedRequest
-	27, // 35: nooks.api.v1.ListService.DeleteList:input_type -> nooks.api.v1.DeleteListRequest
-	23, // 36: nooks.api.v1.ListService.DuplicateList:input_type -> nooks.api.v1.DuplicateListRequest
-	29, // 37: nooks.api.v1.ListService.SetListPinned:input_type -> nooks.api.v1.SetListPinnedRequest
-	31, // 38: nooks.api.v1.ListService.CreateItem:input_type -> nooks.api.v1.CreateItemRequest
-	33, // 39: nooks.api.v1.ListService.UpdateItem:input_type -> nooks.api.v1.UpdateItemRequest
-	35, // 40: nooks.api.v1.ListService.SetItemDone:input_type -> nooks.api.v1.SetItemDoneRequest
-	37, // 41: nooks.api.v1.ListService.MoveItem:input_type -> nooks.api.v1.MoveItemRequest
-	39, // 42: nooks.api.v1.ListService.DeleteItem:input_type -> nooks.api.v1.DeleteItemRequest
-	45, // 43: nooks.api.v1.ListService.ListDatedItems:input_type -> nooks.api.v1.ListDatedItemsRequest
-	42, // 44: nooks.api.v1.ListService.Search:input_type -> nooks.api.v1.SearchRequest
-	7,  // 45: nooks.api.v1.ListService.ListLists:output_type -> nooks.api.v1.ListListsResponse
-	10, // 46: nooks.api.v1.ListService.GetSidebar:output_type -> nooks.api.v1.GetSidebarResponse
-	12, // 47: nooks.api.v1.ListService.GetList:output_type -> nooks.api.v1.GetListResponse
-	14, // 48: nooks.api.v1.ListService.GetItem:output_type -> nooks.api.v1.GetItemResponse
-	16, // 49: nooks.api.v1.ListService.CreateList:output_type -> nooks.api.v1.CreateListResponse
-	18, // 50: nooks.api.v1.ListService.RenameList:output_type -> nooks.api.v1.RenameListResponse
-	20, // 51: nooks.api.v1.ListService.SetListSharing:output_type -> nooks.api.v1.SetListSharingResponse
-	22, // 52: nooks.api.v1.ListService.GetListShares:output_type -> nooks.api.v1.GetListSharesResponse
-	26, // 53: nooks.api.v1.ListService.SetListArchived:output_type -> nooks.api.v1.SetListArchivedResponse
-	28, // 54: nooks.api.v1.ListService.DeleteList:output_type -> nooks.api.v1.DeleteListResponse
-	24, // 55: nooks.api.v1.ListService.DuplicateList:output_type -> nooks.api.v1.DuplicateListResponse
-	30, // 56: nooks.api.v1.ListService.SetListPinned:output_type -> nooks.api.v1.SetListPinnedResponse
-	32, // 57: nooks.api.v1.ListService.CreateItem:output_type -> nooks.api.v1.CreateItemResponse
-	34, // 58: nooks.api.v1.ListService.UpdateItem:output_type -> nooks.api.v1.UpdateItemResponse
-	36, // 59: nooks.api.v1.ListService.SetItemDone:output_type -> nooks.api.v1.SetItemDoneResponse
-	38, // 60: nooks.api.v1.ListService.MoveItem:output_type -> nooks.api.v1.MoveItemResponse
-	40, // 61: nooks.api.v1.ListService.DeleteItem:output_type -> nooks.api.v1.DeleteItemResponse
-	46, // 62: nooks.api.v1.ListService.ListDatedItems:output_type -> nooks.api.v1.ListDatedItemsResponse
-	43, // 63: nooks.api.v1.ListService.Search:output_type -> nooks.api.v1.SearchResponse
-	45, // [45:64] is the sub-list for method output_type
-	26, // [26:45] is the sub-list for method input_type
-	26, // [26:26] is the sub-list for extension type_name
-	26, // [26:26] is the sub-list for extension extendee
-	0,  // [0:26] is the sub-list for field type_name
+	4,  // 19: nooks.api.v1.RestoreListResponse.list:type_name -> nooks.api.v1.List
+	5,  // 20: nooks.api.v1.CreateItemResponse.item:type_name -> nooks.api.v1.Item
+	5,  // 21: nooks.api.v1.UpdateItemResponse.item:type_name -> nooks.api.v1.Item
+	5,  // 22: nooks.api.v1.SetItemDoneResponse.item:type_name -> nooks.api.v1.Item
+	3,  // 23: nooks.api.v1.SearchHit.kind:type_name -> nooks.api.v1.SearchHitKind
+	43, // 24: nooks.api.v1.SearchResponse.hits:type_name -> nooks.api.v1.SearchHit
+	5,  // 25: nooks.api.v1.DatedItem.item:type_name -> nooks.api.v1.Item
+	46, // 26: nooks.api.v1.ListDatedItemsResponse.items:type_name -> nooks.api.v1.DatedItem
+	6,  // 27: nooks.api.v1.ListService.ListLists:input_type -> nooks.api.v1.ListListsRequest
+	8,  // 28: nooks.api.v1.ListService.GetSidebar:input_type -> nooks.api.v1.GetSidebarRequest
+	11, // 29: nooks.api.v1.ListService.GetList:input_type -> nooks.api.v1.GetListRequest
+	13, // 30: nooks.api.v1.ListService.GetItem:input_type -> nooks.api.v1.GetItemRequest
+	15, // 31: nooks.api.v1.ListService.CreateList:input_type -> nooks.api.v1.CreateListRequest
+	17, // 32: nooks.api.v1.ListService.RenameList:input_type -> nooks.api.v1.RenameListRequest
+	19, // 33: nooks.api.v1.ListService.SetListSharing:input_type -> nooks.api.v1.SetListSharingRequest
+	21, // 34: nooks.api.v1.ListService.GetListShares:input_type -> nooks.api.v1.GetListSharesRequest
+	25, // 35: nooks.api.v1.ListService.SetListArchived:input_type -> nooks.api.v1.SetListArchivedRequest
+	27, // 36: nooks.api.v1.ListService.RestoreList:input_type -> nooks.api.v1.RestoreListRequest
+	29, // 37: nooks.api.v1.ListService.DeleteList:input_type -> nooks.api.v1.DeleteListRequest
+	23, // 38: nooks.api.v1.ListService.DuplicateList:input_type -> nooks.api.v1.DuplicateListRequest
+	31, // 39: nooks.api.v1.ListService.SetListPinned:input_type -> nooks.api.v1.SetListPinnedRequest
+	33, // 40: nooks.api.v1.ListService.CreateItem:input_type -> nooks.api.v1.CreateItemRequest
+	35, // 41: nooks.api.v1.ListService.UpdateItem:input_type -> nooks.api.v1.UpdateItemRequest
+	37, // 42: nooks.api.v1.ListService.SetItemDone:input_type -> nooks.api.v1.SetItemDoneRequest
+	39, // 43: nooks.api.v1.ListService.MoveItem:input_type -> nooks.api.v1.MoveItemRequest
+	41, // 44: nooks.api.v1.ListService.DeleteItem:input_type -> nooks.api.v1.DeleteItemRequest
+	47, // 45: nooks.api.v1.ListService.ListDatedItems:input_type -> nooks.api.v1.ListDatedItemsRequest
+	44, // 46: nooks.api.v1.ListService.Search:input_type -> nooks.api.v1.SearchRequest
+	7,  // 47: nooks.api.v1.ListService.ListLists:output_type -> nooks.api.v1.ListListsResponse
+	10, // 48: nooks.api.v1.ListService.GetSidebar:output_type -> nooks.api.v1.GetSidebarResponse
+	12, // 49: nooks.api.v1.ListService.GetList:output_type -> nooks.api.v1.GetListResponse
+	14, // 50: nooks.api.v1.ListService.GetItem:output_type -> nooks.api.v1.GetItemResponse
+	16, // 51: nooks.api.v1.ListService.CreateList:output_type -> nooks.api.v1.CreateListResponse
+	18, // 52: nooks.api.v1.ListService.RenameList:output_type -> nooks.api.v1.RenameListResponse
+	20, // 53: nooks.api.v1.ListService.SetListSharing:output_type -> nooks.api.v1.SetListSharingResponse
+	22, // 54: nooks.api.v1.ListService.GetListShares:output_type -> nooks.api.v1.GetListSharesResponse
+	26, // 55: nooks.api.v1.ListService.SetListArchived:output_type -> nooks.api.v1.SetListArchivedResponse
+	28, // 56: nooks.api.v1.ListService.RestoreList:output_type -> nooks.api.v1.RestoreListResponse
+	30, // 57: nooks.api.v1.ListService.DeleteList:output_type -> nooks.api.v1.DeleteListResponse
+	24, // 58: nooks.api.v1.ListService.DuplicateList:output_type -> nooks.api.v1.DuplicateListResponse
+	32, // 59: nooks.api.v1.ListService.SetListPinned:output_type -> nooks.api.v1.SetListPinnedResponse
+	34, // 60: nooks.api.v1.ListService.CreateItem:output_type -> nooks.api.v1.CreateItemResponse
+	36, // 61: nooks.api.v1.ListService.UpdateItem:output_type -> nooks.api.v1.UpdateItemResponse
+	38, // 62: nooks.api.v1.ListService.SetItemDone:output_type -> nooks.api.v1.SetItemDoneResponse
+	40, // 63: nooks.api.v1.ListService.MoveItem:output_type -> nooks.api.v1.MoveItemResponse
+	42, // 64: nooks.api.v1.ListService.DeleteItem:output_type -> nooks.api.v1.DeleteItemResponse
+	48, // 65: nooks.api.v1.ListService.ListDatedItems:output_type -> nooks.api.v1.ListDatedItemsResponse
+	45, // 66: nooks.api.v1.ListService.Search:output_type -> nooks.api.v1.SearchResponse
+	47, // [47:67] is the sub-list for method output_type
+	27, // [27:47] is the sub-list for method input_type
+	27, // [27:27] is the sub-list for extension type_name
+	27, // [27:27] is the sub-list for extension extendee
+	0,  // [0:27] is the sub-list for field type_name
 }
 
 func init() { file_nooks_api_v1_list_service_proto_init() }
@@ -3001,14 +3106,14 @@ func file_nooks_api_v1_list_service_proto_init() {
 	if File_nooks_api_v1_list_service_proto != nil {
 		return
 	}
-	file_nooks_api_v1_list_service_proto_msgTypes[29].OneofWrappers = []any{}
+	file_nooks_api_v1_list_service_proto_msgTypes[31].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_nooks_api_v1_list_service_proto_rawDesc), len(file_nooks_api_v1_list_service_proto_rawDesc)),
 			NumEnums:      4,
-			NumMessages:   43,
+			NumMessages:   45,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

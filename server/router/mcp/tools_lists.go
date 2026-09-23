@@ -15,7 +15,7 @@ type listListsArgs struct {
 	Page int `json:"page,omitempty" jsonschema:"which page to read, 1-based; leave it out for the first"`
 	// Without these an archived list cannot be found again, which would make
 	// archive_list a one way door.
-	Status string `json:"status,omitempty" jsonschema:"which lists to show: active for ones still in play, completed for ones with everything ticked, archived for ones put away, or leave it out for everything except archived"`
+	Status string `json:"status,omitempty" jsonschema:"which lists to show: active for ones still in play, completed for ones with everything ticked, archived for ones put away, deleted for ones still inside the thirty days they can be restored, or leave it out for everything except archived and deleted"`
 	Order  string `json:"order,omitempty" jsonschema:"how to order them: updated for what changed last, name, or open for the fullest first. Leave it out for updated"`
 }
 
@@ -53,6 +53,7 @@ var statusWords = map[string]apiv1.ListStatus{
 	"active":    apiv1.ListStatus_LIST_STATUS_ACTIVE,
 	"completed": apiv1.ListStatus_LIST_STATUS_COMPLETED,
 	"archived":  apiv1.ListStatus_LIST_STATUS_ARCHIVED,
+	"deleted":   apiv1.ListStatus_LIST_STATUS_DELETED,
 }
 
 var orderWords = map[string]apiv1.ListOrder{
@@ -168,10 +169,24 @@ func addListTools(server *sdk.Server, lists *v1.ListService) {
 	})
 
 	sdk.AddTool(server, &sdk.Tool{
-		Name:        "delete_list",
-		Description: "Delete a list and everything on it. Refused unless the caller's token may delete.",
+		Name: "delete_list",
+		Description: "Delete a list and everything on it. Refused unless the caller's token " +
+			"may delete. It can be brought back with restore_list for thirty days, after " +
+			"which it is gone for good.",
 	}, func(ctx context.Context, _ *sdk.CallToolRequest, args listUIDArgs) (*sdk.CallToolResult, any, error) {
 		return answer(ctx, lists.DeleteList, &apiv1.DeleteListRequest{ListUid: args.ListUID},
 			done[apiv1.DeleteListResponse]("Deleted."))
+	})
+
+	sdk.AddTool(server, &sdk.Tool{
+		Name: "restore_list",
+		Description: "Bring back a list that was deleted, with everything on it findable " +
+			"again. Only the person who deleted it may, and only within thirty days. Find " +
+			"them with list_lists and status deleted.",
+	}, func(ctx context.Context, _ *sdk.CallToolRequest, args listUIDArgs) (*sdk.CallToolResult, any, error) {
+		return answer(ctx, lists.RestoreList, &apiv1.RestoreListRequest{ListUid: args.ListUID},
+			func(res *apiv1.RestoreListResponse) string {
+				return fmt.Sprintf("Restored %q.", res.GetList().GetName())
+			})
 	})
 }

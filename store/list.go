@@ -798,11 +798,11 @@ about — idx_item_open_on_list and idx_item_done_on_list — so each is a range
 never opens a row. Without them this was proportional to everything on the List, twice,
 on every add, tick and delete. See BenchmarkTickOnACrowdedList.
 */
-func (s *sqlStore) recount(ctx context.Context, listID int64) error {
+func recount(ctx context.Context, db bun.IDB, listID int64) error {
 	const open = `(SELECT COUNT(*) FROM item WHERE item.list_id = ? AND item.deleted_at = '' AND item.done_at = '')`
 	const done = `(SELECT COUNT(*) FROM item WHERE item.list_id = ? AND item.deleted_at = '' AND item.done_at <> '')`
 
-	_, err := s.db.NewUpdate().
+	_, err := db.NewUpdate().
 		Model((*listModel)(nil)).
 		Set("open_count = "+open, listID).
 		Set("done_count = "+done, listID).

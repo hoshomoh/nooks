@@ -84,7 +84,13 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 	if params.AddedByTokenID != 0 {
 		row.AddedByTokenID = &params.AddedByTokenID
 	}
-	if err := s.insertAtTheEnd(ctx, row, params.ListID); err != nil {
+	err := s.onOneList(ctx, params.ListID, func(db bun.IDB) error {
+		if err := appendItem(ctx, db, row, params.ListID); err != nil {
+			return err
+		}
+		return recount(ctx, db, params.ListID)
+	})
+	if err != nil {
 		return Item{}, err
 	}
 
@@ -92,9 +98,8 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 	if err != nil {
 		return Item{}, err
 	}
-	if err := s.recount(ctx, item.ListID); err != nil {
-		return Item{}, err
-	}
+	// Indexed after the write, as CreateItems explains: a Note that fails to index is a
+	// Note that cannot be searched for, and is not worth losing the Item over.
 	if err := s.indexItem(ctx, item); err != nil {
 		return Item{}, err
 	}
@@ -102,45 +107,46 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 }
 
 /*
-insertAtTheEnd writes one Item after every Item already on its List.
+onOneList runs a write, and whatever has to be true with it, alone on one List.
 
-The position is worked out inside the insert rather than read and then written. Reading
-the highest and then inserting is two statements with a gap between them, so two people
-adding to one List at the same moment both read the same number and both land on it.
-Reads break the tie on id, so a List still comes back in arrival order, but the tie is
-made and "put this after that one" has no answer while two Items share a place.
+Two things on a List are worked out from what a statement can see rather than passed in:
+where a new Item goes, which is one past the highest position, and what the List's cached
+counts are, which are recomputed from the Items. One statement is enough for both on
+SQLite, which has one writer, so the second cannot begin until the first has finished.
 
-One statement is enough on SQLite, which has one writer, so the second insert cannot
-begin until the first has finished. It is not enough on Postgres, where a statement
-reads from a snapshot taken when it started: two inserts running together both see the
-List as it was before either of them, both take the same maximum, and both land on it.
-This is what the comment here used to claim the engine prevented, and
-TestTwoItemsAddedAtOnceGetDifferentPositions found it the first time the suite ran
-against Postgres with the race detector on.
+It is not enough on Postgres, where a statement reads from a snapshot taken when it
+began. Two people adding to one List at the same moment both see the List as it was
+before either of them: both take the same maximum and land on the same place, and a
+recount that started early can finish last and write a number that was true a moment ago.
+Positions sharing a place leave "put this after that one" with no answer, and a wrong
+count sticks, because nothing recounts a List until the next write to it.
 
-So on Postgres the List's own row is locked first, which makes adding to one List
-one-at-a-time and leaves adding to different Lists as parallel as it was. SQLite needs
-no such thing and has no FOR UPDATE to do it with.
+`TestTwoItemsAddedAtOnceGetDifferentPositions` found the first the day the suite first
+ran against Postgres, and `TestTheCountsSurviveSeveralPeopleAddingAtOnce` the second.
+
+So on Postgres the List's own row is held for the length of the write, which makes
+writing to one List one-at-a-time and leaves writing to different Lists as parallel as it
+was. SQLite needs no such thing and has no FOR UPDATE to do it with.
 */
-func (s *sqlStore) insertAtTheEnd(ctx context.Context, row *itemModel, listID int64) error {
+func (s *sqlStore) onOneList(ctx context.Context, listID int64, write func(bun.IDB) error) error {
 	if s.name != postgresDriver {
-		return appendItem(ctx, s.db, row, listID)
+		return write(s.db)
 	}
 
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return fmt.Errorf("begin create item: %w", err)
+		return fmt.Errorf("begin the write to list %d: %w", listID, err)
 	}
 	defer func() { _ = tx.Rollback() }()
 
 	if err := lockList(ctx, tx, listID); err != nil {
 		return err
 	}
-	if err := appendItem(ctx, tx, row, listID); err != nil {
+	if err := write(tx); err != nil {
 		return err
 	}
 	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("commit create item: %w", err)
+		return fmt.Errorf("commit the write to list %d: %w", listID, err)
 	}
 	return nil
 }
@@ -202,9 +208,9 @@ func (s *sqlStore) CreateItems(ctx context.Context, params []CreateItemParams) (
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	// Read then write, with a gap, which is the shape insertAtTheEnd explains. Here the
-	// gap is inside a transaction and that is still not enough on Postgres, so the List
-	// is held for the same reason and in the same way.
+	// Read then write, with a gap, which is the shape onOneList explains. Here the gap
+	// is inside a transaction and that is still not enough on Postgres, so the List is
+	// held for the same reason and in the same way.
 	if s.name == postgresDriver {
 		if err := lockList(ctx, tx, params[0].ListID); err != nil {
 			return nil, err
@@ -244,15 +250,17 @@ func (s *sqlStore) CreateItems(ctx context.Context, params []CreateItemParams) (
 	if _, err := tx.NewInsert().Model(&rows).Returning("*").Exec(ctx); err != nil {
 		return nil, fmt.Errorf("create items: %w", err)
 	}
+	// Inside the transaction, with the List held: a recount that lands after somebody
+	// else's would otherwise write a number that was true before their Items existed.
+	if err := recount(ctx, tx, params[0].ListID); err != nil {
+		return nil, err
+	}
 	if err := tx.Commit(); err != nil {
 		return nil, fmt.Errorf("commit create items: %w", err)
 	}
 
 	items, err := toItems(rows)
 	if err != nil {
-		return nil, err
-	}
-	if err := s.recount(ctx, params[0].ListID); err != nil {
 		return nil, err
 	}
 	// Indexed after the commit: a Note that fails to index is a Note that cannot be
@@ -452,15 +460,19 @@ func (s *sqlStore) changeItemCount(
 		return fmt.Errorf("read item: %w", err)
 	}
 
-	query := s.db.NewUpdate().Model((*itemModel)(nil)).Where("uid = ? AND deleted_at = ''", uid)
-	result, err := apply(query).Exec(ctx)
-	if err != nil {
-		return fmt.Errorf("%s: %w", what, err)
-	}
-	if err := requireOneRow(result, "item"); err != nil {
-		return err
-	}
-	return s.recount(ctx, listID)
+	// Which List the Item is on is settled before the List is held: an Item does not
+	// move between Lists, so reading it first cannot go stale.
+	return s.onOneList(ctx, listID, func(db bun.IDB) error {
+		query := db.NewUpdate().Model((*itemModel)(nil)).Where("uid = ? AND deleted_at = ''", uid)
+		result, err := apply(query).Exec(ctx)
+		if err != nil {
+			return fmt.Errorf("%s: %w", what, err)
+		}
+		if err := requireOneRow(result, "item"); err != nil {
+			return err
+		}
+		return recount(ctx, db, listID)
+	})
 }
 
 // indexItem makes an Item findable by its label and quantity — both are text a Member

@@ -17,6 +17,22 @@ const SCALES: Record<IconButtonScale, ScaleStyle> = {
   regular: { box: "size-6.5 rounded-md", icon: "medium" },
 }
 
+/*
+The hit area, which is taller than the button is drawn.
+
+DESIGN.md §4: a control in a row is as easy to hit as the row is tall. The square drawn
+here is 22px or 26px, both under the 24px WCAG asks at AA, and growing the square would
+push what sits beside it out of line and change every screen it appears on.
+
+So the target grows and the button does not, the way the tick box already does it. Only
+downwards and upwards: these sit at the end of a row beside other things, and a target
+that reached sideways would take its neighbour's taps, which is an error nobody can
+anticipate. Taller than the row it is in would do the same to the row above.
+*/
+const HIT_AREA =
+  "relative after:absolute after:inset-x-0 after:top-1/2 after:h-control-compact " +
+  "after:-translate-y-1/2 after:content-['']"
+
 export interface IconButtonProps extends Omit<ComponentProps<"button">, "children"> {
   name: IconName
   /** What pressing it does, for anyone who cannot see the icon. Required. */
@@ -47,6 +63,7 @@ export function IconButton({
       className={cn(
         "grid place-items-center text-secondary-foreground transition-colors",
         "hover:bg-secondary hover:text-foreground",
+        HIT_AREA,
         style.box,
         className,
       )}

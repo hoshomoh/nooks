@@ -166,7 +166,7 @@ Otherwise:
 - Components follow `DESIGN.md`. No colour, radius, or size literal in a component —
   tokens only.
 - Accessibility is not a later pass: real `<button>`s, labelled inputs, visible 2px focus
-  rings, 44px hit areas, and keyboard paths for everything in `DESIGN.md` §12.
+  rings, hit areas as tall as the row a control sits in — `DESIGN.md` §4 — and keyboard paths for everything in `DESIGN.md` §12.
 
 ## 6. Commits and review
 

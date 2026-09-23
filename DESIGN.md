@@ -183,6 +183,13 @@ A Group is the same chip at radius 6 rather than a circle, because a Group is no
 person and should not read as one. Avatars drawn overlapping carry a 1.5px ring in the
 page's own ground, which is what separates them.
 
+**A control in a row is as easy to hit as the row is tall.** The list row is 44px and
+the tick box takes all of it, though the box itself is drawn at 17px. An icon-only
+button is drawn at 22px or 26px and takes 32px, the height of a settings row, which is
+as far as it can grow without reaching into the row above. The target grows and the
+control does not, and it grows only up and down: a target that reached sideways would
+take the taps meant for whatever sits beside it.
+
 **Three rule weights, three meanings — do not substitute:**
 
 | Weight | Colour | Separates |

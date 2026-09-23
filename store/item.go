@@ -353,10 +353,10 @@ func (s *sqlStore) DeleteItem(ctx context.Context, uid string, at time.Time) err
 	if err != nil {
 		return err
 	}
-	if err := s.Unindex(ctx, KindItem, uid); err != nil {
+	if err := s.unindex(ctx, KindItem, uid); err != nil {
 		return err
 	}
-	return s.Unindex(ctx, KindNote, uid)
+	return s.unindex(ctx, KindNote, uid)
 }
 
 /*
@@ -407,7 +407,7 @@ func (s *sqlStore) indexItem(ctx context.Context, item Item) error {
 	if item.Quantity != "" {
 		text += " " + item.Quantity
 	}
-	if err := s.Index(ctx, IndexEntry{
+	if err := s.index(ctx, IndexEntry{
 		Kind: KindItem, UID: item.UID, ListID: item.ListID, Text: text,
 	}); err != nil {
 		return err
@@ -419,9 +419,9 @@ func (s *sqlStore) indexItem(ctx context.Context, item Item) error {
 // is emptied.
 func (s *sqlStore) indexNote(ctx context.Context, item Item) error {
 	if item.Note == "" {
-		return s.Unindex(ctx, KindNote, item.UID)
+		return s.unindex(ctx, KindNote, item.UID)
 	}
-	return s.Index(ctx, IndexEntry{
+	return s.index(ctx, IndexEntry{
 		Kind: KindNote, UID: item.UID, ListID: item.ListID, Text: item.Note,
 	})
 }

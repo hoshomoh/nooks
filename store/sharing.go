@@ -71,7 +71,7 @@ func (s *sqlStore) Groups(ctx context.Context) ([]Group, error) {
 }
 
 // AddToGroup puts a Member in a Group. Adding twice is not an error.
-func (s *sqlStore) AddToGroup(ctx context.Context, groupID, memberID int64) error {
+func (s *sqlStore) addToGroup(ctx context.Context, groupID, memberID int64) error {
 	_, err := s.db.NewInsert().
 		Model(&groupMemberModel{GroupID: groupID, MemberID: memberID}).
 		On("CONFLICT (group_id, member_id) DO NOTHING").
@@ -84,7 +84,7 @@ func (s *sqlStore) AddToGroup(ctx context.Context, groupID, memberID int64) erro
 
 // RemoveFromGroup takes a Member out of a Group, and with it the Lists they reached
 // through it.
-func (s *sqlStore) RemoveFromGroup(ctx context.Context, groupID, memberID int64) error {
+func (s *sqlStore) removeFromGroup(ctx context.Context, groupID, memberID int64) error {
 	_, err := s.db.NewDelete().
 		Model((*groupMemberModel)(nil)).
 		Where("group_id = ? AND member_id = ?", groupID, memberID).

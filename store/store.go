@@ -113,7 +113,6 @@ type Store interface {
 	BackupTo(ctx context.Context, path string) error
 
 	// Driver names which engine is holding the data.
-	Driver() string
 
 	// SetMemberPassword replaces a password and clears the must-change flag.
 	SetMemberPassword(ctx context.Context, id int64, hash string) error
@@ -275,11 +274,6 @@ type Store interface {
 	// permissions.
 	Search(ctx context.Context, query string) ([]SearchHit, error)
 
-	// Index and Unindex maintain the search index. The store calls them on its own
-	// writes; a caller should not need to.
-	Index(ctx context.Context, entry IndexEntry) error
-	Unindex(ctx context.Context, kind SearchKind, uid string) error
-
 	// CreateGroup adds a Group — a shortcut for sharing, with no permissions of its own.
 	CreateGroup(ctx context.Context, uid, name string, at time.Time) (Group, error)
 
@@ -291,8 +285,6 @@ type Store interface {
 
 	// AddToGroup and RemoveFromGroup change who is in a Group. Removing someone takes
 	// away the Lists they reached through it, and nothing else.
-	AddToGroup(ctx context.Context, groupID, memberID int64) error
-	RemoveFromGroup(ctx context.Context, groupID, memberID int64) error
 
 	GroupMemberIDs(ctx context.Context, groupID int64) ([]int64, error)
 

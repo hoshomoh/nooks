@@ -68,8 +68,8 @@ func TestSharingWithAGroup(t *testing.T) {
 			if err != nil {
 				t.Fatalf("CreateGroup: %v", err)
 			}
-			if err := s.AddToGroup(t.Context(), group.ID, jonas.ID); err != nil {
-				t.Fatalf("AddToGroup: %v", err)
+			if err := s.ReplaceGroupMembers(t.Context(), group.ID, []int64{jonas.ID}); err != nil {
+				t.Fatalf("ReplaceGroupMembers: %v", err)
 			}
 			if err := s.ReplaceListShares(t.Context(), list.ID, nil, []int64{group.ID}); err != nil {
 				t.Fatalf("ReplaceListShares: %v", err)
@@ -104,8 +104,8 @@ func TestJoiningAGroupGrantsItsLists(t *testing.T) {
 				t.Fatal("Mira can see it before joining the Group")
 			}
 
-			if err := s.AddToGroup(t.Context(), group.ID, mira.ID); err != nil {
-				t.Fatalf("AddToGroup: %v", err)
+			if err := s.ReplaceGroupMembers(t.Context(), group.ID, []int64{mira.ID}); err != nil {
+				t.Fatalf("ReplaceGroupMembers: %v", err)
 			}
 			if !names(t, s, mira.ID)["Groceries"] {
 				t.Error("joining the Group did not grant its Lists")
@@ -135,15 +135,15 @@ func TestLeavingAGroupTakesAwayOnlyItsLists(t *testing.T) {
 			if err != nil {
 				t.Fatalf("CreateGroup: %v", err)
 			}
-			if err := s.AddToGroup(t.Context(), group.ID, jonas.ID); err != nil {
-				t.Fatalf("AddToGroup: %v", err)
+			if err := s.ReplaceGroupMembers(t.Context(), group.ID, []int64{jonas.ID}); err != nil {
+				t.Fatalf("ReplaceGroupMembers: %v", err)
 			}
 			if err := s.ReplaceListShares(t.Context(), shared.ID, nil, []int64{group.ID}); err != nil {
 				t.Fatalf("ReplaceListShares: %v", err)
 			}
 
-			if err := s.RemoveFromGroup(t.Context(), group.ID, jonas.ID); err != nil {
-				t.Fatalf("RemoveFromGroup: %v", err)
+			if err := s.ReplaceGroupMembers(t.Context(), group.ID, nil); err != nil {
+				t.Fatalf("ReplaceGroupMembers: %v", err)
 			}
 
 			after := names(t, s, jonas.ID)
@@ -276,8 +276,8 @@ func TestCanReachListAgreesWithListingThemAll(t *testing.T) {
 			if err != nil {
 				t.Fatalf("CreateGroup: %v", err)
 			}
-			if err := s.AddToGroup(t.Context(), group.ID, mira.ID); err != nil {
-				t.Fatalf("AddToGroup: %v", err)
+			if err := s.ReplaceGroupMembers(t.Context(), group.ID, []int64{mira.ID}); err != nil {
+				t.Fatalf("ReplaceGroupMembers: %v", err)
 			}
 			if err := s.ReplaceListShares(t.Context(), viaGroup.ID, nil, []int64{group.ID}); err != nil {
 				t.Fatalf("ReplaceListShares: %v", err)

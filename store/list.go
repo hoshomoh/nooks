@@ -776,14 +776,14 @@ func (s *sqlStore) DeleteList(ctx context.Context, uid string, at time.Time) err
 		return err
 	}
 	for _, item := range items {
-		if err := s.Unindex(ctx, KindItem, item.UID); err != nil {
+		if err := s.unindex(ctx, KindItem, item.UID); err != nil {
 			return err
 		}
-		if err := s.Unindex(ctx, KindNote, item.UID); err != nil {
+		if err := s.unindex(ctx, KindNote, item.UID); err != nil {
 			return err
 		}
 	}
-	return s.Unindex(ctx, KindList, uid)
+	return s.unindex(ctx, KindList, uid)
 }
 
 /*
@@ -816,7 +816,7 @@ func (s *sqlStore) recount(ctx context.Context, listID int64) error {
 
 // indexList makes a List findable by its name.
 func (s *sqlStore) indexList(ctx context.Context, list List) error {
-	return s.Index(ctx, IndexEntry{
+	return s.index(ctx, IndexEntry{
 		Kind: KindList, UID: list.UID, ListID: list.ID, Text: list.Name,
 	})
 }

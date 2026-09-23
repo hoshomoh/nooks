@@ -49,8 +49,8 @@ type IndexEntry struct {
 
 // Index adds or replaces an entry. Called by the store's own writes, so nothing can be
 // created without being findable.
-func (s *sqlStore) Index(ctx context.Context, entry IndexEntry) error {
-	if err := s.Unindex(ctx, entry.Kind, entry.UID); err != nil {
+func (s *sqlStore) index(ctx context.Context, entry IndexEntry) error {
+	if err := s.unindex(ctx, entry.Kind, entry.UID); err != nil {
 		return err
 	}
 	row := &searchIndexModel{
@@ -63,7 +63,7 @@ func (s *sqlStore) Index(ctx context.Context, entry IndexEntry) error {
 }
 
 // Unindex removes an entry. Removing something absent is not an error.
-func (s *sqlStore) Unindex(ctx context.Context, kind SearchKind, uid string) error {
+func (s *sqlStore) unindex(ctx context.Context, kind SearchKind, uid string) error {
 	_, err := s.db.NewDelete().
 		Model((*searchIndexModel)(nil)).
 		Where("kind = ? AND uid = ?", string(kind), uid).

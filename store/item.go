@@ -70,11 +70,6 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 		return Item{}, errors.New("store: item label is required")
 	}
 
-	position, err := s.nextPosition(ctx, params.ListID)
-	if err != nil {
-		return Item{}, err
-	}
-
 	row := &itemModel{
 		UID:       params.UID,
 		ListID:    params.ListID,
@@ -82,7 +77,6 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 		Quantity:  params.Quantity,
 		DueOn:     params.DueOn,
 		Note:      params.Note,
-		Position:  position,
 		AddedByID: params.AddedByID,
 		CreatedAt: formatTime(params.At),
 		UpdatedAt: formatTime(params.At),
@@ -90,7 +84,23 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 	if params.AddedByTokenID != 0 {
 		row.AddedByTokenID = &params.AddedByTokenID
 	}
-	if _, err := s.db.NewInsert().Model(row).Returning("*").Exec(ctx); err != nil {
+	/*
+	 * The position is worked out inside the insert rather than read and then written.
+	 *
+	 * Reading the highest and then inserting is two statements with a gap between them,
+	 * so two people adding to one List at the same moment both read the same number and
+	 * both land on it. Reads break the tie on id, so a List still comes back in arrival
+	 * order, but the tie is made and "put this after that one" has no answer while two
+	 * Items share a place.
+	 *
+	 * One statement, and the engine holds it: whichever insert runs second sees the
+	 * first one's row. COALESCE in a sub-select is only ever compared and stored here,
+	 * never scanned into Go, which is what nextPosition had to work around.
+	 */
+	insert := s.db.NewInsert().Model(row).Returning("*").
+		Value("position", "(SELECT COALESCE(MAX(position), 0.0) + ? FROM item "+
+			"WHERE list_id = ? AND deleted_at = '')", positionGap, params.ListID)
+	if _, err := insert.Exec(ctx); err != nil {
 		return Item{}, fmt.Errorf("create item: %w", err)
 	}
 

@@ -3,6 +3,7 @@ package store
 import (
 	"errors"
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 )
@@ -423,3 +424,63 @@ func TestItemsAtTheSamePositionKeepTheirOrder(t *testing.T) {
 
 // ptr is a pointer to a value, for the optional fields of UpdateItemParams.
 func ptr[T any](v T) *T { return &v }
+
+/*
+Two people adding to one List at the same moment land in different places.
+
+Appending used to read the highest position and then insert, which is two statements
+with a gap between them, so two callers inside that gap both read the same number and
+both wrote it. Reads break the tie on id, so a List still came back in arrival order and
+nobody saw anything wrong. But the tie was made, and "put this after that one" has no
+answer while two Items share a place.
+
+Raised as optional when it was found, because the order was already settled. Building
+drag-to-reorder is what made it matter.
+
+Run concurrently on purpose. In sequence it passes either way, because the second read
+sees the first insert.
+*/
+func TestTwoItemsAddedAtOnceGetDifferentPositions(t *testing.T) {
+	at := time.Date(2026, time.April, 1, 9, 0, 0, 0, time.UTC)
+
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			anna := newMember(t, s)
+			list := makeList(t, s, anna, "list_shop", "Shopping", SharingInstance)
+
+			const adders = 4
+			start := make(chan struct{})
+			var adding sync.WaitGroup
+			for i := range adders {
+				adding.Add(1)
+				go func() {
+					defer adding.Done()
+					<-start
+					_, _ = s.CreateItem(t.Context(), CreateItemParams{
+						UID:       fmt.Sprintf("item_%d", i),
+						ListID:    list.ID,
+						Label:     fmt.Sprintf("Thing %d", i),
+						AddedByID: anna.ID,
+						At:        at,
+					})
+				}()
+			}
+			close(start)
+			adding.Wait()
+
+			items, err := s.ItemsOnList(t.Context(), list.ID)
+			if err != nil {
+				t.Fatalf("ItemsOnList: %v", err)
+			}
+
+			places := make(map[float64]string, len(items))
+			for _, item := range items {
+				if shared, taken := places[item.Position]; taken {
+					t.Errorf("%q and %q are both at position %v", shared, item.Label, item.Position)
+				}
+				places[item.Position] = item.Label
+			}
+		})
+	}
+}

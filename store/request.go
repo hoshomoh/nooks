@@ -97,10 +97,14 @@ CreateJoinRequest records a Visitor's request for an account.
 It reports ErrAlreadyWaiting when that email is already in the queue and ErrTooManyWaiting
 when the queue is full.
 
-Both rules are conditions on the insert rather than reads taken before it. A flood is the
-concurrent case by definition, so counting first and inserting second would let as many
-through as the server runs at once. That is the shape of the first-run race, and it is
-refused the same way.
+Both rules are conditions on the insert rather than reads taken before it, so on SQLite,
+which has one writer, the statement decides against everything that has happened.
+
+Postgres decides against a snapshot taken when the statement began, so two of these
+running together can both find no request waiting and both insert. The same fault as the
+Item positions: a rule written as one statement and assumed to be atomic because it is
+one statement. Asking is rare, a person typing their name, so the whole queue is taken
+one at a time there rather than reaching for something finer.
 */
 func (s *sqlStore) CreateJoinRequest(ctx context.Context, params CreateJoinRequestParams) (JoinRequest, error) {
 	const claim = `
@@ -111,18 +115,25 @@ func (s *sqlStore) CreateJoinRequest(ctx context.Context, params CreateJoinReque
 
 	email := normaliseEmail(params.Email)
 	pending := string(StatusPending)
-	result, err := s.db.NewRaw(claim,
-		params.UID, params.Name, email, params.Message, pending, formatTime(params.CreatedAt),
-		email, pending,
-		pending, PendingJoinLimit,
-	).Exec(ctx)
-	if err != nil {
-		return JoinRequest{}, fmt.Errorf("create join request: %w", err)
-	}
 
-	made, err := result.RowsAffected()
+	var made int64
+	err := s.oneAtATime(ctx, joinQueueLock, func(db bun.IDB) error {
+		result, err := db.NewRaw(claim,
+			params.UID, params.Name, email, params.Message, pending, formatTime(params.CreatedAt),
+			email, pending,
+			pending, PendingJoinLimit,
+		).Exec(ctx)
+		if err != nil {
+			return fmt.Errorf("create join request: %w", err)
+		}
+		made, err = result.RowsAffected()
+		if err != nil {
+			return fmt.Errorf("read whether the join request was made: %w", err)
+		}
+		return nil
+	})
 	if err != nil {
-		return JoinRequest{}, fmt.Errorf("read whether the join request was made: %w", err)
+		return JoinRequest{}, err
 	}
 	if made == 0 {
 		return JoinRequest{}, s.whyNotJoined(ctx, email)
@@ -266,15 +277,22 @@ func (s *sqlStore) CreateResetRequest(ctx context.Context, uid string, memberID 
 		WHERE NOT EXISTS (SELECT 1 FROM reset_request WHERE member_id = ? AND status = ?)`
 
 	pending := string(StatusPending)
-	result, err := s.db.NewRaw(claim, uid, memberID, pending, formatTime(at), memberID, pending).
-		Exec(ctx)
-	if err != nil {
-		return ResetRequest{}, fmt.Errorf("create reset request: %w", err)
-	}
 
-	made, err := result.RowsAffected()
+	var made int64
+	err := s.oneAtATime(ctx, resetQueueLock, func(db bun.IDB) error {
+		result, err := db.NewRaw(claim, uid, memberID, pending, formatTime(at), memberID, pending).
+			Exec(ctx)
+		if err != nil {
+			return fmt.Errorf("create reset request: %w", err)
+		}
+		made, err = result.RowsAffected()
+		if err != nil {
+			return fmt.Errorf("read whether the reset request was made: %w", err)
+		}
+		return nil
+	})
 	if err != nil {
-		return ResetRequest{}, fmt.Errorf("read whether the reset request was made: %w", err)
+		return ResetRequest{}, err
 	}
 	if made == 0 {
 		return ResetRequest{}, ErrAlreadyWaiting

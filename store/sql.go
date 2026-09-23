@@ -226,3 +226,54 @@ func (s *sqlStore) Analyse(ctx context.Context) error {
 // sqliteDialect and postgresDialect are the two Bun dialects Nooks supports.
 func sqliteDialect() schema.Dialect   { return sqlitedialect.New() }
 func postgresDialect() schema.Dialect { return pgdialect.New() }
+
+/*
+The locks a queue is taken one at a time under. Numbers rather than names because that is
+what Postgres advisory locks are, and arbitrary because nothing else uses them: what
+matters is that two callers doing the same thing pick the same one.
+*/
+const (
+	joinQueueLock  int64 = 8_101
+	resetQueueLock int64 = 8_102
+)
+
+/*
+oneAtATime runs a write with every other write that shares its lock, on the driver that
+needs telling.
+
+A rule written as a condition on a single statement is atomic on SQLite, which has one
+writer, and is not on Postgres, which decides the condition against a snapshot taken when
+the statement began. Two callers in that gap both find the queue empty and both write,
+which is how "one request waiting per email" and "at most twenty-five waiting" stop being
+true. The Item positions were the same fault found first.
+
+An advisory lock rather than a row, because these queues have no row to hold: the rule is
+about the table as a whole. It is held until the transaction ends, so it goes on commit
+or rollback and cannot be left behind.
+
+Coarse on purpose. Asking to join and asking for a password are things a person does by
+typing their name, so serialising them costs nothing worth measuring, and the alternative
+is a lock per email that would have to be right about what an email is.
+*/
+func (s *sqlStore) oneAtATime(ctx context.Context, lock int64, write func(bun.IDB) error) error {
+	if s.name != postgresDriver {
+		return write(s.db)
+	}
+
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin the queued write: %w", err)
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	if _, err := tx.NewRaw("SELECT pg_advisory_xact_lock(?)", lock).Exec(ctx); err != nil {
+		return fmt.Errorf("take the queue lock: %w", err)
+	}
+	if err := write(tx); err != nil {
+		return err
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit the queued write: %w", err)
+	}
+	return nil
+}

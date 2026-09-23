@@ -353,14 +353,6 @@
   },
   "listMenu": {
     "open": "More",
-    "sort": "Sort: {{how}}",
-    "sortManual": "manually",
-    "sortAlphabetical": "by name",
-    "sortDue": "by date",
-    "completed": "Completed: {{where}}",
-    "completedBottom": "at the bottom",
-    "completedHidden": "hidden",
-    "showQuantities": "Show quantities",
     "print": "Print",
     "export": "Export as plain text"
   },

@@ -30,8 +30,8 @@
       "passwordHint": "Twelve characters or more. No other rules.",
       "instanceName": "What should this instance be called?",
       "instanceNameHint": "Shows in the sidebar and on printed lists.",
-      "submit": "Create the instance",
-      "submitting": "Creating…"
+      "submit": "Finish setup",
+      "submitting": "Finishing…"
     },
     "signIn": {
       "eyebrow": "Signing in to",

@@ -20,15 +20,15 @@ const CATALOGUE = "src/i18n/locales/en.json"
  */
 describe("the verb for creating things", () => {
   /*
-   * The first-run button, still to be decided rather than quietly exempt.
+   * Nothing is excused any more.
    *
-   * §13 forbids "Create" and names no replacement for this one, and the instance is not
-   * added to anything the way a member or a list is — "Add the instance" reads wrong for
-   * the screen that brings it into being. So the copy is somebody's call, and until it
-   * is made this names the string so the decision cannot be lost. Whoever makes it
-   * deletes this entry.
+   * This held `auth.setup.submit` and its companion while what the first-run button
+   * should say was still open. §13 forbids "Create" and names no replacement for that
+   * one, because an instance is not added to anything the way a member or a list is.
+   * It says "Finish setup" now, which is what the press does on the screen that is the
+   * setup, so the list is empty and the check below has nothing left to forgive.
    */
-  const undecided = new Set(["auth.setup.submit", "auth.setup.submitting"])
+  const undecided = new Set<string>()
 
   const catalogue = flatten(JSON.parse(readFileSync(CATALOGUE, "utf8")) as Catalogue)
 
@@ -47,7 +47,8 @@ describe("the verb for creating things", () => {
   })
 
   // The exception list is part of the check: an entry left behind after the string was
-  // changed would quietly stop holding that string.
+  // changed would quietly stop holding that string. It is empty now, and this is what
+  // keeps it honest if anything is ever added back.
   it("excuses only strings that are still wrong", () => {
     for (const key of undecided) {
       const said = catalogue.get(key)

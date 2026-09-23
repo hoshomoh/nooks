@@ -73,7 +73,7 @@ if wants go; then
   # row failed here on a timeout this machine could not see, while this script said
   # everything passed.
   if [ "$(go env CGO_ENABLED)" = "1" ]; then
-    go test -race -timeout 40m ./...
+    go test -race -timeout 15m ./...
   elif command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
     echo "no cgo here, so -race runs in docker, which is what CI runs"
     docker run --rm --network host -v "$PWD":/src -w /src \
@@ -82,7 +82,7 @@ if wants go; then
       -e GOFLAGS=-buildvcs=false \
       -e "NOOKS_TEST_POSTGRES_DSN=$NOOKS_TEST_POSTGRES_DSN" \
       "golang:$(go mod edit -json | sed -n 's/.*"Go": "\([0-9]*\.[0-9]*\).*/\1/p' | head -1)" \
-      go test -race -timeout 40m ./...
+      go test -race -timeout 15m ./...
   else
     echo "WARNING: no cgo and no docker, so -race does not run here. CI runs it, and"
     echo "         a green run below does not mean a green run there."

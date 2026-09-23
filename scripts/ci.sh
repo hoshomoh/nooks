@@ -76,7 +76,14 @@ if wants go; then
     go test -race -timeout 15m ./...
   elif command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
     echo "no cgo here, so -race runs in docker, which is what CI runs"
+    # The git directory as well as the tree. In a linked worktree, which is what
+    # preflight runs in, .git is a file pointing at the main repository, so a checkout
+    # mounted on its own is not a repository at all and anything asking git what is
+    # tracked gets nothing. Mounted where it says it is, so the pointer resolves.
+    gitdir=$(git rev-parse --git-common-dir)
+    gitdir=$(cd "$gitdir" && pwd -P)
     docker run --rm --network host -v "$PWD":/src -w /src \
+      -v "$gitdir":"$gitdir" \
       -v "${NOOKS_GO_CACHE:-$HOME/.cache/nooks-ci-go}":/gocache \
       -e GOMODCACHE=/gocache/mod -e GOCACHE=/gocache/build \
       -e GOFLAGS=-buildvcs=false \

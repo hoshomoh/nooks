@@ -201,12 +201,16 @@ func (s *sqlStore) DeleteDecidedRequests(ctx context.Context, before time.Time) 
 }
 
 // PendingJoinRequests lists the requests waiting for an Admin, oldest first.
+//
+// By id as well as by time, because a time here is stored to the second: two people
+// asking in the same second are the same instant as far as the column is concerned, and
+// without the second half they come back in whichever order the engine likes.
 func (s *sqlStore) PendingJoinRequests(ctx context.Context) ([]JoinRequest, error) {
 	var rows []joinRequestModel
 	err := s.db.NewSelect().
 		Model(&rows).
 		Where("status = ?", string(StatusPending)).
-		Order("created_at ASC").
+		Order("created_at ASC", "id ASC").
 		Scan(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("read join requests: %w", err)
@@ -306,7 +310,7 @@ func (s *sqlStore) PendingResetRequests(ctx context.Context) ([]ResetRequest, er
 	err := s.db.NewSelect().
 		Model(&rows).
 		Where("status = ?", string(StatusPending)).
-		Order("created_at ASC").
+		Order("created_at ASC", "id ASC").
 		Scan(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("read reset requests: %w", err)

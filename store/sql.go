@@ -42,7 +42,15 @@ and a decision about whose language, which this is not.
 */
 // OrderExpr, not Order: Bun quotes Order's argument as a column name, which would make
 // this the identifier "lower(name)" rather than a call.
-const byName = "lower(name) ASC"
+// byName is how anything a Member picks from is ordered: by name, and then by which
+// came first.
+//
+// The second half is not decoration. Two Lists can be called the same thing, and two
+// Groups can too, and an order that stops at the name leaves whichever the engine
+// happens to return first, which is not the same answer twice. A sidebar whose rows
+// swap places between loads is the same fault the broker had when presence came back in
+// map order.
+const byName = "lower(name) ASC, id ASC"
 
 // sqlStore implements Store over Bun.
 //

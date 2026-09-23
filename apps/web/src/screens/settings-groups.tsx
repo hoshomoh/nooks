@@ -13,6 +13,7 @@ import { formatList } from "@/lib/format"
 import { groupsQuery, membersQuery } from "@/lib/sharing-queries"
 import { useLocale } from "@/lib/use-locale"
 import { useSettingsCounts } from "@/lib/use-settings-counts"
+import { Avatar } from "@/components/ds/avatar"
 import { initialsOf } from "@/lib/initials"
 
 /**
@@ -119,13 +120,15 @@ function GroupCard({ group, onEdit }: GroupCardProps) {
       <div className="flex items-center gap-3">
         <span className="flex">
           {group.members.map((member, index) => (
-            <span
+            <Avatar
               key={member.uid}
-              className="grid size-5.5 place-items-center rounded-full border-[1.5px] border-background bg-chip text-[9px] text-secondary-foreground"
-              style={index > 0 ? { marginLeft: "-6px" } : undefined}
-            >
-              {initialsOf(member.name)}
-            </span>
+              badge={initialsOf(member.name)}
+              size="small"
+              ringed
+              // Overlapped, which is what the ring is for: each one is drawn over the
+              // last so a group reads as a group rather than a row.
+              className={index > 0 ? "-ml-1.5" : undefined}
+            />
           ))}
         </span>
         <span className="min-w-0 truncate text-field font-medium">{group.name}</span>

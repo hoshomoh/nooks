@@ -3,6 +3,7 @@ import { cn } from "cn"
 import type { Member } from "@nooks/api"
 
 import { TickBox } from "./tick-box"
+import { Avatar } from "./avatar"
 import { initialsOf } from "@/lib/initials"
 
 export interface MemberPickerProps {
@@ -41,9 +42,7 @@ export function MemberPicker({ members, chosen, onToggle }: MemberPickerProps) {
             chosen.includes(member.uid) ? "bg-secondary" : "hover:bg-secondary",
           )}
         >
-          <span className="grid size-6 shrink-0 place-items-center rounded-full bg-chip font-mono text-[10px] text-secondary-foreground">
-            {initialsOf(member.name)}
-          </span>
+          <Avatar badge={initialsOf(member.name)} />
           <span className="text-field">{member.name}</span>
           <span className="truncate text-micro text-muted-foreground">{member.email}</span>
           <TickBox picked={chosen.includes(member.uid)} className="ml-auto" />

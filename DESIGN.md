@@ -170,6 +170,19 @@ Uppercase is reserved for the 11.5 section and column heads. Nothing else is upp
 | 15 | Chip (a 30px pill) |
 | 50% | Avatar |
 
+**The avatar comes in three sizes, in the UI font:**
+
+| Size | Circle | Initials |
+| --- | --- | --- |
+| Small | 22px | 9px |
+| Medium | 24px | 10px |
+| Large | 28px | 11px |
+
+The initials keep their ratio to the circle so two letters sit inside it at every size.
+A Group is the same chip at radius 6 rather than a circle, because a Group is not a
+person and should not read as one. Avatars drawn overlapping carry a 1.5px ring in the
+page's own ground, which is what separates them.
+
 **Three rule weights, three meanings — do not substitute:**
 
 | Weight | Colour | Separates |

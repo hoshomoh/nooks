@@ -10,6 +10,7 @@ import { DIALOG_BODY, DIALOG_SURFACE } from "./dialog-surface"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { groupsQuery, listSharesQuery, membersQuery } from "@/lib/sharing-queries"
 import { TickBox } from "./tick-box"
+import { Avatar } from "./avatar"
 import { initialsOf } from "@/lib/initials"
 
 /** What the dialog sends back when the Member saves. */
@@ -390,14 +391,7 @@ function PickRow({ badge, name, detail, isGroup, picked, onToggle }: PickRowProp
         picked ? "bg-secondary" : "hover:bg-secondary",
       )}
     >
-      <span
-        className={cn(
-          "grid size-6 shrink-0 place-items-center bg-chip font-mono text-[10px] text-secondary-foreground",
-          isGroup ? "rounded-md" : "rounded-full",
-        )}
-      >
-        {badge}
-      </span>
+      <Avatar badge={badge} isGroup={isGroup} />
       <span className="text-field">{name}</span>
       {detail && <span className="truncate text-micro text-muted-foreground">{detail}</span>}
       <TickBox picked={picked} className="ml-auto" />

@@ -5,6 +5,7 @@ import type { PendingJoinRequest } from "@nooks/api"
 import { Button } from "@/components/ds/button"
 import { requestClient } from "@/lib/api"
 import { useMomentLabel } from "@/lib/use-moment-label"
+import { Avatar } from "@/components/ds/avatar"
 import { initialsOf } from "@/lib/initials"
 
 export interface JoinRequestsProps {
@@ -51,9 +52,7 @@ export function JoinRequests({ requests }: JoinRequestsProps) {
           className="grid min-h-13 grid-cols-[1fr_auto] items-center gap-4 border-t border-hair"
         >
           <span className="flex min-w-0 items-center gap-3">
-            <span className="grid size-7 shrink-0 place-items-center rounded-full bg-chip text-[11px] text-secondary-foreground">
-              {initialsOf(request.name)}
-            </span>
+            <Avatar badge={initialsOf(request.name)} size="large" />
             <span className="flex min-w-0 flex-col">
               <span className="text-field">{request.name}</span>
               <span className="truncate text-micro text-muted-foreground">

@@ -8,6 +8,7 @@ import { COVERING, INERT, RAISED } from "./covering"
 import { Icon } from "./icon"
 import { ListActions } from "./list-actions"
 import { SETTINGS_HOME } from "./settings-sections"
+import { Avatar } from "./avatar"
 import { initialsOf } from "@/lib/initials"
 import { reachableCount } from "@/lib/sidebar-groups"
 
@@ -140,9 +141,7 @@ export function Sidebar({
         to={SETTINGS_HOME}
         className="mt-auto flex h-8.5 items-center gap-2.5 rounded-md px-2 transition-colors hover:bg-secondary"
       >
-        <span className="grid size-5.5 place-items-center rounded-full bg-chip text-[10px] text-secondary-foreground">
-          {initialsOf(memberName)}
-        </span>
+        <Avatar badge={initialsOf(memberName)} size="small" />
         <span className="truncate text-small text-secondary-foreground">{memberName}</span>
         <span className="ml-auto text-micro text-muted-foreground">{t("settings.title")}</span>
       </Link>

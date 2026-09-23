@@ -297,10 +297,12 @@ func (s *ListService) nameMembers(
 		}
 		member, err := s.store.MemberByID(ctx, id)
 		if err != nil {
-			// Only ever reached for whoever ticked something: done_by_id is SET NULL, so
-			// that row outlives them and stops naming them. A row they added does not —
-			// added_by_id is ON DELETE CASCADE and the row goes with them. See
-			// TestRemovingAMemberTakesTheirListsAndTheirItems.
+			// Barely reachable now, and it was the ordinary case when this was written.
+			// Removing a Member used to delete the row, so anything they had added went
+			// with them and anything they had ticked stopped naming them. It tombstones
+			// instead, and MemberByID is the one read that still finds a tombstone, so
+			// somebody removed is found and answers with an empty name. What is left
+			// here is a row naming an id that is not there at all.
 			if errors.Is(err, store.ErrNotFound) {
 				continue
 			}

@@ -114,15 +114,23 @@ func (s *PublicService) contributorNames(
 		return nil, nil
 	}
 
+	// Asked about once, by whether the answer is here rather than by whether it says
+	// anything. Removing a Member empties their name and keeps the row, so a tombstone
+	// answers with "" and a check for a non-empty name never remembers them: every Item
+	// a removed person added would read them again, on the one endpoint a stranger can
+	// reach, over a List with no bound on how many Items it holds.
 	names := map[int64]string{}
 	for _, item := range items {
 		id := item.AddedByID
-		if id == 0 || names[id] != "" {
+		if _, known := names[id]; id == 0 || known {
 			continue
 		}
 		member, err := s.store.MemberByID(ctx, id)
 		if err != nil {
 			if errors.Is(err, store.ErrNotFound) {
+				// Remembered as nameless rather than skipped, so a row nothing can name
+				// is read once and not once per Item.
+				names[id] = ""
 				continue
 			}
 			return nil, internalError("read member", err)

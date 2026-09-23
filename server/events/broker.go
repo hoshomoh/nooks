@@ -6,6 +6,7 @@
 package events
 
 import (
+	"slices"
 	"sync"
 )
 
@@ -66,6 +67,21 @@ type Subscription struct {
 // something changed, and the next one says it again.
 const queueDepth = 32
 
+/*
+watchesPerMember is how many streams one Member may have open at once.
+
+A stream is a goroutine, a buffered channel and a row the presence loop walks, so
+without a cap one Member with a script decides how much of all three the Instance
+spends. It matters more since one Note gained one editor: a stream that lingers holds a
+Note read-only for everybody else, and this is what bounds how long that can last.
+
+Ten covers a laptop, a phone, a tablet and spare tabs with room over. Past ten the
+oldest is closed rather than the newest refused, because a refused connection leaves the
+tab somebody has just opened silently without live updates, which is far harder to
+notice than a reconnect.
+*/
+const watchesPerMember = 10
+
 // Broker fans events out to the Members watching for them.
 type Broker struct {
 	mu      sync.Mutex
@@ -117,9 +133,15 @@ func (b *Broker) Watch(params WatchParams) Subscription {
 		events:     make(chan Event, queueDepth),
 	}
 	b.watches[id] = w
+	closed := b.closeOldestOver(params.MemberID)
 	b.mu.Unlock()
 
-	b.announcePresence(params.ListUID)
+	// The List this one opened on, plus whatever List each closed stream was watching.
+	// A closed stream is one fewer person standing there, and the others are told.
+	closed[params.ListUID] = true
+	for listUID := range closed {
+		b.announcePresence(listUID)
+	}
 
 	var once sync.Once
 	return Subscription{
@@ -128,6 +150,45 @@ func (b *Broker) Watch(params WatchParams) Subscription {
 			once.Do(func() { b.drop(id) })
 		},
 	}
+}
+
+/*
+closeOldestOver ends this Member's oldest streams until they are inside the cap, and
+reports which Lists those streams were watching.
+
+Under the caller's lock, and in the same one that added the new watch, so the count a
+decision is taken on is the count after it. Counting first and closing second would let
+through as many as arrive at once, which is the whole case this is for.
+
+Oldest by identifier, which is the order they were opened in: `next` only goes up.
+
+Walks every open watch rather than keeping an index per Member. This runs once when a
+connection opens, where announcePresence already walks the same map, and an index would
+be a second thing to keep true in drop and EndWatchesOn as well.
+*/
+func (b *Broker) closeOldestOver(memberID int64) map[string]bool {
+	theirs := make([]int64, 0, watchesPerMember+1)
+	for id, w := range b.watches {
+		if w.memberID == memberID {
+			theirs = append(theirs, id)
+		}
+	}
+	if len(theirs) <= watchesPerMember {
+		return make(map[string]bool, 1)
+	}
+	slices.Sort(theirs)
+
+	closed := make(map[string]bool)
+	for _, id := range theirs[:len(theirs)-watchesPerMember] {
+		w := b.watches[id]
+		delete(b.watches, id)
+		w.closed = true
+		close(w.events)
+		if w.listUID != "" {
+			closed[w.listUID] = true
+		}
+	}
+	return closed
 }
 
 // drop ends one subscription and tells the List it was watching.

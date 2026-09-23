@@ -241,3 +241,123 @@ func editorsIn(t *testing.T, events <-chan Event) []Editor {
 		}
 	}
 }
+
+// closedWithin reports whether a subscription's channel has been closed, draining what
+// was queued behind it first: presence events already sent come before the close.
+func closedWithin(sub Subscription, patience time.Duration) bool {
+	deadline := time.After(patience)
+	for {
+		select {
+		case _, open := <-sub.Events:
+			if !open {
+				return true
+			}
+		case <-deadline:
+			return false
+		}
+	}
+}
+
+/*
+One Member may hold ten streams, and the eleventh closes the first.
+
+Without this one Member with a script decides how many goroutines, channels and presence
+rows the Instance spends. The oldest goes rather than the newest being refused: a refused
+connection leaves the tab somebody has just opened silently without live updates, which
+is far harder to notice than a reconnect.
+
+It matters more since one Note gained one editor. A stream nobody is reading still holds
+whatever Note it had open, so the cap is what bounds how long everybody else reads a
+Note they could have been writing.
+*/
+func TestOneMemberHoldsTenStreams(t *testing.T) {
+	broker := NewBroker()
+
+	open := make([]Subscription, 0, watchesPerMember)
+	for range watchesPerMember {
+		sub := broker.Watch(WatchParams{MemberID: 1, Name: "Anna", ListUID: "list_shop"})
+		t.Cleanup(sub.Close)
+		open = append(open, sub)
+	}
+	for i, sub := range open {
+		if closedWithin(sub, 20*time.Millisecond) {
+			t.Fatalf("stream %d closed while still inside the cap", i)
+		}
+	}
+
+	eleventh := broker.Watch(WatchParams{MemberID: 1, Name: "Anna", ListUID: "list_shop"})
+	t.Cleanup(eleventh.Close)
+
+	if !closedWithin(open[0], time.Second) {
+		t.Error("the oldest stream is still open, so the cap holds nothing")
+	}
+	if closedWithin(open[1], 20*time.Millisecond) {
+		t.Error("the second oldest closed too, so more went than had to")
+	}
+	if closedWithin(eleventh, 20*time.Millisecond) {
+		t.Error("the stream that was just opened closed, which is the refusal this avoids")
+	}
+}
+
+// The cap is per Member. One person with ten tabs does not close anybody else's stream.
+func TestTheStreamCapIsPerMember(t *testing.T) {
+	broker := NewBroker()
+
+	jonas := broker.Watch(WatchParams{MemberID: 2, Name: "Jonas", ListUID: "list_shop"})
+	t.Cleanup(jonas.Close)
+
+	for range watchesPerMember + 1 {
+		sub := broker.Watch(WatchParams{MemberID: 1, Name: "Anna", ListUID: "list_shop"})
+		t.Cleanup(sub.Close)
+	}
+
+	if closedWithin(jonas, 20*time.Millisecond) {
+		t.Error("Anna's tabs closed Jonas's stream")
+	}
+	if watching := broker.WatchersOf("list_shop"); len(watching) != 2 {
+		t.Errorf("watching = %v, want Anna and Jonas, each counted once", watching)
+	}
+}
+
+/*
+A stream the cap closed is one fewer person standing on the List, and the people left
+are told.
+
+Nothing else would tell them. The browser that lost the stream is not reading, and the
+one that caused it is somewhere else entirely, so the only announce that can carry this
+is the one for the List the closed stream was watching.
+
+Her oldest stream is her only one on that List, which is what makes the answer move: the
+nine that follow are on no List at all, so what Jonas is told changes if and only if the
+closing is announced where it happened.
+*/
+func TestClosingAStreamForTheCapTellsTheList(t *testing.T) {
+	broker := NewBroker()
+
+	onTheList := broker.Watch(WatchParams{MemberID: 1, Name: "Anna", ListUID: "list_shop"})
+	t.Cleanup(onTheList.Close)
+	for range watchesPerMember - 1 {
+		sub := broker.Watch(WatchParams{MemberID: 1, Name: "Anna"})
+		t.Cleanup(sub.Close)
+	}
+
+	jonas := broker.Watch(WatchParams{MemberID: 2, Name: "Jonas", ListUID: "list_shop"})
+	t.Cleanup(jonas.Close)
+	if watching := broker.WatchersOf("list_shop"); len(watching) != 2 {
+		t.Fatalf("watching = %v, want Anna and Jonas before anything is closed", watching)
+	}
+	drain(jonas)
+
+	// Her eleventh is on no List, so the only thing that moves is the stream the cap
+	// closes, which was her only one on Jonas's List.
+	eleventh := broker.Watch(WatchParams{MemberID: 1, Name: "Anna"})
+	t.Cleanup(eleventh.Close)
+
+	event := waitFor(t, jonas)
+	if event.Kind != KindPresence || event.ListUID != "list_shop" {
+		t.Fatalf("Jonas was told %v, want presence on his own List", event)
+	}
+	if len(event.Watchers) != 0 {
+		t.Errorf("watchers = %v, want nobody: her only stream on it was closed", event.Watchers)
+	}
+}

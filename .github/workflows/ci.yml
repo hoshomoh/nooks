@@ -37,8 +37,14 @@ jobs:
         run: go build ./...
       - name: Vet
         run: go vet ./...
+      # -timeout is a deadlock detector, not a speed limit. Go's default is ten minutes
+      # a package, which is its number rather than anybody's, and three packages here
+      # legitimately need longer under the race detector: it makes pure-Go SQLite about
+      # twenty times slower and these open a database per test. Six runs failed on that
+      # default while the tests themselves were fine. Set well clear of the slowest
+      # machine that runs this, so it still catches something genuinely stuck.
       - name: Test
-        run: go test -race ./...
+        run: go test -race -timeout 40m ./...
         env:
           NOOKS_TEST_POSTGRES_DSN: postgres://nooks:nooks@localhost:5432/nooks?sslmode=disable
       - name: Formatted

@@ -56,12 +56,36 @@ if wants go; then
   go vet ./...
 
   step "go test"
-  # -race needs cgo, and a machine without a C compiler cannot run it. CI has one, so it
-  # runs there; here we fall back rather than skipping the tests altogether.
+  # The store suite covers both drivers, and the Postgres half skips itself when there
+  # is nowhere to connect. Silent skipping is how a driver rots, and it is half of why
+  # this script disagreed with CI for a week.
+  if [ -z "$NOOKS_TEST_POSTGRES_DSN" ]; then
+    echo "WARNING: NOOKS_TEST_POSTGRES_DSN is unset, so every Postgres case skips."
+    echo "         CI sets it. To check what CI checks, start one and point at it:"
+    echo '         docker run -d --rm --name nooks-pg -e POSTGRES_USER=nooks \'
+    echo '           -e POSTGRES_PASSWORD=nooks -e POSTGRES_DB=nooks -p 55432:5432 \'
+    echo '           postgres:17-alpine'
+    echo '         export NOOKS_TEST_POSTGRES_DSN=postgres://nooks:nooks@localhost:55432/nooks?sslmode=disable'
+  fi
+
+  # -race needs cgo, and a machine with no C compiler cannot run it. Rather than skip
+  # the one check CI does differently, borrow a toolchain from Docker: six CI runs in a
+  # row failed here on a timeout this machine could not see, while this script said
+  # everything passed.
   if [ "$(go env CGO_ENABLED)" = "1" ]; then
-    go test -race ./...
+    go test -race -timeout 40m ./...
+  elif command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+    echo "no cgo here, so -race runs in docker, which is what CI runs"
+    docker run --rm --network host -v "$PWD":/src -w /src \
+      -v "${NOOKS_GO_CACHE:-$HOME/.cache/nooks-ci-go}":/gocache \
+      -e GOMODCACHE=/gocache/mod -e GOCACHE=/gocache/build \
+      -e GOFLAGS=-buildvcs=false \
+      -e "NOOKS_TEST_POSTGRES_DSN=$NOOKS_TEST_POSTGRES_DSN" \
+      "golang:$(go mod edit -json | sed -n 's/.*"Go": "\([0-9]*\.[0-9]*\).*/\1/p' | head -1)" \
+      go test -race -timeout 40m ./...
   else
-    echo "note: no cgo on this machine, running without -race (CI still runs it)"
+    echo "WARNING: no cgo and no docker, so -race does not run here. CI runs it, and"
+    echo "         a green run below does not mean a green run there."
     go test ./...
   fi
 

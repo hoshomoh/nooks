@@ -2,7 +2,6 @@ package v1
 
 import (
 	"context"
-	"path/filepath"
 	"slices"
 	"testing"
 	"time"
@@ -12,6 +11,7 @@ import (
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
+	"github.com/hoshomoh/nooks/store/storetest"
 )
 
 // heard records what a service announced, so a test can ask who was told.
@@ -52,11 +52,7 @@ func (h *heard) ActivityArrived(memberID int64) {
 func listening(t *testing.T) (listFixture, *heard) {
 	t.Helper()
 
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.Fresh(t)
 
 	member := func(uid, name, email string, role store.Role) store.Member {
 		t.Helper()
@@ -169,11 +165,7 @@ either, which left both the person who gained a List and the person who lost one
 at a sidebar that was wrong until they reloaded.
 */
 func TestGroupMembershipTellsWhoeverItMoved(t *testing.T) {
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.Fresh(t)
 
 	member := func(uid, name string, role store.Role) store.Member {
 		t.Helper()
@@ -233,11 +225,7 @@ told the people left: the Admin who clicked had their own screen refreshed by th
 and everyone else kept a sidebar full of Lists that no longer exist until they reloaded.
 */
 func TestRemovingAMemberTellsTheOnesWhoStay(t *testing.T) {
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.Fresh(t)
 
 	member := func(uid, name string, role store.Role) store.Member {
 		t.Helper()
@@ -287,11 +275,7 @@ goes on being offered buttons the Instance refuses, both until they happen to re
 Refused, so nothing leaks; wrong for as long as the tab stays open.
 */
 func TestChangingARoleTellsTheMemberItHappenedTo(t *testing.T) {
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.Fresh(t)
 
 	member := func(uid, name string, role store.Role) store.Member {
 		t.Helper()

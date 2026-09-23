@@ -9,6 +9,7 @@ import (
 
 	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
+	"github.com/hoshomoh/nooks/store/storetest"
 )
 
 var testClock = time.Date(2026, 8, 25, 9, 0, 0, 0, time.UTC)
@@ -25,11 +26,7 @@ type served struct {
 func serve(t *testing.T, role store.Role) (*Handler, string) {
 	t.Helper()
 	data := t.TempDir()
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(data, "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.FreshIn(t, data)
 
 	member, err := s.CreateMember(t.Context(), store.CreateMemberParams{
 		UID: "mem_anna", Name: "Anna", Email: "anna@brunnen.lan", Role: role,
@@ -187,11 +184,7 @@ My first version of this test did exactly that and passed over nothing.
 */
 func TestTheSnapshotIsWrittenBesideTheDatabase(t *testing.T) {
 	data := t.TempDir()
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(data, "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.FreshIn(t, data)
 
 	member, err := s.CreateMember(t.Context(), store.CreateMemberParams{
 		UID: "mem_anna", Name: "Anna", Email: "anna@brunnen.lan",

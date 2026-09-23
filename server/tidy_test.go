@@ -4,13 +4,13 @@ import (
 	"errors"
 	"io"
 	"log/slog"
-	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/hoshomoh/nooks/internal/profile"
 	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
+	"github.com/hoshomoh/nooks/store/storetest"
 )
 
 /*
@@ -25,11 +25,7 @@ a test of it would be a test of time.
 */
 func TestAnInstanceClearsOutExpiredSessions(t *testing.T) {
 	dir := t.TempDir()
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(dir, "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.FreshIn(t, dir)
 
 	member, err := s.CreateMember(t.Context(), store.CreateMemberParams{
 		UID: "mem_anna", Name: "Anna", Email: "anna@brunnen.lan", Role: store.RoleAdmin,

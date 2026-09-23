@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -9,6 +8,7 @@ import (
 
 	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
+	"github.com/hoshomoh/nooks/store/storetest"
 )
 
 /*
@@ -71,11 +71,7 @@ var reachableByToken = map[string]string{
 }
 
 func TestNoRPCAnswersALeakedKeyByAccident(t *testing.T) {
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.Fresh(t)
 
 	now := func() time.Time { return testClock }
 	anna, err := s.CreateMember(t.Context(), store.CreateMemberParams{

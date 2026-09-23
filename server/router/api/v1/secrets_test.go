@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -11,6 +10,7 @@ import (
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
+	"github.com/hoshomoh/nooks/store/storetest"
 	"google.golang.org/protobuf/encoding/prototext"
 )
 
@@ -27,13 +27,9 @@ const theHash = "$2a$10$ThisIsTheStoredBcryptHashAndItMustNotTravel"
 // catches is a field nobody thought about. A test that named the fields it knew would
 // pass straight through one.
 func TestListMembersNeverCarriesAStoredHash(t *testing.T) {
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.Fresh(t)
 
-	_, err = s.CreateMember(t.Context(), store.CreateMemberParams{
+	_, err := s.CreateMember(t.Context(), store.CreateMemberParams{
 		UID: "mem_anna", Name: "Anna", Email: "anna@brunnen.lan",
 		Role: store.RoleAdmin, PasswordHash: theHash, CreatedAt: testClock,
 	})

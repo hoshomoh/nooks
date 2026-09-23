@@ -3,12 +3,11 @@ package server
 import (
 	"io"
 	"log/slog"
-	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/hoshomoh/nooks/internal/profile"
-	"github.com/hoshomoh/nooks/store"
+	"github.com/hoshomoh/nooks/store/storetest"
 )
 
 /*
@@ -25,11 +24,7 @@ request, and a handler that keeps writing afterwards is not cut off by it.
 */
 func TestWhatBoundsAConnection(t *testing.T) {
 	dir := t.TempDir()
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(dir, "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.FreshIn(t, dir)
 
 	server, err := New(profile.Config{
 		Addr: ":0", Data: dir, Driver: profile.DriverSQLite, Mode: profile.ModeDev,

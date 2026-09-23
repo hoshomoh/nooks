@@ -3,7 +3,6 @@ package mcp
 import (
 	"net/http"
 	"net/http/httptest"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -13,6 +12,7 @@ import (
 	"github.com/hoshomoh/nooks/server/auth"
 	v1 "github.com/hoshomoh/nooks/server/router/api/v1"
 	"github.com/hoshomoh/nooks/store"
+	"github.com/hoshomoh/nooks/store/storetest"
 )
 
 var testClock = time.Date(2026, 8, 25, 9, 0, 0, 0, time.UTC)
@@ -29,11 +29,7 @@ type instance struct {
 
 func newInstance(t *testing.T) *instance {
 	t.Helper()
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.Fresh(t)
 
 	member, err := s.CreateMember(t.Context(), store.CreateMemberParams{
 		UID: "mem_anna", Name: "Anna", Email: "anna@brunnen.lan", Role: store.RoleAdmin,

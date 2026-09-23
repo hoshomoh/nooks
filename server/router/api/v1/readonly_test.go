@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -10,6 +9,7 @@ import (
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
+	"github.com/hoshomoh/nooks/store/storetest"
 )
 
 /*
@@ -24,11 +24,7 @@ by nearly everything for some other reason, and a test satisfied by that would p
 just as happily with the check gone.
 */
 func TestAReadOnlyTokenCannotChangeAnything(t *testing.T) {
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.Fresh(t)
 
 	now := func() time.Time { return testClock }
 	anna, err := s.CreateMember(t.Context(), store.CreateMemberParams{

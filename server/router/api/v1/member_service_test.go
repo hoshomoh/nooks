@@ -3,7 +3,6 @@ package v1
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
+	"github.com/hoshomoh/nooks/store/storetest"
 )
 
 // memberFixture is a store with an Admin, two Members, and the service under test.
@@ -27,11 +27,7 @@ type memberFixture struct {
 func newMemberFixture(t *testing.T) memberFixture {
 	t.Helper()
 
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.Fresh(t)
 
 	member := func(uid, name, email string, role store.Role) store.Member {
 		t.Helper()

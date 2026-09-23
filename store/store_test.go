@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/hoshomoh/nooks/internal/dbtemplate"
 )
 
 // postgresDSNEnv names the environment variable that points the suite at a Postgres
@@ -29,9 +31,26 @@ func drivers() []driverCase {
 	}
 }
 
+/*
+sqliteTemplate is one migrated database, copied for each test rather than built again.
+
+Wired here rather than shared with the rest of the tree because these tests are inside
+the store package, so anything that knew how to open one would be importing the package
+it lives in. `dbtemplate` says what this buys.
+*/
+var sqliteTemplate = dbtemplate.Copies{
+	Build: func(path string) error {
+		s, err := OpenSQLite(context.Background(), path)
+		if err != nil {
+			return err
+		}
+		return s.Close()
+	},
+}
+
 func openSQLiteForTest(t *testing.T) Store {
 	t.Helper()
-	s, err := OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
+	s, err := OpenSQLite(t.Context(), sqliteTemplate.Fresh(t))
 	if err != nil {
 		t.Fatalf("OpenSQLite: %v", err)
 	}

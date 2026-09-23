@@ -2,7 +2,6 @@ package v1
 
 import (
 	"context"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -10,7 +9,7 @@ import (
 
 	"connectrpc.com/connect"
 
-	"github.com/hoshomoh/nooks/store"
+	"github.com/hoshomoh/nooks/store/storetest"
 )
 
 /*
@@ -49,11 +48,7 @@ var openToAnyone = map[string]string{
 }
 
 func TestNoRPCAnswersAStrangerByAccident(t *testing.T) {
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.Fresh(t)
 
 	now := func() time.Time { return testClock }
 	services := Services{

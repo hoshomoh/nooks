@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
@@ -16,6 +15,7 @@ import (
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 	"github.com/hoshomoh/nooks/server/auth"
 	"github.com/hoshomoh/nooks/store"
+	"github.com/hoshomoh/nooks/store/storetest"
 )
 
 const goodPassword = "the good beans from the market"
@@ -27,11 +27,7 @@ var testClock = time.Date(2026, time.March, 3, 9, 30, 0, 0, time.UTC)
 func newAuthService(t *testing.T) (*AuthService, store.Store) {
 	t.Helper()
 
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.Fresh(t)
 
 	// Tokens are numbered rather than fixed: signing in twice must produce two
 	// sessions, which a constant token would collide on.

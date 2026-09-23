@@ -5,12 +5,11 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
-	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/hoshomoh/nooks/internal/profile"
-	"github.com/hoshomoh/nooks/store"
+	"github.com/hoshomoh/nooks/store/storetest"
 )
 
 /*
@@ -81,11 +80,7 @@ that has to have it.
 */
 func TestTheServerAppliesTheCeiling(t *testing.T) {
 	dir := t.TempDir()
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(dir, "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.FreshIn(t, dir)
 
 	server, err := New(profile.Config{
 		Addr: ":0", Data: dir, Driver: profile.DriverSQLite, Mode: profile.ModeDev,
@@ -119,11 +114,7 @@ ordinary request: it takes a different path out and would be an easy one to miss
 */
 func TestEveryAnswerCarriesItsDefences(t *testing.T) {
 	dir := t.TempDir()
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(dir, "nooks.db"))
-	if err != nil {
-		t.Fatalf("OpenSQLite: %v", err)
-	}
-	t.Cleanup(func() { _ = s.Close() })
+	s := storetest.FreshIn(t, dir)
 
 	server, err := New(profile.Config{
 		Addr: ":0", Data: dir, Driver: profile.DriverSQLite, Mode: profile.ModeDev,

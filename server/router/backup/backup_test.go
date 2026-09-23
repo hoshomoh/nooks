@@ -24,7 +24,8 @@ type served struct {
 // serve builds a handler over a store with one Member of the given role.
 func serve(t *testing.T, role store.Role) (*Handler, string) {
 	t.Helper()
-	s, err := store.OpenSQLite(t.Context(), filepath.Join(t.TempDir(), "nooks.db"))
+	data := t.TempDir()
+	s, err := store.OpenSQLite(t.Context(), filepath.Join(data, "nooks.db"))
 	if err != nil {
 		t.Fatalf("OpenSQLite: %v", err)
 	}
@@ -50,7 +51,10 @@ func serve(t *testing.T, role store.Role) (*Handler, string) {
 	}
 
 	resolver := auth.NewResolver(s, func() time.Time { return testClock })
-	return NewHandler(s, resolver, func() time.Time { return testClock }), token
+	// The snapshot is written beside the database, so the test gives it the same
+	// directory the store was opened in rather than letting it fall back to the
+	// system's.
+	return NewHandler(s, resolver, data, func() time.Time { return testClock }), token
 }
 
 // serveWithToken is serve, plus an Access token the Member cut for themselves.
@@ -161,5 +165,63 @@ func TestAnAdminsAccessTokenIsRefused(t *testing.T) {
 	// The same Admin, in the browser they signed into, still gets it.
 	if allowed := ask(it.handler, it.session); allowed.Code != http.StatusOK {
 		t.Errorf("code = %d for the browser, want 200", allowed.Code)
+	}
+}
+
+/*
+The snapshot is written beside the database, not in the system's temp directory.
+
+VACUUM INTO writes a complete second copy, so exporting a household of any size needs
+that much space somewhere. `os.MkdirTemp("")` follows TMPDIR, which on several
+distributions is tmpfs and therefore RAM, and in the shipped image is the container's
+own layer rather than the volume somebody mounted. The data directory is sized for the
+database by definition, because it is already holding it.
+
+Asserted by pointing the handler at a directory that does not exist. If it honours that,
+making the snapshot directory fails and the export answers 500; if it ignores it and
+reaches for the system's, the export succeeds and this is how we find out. Checking the
+data directory afterwards would prove nothing, because the handler cleans up on the way
+out and an empty directory looks the same either way.
+
+My first version of this test did exactly that and passed over nothing.
+*/
+func TestTheSnapshotIsWrittenBesideTheDatabase(t *testing.T) {
+	data := t.TempDir()
+	s, err := store.OpenSQLite(t.Context(), filepath.Join(data, "nooks.db"))
+	if err != nil {
+		t.Fatalf("OpenSQLite: %v", err)
+	}
+	t.Cleanup(func() { _ = s.Close() })
+
+	member, err := s.CreateMember(t.Context(), store.CreateMemberParams{
+		UID: "mem_anna", Name: "Anna", Email: "anna@brunnen.lan",
+		Role: store.RoleAdmin, PasswordHash: "hash", CreatedAt: testClock,
+	})
+	if err != nil {
+		t.Fatalf("CreateMember: %v", err)
+	}
+	token, hash, err := auth.NewToken()
+	if err != nil {
+		t.Fatalf("NewToken: %v", err)
+	}
+	if err := s.CreateSession(t.Context(), store.Session{
+		TokenHash: hash, MemberID: member.ID,
+		CreatedAt: testClock, ExpiresAt: testClock.Add(time.Hour),
+	}); err != nil {
+		t.Fatalf("CreateSession: %v", err)
+	}
+
+	resolver := auth.NewResolver(s, func() time.Time { return testClock })
+	nowhere := filepath.Join(data, "not-a-directory")
+	handler := NewHandler(s, resolver, nowhere, func() time.Time { return testClock })
+
+	request := httptest.NewRequest(http.MethodGet, "/api/v1/backup", nil)
+	request.AddCookie(&http.Cookie{Name: auth.CookieName, Value: token})
+	recorder := httptest.NewRecorder()
+	handler.ServeHTTP(recorder, request)
+
+	if recorder.Code == http.StatusOK {
+		t.Error("the export succeeded against a data directory that does not exist, " +
+			"so the snapshot went somewhere else")
 	}
 }

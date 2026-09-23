@@ -164,7 +164,7 @@ func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
 	// may only read is refused a write here exactly as it is everywhere else.
 	mux.Handle("/mcp", mcp.Handler(services, resolver))
 
-	mux.Handle("GET /api/v1/backup", backup.NewHandler(s, resolver, nil))
+	mux.Handle("GET /api/v1/backup", backup.NewHandler(s, resolver, cfg.Data, nil))
 	mux.HandleFunc("GET /healthz", handleHealthz)
 
 	// In dev the Vite server serves the app and proxies here, so the binary serves only

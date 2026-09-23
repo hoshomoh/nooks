@@ -17,15 +17,17 @@ import (
 type Handler struct {
 	store    store.Store
 	resolver *auth.Resolver
-	now      func() time.Time
+	// data is where the database lives, and where the snapshot is written beside it.
+	data string
+	now  func() time.Time
 }
 
 // NewHandler builds it. now may be nil, in which case time.Now is used.
-func NewHandler(s store.Store, resolver *auth.Resolver, now func() time.Time) *Handler {
+func NewHandler(s store.Store, resolver *auth.Resolver, data string, now func() time.Time) *Handler {
 	if now == nil {
 		now = time.Now
 	}
-	return &Handler{store: s, resolver: resolver, now: now}
+	return &Handler{store: s, resolver: resolver, data: data, now: now}
 }
 
 /*
@@ -54,7 +56,23 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dir, err := os.MkdirTemp("", "nooks-backup")
+	/*
+	 * Beside the database rather than in the system temp directory.
+	 *
+	 * VACUUM INTO writes a complete second copy, so exporting a 1.5GB household needs
+	 * 1.5GB somewhere. `os.MkdirTemp("")` follows TMPDIR, which on several
+	 * distributions is tmpfs and therefore RAM, and in the shipped image is the
+	 * container's own layer rather than the volume somebody mounted. Either way it is
+	 * space nobody sized for it.
+	 *
+	 * The data directory is sized for the database by definition, because it is already
+	 * holding it, and in Docker it is the volume. It is also visible: a snapshot left
+	 * behind by a failure is one somebody can find.
+	 *
+	 * Empty falls back to the old behaviour, which is what Postgres gets: there is no
+	 * data directory there, and BackupTo refuses below before anything is written.
+	 */
+	dir, err := os.MkdirTemp(h.data, "nooks-backup")
 	if err != nil {
 		http.Error(w, "could not start a backup", http.StatusInternalServerError)
 		return

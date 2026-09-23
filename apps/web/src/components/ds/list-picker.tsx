@@ -54,7 +54,7 @@ export function ListPicker({ suggested, chosen, onToggle, lead }: ListPickerProp
           {typed ? t("pickList.noneFound") : t("pickList.noneYet")}
         </p>
       ) : (
-        <div className="flex max-h-[38vh] flex-col gap-0.5 overflow-y-auto">
+        <div className="flex max-h-(--size-floating-list) flex-col gap-0.5 overflow-y-auto">
           {shown.map((list) => (
             <button
               key={list.uid}

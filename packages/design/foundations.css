@@ -139,6 +139,12 @@
   --container-form: 460px; /* a signed-out form, narrower than content */
   --container-settings: 720px; /* settings pages hold tables, not sentences */
 
+  /* How tall a scrolling list inside a floating surface may grow. Relative to the
+     window rather than fixed, because what has to stay reachable is the rest of the
+     surface: whatever sits under the list is below the fold otherwise, with nothing to
+     scroll it back. Read by the two pickers and the Activity panel. */
+  --size-floating-list: 38vh;
+
   --radius-sm: 4px; /* checkbox, small badge */
   --radius-md: 6px; /* row, toolbar button, menu item */
   --radius-lg: 7px; /* control: button, input, toggle track */

@@ -28,7 +28,7 @@ export function MemberPicker({ members, chosen, onToggle }: MemberPickerProps) {
   }
 
   return (
-    <div className="flex max-h-[38vh] flex-col gap-0.5 overflow-y-auto">
+    <div className="flex max-h-(--size-floating-list) flex-col gap-0.5 overflow-y-auto">
       {members.map((member) => (
         <button
           key={member.uid}

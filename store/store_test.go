@@ -39,8 +39,6 @@ func openSQLiteForTest(t *testing.T) Store {
 	return s
 }
 
-// openPostgresForTest connects to the server named by the environment, and drops the
-// schema first so each test starts from nothing.
 // openPostgresWithConns opens Postgres with a chosen pool bound, skipping without one.
 func openPostgresWithConns(t *testing.T, maxConns int) *sqlStore {
 	t.Helper()
@@ -58,6 +56,8 @@ func openPostgresWithConns(t *testing.T, maxConns int) *sqlStore {
 	return s.(*sqlStore)
 }
 
+// openPostgresForTest connects to the server named by the environment, and drops the
+// schema first so each test starts from nothing.
 func openPostgresForTest(t *testing.T) Store {
 	t.Helper()
 	dsn := os.Getenv(postgresDSNEnv)

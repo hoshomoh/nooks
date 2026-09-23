@@ -64,7 +64,7 @@ func newInstance(t *testing.T) *instance {
 	}
 }
 
-// listOwnedBy adds a List, so a stream has something to say it is watching.
+// list adds a List, so a stream has something to say it is watching.
 func (i *instance) list(uid, name string, sharing store.Sharing, owner store.Member) store.List {
 	i.t.Helper()
 	list, err := i.store.CreateList(i.t.Context(), store.CreateListParams{

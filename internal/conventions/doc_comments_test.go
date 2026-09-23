@@ -46,17 +46,27 @@ lines of the same thing and the package comment says so once, which is better th
 saying it fifty-three times. Nor is a comment that opens with an ordinary word. What is
 caught is a comment opening with the name of something else that is declared somewhere
 in this tree, which is what a stranded one always does.
+
+Test files are read too, for their helpers only. Skipping them entirely hid two strands
+of exactly this shape, one of them a helper renamed with its old comment left in place.
+A test case is not read because its comment is prose about what is being proved, and a
+sentence opening with a word this repository also uses as a name is not a fault.
 */
 func TestADocCommentNamesWhatItDocuments(t *testing.T) {
-	files := goFilesIn(t)
+	files, tests := goFilesIn(t)
 	if len(files) < 50 {
 		t.Fatalf("read %d files, so this is looking at less of the tree than it did", len(files))
 	}
+	if len(tests) < 30 {
+		t.Fatalf("read %d test files, so the helpers in them are going unread", len(tests))
+	}
 
 	// Every name this repository declares, so "opens with somebody else's name" is a
-	// question that can be asked at all.
+	// question that can be asked at all. Helpers count: the one strand this found in a
+	// test file opened with the name of a helper in a different test file, which is
+	// exactly what renaming one and leaving its comment behind looks like.
 	declared := make(map[string]bool)
-	for _, file := range files {
+	for _, file := range all(files, tests) {
 		for _, one := range file.Decls {
 			for _, name := range namesOf(one) {
 				declared[name] = true
@@ -67,8 +77,12 @@ func TestADocCommentNamesWhatItDocuments(t *testing.T) {
 		t.Fatalf("found %d declared names, too few to recognise a stranded comment", len(declared))
 	}
 
-	for path, file := range files {
+	for path, file := range all(files, tests) {
 		for _, one := range file.Decls {
+			// A test case is left alone; the helper under it is not. See isCase.
+			if strings.HasSuffix(path, "_test.go") && isCase(one) {
+				continue
+			}
 			doc := docOf(one)
 			if doc == nil {
 				continue
@@ -131,32 +145,55 @@ func TestTheTreeIsAllOfIt(t *testing.T) {
 	}
 }
 
-// goFilesIn parses the tree once, by path.
-func goFilesIn(t *testing.T) map[string]*ast.File {
+// goFilesIn parses the tree once, by path, keeping the tests apart from the rest.
+func goFilesIn(t *testing.T) (written, tests map[string]*ast.File) {
 	t.Helper()
 
-	files := make(map[string]*ast.File)
+	written = make(map[string]*ast.File)
+	tests = make(map[string]*ast.File)
 	for _, root := range theTree {
 		err := filepath.WalkDir(root, func(path string, entry fs.DirEntry, err error) error {
 			if err != nil || entry.IsDir() || !strings.HasSuffix(path, ".go") {
 				return err
-			}
-			if strings.HasSuffix(path, "_test.go") {
-				return nil
 			}
 			parsed, err := parser.ParseFile(token.NewFileSet(), path, nil, parser.ParseComments)
 			if err != nil {
 				t.Errorf("parse %s: %v", path, err)
 				return nil
 			}
-			files[path] = parsed
+			if strings.HasSuffix(path, "_test.go") {
+				tests[path] = parsed
+				return nil
+			}
+			written[path] = parsed
 			return nil
 		})
 		if err != nil {
 			t.Fatalf("walk %s: %v", root, err)
 		}
 	}
-	return files
+	return written, tests
+}
+
+/*
+isCase reports whether a declaration is a test rather than something a test leans on.
+
+The comment above a case is prose about what is being proved, so it opens with whatever
+word the sentence starts with and often that is a type this repository declares. The
+comment above a helper follows the same convention as the rest of the tree, which is why
+only helpers are read below.
+*/
+func isCase(one ast.Decl) bool {
+	declared, ok := one.(*ast.FuncDecl)
+	if !ok {
+		return false
+	}
+	for _, prefix := range []string{"Test", "Benchmark", "Fuzz", "Example"} {
+		if strings.HasPrefix(declared.Name.Name, prefix) {
+			return true
+		}
+	}
+	return false
 }
 
 // docOf is the comment above a declaration, whichever kind it is.
@@ -202,4 +239,15 @@ func firstWordOf(doc string) string {
 		return ""
 	}
 	return strings.Trim(fields[0], "`*_")
+}
+
+// all reads two sets of files as one.
+func all(sets ...map[string]*ast.File) map[string]*ast.File {
+	joined := make(map[string]*ast.File)
+	for _, set := range sets {
+		for path, file := range set {
+			joined[path] = file
+		}
+	}
+	return joined
 }

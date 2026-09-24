@@ -1,34 +1,64 @@
-import { QueryClient } from "@tanstack/react-query"
 import { describe, expect, it } from "vitest"
+import { QueryClient } from "@tanstack/react-query"
 
-import { CACHE_KEY, type CacheStoreDeps } from "./cache-store"
+import { CACHE_KEY } from "./cache-store"
 import { startNewSession } from "./new-session"
+import { PENDING_TICK_KEY, createPendingTickStore } from "./pending-tick-store"
 
-/** A storage that remembers, so the test can look at what is left in it. */
-function storageHolding(value: string): { deps: CacheStoreDeps; read: () => string | null } {
-  const held = new Map<string, string>([[CACHE_KEY, value]])
+/** held is a browser's storage, with whatever was left in it. */
+function held(initial: Record<string, string>) {
+  const store = new Map(Object.entries(initial))
   return {
-    deps: {
-      storage: {
-        getItem: (key) => held.get(key) ?? null,
-        setItem: (key, next) => void held.set(key, next),
-        removeItem: (key) => void held.delete(key),
-      },
-      now: () => 0,
-    },
-    read: () => held.get(CACHE_KEY) ?? null,
+    getItem: (key: string) => store.get(key) ?? null,
+    setItem: (key: string, value: string) => void store.set(key, value),
+    removeItem: (key: string) => void store.delete(key),
+    has: (key: string) => store.has(key),
   }
 }
 
+/**
+ * A session change ends what the last person left behind.
+ *
+ * Signing out on a shared tablet is the moment this matters: everything the browser is
+ * holding belonged to whoever is leaving. The cache was already forgotten here. A tick
+ * somebody reached for on the public list was not, and it is kept on disk on purpose,
+ * because signing in can take days — so it outlived the sign-out and was applied by
+ * whoever signed in next, under their name rather than the name of the person who
+ * reached for it.
+ */
 describe("starting a new session", () => {
-  it("empties the tab and the disk, not one of them", () => {
-    const client = new QueryClient()
-    client.setQueryData(["current-member"], { name: "Anna", email: "anna@brunnen.lan" })
-    const stored = storageHolding('{"at":0,"state":{"queries":[]}}')
+  it("forgets the answers the last Member saw", () => {
+    const storage = held({ [CACHE_KEY]: "{}" })
+    startNewSession(new QueryClient(), { storage, now: () => 0 })
 
-    startNewSession(client, stored.deps)
+    expect(storage.has(CACHE_KEY)).toBe(false)
+  })
 
-    expect(client.getQueryData(["current-member"])).toBeUndefined()
-    expect(stored.read(), "the next person at this browser reads this").toBeNull()
+  it("forgets a tick the last person at this browser reached for", () => {
+    const storage = held({})
+    const ticks = createPendingTickStore({ storage })
+    ticks.remember("item_bread")
+
+    startNewSession(new QueryClient(), { storage, now: () => 0 }, ticks)
+
+    expect(storage.has(PENDING_TICK_KEY)).toBe(false)
+  })
+
+  /*
+   * Which is why the two callers that mean to apply it take it first.
+   *
+   * Signing in and joining both call applyPendingTick before starting the session. The
+   * other way round, the tick is forgotten before anybody can act on it and the feature
+   * quietly does nothing, which is a thing a reordering would cause and nothing else
+   * would notice.
+   */
+  it("is too late to apply a tick after a session has started", () => {
+    const storage = held({})
+    const ticks = createPendingTickStore({ storage })
+    ticks.remember("item_bread")
+
+    startNewSession(new QueryClient(), { storage, now: () => 0 }, ticks)
+
+    expect(ticks.take()).toBe("")
   })
 })

@@ -17,6 +17,14 @@ export interface PendingTickStore {
    * the Member cannot reach that List should not be tried again on every sign-in.
    */
   take: () => string
+  /**
+   * Forgets it without applying it, for when the browser changes hands.
+   *
+   * An intention belongs to whoever had it. It outlives a tab on purpose, because
+   * signing in can take days, and that is exactly why signing out has to end it: the
+   * next person at a shared tablet did not reach for anything.
+   */
+  forget: () => void
 }
 
 export interface PendingTickStoreDeps {
@@ -44,10 +52,17 @@ export function createPendingTickStore(deps: PendingTickStoreDeps): PendingTickS
         return ""
       }
     },
+    forget() {
+      try {
+        deps.storage.removeItem(PENDING_TICK_KEY)
+      } catch {
+        // Nothing was stored, so there is nothing to end.
+      }
+    },
   }
 }
 
 export const pendingTickStore: PendingTickStore =
   typeof window === "undefined"
-    ? { remember: () => {}, take: () => "" }
+    ? { remember: () => {}, take: () => "", forget: () => {} }
     : createPendingTickStore({ storage: window.localStorage })

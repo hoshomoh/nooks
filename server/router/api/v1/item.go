@@ -92,8 +92,17 @@ func (s *ListService) UpdateItem(
 		Quantity: req.Msg.Quantity,
 		DueOn:    req.Msg.DueOn,
 		Note:     req.Msg.Note,
+		// Carried down so the comparison happens where the write does. The check above
+		// answers the ordinary case in the caller's own words; this one closes the gap
+		// between reading the Item and writing it, which is where two callers who both
+		// read the same Note would both have been let through.
+		ExpectedLabel: req.Msg.ExpectedLabel,
+		ExpectedNote:  req.Msg.ExpectedNote,
 	}
 	if err := s.store.UpdateItem(ctx, item.UID, params, s.now()); err != nil {
+		if errors.Is(err, store.ErrChangedUnderneath) {
+			return nil, errChangedWhileWriting
+		}
 		return nil, internalError("update item", err)
 	}
 	s.announceListChanged(ctx, list)
@@ -352,6 +361,18 @@ func itemToProto(item store.Item, names rowNames) *apiv1.Item {
 	}
 	return out
 }
+
+/*
+errChangedWhileWriting is what the store reports when the conditional write matched
+nothing and the Item is still there.
+
+One message for both fields, where textUnchanged has one each. The statement that
+refused can say that nothing matched and not which half, and inventing a specific answer
+after the fact would be the check guessing. This is the narrow case anyway: the caller
+already read the Item a moment earlier, so anything it can name has been named.
+*/
+var errChangedWhileWriting = connect.NewError(connect.CodeAborted,
+	errors.New("somebody else changed this while you were writing"))
 
 /*
 textUnchanged refuses a change whose text somebody else has already rewritten.

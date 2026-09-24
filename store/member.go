@@ -15,6 +15,10 @@ import (
 // with errors.Is rather than inspecting driver errors.
 var ErrNotFound = errors.New("not found")
 
+// ErrChangedUnderneath reports that a write was refused because what the caller expected
+// to find had already been changed by somebody else.
+var ErrChangedUnderneath = errors.New("changed underneath")
+
 // ErrEmailTaken reports that another Member already uses that email.
 var ErrEmailTaken = errors.New("that email already has an account")
 

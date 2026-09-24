@@ -1360,3 +1360,75 @@ func TestDatedItemsStayInsideWhatATokenNames(t *testing.T) {
 		t.Errorf("a token naming only Groceries was shown %v", labels)
 	}
 }
+
+/*
+A Note rewritten from a stale reading is refused, over the API as well as in the store.
+
+`expected_note` is for something rewriting a Note it read earlier, which is what an
+assistant does through MCP and what any script does over REST. Nothing tested it at this
+level at all: the field was read, compared, and then the write happened separately, so
+what the field promised and what the Instance did were two different things and no test
+asked.
+*/
+func TestRewritingANoteFromAStaleReadingIsRefused(t *testing.T) {
+	f := newListFixture(t)
+	listUID := f.createList(t, f.anna, "Shopping")
+	itemUID := f.addItem(t, f.anna, listUID, "Bread")
+
+	first := "what it says now"
+	if _, err := f.svc.UpdateItem(f.as(t, f.anna), connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid: itemUID, Note: &first,
+	})); err != nil {
+		t.Fatalf("UpdateItem: %v", err)
+	}
+
+	stale, mine := "what it said before", "mine"
+	_, err := f.svc.UpdateItem(f.as(t, f.anna), connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid: itemUID, Note: &mine, ExpectedNote: &stale,
+	}))
+	if connect.CodeOf(err) != connect.CodeAborted {
+		t.Fatalf("UpdateItem with a stale expectation = %v, want aborted", err)
+	}
+
+	read, err := f.svc.GetList(f.as(t, f.anna), connect.NewRequest(&apiv1.GetListRequest{
+		ListUid: listUID,
+	}))
+	if err != nil {
+		t.Fatalf("GetList: %v", err)
+	}
+	if note := read.Msg.GetItems()[0].GetNote(); note != first {
+		t.Errorf("the Note says %q, and the refused write must not have landed", note)
+	}
+}
+
+// And the ordinary case still writes, so the test above cannot pass by refusing
+// everything.
+func TestRewritingANoteFromWhatItSaysNowIsAllowed(t *testing.T) {
+	f := newListFixture(t)
+	listUID := f.createList(t, f.anna, "Shopping")
+	itemUID := f.addItem(t, f.anna, listUID, "Bread")
+
+	first := "what it says now"
+	if _, err := f.svc.UpdateItem(f.as(t, f.anna), connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid: itemUID, Note: &first,
+	})); err != nil {
+		t.Fatalf("UpdateItem: %v", err)
+	}
+
+	mine := "mine"
+	if _, err := f.svc.UpdateItem(f.as(t, f.anna), connect.NewRequest(&apiv1.UpdateItemRequest{
+		ItemUid: itemUID, Note: &mine, ExpectedNote: &first,
+	})); err != nil {
+		t.Fatalf("UpdateItem with the right expectation: %v", err)
+	}
+
+	read, err := f.svc.GetList(f.as(t, f.anna), connect.NewRequest(&apiv1.GetListRequest{
+		ListUid: listUID,
+	}))
+	if err != nil {
+		t.Fatalf("GetList: %v", err)
+	}
+	if note := read.Msg.GetItems()[0].GetNote(); note != mine {
+		t.Errorf("the Note says %q, want the write that was expected to land", note)
+	}
+}

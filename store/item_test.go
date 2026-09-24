@@ -546,3 +546,111 @@ func TestTwoItemsAddedAtOnceGetDifferentPositions(t *testing.T) {
 		})
 	}
 }
+
+/*
+Two callers who read the same Note do not both get to write it.
+
+`expected_note` exists for exactly one situation: something rewriting a Note it read
+earlier, which is what an assistant does. Checking it by reading the Item and comparing
+in Go leaves a gap between the read and the write, so two callers who read the same text
+both find what they expected and both write, and the first one's words are gone. That is
+the thing the field was added to prevent, so it is the thing worth a test.
+
+Both drivers. This is not the Postgres snapshot fault: a read and a write with anything
+at all between them has this shape on any engine.
+*/
+func TestTwoWritersWithTheSameExpectedNoteDoNotBothWin(t *testing.T) {
+	at := time.Date(2026, time.April, 1, 9, 0, 0, 0, time.UTC)
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			anna := newMember(t, s)
+			list := makeList(t, s, anna, "list_shop", "Shopping", SharingInstance)
+
+			was := "what it said before"
+			item, err := s.CreateItem(t.Context(), CreateItemParams{
+				UID: "item_one", ListID: list.ID, Label: "Thing",
+				Note: was, AddedByID: anna.ID, At: at,
+			})
+			if err != nil {
+				t.Fatalf("CreateItem: %v", err)
+			}
+
+			const writers = 6
+			start := make(chan struct{})
+			var writing sync.WaitGroup
+			won := make(chan string, writers)
+			for i := range writers {
+				writing.Add(1)
+				go func() {
+					defer writing.Done()
+					<-start
+					mine := fmt.Sprintf("rewritten by %d", i)
+					expected := was
+					err := s.UpdateItem(t.Context(), item.UID, UpdateItemParams{
+						Note: &mine, ExpectedNote: &expected,
+					}, at)
+					if err == nil {
+						won <- mine
+					}
+				}()
+			}
+			close(start)
+			writing.Wait()
+			close(won)
+
+			var winners []string
+			for one := range won {
+				winners = append(winners, one)
+			}
+			if len(winners) != 1 {
+				t.Fatalf("%d writers were told they had written, want exactly one: %v",
+					len(winners), winners)
+			}
+
+			after, err := s.ItemByUID(t.Context(), item.UID)
+			if err != nil {
+				t.Fatalf("ItemByUID: %v", err)
+			}
+			if after.Note != winners[0] {
+				t.Errorf("the Note says %q and the one writer who was told they had "+
+					"written wrote %q", after.Note, winners[0])
+			}
+		})
+	}
+}
+
+// A Note that moved is a different answer from an Item that is gone, because one is
+// worth retrying against the new text and the other is not.
+func TestAnExpectationThatFailsIsNotAMissingItem(t *testing.T) {
+	at := time.Date(2026, time.April, 1, 9, 0, 0, 0, time.UTC)
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			anna := newMember(t, s)
+			list := makeList(t, s, anna, "list_shop", "Shopping", SharingInstance)
+			item, err := s.CreateItem(t.Context(), CreateItemParams{
+				UID: "item_one", ListID: list.ID, Label: "Thing",
+				Note: "now", AddedByID: anna.ID, At: at,
+			})
+			if err != nil {
+				t.Fatalf("CreateItem: %v", err)
+			}
+
+			stale, mine := "then", "mine"
+			err = s.UpdateItem(t.Context(), item.UID, UpdateItemParams{
+				Note: &mine, ExpectedNote: &stale,
+			}, at)
+			if !errors.Is(err, ErrChangedUnderneath) {
+				t.Errorf("UpdateItem = %v, want ErrChangedUnderneath", err)
+			}
+
+			err = s.UpdateItem(t.Context(), "item_never", UpdateItemParams{
+				Note: &mine, ExpectedNote: &stale,
+			}, at)
+			if !errors.Is(err, ErrNotFound) {
+				t.Errorf("UpdateItem on nothing = %v, want ErrNotFound", err)
+			}
+		})
+	}
+}

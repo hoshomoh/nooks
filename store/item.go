@@ -181,6 +181,29 @@ func lockList(ctx context.Context, tx bun.Tx, listID int64) error {
 }
 
 /*
+whyNotUpdated says whether an update wrote nothing because the Item is gone or because
+its text moved under the caller.
+
+One statement can only report that it changed no rows. Asked afterwards, and only when
+the caller asked for the text to be checked: without an expectation the update is
+unconditional, so nothing having matched means there is nothing there.
+*/
+func (s *sqlStore) whyNotUpdated(
+	ctx context.Context,
+	uid string,
+	params UpdateItemParams,
+	missing error,
+) error {
+	if params.ExpectedLabel == nil && params.ExpectedNote == nil {
+		return missing
+	}
+	if _, err := s.ItemByUID(ctx, uid); err != nil {
+		return missing
+	}
+	return ErrChangedUnderneath
+}
+
+/*
 CreateItems adds several Items to one List at once.
 
 One position read, one insert and one transaction for the batch, so copying a List is a
@@ -343,6 +366,18 @@ type UpdateItemParams struct {
 	Quantity *string
 	DueOn    *string
 	Note     *string
+	/*
+	   ExpectedLabel and ExpectedNote make the write conditional on the text still being
+	   what the caller last read.
+
+	   Conditions on the update rather than a read before it, for the reason every other
+	   claim in this package gives: a read and then a write is two statements with a gap,
+	   and two callers who read the same Note both find what they expected and both
+	   write, which is the thing being asked for protection from. Set nothing and the
+	   write is unconditional, which is what every caller did before this existed.
+	*/
+	ExpectedLabel *string
+	ExpectedNote  *string
 }
 
 // UpdateItem changes an Item's own fields.
@@ -368,12 +403,19 @@ func (s *sqlStore) UpdateItem(ctx context.Context, uid string, params UpdateItem
 		query = query.Set("note = ?", *params.Note)
 	}
 
+	if params.ExpectedLabel != nil {
+		query = query.Where("label = ?", *params.ExpectedLabel)
+	}
+	if params.ExpectedNote != nil {
+		query = query.Where("note = ?", *params.ExpectedNote)
+	}
+
 	result, err := query.Exec(ctx)
 	if err != nil {
 		return fmt.Errorf("update item: %w", err)
 	}
 	if err := requireOneRow(result, "item"); err != nil {
-		return err
+		return s.whyNotUpdated(ctx, uid, params, err)
 	}
 
 	item, err := s.ItemByUID(ctx, uid)

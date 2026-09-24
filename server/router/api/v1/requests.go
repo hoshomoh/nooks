@@ -91,6 +91,9 @@ func (s *AuthService) RequestJoin(
 			return nil, errTooManyRequests
 		}
 		if errors.Is(err, store.ErrAlreadyWaiting) {
+			if err := s.askedAgainToJoin(ctx, msg.GetEmail()); err != nil {
+				return nil, err
+			}
 			return connect.NewResponse(&apiv1.RequestJoinResponse{RequestUid: uid}), nil
 		}
 		return nil, internalError("create join request", err)
@@ -218,6 +221,9 @@ func (s *AuthService) RequestPasswordReset(
 		// Already waiting, so the panel already carries it. The same answer as a first
 		// ask, for the same reason a missing account gets one.
 		if errors.Is(err, store.ErrAlreadyWaiting) {
+			if err := s.askedAgainToReset(ctx, member); err != nil {
+				return nil, err
+			}
 			return connect.NewResponse(&apiv1.RequestPasswordResetResponse{RequestUid: uid}), nil
 		}
 		return nil, internalError("create reset request", err)
@@ -329,3 +335,55 @@ func (s *AuthService) usableResetRequest(ctx context.Context, uid string) (store
 // about the Instance than the asker is entitled to know.
 var errRequestNotApproved = connect.NewError(connect.CodeFailedPrecondition,
 	errors.New("that request has not been approved, or is no longer valid"))
+
+/*
+Asking again reaches the Admin, and tells the asker nothing new.
+
+Somebody who asks twice is written nothing and handed an identifier with no request
+behind it, which is deliberate: the alternative hands whoever types an address the
+identifier that completes that account. The cost falls on the honest case. The browser
+remembers the identifier, so the ordinary repeat asker never sees the form, but anybody
+who cleared their storage, came from another machine, or used "ask again" gets the dead
+one while their real request waits where they cannot reach it.
+
+An Admin can unstick it by ignoring the old request. Nothing said it needed unsticking.
+So the entry already in their panel is rewritten and marked unread, which reaches the
+one person who can act and is invisible to whoever asked.
+
+The sentence is built from the stored request rather than from what was just typed. A
+repeat ask carries a name of the asker's choosing, and writing that into an Admin's
+panel would let anybody who knows an address has asked change what the Admin reads about
+it.
+*/
+func (s *AuthService) askedAgainToJoin(ctx context.Context, email string) error {
+	waiting, err := s.store.PendingJoinRequestFor(ctx, email)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			// Decided between the refusal and this read. There is nothing waiting to
+			// say anything about, and the asker is told the same thing either way.
+			return nil
+		}
+		return internalError("read the waiting join request", err)
+	}
+	if err := s.store.AskedAgain(ctx, waiting.UID, waiting.Name+" asked to join, and has asked again"); err != nil {
+		return internalError("record that they asked to join again", err)
+	}
+	return nil
+}
+
+// askedAgainToReset is askedAgainToJoin for a password reset, where the Member is
+// already known and the name is theirs rather than anything typed into the form.
+func (s *AuthService) askedAgainToReset(ctx context.Context, member store.Member) error {
+	waiting, err := s.store.PendingResetRequestFor(ctx, member.ID)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			return nil
+		}
+		return internalError("read the waiting reset request", err)
+	}
+	text := member.Name + " asked again for a password reset — check it is them, then approve"
+	if err := s.store.AskedAgain(ctx, waiting.UID, text); err != nil {
+		return internalError("record that they asked for a reset again", err)
+	}
+	return nil
+}

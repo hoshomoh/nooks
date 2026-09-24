@@ -151,6 +151,13 @@ type Store interface {
 	// when the queue is full.
 	CreateJoinRequest(ctx context.Context, params CreateJoinRequestParams) (JoinRequest, error)
 
+	// PendingJoinRequestFor is the request an address is already waiting on, or
+	// ErrNotFound where there is none.
+	PendingJoinRequestFor(ctx context.Context, email string) (JoinRequest, error)
+
+	// PendingResetRequestFor is the reset a Member is already waiting on, or ErrNotFound.
+	PendingResetRequestFor(ctx context.Context, memberID int64) (ResetRequest, error)
+
 	// DeleteDecidedRequests clears out requests answered before the given moment, and
 	// reports how many went. One nobody has answered is never touched.
 	DeleteDecidedRequests(ctx context.Context, before time.Time) (int64, error)
@@ -315,6 +322,10 @@ type Store interface {
 
 	// MarkActivityRead marks everything a Member has now seen.
 	MarkActivityRead(ctx context.Context, memberID int64, at time.Time) error
+
+	// AskedAgain rewrites the entries waiting on one request, for somebody who asked
+	// for the same thing twice, and marks them unread again.
+	AskedAgain(ctx context.Context, targetUID, text string) error
 
 	// ResolveActivity records what became of everything pointing at one request.
 	ResolveActivity(ctx context.Context, targetUID string, outcome Outcome) error

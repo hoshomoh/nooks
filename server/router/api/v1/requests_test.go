@@ -3,6 +3,7 @@ package v1
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -546,4 +547,125 @@ func TestOneMemberResetsOnce(t *testing.T) {
 	if len(waiting) != 1 {
 		t.Errorf("%d resets waiting, want one", len(waiting))
 	}
+}
+
+/*
+Asking again reaches the Admin, who is the only person who can unstick it.
+
+The second ask writes nothing and hands back an identifier with no request behind it,
+which is deliberate and stays. What was missing is that nobody was told: the asker's
+real request waits where they cannot reach it, an Admin can free it by ignoring the old
+one, and nothing on any screen said so.
+
+The name is checked against the stored request rather than what the second ask typed.
+Anybody who knows an address has asked could otherwise write a sentence of their own
+choosing into an Admin's panel.
+*/
+func TestAskingToJoinAgainTellsTheAdmin(t *testing.T) {
+	svc, s := newAuthService(t)
+	completeSetup(t, svc)
+
+	admins, err := s.AdminIDs(t.Context())
+	if err != nil || len(admins) == 0 {
+		t.Fatalf("AdminIDs = %v, %v", admins, err)
+	}
+	admin := admins[0]
+
+	first, err := askToJoin(t, svc, "til@example.com")
+	if err != nil {
+		t.Fatalf("RequestJoin: %v", err)
+	}
+	if err := s.MarkActivityRead(t.Context(), admin, testClock); err != nil {
+		t.Fatalf("MarkActivityRead: %v", err)
+	}
+
+	if _, err := svc.RequestJoin(t.Context(), connect.NewRequest(&apiv1.RequestJoinRequest{
+		Name: "Someone Else", Email: "til@example.com", Message: "again",
+	})); err != nil {
+		t.Fatalf("RequestJoin again: %v", err)
+	}
+
+	entries, err := s.ActivityFor(t.Context(), admin)
+	if err != nil {
+		t.Fatalf("ActivityFor: %v", err)
+	}
+
+	var found *store.Activity
+	for i, entry := range entries {
+		if entry.TargetUID == first {
+			found = &entries[i]
+		}
+	}
+	if found == nil {
+		t.Fatalf("no entry points at the waiting request, out of %d", len(entries))
+	}
+	if !strings.Contains(found.Text, "asked again") {
+		t.Errorf("the Admin still reads %q, which does not say they asked again", found.Text)
+	}
+	if strings.Contains(found.Text, "Someone Else") {
+		t.Errorf("the second ask wrote its own name into the panel: %q", found.Text)
+	}
+	if !found.ReadAt.IsZero() {
+		t.Error("asking again left the entry read, so nothing puts it back in front of anybody")
+	}
+
+	// Still one request, and still nothing behind the identifier handed back.
+	waiting, err := s.PendingJoinRequests(t.Context())
+	if err != nil {
+		t.Fatalf("PendingJoinRequests: %v", err)
+	}
+	if len(waiting) != 1 {
+		t.Errorf("%d requests waiting, want one", len(waiting))
+	}
+}
+
+// A second ask for a password reset reaches the Admin the same way, for the same reason:
+// the asker is handed a dead identifier and the person who can free them is the only one
+// worth telling.
+func TestAskingForAResetAgainTellsTheAdmin(t *testing.T) {
+	svc, s := newAuthService(t)
+	completeSetup(t, svc)
+
+	admins, err := s.AdminIDs(t.Context())
+	if err != nil || len(admins) == 0 {
+		t.Fatalf("AdminIDs = %v, %v", admins, err)
+	}
+	admin := admins[0]
+
+	ask := func() string {
+		t.Helper()
+		res, err := svc.RequestPasswordReset(t.Context(),
+			connect.NewRequest(&apiv1.RequestPasswordResetRequest{EmailOrName: "anna@brunnen.lan"}))
+		if err != nil {
+			t.Fatalf("RequestPasswordReset: %v", err)
+		}
+		return res.Msg.GetRequestUid()
+	}
+
+	first := ask()
+	if err := s.MarkActivityRead(t.Context(), admin, testClock); err != nil {
+		t.Fatalf("MarkActivityRead: %v", err)
+	}
+	second := ask()
+	if second == first {
+		t.Error("asking again handed back the first identifier, which resets that account")
+	}
+
+	entries, err := s.ActivityFor(t.Context(), admin)
+	if err != nil {
+		t.Fatalf("ActivityFor: %v", err)
+	}
+	for _, entry := range entries {
+		if entry.TargetUID != first {
+			continue
+		}
+		if !strings.Contains(entry.Text, "asked again") {
+			t.Errorf("the Admin reads %q, which does not say they asked again", entry.Text)
+		}
+		if !entry.ReadAt.IsZero() {
+			t.Error("asking again left the entry read")
+		}
+		return
+	}
+	t.Fatalf("no entry points at the waiting reset, out of %d", len(entries))
 }

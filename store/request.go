@@ -141,6 +141,48 @@ func (s *sqlStore) CreateJoinRequest(ctx context.Context, params CreateJoinReque
 	return s.JoinRequestByUID(ctx, params.UID)
 }
 
+/*
+PendingJoinRequestFor is the request an address is already waiting on.
+
+ErrNotFound where there is none. Read by the caller that has just been refused for
+asking twice, so it can reach the entry an Admin is already looking at rather than make
+a second one.
+*/
+func (s *sqlStore) PendingJoinRequestFor(ctx context.Context, email string) (JoinRequest, error) {
+	var row joinRequestModel
+	err := s.db.NewSelect().
+		Model(&row).
+		Where("email = ? AND status = ?", normaliseEmail(email), string(StatusPending)).
+		Order("created_at ASC", "id ASC").
+		Limit(1).
+		Scan(ctx)
+	if errors.Is(err, sql.ErrNoRows) {
+		return JoinRequest{}, ErrNotFound
+	}
+	if err != nil {
+		return JoinRequest{}, fmt.Errorf("read the join request this email is waiting on: %w", err)
+	}
+	return row.toJoinRequest()
+}
+
+// PendingResetRequestFor is the reset a Member is already waiting on, or ErrNotFound.
+func (s *sqlStore) PendingResetRequestFor(ctx context.Context, memberID int64) (ResetRequest, error) {
+	var row resetRequestModel
+	err := s.db.NewSelect().
+		Model(&row).
+		Where("member_id = ? AND status = ?", memberID, string(StatusPending)).
+		Order("created_at ASC", "id ASC").
+		Limit(1).
+		Scan(ctx)
+	if errors.Is(err, sql.ErrNoRows) {
+		return ResetRequest{}, ErrNotFound
+	}
+	if err != nil {
+		return ResetRequest{}, fmt.Errorf("read the reset request this member is waiting on: %w", err)
+	}
+	return row.toResetRequest()
+}
+
 // whyNotJoined says which of the two rules refused a request, read after the fact
 // because one statement can only report that it wrote nothing.
 func (s *sqlStore) whyNotJoined(ctx context.Context, email string) error {

@@ -237,6 +237,33 @@ func (s *sqlStore) ResolveActivity(ctx context.Context, targetUID string, outcom
 	return nil
 }
 
+/*
+AskedAgain says a waiting request has been asked about a second time.
+
+Every Admin has their own row for the same request, so all of them are rewritten: the
+one who looks next should see it whoever that is. The row is marked unread again, which
+is what puts it back in front of somebody.
+
+`created_at` is deliberately left alone. It says when the request was made, and moving
+it to the top of a panel that reads newest first would be the panel telling a small lie
+about when somebody asked. What changes is the sentence and the unread mark.
+
+Only an entry nobody has decided is touched. A request that was answered is history, and
+history does not become unread because a stranger typed an address again.
+*/
+func (s *sqlStore) AskedAgain(ctx context.Context, targetUID, text string) error {
+	_, err := s.db.NewUpdate().
+		Model((*activityModel)(nil)).
+		Set("text = ?", text).
+		Set("read_at = ?", "").
+		Where("target_uid = ? AND outcome = ''", targetUID).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("record that it was asked again: %w", err)
+	}
+	return nil
+}
+
 // AdminIDs lists the Members who can act on a request. Join and Reset requests go to
 // every Admin, so the sender does not depend on one person being awake.
 func (s *sqlStore) AdminIDs(ctx context.Context) ([]int64, error) {

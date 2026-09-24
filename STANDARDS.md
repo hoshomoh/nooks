@@ -13,8 +13,13 @@ first learning our abstractions.**
 ## 1. Architecture
 
 **Single responsibility.** Each function, type, or package does exactly one thing and has one reason to
-change. A `store` package persists; it does not decide policy. A service method decides policy; it does
-not format HTTP.
+change. A service method decides policy; it does not format HTTP.
+
+`store` persists, and holds the numbers its own statements have to enforce: how many
+entries a panel draws, how many requests may wait, how long something answered is kept.
+They are there because that is where they are applied — inside a window function, inside
+an insert's own condition — and a number passed in to be enforced somewhere else is a
+number two places have to agree about. What `store` does not do is decide who may ask.
 
 **KISS.** No abstract framework, no plugin system, no premature optimisation, unless a task explicitly
 calls for it. Two similar call sites do not justify an abstraction — the third might. Prefer the
@@ -101,10 +106,13 @@ what became of the Member's work. Never "Something went wrong".
 
 ## 5. Frontend specifics
 
-Both apps. Most of what follows is about `apps/web`, because most of the frontend is, and
-the paths below are its. The rules that are about TypeScript rather than about the app —
-named types, and no English written into a component — hold in `apps/website` too. It is
-in this repository and nothing exempts it.
+Both apps, where the rule is about TypeScript. Most of what follows is about `apps/web`,
+because most of the frontend is, and the paths below are its. Named types hold in
+`apps/website` as well: it is in this repository and nothing exempts it.
+
+The locale rule does not, and could not. It is about a Member reading a screen in their
+own language, and the website has no Members and no languages — its words are the
+content. `apps/web/src/i18n` is the app's.
 
 **Generated shadcn components are never edited.** `src/components/ui/` is output from
 `pnpm dlx shadcn@latest add <component>` and must stay byte-for-byte what the generator

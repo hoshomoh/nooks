@@ -46,6 +46,33 @@ describe("what a Note draws", () => {
     expect(container.textContent).not.toContain("- [")
   })
 
+  /*
+   * The editor is the other place a Note is drawn, and the only one that draws real
+   * anchors: the preview draws spans, so an address there has nowhere to be an address.
+   *
+   * What refuses a hostile scheme here is TipTap, not anything written in this
+   * repository, which `note-preview.test.tsx` said in a comment and nothing checked. A
+   * dependency default is a fine thing to rely on and a poor thing to assume: this is
+   * here so that the day it changes is a failing test rather than a live
+   * `javascript:` link in somebody's Note.
+   */
+  it("gives a hostile address nowhere to be an address", () => {
+    const container = show("[click me](javascript:alert(1))")
+
+    expect(container.textContent).toContain("click me")
+    for (const anchor of container.querySelectorAll("a")) {
+      expect(anchor.getAttribute("href") ?? "").not.toContain("javascript:")
+    }
+    expect(container.innerHTML).not.toContain("javascript:")
+  })
+
+  // The ordinary case, so the test above cannot pass by the editor drawing no links.
+  it("draws an ordinary address as a link", () => {
+    const container = show("[the shop](https://nooks.example)")
+
+    expect(container.querySelector("a")?.getAttribute("href")).toBe("https://nooks.example")
+  })
+
   it("says what an empty Note is for", () => {
     const container = show("")
     expect(container.querySelector("[data-placeholder]")).not.toBeNull()

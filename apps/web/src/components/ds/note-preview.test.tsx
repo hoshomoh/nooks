@@ -35,9 +35,14 @@ describe("a Note on a row", () => {
    * reaches, and markdown will carry any address at all.
    *
    * `documentFrom` keeps `javascript:` in the document — it parses, it does not sanitise
-   * — so what stops it being a live anchor is that this draws spans. TipTap's own render
-   * refuses a disallowed scheme too, and the editor is the only other place a Note is
-   * drawn, but that is a dependency's default rather than anything written down here.
+   * — so what stops it being a live anchor is that this draws spans.
+   *
+   * The editor is the only other place a Note is drawn and it draws real anchors, where
+   * what refuses the scheme is TipTap rather than anything written here. That used to be
+   * an assumption and is now checked: note-editor.test.tsx has the same case, "gives a
+   * hostile address nowhere to be an address", and it fails the day the dependency
+   * changes its mind. Adding one protocol to the link extension is enough to make the
+   * address live, which is why it is pinned rather than trusted.
    */
   it("gives a hostile address nowhere to be an address", () => {
     const { container } = render(

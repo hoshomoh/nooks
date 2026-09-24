@@ -70,31 +70,6 @@ func (s *sqlStore) Groups(ctx context.Context) ([]Group, error) {
 	return groups, nil
 }
 
-// AddToGroup puts a Member in a Group. Adding twice is not an error.
-func (s *sqlStore) addToGroup(ctx context.Context, groupID, memberID int64) error {
-	_, err := s.db.NewInsert().
-		Model(&groupMemberModel{GroupID: groupID, MemberID: memberID}).
-		On("CONFLICT (group_id, member_id) DO NOTHING").
-		Exec(ctx)
-	if err != nil {
-		return fmt.Errorf("add to group: %w", err)
-	}
-	return nil
-}
-
-// RemoveFromGroup takes a Member out of a Group, and with it the Lists they reached
-// through it.
-func (s *sqlStore) removeFromGroup(ctx context.Context, groupID, memberID int64) error {
-	_, err := s.db.NewDelete().
-		Model((*groupMemberModel)(nil)).
-		Where("group_id = ? AND member_id = ?", groupID, memberID).
-		Exec(ctx)
-	if err != nil {
-		return fmt.Errorf("remove from group: %w", err)
-	}
-	return nil
-}
-
 // ReplaceGroupMembers sets exactly who is in a Group, replacing whoever was there.
 //
 // Membership is one decision for the same reason sharing is: an Admin picks the people

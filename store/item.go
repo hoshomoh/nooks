@@ -546,24 +546,6 @@ func (s *sqlStore) indexNote(ctx context.Context, item Item) error {
 	})
 }
 
-// nextPosition is one gap past the last Item on the List.
-//
-// MAX is scanned as nullable rather than wrapped in COALESCE: SQLite types the literal
-// in COALESCE(MAX(position), 0) as an integer and then refuses to scan it into a float,
-// while an empty result is exactly what NULL already means.
-func (s *sqlStore) nextPosition(ctx context.Context, listID int64) (float64, error) {
-	var last sql.NullFloat64
-	err := s.db.NewSelect().
-		Model((*itemModel)(nil)).
-		ColumnExpr("MAX(position)").
-		Where("list_id = ? AND deleted_at = ''", listID).
-		Scan(ctx, &last)
-	if err != nil {
-		return 0, fmt.Errorf("read last position: %w", err)
-	}
-	return last.Float64 + positionGap, nil
-}
-
 func toItems(rows []itemModel) ([]Item, error) {
 	items := make([]Item, 0, len(rows))
 	for _, row := range rows {

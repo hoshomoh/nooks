@@ -431,6 +431,10 @@ English wherever it was read. The reference is how whoever runs the Instance fin
 matching log line, which on a machine they own is a thing they can actually do.
 */
 func internalError(what string, err error) error {
+	if store.Busy(err) {
+		return contendedError(what, err)
+	}
+
 	ref := newErrorRef()
 	kind := kindOf(what)
 	slog.Error("request failed", "doing", what, "kind", kind, "ref", ref, "error", err)
@@ -440,6 +444,34 @@ func internalError(what string, err error) error {
 	// can quote rather than a bare code.
 	failure := connect.NewError(connect.CodeInternal,
 		fmt.Errorf("could not %s (ref %s)", what, ref))
+	failure.Meta().Set(errorKindHeader, kind)
+	failure.Meta().Set(errorRefHeader, ref)
+	return failure
+}
+
+/*
+contendedError is what a caller is told when something else held the lock.
+
+Everything else reaching internalError means the Instance is broken, and CodeInternal
+says exactly that: do not try this again, it will not work. A lock held for a moment is
+not that. It is the database doing its job, and a caller told the server is broken will
+stop rather than retry, which is how a delay becomes a lost write.
+
+CodeUnavailable is the standard word for temporary, so a script or an assistant knows
+what to do with it without anybody writing retry logic for them. The app is deliberately
+unchanged: the kind stays whatever the description says, so the Member reads the same
+sentence they read now. Keeping what they typed is a separate question and a harder one.
+
+Logged at warning rather than error. Contention is not a fault, and an error log that
+fills with it buries the things that are.
+*/
+func contendedError(what string, err error) error {
+	ref := newErrorRef()
+	kind := kindOf(what)
+	slog.Warn("request contended", "doing", what, "kind", kind, "ref", ref, "error", err)
+
+	failure := connect.NewError(connect.CodeUnavailable,
+		fmt.Errorf("could not %s because something else was writing, try again (ref %s)", what, ref))
 	failure.Meta().Set(errorKindHeader, kind)
 	failure.Meta().Set(errorRefHeader, ref)
 	return failure

@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"database/sql"
 	"errors"
 	"go/ast"
 	"go/parser"
@@ -231,4 +232,82 @@ func TestEveryWrittenFieldIsBounded(t *testing.T) {
 			t.Errorf("code = %v, want invalid_argument", got)
 		}
 	})
+}
+
+/*
+A lock held for a moment is not the Instance being broken.
+
+CodeInternal means do not retry, and a caller that believes it will drop the write
+rather than try again a second later. So the one failure worth retrying has to arrive
+saying so, or every non-browser caller does the wrong thing with it.
+
+Driven with a real SQLITE_BUSY rather than a stand-in. `*sqlite.Error` keeps its code
+unexported and only the driver builds one, and a test that fabricates the error it is
+checking for proves the fabrication.
+*/
+func TestAContendedWriteIsToldToTryAgain(t *testing.T) {
+	failure := internalError("update item", heldLock(t))
+
+	var connectErr *connect.Error
+	if !errors.As(failure, &connectErr) {
+		t.Fatalf("internalError returned %T, want a connect error", failure)
+	}
+	if connectErr.Code() != connect.CodeUnavailable {
+		t.Errorf("a contended write came back as %v, want %v",
+			connectErr.Code(), connect.CodeUnavailable)
+	}
+	if !strings.Contains(connectErr.Message(), "try again") {
+		t.Errorf("a contended write says %q, which does not tell the caller to try again",
+			connectErr.Message())
+	}
+	// The app reads the kind, not the code, and it should read what it read before.
+	if got := connectErr.Meta().Get(errorKindHeader); got != kindSaveFailed {
+		t.Errorf("a contended write is kind %q, want %q", got, kindSaveFailed)
+	}
+
+	// The same funnel still calls everything else broken.
+	ordinary := internalError("update item", errors.New("disk on fire"))
+	if !errors.As(ordinary, &connectErr) {
+		t.Fatalf("internalError returned %T, want a connect error", ordinary)
+	}
+	if connectErr.Code() != connect.CodeInternal {
+		t.Errorf("an ordinary failure came back as %v, want %v",
+			connectErr.Code(), connect.CodeInternal)
+	}
+}
+
+// heldLock is a real SQLITE_BUSY, made by writing to a database another connection is
+// already writing to with nothing willing to wait.
+func heldLock(t *testing.T) error {
+	t.Helper()
+
+	path := filepath.Join(t.TempDir(), "contended.db")
+	dsn := "file:" + path + "?_pragma=busy_timeout(0)"
+
+	held, err := sql.Open("sqlite", dsn)
+	if err != nil {
+		t.Fatalf("open the holder: %v", err)
+	}
+	t.Cleanup(func() { _ = held.Close() })
+
+	tx, err := held.BeginTx(t.Context(), nil)
+	if err != nil {
+		t.Fatalf("begin: %v", err)
+	}
+	t.Cleanup(func() { _ = tx.Rollback() })
+	if _, err := tx.ExecContext(t.Context(), "CREATE TABLE probe_held (x)"); err != nil {
+		t.Fatalf("take the write lock: %v", err)
+	}
+
+	other, err := sql.Open("sqlite", dsn)
+	if err != nil {
+		t.Fatalf("open the second connection: %v", err)
+	}
+	t.Cleanup(func() { _ = other.Close() })
+
+	_, err = other.ExecContext(t.Context(), "CREATE TABLE probe_waiting (x)")
+	if err == nil {
+		t.Fatal("the second write succeeded while the lock was held")
+	}
+	return err
 }

@@ -407,11 +407,11 @@ every limit, so the optional fields pass this without being asked whether they w
 sent.
 */
 func itemTextWithinLimits(label, quantity, note string) error {
-	if err := withinLimit(label, "an item", limitItemLabel); err != nil {
+	if err := withinLimit(label, "an item", LimitItemLabel); err != nil {
 		return err
 	}
-	if err := withinLimit(quantity, "a quantity", limitItemQuantity); err != nil {
+	if err := withinLimit(quantity, "a quantity", LimitItemQuantity); err != nil {
 		return err
 	}
-	return withinLimit(note, "a note", limitItemNote)
+	return withinLimit(note, "a note", LimitItemNote)
 }

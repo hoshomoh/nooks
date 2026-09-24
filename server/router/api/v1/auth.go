@@ -276,13 +276,13 @@ func (s *AuthService) checkSetupIsOpen(ctx context.Context, msg *apiv1.CompleteS
 	if err := requireText(msg.GetInstanceName(), "a name for this instance"); err != nil {
 		return err
 	}
-	if err := withinLimit(msg.GetName(), "a name", limitMemberName); err != nil {
+	if err := withinLimit(msg.GetName(), "a name", LimitMemberName); err != nil {
 		return err
 	}
-	if err := withinLimit(msg.GetEmail(), "an email", limitMemberEmail); err != nil {
+	if err := withinLimit(msg.GetEmail(), "an email", LimitMemberEmail); err != nil {
 		return err
 	}
-	return withinLimit(msg.GetInstanceName(), "an instance name", limitInstanceName)
+	return withinLimit(msg.GetInstanceName(), "an instance name", LimitInstanceName)
 }
 
 // createMemberInput is what createMember needs, kept separate so the signature does not
@@ -529,17 +529,17 @@ Counted in characters rather than bytes, because that is what the number means t
 whoever is typing. Storage is already bounded by the request cap above.
 */
 const (
-	limitItemLabel    = 500
-	limitItemQuantity = 50
-	limitItemNote     = 64_000
-	limitListName     = 200
-	limitMemberName   = 100
+	LimitItemLabel    = 500
+	LimitItemQuantity = 50
+	LimitItemNote     = 64_000
+	LimitListName     = 200
+	LimitMemberName   = 100
 	// The longest an address can be, from RFC 5321. Not a judgement.
-	limitMemberEmail  = 254
-	limitGroupName    = 200
-	limitTokenName    = 200
-	limitInstanceName = 200
-	limitJoinMessage  = 1_000
+	LimitMemberEmail  = 254
+	LimitGroupName    = 200
+	LimitTokenName    = 200
+	LimitInstanceName = 200
+	LimitJoinMessage  = 1_000
 )
 
 // withinLimit rejects a field longer than a Member could have meant, naming the number

@@ -54,8 +54,10 @@ type moveItemArgs struct {
 // addItemTools registers what can be done to what is on a List.
 func addItemTools(server *sdk.Server, lists *v1.ListService) {
 	sdk.AddTool(server, &sdk.Tool{
-		Name:        "add_item",
-		Description: "Put something on a list. Refused when the caller's token may only read.",
+		Name: "add_item",
+		Description: fmt.Sprintf("Put something on a list. A label is at most %d "+
+			"characters and a quantity %d. Refused when the caller's token may only read.",
+			v1.LimitItemLabel, v1.LimitItemQuantity),
 	}, func(ctx context.Context, _ *sdk.CallToolRequest, args addItemArgs) (*sdk.CallToolResult, any, error) {
 		return answer(ctx, lists.CreateItem, &apiv1.CreateItemRequest{
 			ListUid: args.ListUID, Label: args.Label,
@@ -66,8 +68,13 @@ func addItemTools(server *sdk.Server, lists *v1.ListService) {
 	})
 
 	sdk.AddTool(server, &sdk.Tool{
-		Name:        "update_item",
-		Description: "Change an item's wording, quantity, due date or note. Omitted fields are left alone. Notes are markdown, but only the blocks the app draws: paragraphs, ### headings, - [ ] checklists, > quotes, fenced code, tables and --- rules. Bullet and numbered lists are not rendered.",
+		Name: "update_item",
+		Description: fmt.Sprintf("Change an item's wording, quantity, due date or note. "+
+			"Omitted fields are left alone. A label is at most %d characters, a quantity "+
+			"%d and a note %d. Notes are markdown, but only the blocks the app draws: "+
+			"paragraphs, ### headings, - [ ] checklists, > quotes, fenced code, tables "+
+			"and --- rules. Bullet and numbered lists are not rendered.",
+			v1.LimitItemLabel, v1.LimitItemQuantity, v1.LimitItemNote),
 	}, func(ctx context.Context, _ *sdk.CallToolRequest, args updateItemArgs) (*sdk.CallToolResult, any, error) {
 		return answer(ctx, lists.UpdateItem, &apiv1.UpdateItemRequest{
 			ItemUid: args.ItemUID, Label: args.Label,

@@ -23,6 +23,11 @@ against the service methods rather than against a list kept here.
 Arguments are described on the structs rather than in a schema file: the SDK reads
 those and writes the JSON Schema, so the description an assistant reads and the field a
 handler uses cannot drift apart.
+
+How much a field holds is the exception, and is written on the tool rather than on the
+field. A struct tag is a constant, so the only way to say five hundred there is to copy
+it, and a copied limit is one that goes quietly wrong the day somebody changes the
+number that does the refusing.
 */
 func addTools(server *sdk.Server, services v1.Services) {
 	addListTools(server, services.List)

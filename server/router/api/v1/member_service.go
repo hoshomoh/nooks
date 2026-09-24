@@ -108,7 +108,7 @@ func (s *MemberService) CreateGroup(
 	if name == "" {
 		return nil, errGroupNameRequired
 	}
-	if err := withinLimit(name, "a group name", limitGroupName); err != nil {
+	if err := withinLimit(name, "a group name", LimitGroupName); err != nil {
 		return nil, err
 	}
 
@@ -251,10 +251,10 @@ func (s *MemberService) AddMember(
 	if err := requireText(name, "a name"); err != nil {
 		return nil, err
 	}
-	if err := withinLimit(name, "a name", limitMemberName); err != nil {
+	if err := withinLimit(name, "a name", LimitMemberName); err != nil {
 		return nil, err
 	}
-	if err := withinLimit(email, "an email", limitMemberEmail); err != nil {
+	if err := withinLimit(email, "an email", LimitMemberEmail); err != nil {
 		return nil, err
 	}
 	if err := requireText(email, "an email"); err != nil {
@@ -510,10 +510,10 @@ func (s *MemberService) UpdateOwnProfile(
 		return nil, err
 	}
 	email := strings.TrimSpace(req.Msg.GetEmail())
-	if err := withinLimit(name, "a name", limitMemberName); err != nil {
+	if err := withinLimit(name, "a name", LimitMemberName); err != nil {
 		return nil, err
 	}
-	if err := withinLimit(email, "an email", limitMemberEmail); err != nil {
+	if err := withinLimit(email, "an email", LimitMemberEmail); err != nil {
 		return nil, err
 	}
 	if err := requireText(email, "an email"); err != nil {

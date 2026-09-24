@@ -86,7 +86,7 @@ func (s *InstanceService) UpdateInstanceSettings(
 
 	wanted := req.Msg.GetSettings()
 	name := strings.TrimSpace(wanted.GetName())
-	if err := withinLimit(name, "an instance name", limitInstanceName); err != nil {
+	if err := withinLimit(name, "an instance name", LimitInstanceName); err != nil {
 		return nil, err
 	}
 	if err := requireText(name, "a name"); err != nil {

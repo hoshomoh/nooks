@@ -154,9 +154,9 @@ func TestEveryWrittenFieldIsBounded(t *testing.T) {
 			what string
 			req  *apiv1.CreateItemRequest
 		}{
-			{"label", &apiv1.CreateItemRequest{ListUid: uid, Label: over(limitItemLabel)}},
+			{"label", &apiv1.CreateItemRequest{ListUid: uid, Label: over(LimitItemLabel)}},
 			{"quantity", &apiv1.CreateItemRequest{
-				ListUid: uid, Label: "Bread", Quantity: over(limitItemQuantity),
+				ListUid: uid, Label: "Bread", Quantity: over(LimitItemQuantity),
 			}},
 		} {
 			t.Run(one.what, func(t *testing.T) {
@@ -174,7 +174,7 @@ func TestEveryWrittenFieldIsBounded(t *testing.T) {
 			if err != nil {
 				t.Fatalf("CreateItem: %v", err)
 			}
-			note := over(limitItemNote)
+			note := over(LimitItemNote)
 			_, err = f.svc.UpdateItem(f.as(t, f.anna), connect.NewRequest(
 				&apiv1.UpdateItemRequest{ItemUid: item.Msg.GetItem().GetUid(), Note: &note},
 			))
@@ -187,7 +187,7 @@ func TestEveryWrittenFieldIsBounded(t *testing.T) {
 	t.Run("list name", func(t *testing.T) {
 		f := newListFixture(t)
 		_, err := f.svc.CreateList(f.as(t, f.anna), connect.NewRequest(
-			&apiv1.CreateListRequest{Name: over(limitListName)},
+			&apiv1.CreateListRequest{Name: over(LimitListName)},
 		))
 		if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
 			t.Errorf("code = %v, want invalid_argument", got)
@@ -200,13 +200,13 @@ func TestEveryWrittenFieldIsBounded(t *testing.T) {
 			req  *apiv1.RequestJoinRequest
 		}{
 			{"name", &apiv1.RequestJoinRequest{
-				Name: over(limitMemberName), Email: "til@example.com",
+				Name: over(LimitMemberName), Email: "til@example.com",
 			}},
 			{"email", &apiv1.RequestJoinRequest{
-				Name: "Til", Email: over(limitMemberEmail),
+				Name: "Til", Email: over(LimitMemberEmail),
 			}},
 			{"message", &apiv1.RequestJoinRequest{
-				Name: "Til", Email: "til@example.com", Message: over(limitJoinMessage),
+				Name: "Til", Email: "til@example.com", Message: over(LimitJoinMessage),
 			}},
 		} {
 			t.Run(one.what, func(t *testing.T) {
@@ -225,7 +225,7 @@ func TestEveryWrittenFieldIsBounded(t *testing.T) {
 		svc, _ := newAuthService(t)
 		_, err := svc.CompleteSetup(t.Context(), connect.NewRequest(&apiv1.CompleteSetupRequest{
 			Name: "Anna", Email: "anna@brunnen.lan", Password: goodPassword,
-			InstanceName: over(limitInstanceName),
+			InstanceName: over(LimitInstanceName),
 		}))
 		if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
 			t.Errorf("code = %v, want invalid_argument", got)

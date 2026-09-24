@@ -112,8 +112,9 @@ func addListTools(server *sdk.Server, lists *v1.ListService) {
 	})
 
 	sdk.AddTool(server, &sdk.Tool{
-		Name:        "create_list",
-		Description: "Start a new list. Refused when the caller's token may only read.",
+		Name: "create_list",
+		Description: fmt.Sprintf("Start a new list. A name is at most %d characters. "+
+			"Refused when the caller's token may only read.", v1.LimitListName),
 	}, func(ctx context.Context, _ *sdk.CallToolRequest, args createListArgs) (*sdk.CallToolResult, any, error) {
 		return answer(ctx, lists.CreateList, &apiv1.CreateListRequest{Name: args.Name},
 			func(res *apiv1.CreateListResponse) string {
@@ -122,8 +123,9 @@ func addListTools(server *sdk.Server, lists *v1.ListService) {
 	})
 
 	sdk.AddTool(server, &sdk.Tool{
-		Name:        "rename_list",
-		Description: "Rename a list. Only its owner may, and only with a token that may write.",
+		Name: "rename_list",
+		Description: fmt.Sprintf("Rename a list. A name is at most %d characters. Only "+
+			"its owner may, and only with a token that may write.", v1.LimitListName),
 	}, func(ctx context.Context, _ *sdk.CallToolRequest, args renameListArgs) (*sdk.CallToolResult, any, error) {
 		return answer(ctx, lists.RenameList,
 			&apiv1.RenameListRequest{ListUid: args.ListUID, Name: args.Name},

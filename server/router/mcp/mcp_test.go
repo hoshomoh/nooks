@@ -482,3 +482,38 @@ func TestARewrittenNoteCanBeRefused(t *testing.T) {
 		t.Errorf("Note = %q, want the one that was there", item.Note)
 	}
 }
+
+/*
+A word a tool will not take is answered with every word it would have.
+
+`statusWords` grew `deleted` so an assistant could find a list inside the thirty days it
+can be restored, and the error kept naming the three it had before. That is worse than
+unhelpful: the word left out is the one that finds a deleted list, so an assistant sent
+looking for restore_list was told the way in did not exist.
+
+Driven through a session and checked against the map rather than against a sentence
+written here, so a word added later has to reach the message on its own.
+*/
+func TestARefusedWordIsToldTheOnesThatWork(t *testing.T) {
+	i := newInstance(t)
+	session := i.connect(i.tokenFor(store.TokenAbilities{Read: true}))
+
+	res, err := session.CallTool(t.Context(), &sdk.CallToolParams{
+		Name: "list_lists", Arguments: map[string]any{"status": "binned"},
+	})
+	if err != nil {
+		t.Fatalf("CallTool: %v", err)
+	}
+	if !res.IsError {
+		t.Fatalf("list_lists took a status it does not have: %q", said(res))
+	}
+
+	for word := range statusWords {
+		if word == "" {
+			continue
+		}
+		if !strings.Contains(said(res), word) {
+			t.Errorf("refusing binned never named %q: %s", word, said(res))
+		}
+	}
+}

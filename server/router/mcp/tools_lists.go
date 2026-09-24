@@ -2,8 +2,9 @@ package mcp
 
 import (
 	"context"
-
 	"fmt"
+	"slices"
+	"strings"
 
 	sdk "github.com/modelcontextprotocol/go-sdk/mcp"
 
@@ -73,12 +74,12 @@ func addListTools(server *sdk.Server, lists *v1.ListService) {
 		status, ok := statusWords[args.Status]
 		if !ok {
 			return errorText(fmt.Errorf(
-				"status must be active, completed or archived, not %q", args.Status)), nil, nil
+				"status must be %s, not %q", oneOf(statusWords), args.Status)), nil, nil
 		}
 		order, ok := orderWords[args.Order]
 		if !ok {
 			return errorText(fmt.Errorf(
-				"order must be updated, name or open, not %q", args.Order)), nil, nil
+				"order must be %s, not %q", oneOf(orderWords), args.Order)), nil, nil
 		}
 		return answer(ctx, lists.ListLists, &apiv1.ListListsRequest{
 			Page: int32(args.Page), Status: status, Order: order,
@@ -191,4 +192,30 @@ func addListTools(server *sdk.Server, lists *v1.ListService) {
 				return fmt.Sprintf("Restored %q.", res.GetList().GetName())
 			})
 	})
+}
+
+/*
+oneOf names the words a map accepts, for an error that has to say what it would have
+taken.
+
+Written out by hand, this went stale. `statusWords` grew `deleted` so an assistant could
+find a list inside the thirty days it can be restored, and the error kept saying active,
+completed or archived. An assistant that mistyped was told the one word it needed did
+not exist, which put restore_list out of reach from the message sent to look for it.
+
+The empty string is left out because it is "did not ask" rather than a word anybody
+would type.
+*/
+func oneOf[T any](words map[string]T) string {
+	said := make([]string, 0, len(words))
+	for word := range words {
+		if word != "" {
+			said = append(said, word)
+		}
+	}
+	slices.Sort(said)
+	if len(said) < 2 {
+		return strings.Join(said, "")
+	}
+	return strings.Join(said[:len(said)-1], ", ") + " or " + said[len(said)-1]
 }

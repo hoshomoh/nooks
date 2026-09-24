@@ -60,10 +60,75 @@ export function inlineTo(nodes: readonly JSONContent[]): string {
   return nodes.map(writeRun).join("")
 }
 
+/** PAIRING are the inline tokens, which only mean anything when one closes another. */
+const PAIRING = ["*", "`", "~"] as const
+
+/*
+escapeText keeps punctuation somebody typed from reading as markup next time.
+
+Only where it would. A delimiter on its own is a character somebody typed: "2 * 3 items"
+has always come back as itself and should go on doing so, and a Note full of backslashes
+is read by whoever calls the API and by any assistant holding one. So a pairing token is
+protected when the same one appears again and could close it, and a bracket when there is
+a `](` after it for a link to end with.
+
+A backslash is always protected. Without that, somebody typing `\*` as two characters
+would find it had become an escape, which is the same loss one turn later.
+
+`]`, `(` and `)` are left alone: with no unescaped `[` in front of them a link cannot
+begin.
+*/
+function escapeText(text: string): string {
+  const pairs = new Set(
+    PAIRING.filter((token) => text.indexOf(token) !== text.lastIndexOf(token)),
+  )
+
+  let out = ""
+  for (let at = 0; at < text.length; at++) {
+    const here = text[at] ?? ""
+    if (here === "\\" || pairs.has(here as (typeof PAIRING)[number]) || opensALink(text, at)) {
+      out += "\\"
+    }
+    out += here
+  }
+  return out
+}
+
+/** opensALink reports whether a bracket here has somewhere to close. */
+function opensALink(text: string, at: number): boolean {
+  return text[at] === "[" && text.slice(at + 1).includes("](")
+}
+
+/** unescapeText is the inverse, applied where a run of literal text is made. */
+function unescapeText(text: string): string {
+  return text.replace(/\\([\\`*~[])/g, "$1")
+}
+
+/*
+masked hides what a backslash protects from the search for markup, keeping the length so
+that every position found in it is a position in the text itself.
+
+Searching the text directly would find the `*` in `\*this\*` and read it as emphasis,
+which is the fault this exists to stop.
+*/
+function masked(text: string): string {
+  let out = ""
+  for (let at = 0; at < text.length; at++) {
+    if (text[at] === "\\" && at + 1 < text.length) {
+      out += "\0\0"
+      at++
+      continue
+    }
+    out += text[at]
+  }
+  return out
+}
+
 /** runsIn parses text into runs, carrying the marks already open around it. */
 function runsIn(text: string, open: readonly MarkSpec[]): JSONContent[] {
-  const link = LINK.exec(text)
-  const found = firstPair(text)
+  const search = masked(text)
+  const link = LINK.exec(search)
+  const found = firstPair(search)
 
   // Whichever starts first wins, so `**[a](b)**` and `[**a**](b)` both read correctly
   // rather than depending on which rule was tried first.
@@ -71,7 +136,7 @@ function runsIn(text: string, open: readonly MarkSpec[]): JSONContent[] {
     return linkRuns(text, link, open)
   }
   if (!found) {
-    return text ? [run(text, open)] : []
+    return text ? [run(unescapeText(text), open)] : []
   }
 
   const before = text.slice(0, found.start)
@@ -79,7 +144,7 @@ function runsIn(text: string, open: readonly MarkSpec[]): JSONContent[] {
   const after = text.slice(found.end + found.token.length)
 
   return [
-    ...(before ? [run(before, open)] : []),
+    ...(before ? [run(unescapeText(before), open)] : []),
     // Code is literal: markup inside a code span is text, which is the whole point of
     // writing something in a code span.
     ...(found.name === "code"
@@ -128,11 +193,18 @@ function firstPair(text: string): Pair | null {
 function linkRuns(text: string, link: RegExpExecArray, open: readonly MarkSpec[]): JSONContent[] {
   const before = text.slice(0, link.index)
   const after = text.slice(link.index + link[0].length)
-  const href = link[2] ?? ""
+
+  // Cut from the text rather than taken from the match, because the match was made
+  // against the masked copy and would carry the mask's own characters. The positions
+  // are the same in both, which is what masked() preserves the length for.
+  const labelAt = link.index + "[".length
+  const label = text.slice(labelAt, labelAt + (link[1] ?? "").length)
+  const hrefAt = labelAt + label.length + "](".length
+  const href = unescapeText(text.slice(hrefAt, hrefAt + (link[2] ?? "").length))
 
   return [
     ...(before ? runsIn(before, open) : []),
-    ...runsIn(link[1] ?? "", [...open, { type: "link", attrs: { href } }]),
+    ...runsIn(label, [...open, { type: "link", attrs: { href } }]),
     ...runsIn(after, open),
   ]
 }
@@ -156,11 +228,15 @@ function writeRun(node: JSONContent): string {
   const carried = node.marks ?? []
   const names = new Set(carried.map((mark) => mark.type))
 
+  // Everything but a code span, where markdown does not read a backslash as protecting
+  // anything and the point of the span is that what is inside it is literal.
+  const written = names.has("code") ? text : escapeText(text)
+
   // Written outermost first and closed in reverse, so a bold-italic phrase reads the
   // same every time rather than depending on which mark was applied first.
   const marked = WRITE_ORDER.filter((name) => names.has(name)).reduceRight(
     (inner, name) => wrap(inner, name),
-    text,
+    written,
   )
 
   // The link goes outside the rest: `[**loud**](url)` rather than `**[loud](url)**`,

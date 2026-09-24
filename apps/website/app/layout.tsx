@@ -25,7 +25,11 @@ export const metadata: Metadata = {
  * bundles them — an Instance may run on a machine with no internet, and a CDN call
  * would tell Google the site was visited.
  */
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+interface RootLayoutProps {
+  children: React.ReactNode
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   // next-themes writes the theme class onto <html> before React runs, so the markup
   // React sees does not match what it rendered. suppressHydrationWarning says so on
   // purpose rather than leaving a warning nobody can act on.

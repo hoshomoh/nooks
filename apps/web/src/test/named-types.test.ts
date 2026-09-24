@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest"
 const GENERATED = "src/components/ui/"
 
 /**
- * A type in a signature has a name.
+ * A type in a signature has a name, in both the apps.
  *
  * STANDARDS §5: "A prop object written into a signature cannot be imported, extended, or
  * read at a glance." It is also the shape that spreads — the second component that needs
@@ -15,12 +15,18 @@ const GENERATED = "src/components/ui/"
  * Parsed rather than matched: an object type in a signature spans lines, nests, and
  * shares its braces with every other use of `{` in TypeScript. There is no pattern for
  * it, only a syntax tree.
+ *
+ * The website is read too, and was not before. STANDARDS is the repository's rather than
+ * the app's, and nothing said the website was outside it, which is how three signatures
+ * ended up written the other way with nothing to say so. Read from here rather than
+ * copied into a second test, because the detector is the thing that would drift.
  */
 describe("a type in a signature", () => {
   const files = ours()
 
-  it("is reading the app", () => {
+  it("is reading both apps", () => {
     expect(files.length).toBeGreaterThan(80)
+    expect(files.some((file) => file.includes("website"))).toBe(true)
   })
 
   it("has a name", () => {
@@ -70,11 +76,18 @@ function takesArguments(node: ts.Node): node is Signature {
   )
 }
 
-/** ours is the app's own source: tests describe, and the generated components are not ours. */
+/**
+ * ours is the TypeScript this repository writes: both apps, without their tests, which
+ * describe rather than declare, and without the generated components, whose signatures
+ * are upstream's to write.
+ */
 function ours(): string[] {
-  return globSync("src/**/*.{ts,tsx}")
+  const written = [...globSync("src/**/*.{ts,tsx}"), ...globSync("../website/**/*.{ts,tsx}")]
+  return written
     .map((file) => String(file))
     .filter((file) => !file.includes(".test."))
+    .filter((file) => !file.includes("node_modules"))
+    .filter((file) => !file.endsWith(".d.ts"))
     .filter((file) => !file.replaceAll("\\", "/").includes(GENERATED))
 }
 

@@ -101,6 +101,11 @@ what became of the Member's work. Never "Something went wrong".
 
 ## 5. Frontend specifics
 
+Both apps. Most of what follows is about `apps/web`, because most of the frontend is, and
+the paths below are its. The rules that are about TypeScript rather than about the app —
+named types, and no English written into a component — hold in `apps/website` too. It is
+in this repository and nothing exempts it.
+
 **Generated shadcn components are never edited.** `src/components/ui/` is output from
 `pnpm dlx shadcn@latest add <component>` and must stay byte-for-byte what the generator
 produces, so that adding or updating a component never clobbers a local change. Nooks'

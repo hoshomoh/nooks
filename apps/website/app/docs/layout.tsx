@@ -13,7 +13,11 @@ import { source } from "@/lib/source"
  * onto a site looks like, and the way back to the site should not change depending on
  * which page a reader is on.
  */
-export default function Layout({ children }: { children: ReactNode }) {
+interface LayoutProps {
+  children: ReactNode
+}
+
+export default function Layout({ children }: LayoutProps) {
   return (
     <DocsLayout
       tree={source.pageTree}

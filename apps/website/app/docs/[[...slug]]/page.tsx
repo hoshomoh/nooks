@@ -12,8 +12,16 @@ import { SetupBlock } from "@/components/setup-block"
 import { openapi } from "@/lib/openapi"
 import { source } from "@/lib/source"
 
+/**
+ * What Next hands a docs page: the path it was asked for, a promise because a dynamic
+ * route is resolved per request.
+ */
+interface DocsPageProps {
+  params: Promise<{ slug?: string[] }>
+}
+
 /** One docs page, rendered from its MDX file. */
-export default async function Page(props: { params: Promise<{ slug?: string[] }> }) {
+export default async function Page(props: DocsPageProps) {
   const params = await props.params
   const page = source.getPage(params.slug)
   if (!page) {
@@ -65,7 +73,7 @@ export function generateStaticParams() {
   return source.generateParams()
 }
 
-export async function generateMetadata(props: { params: Promise<{ slug?: string[] }> }) {
+export async function generateMetadata(props: DocsPageProps) {
   const params = await props.params
   const page = source.getPage(params.slug)
   if (!page) {

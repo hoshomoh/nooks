@@ -104,7 +104,11 @@ export default async function Changelog() {
  * The version sits in a column of its own so a reader scanning for the one they are on
  * reads down a single line rather than across every entry.
  */
-function Entry({ release }: { release: Release }) {
+interface EntryProps {
+  release: Release
+}
+
+function Entry({ release }: EntryProps) {
   return (
     <div className="flex flex-wrap gap-x-10 gap-y-2 border-t border-border py-7">
       <div className="flex w-50 flex-none flex-col gap-1.5">

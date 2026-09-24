@@ -35,8 +35,11 @@ var writeSafety = map[string]string{
 	"changeItemCount": "onOneList holds the List for the update and the recount together",
 	"appendItem": "its one caller runs it inside onOneList, which is where the List is " +
 		"held; it takes the transaction to write through rather than reaching for the pool",
-	"recount": "never called on its own: every caller has the List held, and the count " +
-		"is written with the change that made it wrong",
+	"listChanged": "never called on its own: every caller has the List held, and the " +
+		"count is written with the change that made it wrong",
+	"touchListOfItem": "nothing holds it, and nothing needs to: it writes one column " +
+		"from a subquery in the same statement, and losing the race means a List sorts " +
+		"a moment older than it is",
 
 	"CreateJoinRequest":  "oneAtATime holds the whole join queue, which is what both the per-email rule and the ceiling are about",
 	"CreateResetRequest": "oneAtATime holds the reset queue, for the one-per-Member rule",

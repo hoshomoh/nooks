@@ -787,7 +787,7 @@ func (s *sqlStore) DeleteList(ctx context.Context, uid string, at time.Time) err
 }
 
 /*
-recount rewrites how much is on one List.
+listChanged rewrites how much is on one List, and says when it last changed.
 
 Counted rather than adjusted. A counter kept by adding and subtracting drifts the first
 time a path forgets to adjust it or a write is retried, and the number a Member reads
@@ -797,8 +797,14 @@ What makes that affordable is an index per count holding only the rows that coun
 about — idx_item_open_on_list and idx_item_done_on_list — so each is a range scan that
 never opens a row. Without them this was proportional to everything on the List, twice,
 on every add, tick and delete. See BenchmarkTickOnACrowdedList.
+
+The time goes in the same statement because it used to go nowhere. `updated_at` moved
+for a rename, a pin, an archive and a share, and not for anything on the List, so the
+sidebar's own default order — "updated for what changed last" — did not move when
+somebody added milk to the shopping list. Proven with two Lists, the older one given an
+Item an hour later, staying below the newer one.
 */
-func recount(ctx context.Context, db bun.IDB, listID int64) error {
+func listChanged(ctx context.Context, db bun.IDB, listID int64, at time.Time) error {
 	const open = `(SELECT COUNT(*) FROM item WHERE item.list_id = ? AND item.deleted_at = '' AND item.done_at = '')`
 	const done = `(SELECT COUNT(*) FROM item WHERE item.list_id = ? AND item.deleted_at = '' AND item.done_at <> '')`
 
@@ -806,10 +812,36 @@ func recount(ctx context.Context, db bun.IDB, listID int64) error {
 		Model((*listModel)(nil)).
 		Set("open_count = "+open, listID).
 		Set("done_count = "+done, listID).
+		Set("updated_at = ?", formatTime(at)).
 		Where("id = ?", listID).
 		Exec(ctx)
 	if err != nil {
-		return fmt.Errorf("recount list: %w", err)
+		return fmt.Errorf("record that the list changed: %w", err)
+	}
+	return nil
+}
+
+/*
+touchListOfItem says the List an Item is on has changed, without being told which one.
+
+The two writes that do not already hold their List — editing an Item's own fields, and
+moving one within its List — would otherwise have to read the Item to learn its List and
+then write. The subquery does it in the statement that was already going to run.
+
+It is deliberately not atomic with the Item write. Losing the touch means a List sorts a
+moment older than it is, which is worth less than holding a lock across two statements on
+the row every add already contends for.
+*/
+func touchListOfItem(ctx context.Context, db bun.IDB, itemUID string, at time.Time) error {
+	const onList = `(SELECT list_id FROM item WHERE uid = ?)`
+
+	_, err := db.NewUpdate().
+		Model((*listModel)(nil)).
+		Set("updated_at = ?", formatTime(at)).
+		Where("id = "+onList, itemUID).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("record that the list changed: %w", err)
 	}
 	return nil
 }

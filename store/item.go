@@ -88,7 +88,7 @@ func (s *sqlStore) CreateItem(ctx context.Context, params CreateItemParams) (Ite
 		if err := appendItem(ctx, db, row, params.ListID); err != nil {
 			return err
 		}
-		return recount(ctx, db, params.ListID)
+		return listChanged(ctx, db, params.ListID, params.At)
 	})
 	if err != nil {
 		return Item{}, err
@@ -275,7 +275,7 @@ func (s *sqlStore) CreateItems(ctx context.Context, params []CreateItemParams) (
 	}
 	// Inside the transaction, with the List held: a recount that lands after somebody
 	// else's would otherwise write a number that was true before their Items existed.
-	if err := recount(ctx, tx, params[0].ListID); err != nil {
+	if err := listChanged(ctx, tx, params[0].ListID, params[0].At); err != nil {
 		return nil, err
 	}
 	if err := tx.Commit(); err != nil {
@@ -418,6 +418,10 @@ func (s *sqlStore) UpdateItem(ctx context.Context, uid string, params UpdateItem
 		return s.whyNotUpdated(ctx, uid, params, err)
 	}
 
+	if err := touchListOfItem(ctx, s.db, uid, at); err != nil {
+		return err
+	}
+
 	item, err := s.ItemByUID(ctx, uid)
 	if err != nil {
 		return err
@@ -430,7 +434,7 @@ func (s *sqlStore) UpdateItem(ctx context.Context, uid string, params UpdateItem
 // Ticking is last-write-wins: a tick is a tick whoever made it, so this never conflicts
 // and never asks a question — see DESIGN.md §11.
 func (s *sqlStore) SetItemDone(ctx context.Context, uid string, doneBy int64, at time.Time) error {
-	return s.changeItemCount(ctx, uid, "tick item", func(q *bun.UpdateQuery) *bun.UpdateQuery {
+	return s.changeItemCount(ctx, uid, "tick item", at, func(q *bun.UpdateQuery) *bun.UpdateQuery {
 		return q.Set("done_at = ?", formatTime(at)).
 			Set("done_by_id = ?", doneBy).
 			Set("updated_at = ?", formatTime(at))
@@ -438,7 +442,7 @@ func (s *sqlStore) SetItemDone(ctx context.Context, uid string, doneBy int64, at
 }
 
 func (s *sqlStore) SetItemNotDone(ctx context.Context, uid string, at time.Time) error {
-	return s.changeItemCount(ctx, uid, "untick item", func(q *bun.UpdateQuery) *bun.UpdateQuery {
+	return s.changeItemCount(ctx, uid, "untick item", at, func(q *bun.UpdateQuery) *bun.UpdateQuery {
 		return q.Set("done_at = ?", "").
 			Set("done_by_id = ?", nil).
 			Set("updated_at = ?", formatTime(at))
@@ -457,12 +461,15 @@ func (s *sqlStore) MoveItem(ctx context.Context, uid string, position float64, a
 	if err != nil {
 		return fmt.Errorf("move item: %w", err)
 	}
-	return requireOneRow(result, "item")
+	if err := requireOneRow(result, "item"); err != nil {
+		return err
+	}
+	return touchListOfItem(ctx, s.db, uid, at)
 }
 
 // DeleteItem removes an Item. The removal is soft.
 func (s *sqlStore) DeleteItem(ctx context.Context, uid string, at time.Time) error {
-	err := s.changeItemCount(ctx, uid, "delete item", func(q *bun.UpdateQuery) *bun.UpdateQuery {
+	err := s.changeItemCount(ctx, uid, "delete item", at, func(q *bun.UpdateQuery) *bun.UpdateQuery {
 		return q.Set("deleted_at = ?", formatTime(at)).
 			Set("updated_at = ?", formatTime(at))
 	})
@@ -487,6 +494,7 @@ func (s *sqlStore) changeItemCount(
 	ctx context.Context,
 	uid string,
 	what string,
+	at time.Time,
 	apply func(*bun.UpdateQuery) *bun.UpdateQuery,
 ) error {
 	var listID int64
@@ -513,7 +521,7 @@ func (s *sqlStore) changeItemCount(
 		if err := requireOneRow(result, "item"); err != nil {
 			return err
 		}
-		return recount(ctx, db, listID)
+		return listChanged(ctx, db, listID, at)
 	})
 }
 

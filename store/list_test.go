@@ -372,3 +372,85 @@ func TestADeletedListIsPurgedAfterItsWindow(t *testing.T) {
 		})
 	}
 }
+
+/*
+Adding to a List is what changed last.
+
+`updated_at` moved for a rename, a pin, an archive and a share, and for nothing on the
+List itself, so the order the sidebar uses by default did not move when somebody added
+milk to the shopping list. `list_lists` calls that order "updated for what changed
+last", which it was not.
+
+Every way of changing an Item is checked, because the counts are written by one path and
+the rest were writing nothing at all: ticking, editing and moving go through code that
+never touched the List row.
+*/
+func TestEveryChangeToAnItemSaysTheListChanged(t *testing.T) {
+	for _, driver := range drivers() {
+		t.Run(driver.name, func(t *testing.T) {
+			s := driver.open(t)
+			ctx := t.Context()
+
+			made := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
+			owner, err := s.CreateMember(ctx, CreateMemberParams{
+				UID: "m1", Name: "Ada", Email: "ada@example.invalid",
+				PasswordHash: "x", CreatedAt: made,
+			})
+			if err != nil {
+				t.Fatalf("member: %v", err)
+			}
+			list, err := s.CreateList(ctx, CreateListParams{
+				UID: "l1", Name: "Shopping", OwnerID: owner.ID, At: made,
+			})
+			if err != nil {
+				t.Fatalf("list: %v", err)
+			}
+
+			item, err := s.CreateItem(ctx, CreateItemParams{
+				UID: "i1", ListID: list.ID, Label: "Milk",
+				AddedByID: owner.ID, At: made.Add(time.Hour),
+			})
+			if err != nil {
+				t.Fatalf("add: %v", err)
+			}
+
+			label := "Oat milk"
+			for _, one := range []struct {
+				what string
+				at   time.Time
+				do   func(at time.Time) error
+			}{
+				{what: "adding", at: made.Add(time.Hour)},
+				{what: "editing", at: made.Add(2 * time.Hour), do: func(at time.Time) error {
+					return s.UpdateItem(ctx, item.UID, UpdateItemParams{Label: &label}, at)
+				}},
+				{what: "ticking", at: made.Add(3 * time.Hour), do: func(at time.Time) error {
+					return s.SetItemDone(ctx, item.UID, owner.ID, at)
+				}},
+				{what: "unticking", at: made.Add(4 * time.Hour), do: func(at time.Time) error {
+					return s.SetItemNotDone(ctx, item.UID, at)
+				}},
+				{what: "moving", at: made.Add(5 * time.Hour), do: func(at time.Time) error {
+					return s.MoveItem(ctx, item.UID, 4096, at)
+				}},
+				{what: "deleting", at: made.Add(6 * time.Hour), do: func(at time.Time) error {
+					return s.DeleteItem(ctx, item.UID, at)
+				}},
+			} {
+				if one.do != nil {
+					if err := one.do(one.at); err != nil {
+						t.Fatalf("%s: %v", one.what, err)
+					}
+				}
+				after, err := s.ListByUID(ctx, list.UID)
+				if err != nil {
+					t.Fatalf("reread after %s: %v", one.what, err)
+				}
+				if !after.UpdatedAt.Equal(one.at) {
+					t.Errorf("%s an Item left the List saying it changed at %v, want %v",
+						one.what, after.UpdatedAt, one.at)
+				}
+			}
+		})
+	}
+}

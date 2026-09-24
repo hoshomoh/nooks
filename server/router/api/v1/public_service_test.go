@@ -1,7 +1,9 @@
 package v1
 
 import (
+	"context"
 	"testing"
+	"time"
 
 	"connectrpc.com/connect"
 
@@ -27,7 +29,7 @@ func (f listFixture) publish(t *testing.T, listUID string, public store.PublicLi
 // readPublic asks for the public page as a Visitor would: with no session at all.
 func (f listFixture) readPublic(t *testing.T) *apiv1.GetPublicListResponse {
 	t.Helper()
-	res, err := NewPublicService(f.store).GetPublicList(
+	res, err := NewPublicService(f.store, nil).GetPublicList(
 		t.Context(), connect.NewRequest(&apiv1.GetPublicListRequest{}),
 	)
 	if err != nil {
@@ -139,5 +141,88 @@ func TestThePublicPageSaysWhatIsLeftAndWhenItChanged(t *testing.T) {
 	}
 	if res.GetUpdatedAt() == "" {
 		t.Error("updatedAt is empty, want when the list last changed")
+	}
+}
+
+// countingStore is a Store that says how many times the whole List was read.
+type countingStore struct {
+	store.Store
+	reads int
+}
+
+func (c *countingStore) ItemsOnList(ctx context.Context, listID int64) ([]store.Item, error) {
+	c.reads++
+	return c.Store.ItemsOnList(ctx, listID)
+}
+
+/*
+The page is built again when it could have changed, and not for every Visitor.
+
+Nothing bounded this endpoint. It needs no session, has no rate limit, and reads every
+Item on the List, which is 653ms at ten thousand of them. A caller asking a thousand
+times paid that a thousand times, and paging the answer would not have helped: the cost
+is the repetition, not the size of one reply.
+
+Three things are checked because the cache has to be wrong in none of them: it stops
+reading when nothing changed, it notices a change at once rather than when a timer says
+so, and it gives up on its own after a while for the changes it cannot see.
+*/
+func TestThePublicPageIsNotRebuiltForEveryVisitor(t *testing.T) {
+	f := newListFixture(t)
+	uid := f.createList(t, f.anna, "Groceries")
+	f.addItem(t, f.anna, uid, "Milk")
+	f.publish(t, uid, store.PublicList{ShowMeta: true})
+
+	counting := &countingStore{Store: f.store}
+	clock := testClock
+	service := NewPublicService(counting, func() time.Time { return clock })
+
+	ask := func() *apiv1.GetPublicListResponse {
+		t.Helper()
+		res, err := service.GetPublicList(t.Context(), connect.NewRequest(&apiv1.GetPublicListRequest{}))
+		if err != nil {
+			t.Fatalf("GetPublicList: %v", err)
+		}
+		return res.Msg
+	}
+
+	ask()
+	ask()
+	ask()
+	if counting.reads != 1 {
+		t.Errorf("three Visitors read the List %d times, want 1", counting.reads)
+	}
+
+	// Added through the store with a later clock, because the fixture's own is frozen
+	// and a List that changed at the same instant did not change.
+	list, err := f.store.ListByUID(t.Context(), uid)
+	if err != nil {
+		t.Fatalf("ListByUID: %v", err)
+	}
+	if _, err := f.store.CreateItem(t.Context(), store.CreateItemParams{
+		UID: "later-item", ListID: list.ID, Label: "Bread",
+		AddedByID: f.anna.ID, At: testClock.Add(time.Hour),
+	}); err != nil {
+		t.Fatalf("CreateItem: %v", err)
+	}
+
+	got := ask()
+	if counting.reads != 2 {
+		t.Errorf("a changed List was read %d times, want 2", counting.reads)
+	}
+	if len(got.GetItems()) != 2 {
+		t.Fatalf("the page shows %d items after one was added, want 2", len(got.GetItems()))
+	}
+
+	// Nothing changed, so nothing is read, until it is old enough to have missed
+	// something a List does not record: a Member renaming themselves.
+	ask()
+	if counting.reads != 2 {
+		t.Errorf("an unchanged List was read %d times, want 2", counting.reads)
+	}
+	clock = clock.Add(pageMaxAge + time.Second)
+	ask()
+	if counting.reads != 3 {
+		t.Errorf("a page older than %v was read %d times, want 3", pageMaxAge, counting.reads)
 	}
 }

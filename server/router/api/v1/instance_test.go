@@ -168,7 +168,7 @@ func TestPublishingAList(t *testing.T) {
 		t.Errorf("published %q, want %q", got, uid)
 	}
 
-	page, err := NewPublicService(f.store).GetPublicList(
+	page, err := NewPublicService(f.store, nil).GetPublicList(
 		t.Context(), connect.NewRequest(&apiv1.GetPublicListRequest{}),
 	)
 	if err != nil {
@@ -234,7 +234,7 @@ func TestUnpublishing(t *testing.T) {
 	publish(uid)
 	publish("")
 
-	page, err := NewPublicService(f.store).GetPublicList(
+	page, err := NewPublicService(f.store, nil).GetPublicList(
 		t.Context(), connect.NewRequest(&apiv1.GetPublicListRequest{}),
 	)
 	if err != nil {

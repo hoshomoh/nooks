@@ -57,7 +57,7 @@ func TestNoRPCAnswersAStrangerByAccident(t *testing.T) {
 		Instance: NewInstanceService(s),
 		List:     NewListService(s, now, nil),
 		Member:   NewMemberService(s, now, nil),
-		Public:   NewPublicService(s),
+		Public:   NewPublicService(s, nil),
 		Request:  NewRequestService(s, now),
 		Token:    NewTokenService(s, now, nil, nil),
 	}

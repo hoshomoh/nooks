@@ -177,7 +177,7 @@ func testServices(s store.Store, now func() time.Time) v1.Services {
 		Instance: v1.NewInstanceService(s),
 		List:     v1.NewListService(s, now, nil),
 		Member:   v1.NewMemberService(s, now, nil),
-		Public:   v1.NewPublicService(s),
+		Public:   v1.NewPublicService(s, nil),
 		Request:  v1.NewRequestService(s, now),
 		Token:    v1.NewTokenService(s, now, nil, nil),
 	}

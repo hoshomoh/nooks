@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"errors"
+	"sync"
 	"time"
 
 	"connectrpc.com/connect"
@@ -18,11 +19,57 @@ import (
 // method that needs no session should be impossible to add by accident.
 type PublicService struct {
 	store store.Store
+	now   func() time.Time
+	page  publicPage
 }
 
-func NewPublicService(s store.Store) *PublicService {
-	return &PublicService{store: s}
+func NewPublicService(s store.Store, now func() time.Time) *PublicService {
+	if now == nil {
+		now = time.Now
+	}
+	return &PublicService{store: s, now: now}
 }
+
+/*
+publicPage is the rows the page was last built from, and what they were built for.
+
+This is the one endpoint anybody on the internet reaches, with no session, no rate limit
+and nothing bounding how much is on the List: reading it is 44ms at a thousand Items,
+653ms at ten thousand and 6.6s at a hundred thousand. Paging the answer would bound one
+response and do nothing about the same caller asking a thousand times, which is the
+shape of the exposure and is cheap for them and linear for whoever is hosting.
+
+The Items are kept rather than the built answer. A proto message written once and handed
+to several requests at once is shared mutable state the moment anything marshals it, and
+building the rows again from a slice already in memory is not what costs anything here.
+
+Two things end an entry, because one of them cannot see everything. The version is
+exact for the List and the settings, and since a List now records that it changed when
+anything on it did, an add or a tick is reflected on the next request rather than
+whenever a timer says so. The age is the backstop for what the version cannot see: a
+Member renaming themselves changes what the page says and touches no List.
+*/
+type publicPage struct {
+	mu    sync.Mutex
+	from  publicVersion
+	at    time.Time
+	items []store.Item
+	names map[int64]string
+}
+
+// publicVersion is everything the page is built from that can be read cheaply. Every
+// field is compared, so adding one to the page means adding it here or serving it stale.
+type publicVersion struct {
+	listUID      string
+	changedAt    time.Time
+	instanceName string
+	public       store.PublicList
+}
+
+// pageMaxAge bounds how long a Member's own rename can be missing from the page. Short
+// enough that nobody notices, long enough that a thousand requests a second become one
+// read a minute.
+const pageMaxAge = time.Minute
 
 // GetPublicList returns the published List, or nothing when there is none.
 //
@@ -51,12 +98,7 @@ func (s *PublicService) GetPublicList(
 		return nil, internalError("read list", err)
 	}
 
-	items, err := s.store.ItemsOnList(ctx, list.ID)
-	if err != nil {
-		return nil, internalError("read items", err)
-	}
-
-	names, err := s.contributorNames(ctx, settings.Public, items)
+	items, names, err := s.rowsFor(ctx, list, settings)
 	if err != nil {
 		return nil, err
 	}
@@ -79,6 +121,52 @@ func (s *PublicService) GetPublicList(
 		OpenCount:    int32(open),
 		UpdatedAt:    lastChangedAt(list, items),
 	}), nil
+}
+
+/*
+rowsFor is what the page is made of, read again only when it could have changed.
+
+Held under one lock rather than a read-write pair. The work being protected is a map
+lookup and a comparison; the read it avoids is the whole List. Two Visitors arriving
+together on a cold page both read, which is the ordinary cost of not holding a lock
+across a database call, and is the right way round on the endpoint that must never let
+one slow read hold up another request.
+*/
+func (s *PublicService) rowsFor(
+	ctx context.Context,
+	list store.List,
+	settings store.InstanceSettings,
+) ([]store.Item, map[int64]string, error) {
+	want := publicVersion{
+		listUID:      list.UID,
+		changedAt:    list.UpdatedAt,
+		instanceName: settings.Name,
+		public:       settings.Public,
+	}
+
+	now := s.now()
+	s.page.mu.Lock()
+	if s.page.from == want && s.page.items != nil && now.Sub(s.page.at) < pageMaxAge {
+		items, names := s.page.items, s.page.names
+		s.page.mu.Unlock()
+		return items, names, nil
+	}
+	s.page.mu.Unlock()
+
+	items, err := s.store.ItemsOnList(ctx, list.ID)
+	if err != nil {
+		return nil, nil, internalError("read items", err)
+	}
+	names, err := s.contributorNames(ctx, settings.Public, items)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	s.page.mu.Lock()
+	s.page.from, s.page.at, s.page.items, s.page.names = want, now, items, names
+	s.page.mu.Unlock()
+
+	return items, names, nil
 }
 
 /*

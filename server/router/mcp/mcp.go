@@ -27,7 +27,7 @@ func Handler(services v1.Services, resolver *auth.Resolver) http.Handler {
 	server := sdk.NewServer(&sdk.Implementation{
 		Name:    "nooks",
 		Version: version.String(),
-	}, nil)
+	}, &sdk.ServerOptions{Instructions: instructions})
 
 	addTools(server, services)
 
@@ -73,3 +73,25 @@ func errorText(err error) *sdk.CallToolResult {
 func text(said string) *sdk.CallToolResult {
 	return &sdk.CallToolResult{Content: []sdk.Content{&sdk.TextContent{Text: said}}}
 }
+
+/*
+instructions orient an assistant once, at the start, in what no single tool can say.
+
+The protocol offers this and nothing was sent, so a client arrived at twenty-four tools
+with no idea which one to call first or how they fit together. A tool description is
+read when a tool is being considered; this is read before any of them are.
+
+It says the shape of the thing and the two traps. The shape is that there is one
+container and identifiers are handed out rather than guessed. The traps are that a note
+is replaced whole rather than appended to, and that a refusal is usually the token's
+edges rather than a fault worth retrying.
+*/
+const instructions = `Lists are the only container. Everything is an item on a list, and there are no folders, tags or projects to look for.
+
+Start at list_lists. Every identifier the other tools take came from a tool that returned it, and none of them can be guessed.
+
+get_list shortens a long note to keep a row a row. get_item has the whole of one, and is what to read before rewriting a note: update_item replaces a note rather than adding to it. Send expected_note with the rewrite and it is refused rather than overwriting somebody who changed it in between.
+
+A date is a day. Nothing here is scheduled to a time.
+
+What a token may do is decided when it is minted, so a refusal is usually the token's edges rather than a fault to retry. Reading, writing and deleting are separate, and the admin work, adding people, minting tokens and deciding requests, is not open to a token at all.`

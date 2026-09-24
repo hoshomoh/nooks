@@ -48,7 +48,7 @@ func addInstanceTools(server *sdk.Server, services v1.Services) {
 	}, func(ctx context.Context, _ *sdk.CallToolRequest, _ aboutArgs) (*sdk.CallToolResult, any, error) {
 		return answer(ctx, services.Instance.GetInstanceAbout, &apiv1.GetInstanceAboutRequest{},
 			func(res *apiv1.GetInstanceAboutResponse) string {
-				return fmt.Sprintf("%s, Nooks %s under %s on %s — %d people, %d lists, %d items.",
+				return fmt.Sprintf("%s, nooks %s under %s on %s — %d people, %d lists, %d items.",
 					res.GetInstanceName(), res.GetVersion(), res.GetLicence(),
 					res.GetStorageDriver(), res.GetMemberCount(),
 					res.GetListCount(), res.GetItemCount())

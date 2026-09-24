@@ -111,8 +111,9 @@ func addItemTools(server *sdk.Server, lists *v1.ListService) {
 	})
 
 	sdk.AddTool(server, &sdk.Tool{
-		Name:        "move_item",
-		Description: "Reorder an item within its list. Lists keep the order a person put them in, not an order Nooks chose.",
+		Name: "move_item",
+		Description: "Reorder an item within its list. Lists keep the order a person put " +
+			"them in, rather than one chosen for them.",
 	}, func(ctx context.Context, _ *sdk.CallToolRequest, args moveItemArgs) (*sdk.CallToolResult, any, error) {
 		return answer(ctx, lists.MoveItem,
 			&apiv1.MoveItemRequest{ItemUid: args.ItemUID, AfterItemUid: args.AfterItemUID},

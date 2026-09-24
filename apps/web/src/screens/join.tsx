@@ -32,7 +32,15 @@ export function Join() {
   if (!requestUid) {
     return <AskToJoin onSent={setRequestUid} />
   }
-  return <CheckJoinRequest requestUid={requestUid} onStartOver={() => setRequestUid(null)} />
+  // Forgotten where it is kept, not only in this component. Asking again is a Member
+  // saying they are done with the old request, and a request left in storage comes back
+  // on the next visit and is still the thing that completes that account.
+  const startOver = () => {
+    forgetPendingRequest("join")
+    setRequestUid(null)
+  }
+
+  return <CheckJoinRequest requestUid={requestUid} onStartOver={startOver} />
 }
 
 type AskToJoinProps = {

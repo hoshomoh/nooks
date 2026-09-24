@@ -27,7 +27,13 @@ export function ForgotPassword() {
   if (!requestUid) {
     return <AskForReset onSent={setRequestUid} />
   }
-  return <CheckResetRequest requestUid={requestUid} onStartOver={() => setRequestUid(null)} />
+  // As in join.tsx: asking again means the old one is done with, and it is kept on disk.
+  const startOver = () => {
+    forgetPendingRequest("reset")
+    setRequestUid(null)
+  }
+
+  return <CheckResetRequest requestUid={requestUid} onStartOver={startOver} />
 }
 
 /** The quiet link back, used by both states of this screen. */

@@ -100,7 +100,7 @@ func fileExists(dist fs.FS, name string) bool {
 /*
 The policy the app is served under.
 
-Everything comes from this origin. Nooks loads no script, style, font or image from
+Everything comes from this origin. nooks loads no script, style, font or image from
 anywhere else and talks to nothing but itself, so saying so costs nothing and means that
 a way to inject a script into a page would still have nowhere to load one from.
 

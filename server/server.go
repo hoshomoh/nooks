@@ -101,7 +101,7 @@ func New(cfg profile.Config, s store.Store, log *slog.Logger) (*Server, error) {
 
 // newMux wires every route an Instance answers.
 func newMux(cfg profile.Config, s store.Store) (*http.ServeMux, error) {
-	// One broker per process. Nooks is one binary on one machine, so there is nothing
+	// One broker per process. nooks is one binary on one machine, so there is nothing
 	// to coordinate between.
 	broker := events.NewBroker()
 	publisher := live.NewPublisher(s, broker)
@@ -187,7 +187,7 @@ response is: the REST API answers some things over GET, so a Member can be sent 
 to one, and what comes back is JSON with their own words in it. The type is always
 declared, and this says not to second-guess it.
 
-same-origin keeps a Nooks address off other people's servers. A path here names a List
+same-origin keeps a nooks address off other people's servers. A path here names a List
 and an Item, so a request that left carrying one would be handing a stranger the shape
 of somebody's household.
 

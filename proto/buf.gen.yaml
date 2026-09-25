@@ -22,7 +22,7 @@ plugins:
   - remote: buf.build/connectrpc/go
     out: gen
     opt: paths=source_relative
-  # The gateway calls a gRPC-shaped server interface, which this generates. Nooks does
+  # The gateway calls a gRPC-shaped server interface, which this generates. nooks does
   # not serve gRPC — the stubs exist so the gateway has something to talk to in-process.
   - remote: buf.build/grpc/go
     out: gen
@@ -39,7 +39,7 @@ plugins:
       # single service to take a title from and leaves it empty.
       # The option parser splits on punctuation, so a sentence here becomes a flag it
       # does not recognise. The description belongs on the docs page instead.
-      - title=Nooks
+      - title=nooks
       - version=v1
       - enum_type=string
   - remote: buf.build/bufbuild/es

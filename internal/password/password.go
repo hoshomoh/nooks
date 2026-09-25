@@ -1,4 +1,4 @@
-// Package password hashes and checks Member passwords, and owns the one rule Nooks
+// Package password hashes and checks Member passwords, and owns the one rule nooks
 // puts on them.
 //
 // The rule is deliberately singular: twelve characters or more, and nothing else. No

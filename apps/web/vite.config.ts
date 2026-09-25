@@ -34,8 +34,8 @@ export default defineConfig({
       registerType: "prompt",
       includeAssets: ["favicon.svg", "icon.svg"],
       manifest: {
-        name: "Nooks",
-        short_name: "Nooks",
+        name: "nooks",
+        short_name: "nooks",
         description: "A household todo app you run on your own machine.",
         start_url: "/",
         scope: "/",
@@ -67,7 +67,7 @@ export default defineConfig({
     alias: [
       { find: "@", replacement: path.resolve(import.meta.dirname, "./src") },
       // The generated shadcn components import "cn" directly and must not be edited,
-      // so the name resolves to Nooks' configured merger — see src/lib/cn.ts.
+      // so the name resolves to nooks' configured merger — see src/lib/cn.ts.
       {
         find: /^cn$/,
         replacement: path.resolve(import.meta.dirname, "./src/lib/cn.ts"),

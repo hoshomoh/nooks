@@ -3,7 +3,7 @@ import { onlineManager } from "@tanstack/react-query"
 import type { ConnectionStore } from "./connection-store"
 
 /**
- * Tells TanStack Query what Nooks means by offline.
+ * Tells TanStack Query what nooks means by offline.
  *
  * Its own answer is the browser's, which is wrong both ways: hotel wifi that reaches
  * nothing still reports online, and a device that reports offline may still reach an

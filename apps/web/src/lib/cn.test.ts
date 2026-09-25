@@ -54,7 +54,7 @@ describe("the tokens cn is told about", () => {
   })
 })
 
-describe("merging Nooks' own classes", () => {
+describe("merging nooks' own classes", () => {
   it("keeps a size and a colour that are both spelled text-", () => {
     expect(cn("text-small text-shared")).toBe("text-small text-shared")
   })
@@ -67,8 +67,8 @@ describe("merging Nooks' own classes", () => {
     expect(cn("text-shared text-overdue")).toBe("text-overdue")
   })
 
-  // A generated shadcn component sets its own width; a Nooks one overrides it.
-  it("lets a Nooks width win over the one a shadcn component sets", () => {
+  // A generated shadcn component sets its own width; a nooks one overrides it.
+  it("lets a nooks width win over the one a shadcn component sets", () => {
     expect(cn("max-w-[calc(100%-2rem)] sm:max-w-sm", "max-w-dialog sm:max-w-dialog")).toBe(
       "max-w-dialog sm:max-w-dialog",
     )

@@ -27,7 +27,7 @@ type Resolver struct {
 TokenWatcher is told the first time an Access token reaches the Instance.
 
 An interface, and optional, so the resolver stays a thing that answers "who is this?".
-What Nooks does about a key starting to be used is a decision for the layer that owns
+What nooks does about a key starting to be used is a decision for the layer that owns
 the Activity panel, not for the layer that reads a header.
 */
 type TokenWatcher interface {

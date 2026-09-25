@@ -14,7 +14,7 @@ export type ResolvedTheme = "light" | "dark"
 /** Where the choice is remembered. */
 export const THEME_STORAGE_KEY = "nooks.theme"
 
-/** System is the default: Nooks follows the machine until told otherwise. */
+/** System is the default: nooks follows the machine until told otherwise. */
 export const DEFAULT_THEME: Theme = "system"
 
 /** resolveTheme turns a choice plus the machine's preference into a concrete theme. */

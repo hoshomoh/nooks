@@ -26,7 +26,7 @@ const (
 
 // Activity is one thing waiting for a Member's attention.
 //
-// Nooks has no mail server, so this is the only place any of it surfaces — which is why
+// nooks has no mail server, so this is the only place any of it surfaces — which is why
 // an entry carries its own text rather than a code the reader has to interpret.
 type Activity struct {
 	ID       int64
@@ -105,7 +105,7 @@ func (s *sqlStore) DeleteUnreadableActivity(ctx context.Context) (int64, error) 
 	 * Everything past the end, except a request nobody has answered.
 	 *
 	 * An undecided request is not history. It is somebody locked out or waiting for an
-	 * account, and Activity is the only place it appears — Nooks sends no mail. Sweeping
+	 * account, and Activity is the only place it appears — nooks sends no mail. Sweeping
 	 * one away leaves the row pending in its own table for ever with nothing anywhere
 	 * that shows it, and the person waiting is never told either way.
 	 */

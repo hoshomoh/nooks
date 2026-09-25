@@ -41,25 +41,7 @@ Written as a shape rather than as a list of the things not to say. A guard that 
 them out would put them in the repository itself, which is the thing it is for.
 */
 func TestNothingTrackedCarriesSomebodyElsesIdentifier(t *testing.T) {
-	// safe.directory because this also runs inside a container, where the checkout
-	// belongs to somebody other than the user running the tests and git refuses to look
-	// at it. Nothing here writes, so there is nothing for that check to protect.
-	listing := exec.CommandContext(t.Context(),
-		"git", "-c", "safe.directory=*", "ls-files", "-z")
-	listing.Dir = filepath.Join("..", "..")
-
-	var refused bytes.Buffer
-	listing.Stderr = &refused
-	listed, err := listing.Output()
-	if err != nil {
-		// With what git said, because an exit status on its own names no cause.
-		t.Fatalf("git ls-files: %v: %s", err, strings.TrimSpace(refused.String()))
-	}
-
-	tracked := strings.FieldsFunc(string(listed), func(r rune) bool { return r == 0 })
-	if len(tracked) < 200 {
-		t.Fatalf("git tracks %d files, too few to be reading the repository", len(tracked))
-	}
+	tracked := trackedFiles(t)
 
 	read := 0
 	for _, name := range tracked {
@@ -88,6 +70,73 @@ func TestNothingTrackedCarriesSomebodyElsesIdentifier(t *testing.T) {
 			t.Errorf("excused names %s, which git does not track", name)
 		}
 	}
+}
+
+/*
+The name is written in lower case, everywhere it is tracked.
+
+nooks is a brand name and keeps its styling at the start of a sentence as much as in the
+middle of one. Three hundred and twenty-one places said otherwise, because the design
+rules once said to capitalise it in prose and everything written since followed them.
+The rule changed; a sweep without a guard is a sweep somebody repeats.
+
+Generated code is left out, for the reason every other guard here leaves it out: it is
+not written by anybody. It is also where the capital is correct. buf derives
+`[N]ooks.Api.V1`, `[N]ooks\Api\V1` and `[N]ooks::Api::V1` from the package name in the
+casing C#, PHP and Ruby expect, and those are namespaces a client in those languages
+imports rather than the brand in a sentence.
+
+The pattern is written `[N]ooks` so that this file, which has to mention it, does not
+match itself.
+*/
+func TestTheNameIsWrittenInLowerCase(t *testing.T) {
+	capitalised := regexp.MustCompile(`\b[N]ooks\b`)
+
+	read := 0
+	for _, name := range trackedFiles(t) {
+		if strings.HasPrefix(name, "proto/gen/") || strings.HasPrefix(name, "packages/api/src/gen/") {
+			continue
+		}
+		body, err := readIfText(filepath.Join("..", "..", name))
+		if err != nil || body == "" {
+			continue
+		}
+		read++
+		for number, line := range strings.Split(body, "\n") {
+			if capitalised.MatchString(line) {
+				t.Errorf("%s:%d writes the name with a capital: %s", name, number+1, strings.TrimSpace(line))
+			}
+		}
+	}
+	if read < 150 {
+		t.Fatalf("read %d tracked files, so most of the repository went unread", read)
+	}
+}
+
+// trackedFiles is what git says is in the repository, which is what is public.
+func trackedFiles(t *testing.T) []string {
+	t.Helper()
+
+	// safe.directory because this also runs inside a container, where the checkout
+	// belongs to somebody other than the user running the tests and git refuses to look
+	// at it. Nothing here writes, so there is nothing for that check to protect.
+	listing := exec.CommandContext(t.Context(),
+		"git", "-c", "safe.directory=*", "ls-files", "-z")
+	listing.Dir = filepath.Join("..", "..")
+
+	var refused bytes.Buffer
+	listing.Stderr = &refused
+	listed, err := listing.Output()
+	if err != nil {
+		// With what git said, because an exit status on its own names no cause.
+		t.Fatalf("git ls-files: %v: %s", err, strings.TrimSpace(refused.String()))
+	}
+
+	tracked := strings.FieldsFunc(string(listed), func(r rune) bool { return r == 0 })
+	if len(tracked) < 200 {
+		t.Fatalf("git tracks %d files, too few to be reading the repository", len(tracked))
+	}
+	return tracked
 }
 
 // contains reports whether a listing holds one name.

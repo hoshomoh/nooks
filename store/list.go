@@ -22,7 +22,7 @@ const (
 	SharingSpecific Sharing = "SPECIFIC"
 )
 
-// List is a named, ordered collection of Items — the only container in Nooks.
+// List is a named, ordered collection of Items — the only container in nooks.
 type List struct {
 	ID      int64
 	UID     string

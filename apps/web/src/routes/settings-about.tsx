@@ -4,7 +4,7 @@ import { aboutQuery } from "@/lib/about-queries"
 import { currentMemberQuery } from "@/lib/queries"
 import { rootRoute } from "./root"
 
-/** What this copy of Nooks is, and how much it holds. */
+/** What this copy of nooks is, and how much it holds. */
 export const settingsAboutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/settings/about",

@@ -173,7 +173,7 @@ func lines(rows []string, whenEmpty string) string {
 /*
 noteRow keeps a Note to the part that fits on a row, and says when it did.
 
-The part shown is the Member's own first line, because Nooks never summarises what
+The part shown is the Member's own first line, because nooks never summarises what
 somebody wrote. Saying how much was held back is the half that matters: update_item
 replaces a Note rather than adding to it, so a reader that took the row for the whole
 Note would write back a fragment and delete the rest.

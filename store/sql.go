@@ -231,7 +231,7 @@ func (s *sqlStore) Analyse(ctx context.Context) error {
 	return nil
 }
 
-// sqliteDialect and postgresDialect are the two Bun dialects Nooks supports.
+// sqliteDialect and postgresDialect are the two Bun dialects nooks supports.
 func sqliteDialect() schema.Dialect   { return sqlitedialect.New() }
 func postgresDialect() schema.Dialect { return pgdialect.New() }
 

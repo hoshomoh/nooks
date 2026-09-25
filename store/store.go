@@ -313,7 +313,7 @@ type Store interface {
 	// SharedListIDs is every List reaching a Member by name, directly or via a Group.
 	SharedListIDs(ctx context.Context, memberID int64) ([]int64, error)
 
-	// CreateActivity records something for a Member to see. Nooks sends no email, so
+	// CreateActivity records something for a Member to see. nooks sends no email, so
 	// this is the only place it surfaces.
 	CreateActivity(ctx context.Context, params CreateActivityParams) (Activity, error)
 

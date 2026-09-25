@@ -141,7 +141,7 @@ describe("saying how far away a day is", () => {
   })
 
   it("refuses a unit it does not know", () => {
-    // Nooks has no time of day, so an hour is not something an Item can be due in.
+    // nooks has no time of day, so an hour is not something an Item can be due in.
     expect(parse("milk in 2 hours").due).toBe("")
     expect(parse("milk in 2 months").due).toBe("")
   })

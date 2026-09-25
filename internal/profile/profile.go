@@ -1,4 +1,4 @@
-// Package profile holds the configuration one Nooks instance runs with.
+// Package profile holds the configuration one nooks instance runs with.
 //
 // Parsing is a pure function of its arguments and an environment lookup, so the
 // whole surface can be tested without touching the process or the filesystem.
@@ -64,7 +64,7 @@ type Config struct {
 // ErrHelp reports that the caller asked for usage rather than a running server.
 var ErrHelp = flag.ErrHelp
 
-// DefaultAddr is the port Nooks listens on when nothing says otherwise.
+// DefaultAddr is the port nooks listens on when nothing says otherwise.
 const DefaultAddr = ":8081"
 
 // Parse builds a Config from command-line arguments and an environment lookup.

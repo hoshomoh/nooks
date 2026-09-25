@@ -9,7 +9,7 @@ const t = (key: string) => key
 const now = new Date(2026, 7, 25)
 
 describe("what a new Instance opens onto", () => {
-  // A Member who has never seen Nooks cannot tell that an Item carries these unless
+  // A Member who has never seen nooks cannot tell that an Item carries these unless
   // something on screen does.
   it("shows a quantity, a date and a Note, each at least once", () => {
     const items = starterItems(t, now)

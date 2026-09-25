@@ -1,5 +1,5 @@
 /*
- * Nooks' design foundations: the fonts, the scales, the palettes, the base layer.
+ * nooks' design foundations: the fonts, the scales, the palettes, the base layer.
  *
  * Shared because DESIGN.md is one document. The app and the website are different
  * programs that have to look like the same product, and the only way that stays true
@@ -12,7 +12,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* Self-hosted: a Nooks Instance may run on a machine with no internet, and a CDN call
+/* Self-hosted: a nooks Instance may run on a machine with no internet, and a CDN call
    would also tell Google that the Instance exists. See DESIGN.md §3. */
 @import "@fontsource-variable/public-sans";
 @import "@fontsource/ibm-plex-mono/400.css";
@@ -30,7 +30,7 @@
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
 
   /* Radius means something — DESIGN.md §4. shadcn components reach for sm/md/lg/xl,
-     so those are mapped onto Nooks' five radii rather than derived from one value. */
+     so those are mapped onto nooks' five radii rather than derived from one value. */
   /* The type scale — DESIGN.md §3. Every role is a token so that no component has to
      write a size literal, and changing the scale changes it everywhere. */
   --text-display: 33px; /* list titles, view headings */
@@ -152,7 +152,7 @@
   --radius-2xl: 10px; /* surface: panel, dialog */
   --radius-menu: 9px; /* the one radius between the two: menus — DESIGN.md §9 */
 
-  /* Motion — DESIGN.md §11. Nooks moves to explain where something came from and
+  /* Motion — DESIGN.md §11. nooks moves to explain where something came from and
      nowhere else: a sheet arrives from the edge it is anchored to, an overlay fades
      its ground in, and a tick by somebody else holds for a second before settling.
      Nothing bounces and nothing waits for an animation to finish. */
@@ -254,7 +254,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Nooks' own tokens. Four meaning colours, each with exactly one job, plus the
+  /* nooks' own tokens. Four meaning colours, each with exactly one job, plus the
      surfaces and rules shadcn has no name for. DESIGN.md §2. */
   --color-desk: var(--desk);
   --color-hair: var(--hair);
@@ -280,7 +280,7 @@
 :root {
   --radius: 7px;
 
-  /* shadcn's semantics, filled with Nooks' palette. DESIGN.md §16 maps these. */
+  /* shadcn's semantics, filled with nooks' palette. DESIGN.md §16 maps these. */
   --background: oklch(1 0 0); /* paper #FFFFFF */
   --foreground: oklch(0.2389 0.0019 106.54); /* ink #1F1F1E */
   --card: oklch(1 0 0);
@@ -293,14 +293,14 @@
   --secondary-foreground: oklch(0.3666 0.005 106.65); /* sub #3F3F3C */
   --muted: oklch(0.9516 0.0027 106.45); /* a surface, not a text colour */
   --muted-foreground: oklch(0.4842 0.0063 106.63); /* muted text #5F5F5B */
-  --accent: oklch(0.9516 0.0027 106.45); /* shadcn's hover surface — NOT Nooks' accent */
+  --accent: oklch(0.9516 0.0027 106.45); /* shadcn's hover surface — NOT nooks' accent */
   --accent-foreground: oklch(0.2389 0.0019 106.54);
   --destructive: oklch(0.463 0.1151 29.14); /* error text #8E3B31 */
   --border: oklch(0.9241 0.004 106.48); /* line #E6E6E3 */
   --input: oklch(0.8747 0.0068 106.54); /* input-line #D6D6D1, darker than border */
   --ring: oklch(0.4836 0.0883 252.04); /* the 2px focus ring is shared #37618F */
 
-  /* Unused — Nooks has no charts. Set so shadcn's defaults never leak in. */
+  /* Unused — nooks has no charts. Set so shadcn's defaults never leak in. */
   --chart-1: oklch(0.4836 0.0883 252.04);
   --chart-2: oklch(0.5314 0.0946 161.86);
   --chart-3: oklch(0.5629 0.1115 76.44);
@@ -316,7 +316,7 @@
   --sidebar-border: oklch(0.9241 0.004 106.48);
   --sidebar-ring: oklch(0.4836 0.0883 252.04);
 
-  /* Nooks' own */
+  /* nooks' own */
   --desk: oklch(0.9606 0.0027 106.45); /* #F2F2F0 */
   --hair: oklch(0.9546 0.0027 106.45); /* #F0F0EE — the row rule */
   --control: oklch(0.6485 0.0073 106.6); /* #8F8F8A — checkbox borders at rest */

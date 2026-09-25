@@ -17,7 +17,7 @@ CREATE TABLE member (
   role                 TEXT      NOT NULL,
   password_hash        TEXT      NOT NULL,
   -- Set when an Admin creates the account with a temporary password. The Member must
-  -- replace it before they can use Nooks.
+  -- replace it before they can use nooks.
   must_change_password BOOLEAN   NOT NULL DEFAULT FALSE,
   created_at           TEXT      NOT NULL,
   -- Empty until the Member has signed in at least once.
@@ -43,7 +43,7 @@ CREATE TABLE session (
 CREATE INDEX idx_session_member_id ON session (member_id);
 CREATE INDEX idx_session_parent_hash ON session (parent_hash);
 -- A Visitor asking for an account, and a Member asking to replace a forgotten
--- password. Nooks sends no email, so both wait here until an Admin acts on them.
+-- password. nooks sends no email, so both wait here until an Admin acts on them.
 CREATE TABLE join_request (
   id         BIGSERIAL PRIMARY KEY,
   uid        TEXT      NOT NULL UNIQUE,
@@ -74,7 +74,7 @@ CREATE TABLE reset_request (
 );
 
 CREATE INDEX idx_reset_request_member_id ON reset_request (member_id);
--- A List is a named, ordered collection of Items — the only container in Nooks.
+-- A List is a named, ordered collection of Items — the only container in nooks.
 CREATE TABLE list (
   id         BIGSERIAL PRIMARY KEY,
   uid        TEXT    NOT NULL UNIQUE,
@@ -211,7 +211,7 @@ CREATE TABLE list_share (
 CREATE INDEX idx_list_share_list_id ON list_share (list_id);
 CREATE INDEX idx_list_share_member_id ON list_share (member_id);
 
--- Activity is where everything that would be an email elsewhere waits. Nooks has no
+-- Activity is where everything that would be an email elsewhere waits. nooks has no
 -- mail server, so this is the only place these surface.
 CREATE TABLE activity (
   id         BIGSERIAL PRIMARY KEY,
@@ -237,7 +237,7 @@ CREATE INDEX idx_activity_member_id ON activity (member_id, created_at);
 -- A token is how anything that is not a browser reaches an Instance: a script, a
 -- shortcut, an MCP client.
 --
--- Only the hash is kept. The token itself is shown once, when it is made, and Nooks
+-- Only the hash is kept. The token itself is shown once, when it is made, and nooks
 -- cannot show it again — the same rule a password follows, for the same reason.
 CREATE TABLE access_token (
   id         BIGSERIAL PRIMARY KEY,

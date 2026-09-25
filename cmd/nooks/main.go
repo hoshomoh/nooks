@@ -1,4 +1,4 @@
-// Command nooks runs a Nooks instance: one binary serving both the API and the app.
+// Command nooks runs a nooks instance: one binary serving both the API and the app.
 package main
 
 import (

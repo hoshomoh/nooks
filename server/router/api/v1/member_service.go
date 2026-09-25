@@ -236,7 +236,7 @@ var errCannotRemoveYourself = connect.NewError(connect.CodeFailedPrecondition,
 
 // AddMember creates an account with a temporary password, read out once.
 //
-// Nooks has no mail server, so the Admin hands the password over however they already
+// nooks has no mail server, so the Admin hands the password over however they already
 // talk to this person. The Member must replace it before anything else.
 func (s *MemberService) AddMember(
 	ctx context.Context,
@@ -280,7 +280,7 @@ func (s *MemberService) AddMember(
 		return nil, createMemberError(err)
 	}
 
-	// The only moment the password can be read. Nooks keeps the hash and nothing else.
+	// The only moment the password can be read. nooks keeps the hash and nothing else.
 	return connect.NewResponse(&apiv1.AddMemberResponse{
 		Member:            memberToProto(member),
 		TemporaryPassword: temporary,
@@ -491,7 +491,7 @@ func (s *MemberService) isLastAdmin(ctx context.Context, member store.Member) (b
 UpdateOwnProfile changes the signed-in Member's own name and email.
 
 Their own, and only their own. An Admin who wants somebody else's name changed asks
-them: an account is a person, and Nooks does not let one person edit another.
+them: an account is a person, and nooks does not let one person edit another.
 
 A browser, never a token: a key that reaches somebody's Lists must not be a way to
 change the address their account signs in with.

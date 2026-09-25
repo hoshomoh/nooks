@@ -1,5 +1,5 @@
 /**
- * The Nooks mark: a list title, the hairline rule under it, and two items.
+ * The nooks mark: a list title, the hairline rule under it, and two items.
  *
  * Geometry is fixed by DESIGN.md §14 and must not be adjusted per use — pass a size
  * instead. Below 20px the mark simplifies to two paths, because the four-line version

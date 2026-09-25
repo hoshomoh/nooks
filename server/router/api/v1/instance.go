@@ -19,7 +19,7 @@ import (
 	"github.com/hoshomoh/nooks/store"
 )
 
-// InstanceService reports what this copy of Nooks is and how it is configured.
+// InstanceService reports what this copy of nooks is and how it is configured.
 type InstanceService struct {
 	store store.Store
 }
@@ -184,7 +184,7 @@ func settingsToProto(settings store.InstanceSettings, publishedName string) *api
 const licence = "AGPL-3.0-or-later"
 
 /*
-GetInstanceAbout reports what this copy of Nooks is and how much it holds.
+GetInstanceAbout reports what this copy of nooks is and how much it holds.
 
 Any Member, not only an Admin. It is their Instance too, and none of it — a version, a
 count, the size on disk — is anybody else's business to keep from them.

@@ -9,7 +9,7 @@ import (
 // ErrNoBackup reports a driver that cannot make a copy of itself.
 //
 // Postgres is the case: its backup tool is pg_dump, which already exists and is better
-// than anything Nooks would write. Saying so is more useful than a worse export.
+// than anything nooks would write. Saying so is more useful than a worse export.
 var ErrNoBackup = errors.New("store: this driver exports with its own tools")
 
 /*

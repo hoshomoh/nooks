@@ -5,7 +5,7 @@
  * breakpoint, and overriding it takes both the plain and the prefixed class. Passing
  * one leaves the dialog 560px on a phone and 384px on a desktop.
  *
- * Padding is zero because a Nooks dialog lays out its own header, body and footer.
+ * Padding is zero because a nooks dialog lays out its own header, body and footer.
  *
  * The height ceiling is here rather than in each dialog so the next one written gets
  * it: a dialog sized by its content grows past the viewport the moment somebody picks

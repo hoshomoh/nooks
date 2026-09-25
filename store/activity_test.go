@@ -308,7 +308,7 @@ func panelFor(t *testing.T, s Store, member Member) []string {
 /*
 A request nobody has answered stays where the person waiting can be helped.
 
-Nooks sends no mail, so Activity is the only place a join or reset request appears. It
+nooks sends no mail, so Activity is the only place a join or reset request appears. It
 used to be the newest fifty entries and nothing else, swept to the same fifty — so a
 request that fifty other things happened after was first invisible and then deleted,
 while its row sat pending in its own table for ever. The Member who asked to be let back

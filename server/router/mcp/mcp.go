@@ -1,4 +1,4 @@
-// Package mcp serves Nooks' tools to an assistant over the Model Context Protocol.
+// Package mcp serves nooks' tools to an assistant over the Model Context Protocol.
 package mcp
 
 import (

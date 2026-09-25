@@ -9,7 +9,7 @@ import { markerOf, type BlockKind } from "./markers"
  *
  * A Note is stored as markdown and edited as a document. That is deliberate: markdown
  * is what a Member exports, what the conflict rule in M13 compares, and what survives
- * Nooks being uninstalled — while a document tree is what an editor can render without
+ * nooks being uninstalled — while a document tree is what an editor can render without
  * ever showing the markup. So the two meet here, at the save boundary, and nowhere else.
  *
  * Only the block types the design names are represented. Anything else in the markdown

@@ -10,7 +10,7 @@ import (
 //
 // They are separate from the domain types in store.go, member.go and session.go so that
 // the ORM's tags — and the storage shapes it needs, like timestamps as text — stay out
-// of the types the rest of Nooks passes around. The mapping functions below are the one
+// of the types the rest of nooks passes around. The mapping functions below are the one
 // place those two shapes meet.
 
 type settingModel struct {

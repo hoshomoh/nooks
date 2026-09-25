@@ -1,7 +1,7 @@
 // Package gateway serves the REST API by handing requests to the same services the
 // browser talks to.
 //
-// grpc-gateway generates a proxy that calls a gRPC-shaped server interface, and Nooks'
+// grpc-gateway generates a proxy that calls a gRPC-shaped server interface, and nooks'
 // services are Connect-shaped. These adapters are that difference and nothing else:
 // build the request the service expects, carrying what the call arrived with, then
 // hand back the message. Only the request half travels — a Set-Cookie on the way out

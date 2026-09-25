@@ -1,4 +1,4 @@
--- A List is a named, ordered collection of Items — the only container in Nooks.
+-- A List is a named, ordered collection of Items — the only container in nooks.
 CREATE TABLE list (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   uid        TEXT    NOT NULL UNIQUE,

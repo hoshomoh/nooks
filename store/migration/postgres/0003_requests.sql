@@ -1,5 +1,5 @@
 -- A Visitor asking for an account, and a Member asking to replace a forgotten
--- password. Nooks sends no email, so both wait here until an Admin acts on them.
+-- password. nooks sends no email, so both wait here until an Admin acts on them.
 CREATE TABLE join_request (
   id         BIGSERIAL PRIMARY KEY,
   uid        TEXT      NOT NULL UNIQUE,

@@ -22,7 +22,7 @@ import { useMomentLabel } from "@/lib/use-moment-label"
 import { useSettingsCounts } from "@/lib/use-settings-counts"
 
 /**
- * About: what this copy of Nooks is, and how much it is holding.
+ * About: what this copy of nooks is, and how much it is holding.
  *
  * Facts in the same rows every other settings page uses. There is no dashboard here
  * and nothing is charted — somebody self-hosting wants to know the thing is real and
@@ -92,19 +92,19 @@ export function SettingsAboutScreen() {
 }
 
 interface ExportProps {
-  /** What is holding the data, which decides whether Nooks can copy it itself. */
+  /** What is holding the data, which decides whether nooks can copy it itself. */
   driver: string
 }
 
 /**
  * Taking the whole Instance away with you.
  *
- * On SQLite the database is one file and Nooks copies it while it runs, so the export
+ * On SQLite the database is one file and nooks copies it while it runs, so the export
  * is the database itself rather than a format of ours — nothing here describes the
  * schema, so nothing here can fall behind it.
  *
  * On Postgres it says so and shows the command. That deployment already has a backup
- * story, and anything Nooks wrote would be a worse one.
+ * story, and anything nooks wrote would be a worse one.
  */
 function Export({ driver }: ExportProps) {
   const { t } = useTranslation()

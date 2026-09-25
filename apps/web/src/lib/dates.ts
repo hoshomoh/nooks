@@ -20,7 +20,7 @@ import {
 import type { Locale as DateLocale } from "date-fns"
 
 /**
- * Every date operation in Nooks. Nothing else parses, formats or compares a date.
+ * Every date operation in nooks. Nothing else parses, formats or compares a date.
  *
  * date-fns rather than Intl or hand-rolled arithmetic: its month names are stable
  * across runtimes, where `Intl.DateTimeFormat("en-GB")` renders September as "Sept" and
@@ -247,7 +247,7 @@ export function rangeFrom(from: Date, days: number): DueRange {
 }
 
 /**
- * WEEK_STARTS_ON_MONDAY is the only week Nooks draws.
+ * WEEK_STARTS_ON_MONDAY is the only week nooks draws.
  *
  * DESIGN.md §8: a week does not begin on Sunday. date-fns defaults to Sunday, so every
  * call that cares has to say otherwise — which is why they all live in this file.

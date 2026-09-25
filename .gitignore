@@ -15,7 +15,7 @@ apps/web/dist/
 server/router/frontend/dist/*
 !server/router/frontend/dist/.gitkeep
 
-# Local data — a Nooks instance keeps its SQLite file here during development
+# Local data — a nooks instance keeps its SQLite file here during development
 *.db
 *.db-shm
 *.db-wal

@@ -18,7 +18,7 @@ import {
 import { startNewSession } from "@/lib/new-session"
 
 /**
- * A forgotten password. Nooks sends no email: an Admin checks it is really you however
+ * A forgotten password. nooks sends no email: an Admin checks it is really you however
  * they like, approves, and you set the new password yourself.
  */
 export function ForgotPassword() {

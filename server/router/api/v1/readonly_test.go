@@ -93,7 +93,7 @@ what the Member asked of it, and the three-way model exists precisely so that as
 worth something.
 
 This test asserts the hole rather than the rule, because closing it is a decision
-about whether a write-only token is a thing Nooks offers at all: Usable() is
+about whether a write-only token is a thing nooks offers at all: Usable() is
 `Read || Write`, so today it is offered. Whoever decides comes here, and the guard
 worth adding with the fix is that every field of TokenAbilities is consulted by some
 Grant method — which is what would have caught this.

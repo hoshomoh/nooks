@@ -75,7 +75,7 @@ function saying(node: JSONContent): PreviewRun[][] {
  * spaced reads a row as somebody would read it aloud, with a space between the cells.
  *
  * The only punctuation a preview is allowed to invent. Anything more — a bullet, a
- * pipe — would be Nooks writing in the middle of the Member's own words.
+ * pipe — would be nooks writing in the middle of the Member's own words.
  */
 function spaced(row: JSONContent): JSONContent[] {
   return (row.content ?? []).flatMap((cell, index) => {

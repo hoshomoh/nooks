@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Nooks is one binary. This builds it, and the image around it holds nothing else.
+# nooks is one binary. This builds it, and the image around it holds nothing else.
 #
 # Three stages: the app, the binary with the app baked into it, and a runtime with
 # neither toolchain in it. The result is a static binary and a CA bundle — no shell, no

@@ -254,7 +254,7 @@ Copying a List writes once, not once per Item.
 
 It used to be a CreateItem per row, and each of those read the next position, inserted,
 and committed on its own — a hundred Items meant a hundred commits, which on the kind of
-machine Nooks is meant to run on is felt rather than measured.
+machine nooks is meant to run on is felt rather than measured.
 */
 func TestCreateItemsKeepsTheOrderItIsGiven(t *testing.T) {
 	for _, d := range drivers() {

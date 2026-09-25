@@ -74,7 +74,7 @@ describe("markdown the design does not have", () => {
   /*
    * A Member's words matter more than the shape they arrived in.
    *
-   * A bullet list, because that is the block type Nooks has no drawing for. `markerOf`
+   * A bullet list, because that is the block type nooks has no drawing for. `markerOf`
    * has no `- ` among its prefixes, so `- milk` falls through to a paragraph whose
    * marker length is zero, and the dash stays part of the words. A `- ` prefix added
    * there would consume the marker and the Member would lose it.
@@ -89,7 +89,7 @@ describe("markdown the design does not have", () => {
    * dropped: "Bullet and numbered lists are not rendered and survive as the literal
    * characters typed, so use a checklist instead."
    */
-  it("keeps the text of a block type Nooks cannot draw", () => {
+  it("keeps the text of a block type nooks cannot draw", () => {
     expect(documentFrom("- milk").content?.[0]?.type).toBe("paragraph")
     expect(roundTrip("- milk")).toBe("- milk")
     expect(roundTrip("1. milk")).toBe("1. milk")

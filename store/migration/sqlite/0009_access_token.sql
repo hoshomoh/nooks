@@ -1,7 +1,7 @@
 -- A token is how anything that is not a browser reaches an Instance: a script, a
 -- shortcut, an MCP client.
 --
--- Only the hash is kept. The token itself is shown once, when it is made, and Nooks
+-- Only the hash is kept. The token itself is shown once, when it is made, and nooks
 -- cannot show it again — the same rule a password follows, for the same reason.
 CREATE TABLE access_token (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,

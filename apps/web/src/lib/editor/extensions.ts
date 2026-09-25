@@ -25,7 +25,7 @@ export function noteExtensions(options: NoteExtensionOptions): (Extension | Node
     StarterKit.configure({
       heading: { levels: [3] },
       // Bullet and ordered lists are not among the seven. A checklist is the list
-      // Nooks has, and it is the one that means something on a household todo.
+      // nooks has, and it is the one that means something on a household todo.
       bulletList: false,
       orderedList: false,
       listItem: false,

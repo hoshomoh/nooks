@@ -35,7 +35,7 @@ export interface TemporarySecret {
 /**
  * Adding a Member: two steps in one dialog.
  *
- * The second step is the password, and it exists because Nooks has no mail server —
+ * The second step is the password, and it exists because nooks has no mail server —
  * nothing will reach the new Member unless the Admin carries it. Showing it in the same
  * dialog is what makes that impossible to miss.
  */

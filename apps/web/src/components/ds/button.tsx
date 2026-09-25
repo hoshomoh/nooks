@@ -4,7 +4,7 @@ import { cn } from "cn"
 import { Button as ShadcnButton } from "@/components/ui/button"
 
 /**
- * Nooks' button, per DESIGN.md §7.
+ * nooks' button, per DESIGN.md §7.
  *
  * It wraps the generated shadcn button rather than replacing it, so that Base UI's
  * behaviour — focus handling, disabled state, slots — comes for free and

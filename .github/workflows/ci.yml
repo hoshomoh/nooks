@@ -50,7 +50,7 @@ jobs:
         run: test -z "$(gofmt -l cmd internal server store)"
 
   # Neither ecosystem was scanned for known vulnerabilities by anything, so an advisory
-  # against a dependency would have arrived silently. Nooks is a thing people run on
+  # against a dependency would have arrived silently. nooks is a thing people run on
   # their own machines, where nobody is watching a feed on their behalf.
   security:
     name: Security
@@ -190,7 +190,7 @@ jobs:
 
       # Built, not just linted. A Dockerfile that has never produced an image is a
       # Dockerfile nobody knows the state of, and the one in this repository is how
-      # most people will run Nooks.
+      # most people will run nooks.
       - name: Build
         uses: docker/build-push-action@v6
         with:

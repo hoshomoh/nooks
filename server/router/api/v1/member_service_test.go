@@ -165,7 +165,7 @@ func TestAGroupNeedsAName(t *testing.T) {
 	}
 }
 
-// Nooks has no mail server, so the password is handed over in person — and read once.
+// nooks has no mail server, so the password is handed over in person — and read once.
 func TestAddingAMemberReadsThePasswordOut(t *testing.T) {
 	f := newMemberFixture(t)
 
@@ -342,7 +342,7 @@ func TestAMemberWhoHasNeverSignedIn(t *testing.T) {
 	}
 }
 
-// An account is a person. Nooks does not let one person edit another, which is why
+// An account is a person. nooks does not let one person edit another, which is why
 // there is no "member_uid" on this request at all.
 func TestAMemberChangesTheirOwnNameAndEmail(t *testing.T) {
 	f := newListFixture(t)

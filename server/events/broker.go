@@ -1,6 +1,6 @@
 // Package events carries changes from the Member who made them to the Members watching.
 //
-// Everything here is in memory and per process. Nooks is one binary on one machine, so
+// Everything here is in memory and per process. nooks is one binary on one machine, so
 // there is nothing to coordinate between: a broker that survived a restart would be a
 // message queue nobody asked to run.
 package events

@@ -24,7 +24,7 @@ const queryClient = new QueryClient({
   },
 })
 
-// What Nooks means by offline, rather than what the browser guesses. Wired before
+// What nooks means by offline, rather than what the browser guesses. Wired before
 // anything can be mutated, so a change made on a dead connection is paused and kept
 // instead of failing and being lost.
 wireOnline(connectionStore)

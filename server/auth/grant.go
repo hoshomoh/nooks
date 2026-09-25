@@ -19,7 +19,7 @@ token model — a token is never its own identity with its own permissions, it i
 else's access with edges.
 
 Keeping it in one value means the rules are applied in one place. Permissions are
-decided by accessTo, and everything that reaches Nooks — browser, script, MCP client —
+decided by accessTo, and everything that reaches nooks — browser, script, MCP client —
 goes through the same decision.
 */
 type Grant struct {

@@ -12,7 +12,7 @@ import (
 
 // Access is what a Member may do with one List.
 //
-// The three levels are deliberately coarse. Nooks has one container and one sharing
+// The three levels are deliberately coarse. nooks has one container and one sharing
 // switch; anything finer would be a permission system nobody asked for.
 type Access int
 
@@ -89,7 +89,7 @@ func reaches(list store.List, shares namedShares) bool {
 
 // sharesFor reads the Member's named shares once.
 //
-// A free function rather than a method: every way into Nooks has to work out reach the
+// A free function rather than a method: every way into nooks has to work out reach the
 // same way, and a helper that hangs off one service is a helper the next one copies.
 func sharesFor(ctx context.Context, st store.Store, member store.Member) (namedShares, error) {
 	ids, err := st.SharedListIDs(ctx, member.ID)

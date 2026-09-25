@@ -25,7 +25,7 @@ CREATE TABLE list_share (
 CREATE INDEX idx_list_share_list_id ON list_share (list_id);
 CREATE INDEX idx_list_share_member_id ON list_share (member_id);
 
--- Activity is where everything that would be an email elsewhere waits. Nooks has no
+-- Activity is where everything that would be an email elsewhere waits. nooks has no
 -- mail server, so this is the only place these surface.
 CREATE TABLE activity (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,

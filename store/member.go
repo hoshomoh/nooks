@@ -41,7 +41,7 @@ type Member struct {
 	UID string
 	// Name is how the Member appears on Items they add.
 	Name string
-	// Email identifies the Member at sign-in. Nooks never sends mail to it.
+	// Email identifies the Member at sign-in. nooks never sends mail to it.
 	Email string
 	Role  Role
 	// PasswordHash is a bcrypt hash. The password itself is never stored or logged.

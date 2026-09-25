@@ -35,7 +35,7 @@ export async function createStarterList(t: Translate, now: Date = new Date()): P
  * Publishes the first List, so the Instance's address answers with something.
  *
  * An Instance whose front door asks for credentials is one nobody can be shown. The
- * first List is also the least private thing on it — it was made by Nooks, not by
+ * first List is also the least private thing on it — it was made by nooks, not by
  * anybody — so it is the one that can be public before an Admin has decided anything.
  *
  * Contributor names stay off, as they do everywhere by default. Settings → Public list

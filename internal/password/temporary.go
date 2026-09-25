@@ -18,7 +18,7 @@ const temporarySeparator = "-"
 /*
 alphabet is plain English words, chosen to be unambiguous when spoken.
 
-Nooks has no mail server, so an Admin who adds a Member reads the password out. A
+nooks has no mail server, so an Admin who adds a Member reads the password out. A
 spoken secret cannot contain characters that have to be described: no "capital eye",
 no "underscore". Nothing here sounds like anything else here, and nothing is longer
 than six letters.

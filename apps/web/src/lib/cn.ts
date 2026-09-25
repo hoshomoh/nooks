@@ -1,9 +1,9 @@
 import { createCn } from "cn/config"
 
 /**
- * Class merging that knows Nooks' own tokens.
+ * Class merging that knows nooks' own tokens.
  *
- * `cn` resolves conflicts from a table of Tailwind's built-in names. Without Nooks'
+ * `cn` resolves conflicts from a table of Tailwind's built-in names. Without nooks'
  * colours and type scale in that table, a size and a colour both spelled `text-…` look
  * like the same utility, and `cn("text-small text-shared")` quietly drops the size.
  *
@@ -11,7 +11,7 @@ import { createCn } from "cn/config"
  * forgotten here.
  */
 
-/** Every colour Nooks defines beyond the ones shadcn ships. */
+/** Every colour nooks defines beyond the ones shadcn ships. */
 export const NOOKS_COLORS = [
   "desk",
   "hair",

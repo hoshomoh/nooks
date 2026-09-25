@@ -1,7 +1,7 @@
 /**
  * The identifier of a request this browser has made, remembered locally.
  *
- * Nooks sends no email, so there is no link to come back on: the browser that asked is
+ * nooks sends no email, so there is no link to come back on: the browser that asked is
  * the thing that remembers, and the Member returns to the same address to check.
  */
 export type PendingRequestKind = "join" | "reset"

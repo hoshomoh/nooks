@@ -170,7 +170,7 @@ function AccountSection() {
   )
 }
 
-/** How Nooks looks, and what language it speaks. Applies as chosen. */
+/** How nooks looks, and what language it speaks. Applies as chosen. */
 function AppearanceSection() {
   const { t } = useTranslation()
   const { theme, setTheme } = useTheme()

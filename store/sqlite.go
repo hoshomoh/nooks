@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	_ "modernc.org/sqlite" // pure-Go driver: no cgo, so Nooks cross-compiles freely
+	_ "modernc.org/sqlite" // pure-Go driver: no cgo, so nooks cross-compiles freely
 )
 
 // OpenSQLite opens the Instance's single file, creating it and its directory when

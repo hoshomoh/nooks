@@ -175,7 +175,7 @@ interface SignInPromptProps {
  * Under the row they touched, not across the page: it answers the thing they just
  * tried, and leaves everything else readable.
  *
- * It arrives rather than appears. This is a stranger's first minute with Nooks, and
+ * It arrives rather than appears. This is a stranger's first minute with nooks, and
  * the rows below it are about to move: the one thing worth spending motion on here is
  * saying that the panel is what moved them.
  */

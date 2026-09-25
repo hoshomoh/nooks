@@ -13,7 +13,7 @@ import (
 
 // ActivityService is everything waiting for one Member's attention.
 //
-// Nooks has no mail server, so this panel is the only place any of it surfaces.
+// nooks has no mail server, so this panel is the only place any of it surfaces.
 type ActivityService struct {
 	store store.Store
 	now   func() time.Time

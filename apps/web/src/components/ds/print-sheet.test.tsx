@@ -98,7 +98,7 @@ describe("the printed sheet", () => {
 
 describe("what the sheet says it is", () => {
   it("never calls a list something it is not", () => {
-    // The design writes the kind of list in the eyebrow and Nooks has no field for
+    // The design writes the kind of list in the eyebrow and nooks has no field for
     // one, so it says nothing rather than printing "shopping list" over a packing
     // list. The list's own name is the heading directly below it.
     render(

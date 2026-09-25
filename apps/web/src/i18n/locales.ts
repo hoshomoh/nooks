@@ -2,7 +2,7 @@ import type { Locale as DateLocale } from "date-fns"
 import { enGB } from "date-fns/locale"
 
 /**
- * The languages Nooks speaks.
+ * The languages nooks speaks.
  *
  * Adding one is a JSON file in `locales/` and an entry here — no code changes. Where a
  * language needs different date or number conventions, it names the date-fns locale to

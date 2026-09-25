@@ -1,4 +1,4 @@
-# Nooks
+# nooks
 
 A household todo app you run on your own machine.
 
@@ -10,7 +10,7 @@ MCP server.
 
 ## Running it
 
-Nooks is one binary. It serves the API and the app from the same process and keeps everything in one
+nooks is one binary. It serves the API and the app from the same process and keeps everything in one
 SQLite file you can copy.
 
 With Docker:
@@ -56,7 +56,7 @@ Instance; everyone else joins by asking, and an Admin approves.
 
 ### Backing it up
 
-Stop Nooks and copy `data/nooks.db`. That is the whole Instance.
+Stop nooks and copy `data/nooks.db`. That is the whole Instance.
 
 ## Developing
 
@@ -118,7 +118,7 @@ and none of them are ruled out later:
 
 ## Two standing decisions
 
-These are not scheduling. They shape what Nooks is, and changing either would change
+These are not scheduling. They shape what nooks is, and changing either would change
 the app rather than extend it:
 
 - **No email, of any kind.** No mail server to configure on a machine in a hallway, and

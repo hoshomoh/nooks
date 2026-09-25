@@ -1,6 +1,6 @@
 # Contributing
 
-Nooks is a household todo app you run yourself. It is one Go binary serving an API and a
+nooks is a household todo app you run yourself. It is one Go binary serving an API and a
 React app from the same process, with everything in one SQLite file.
 
 This page is how to get it running and what is expected of a change. The reasoning
@@ -100,7 +100,7 @@ fix(api): refuse a text change that would overwrite another
 docs(website): explain the api before listing it
 ```
 
-The subject says what changed for somebody using Nooks, not which files moved.
+The subject says what changed for somebody using nooks, not which files moved.
 
 That subject is not only for the log. release-please reads these commits to decide the
 next version and to write the changelog the docs publish, so the line you write here is

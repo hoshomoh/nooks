@@ -6,7 +6,7 @@ These files are produced by `pnpm dlx shadcn@latest add <component>` and are ove
 whenever a component is added or updated. Editing them means the next update either
 clobbers your change or has to be merged by hand — and both go wrong quietly.
 
-Nooks' own components live in `../ds/`. They compose these primitives and apply
+nooks' own components live in `../ds/`. They compose these primitives and apply
 `DESIGN.md`. If a component needs to look or behave differently:
 
 1. Wrap it in `../ds/`, passing `className` or props.

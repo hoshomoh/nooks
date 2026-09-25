@@ -165,7 +165,7 @@
 
 ### ⚠ BREAKING CHANGES
 
-* rename the app from Nook to Nooks
+* rename the app from Nook to nooks
 
 ### New
 
@@ -294,7 +294,7 @@
 * copy a list in one write, and parse its notes once ([f68eeb5](https://github.com/hoshomoh/nooks/commit/f68eeb5c179722ef99e1c84131038996706f32af))
 * keep design values in one place ([473f826](https://github.com/hoshomoh/nooks/commit/473f8261c0a67583d898175e56c275ac50d1f4d3))
 * move to an apps and packages monorepo layout ([5fa6a77](https://github.com/hoshomoh/nooks/commit/5fa6a7735073dbc838979b42fd7e9092924c7431))
-* rename the app from Nook to Nooks ([57bbbcf](https://github.com/hoshomoh/nooks/commit/57bbbcf229bf13dde3a5620ae14797f36d6d3494))
+* rename the app from Nook to nooks ([57bbbcf](https://github.com/hoshomoh/nooks/commit/57bbbcf229bf13dde3a5620ae14797f36d6d3494))
 * **store:** move to bun for typed multi-dialect queries ([27853bd](https://github.com/hoshomoh/nooks/commit/27853bd4dec34d50412f56dcf438b0ab5683f649))
 * **web:** make theme an external store and add the ds layer ([e57a7d9](https://github.com/hoshomoh/nooks/commit/e57a7d9b28b73032c70e7aa80a2f1a724fb589f1))
 * **web:** stop every screen paying for the editor ([6ee7b0f](https://github.com/hoshomoh/nooks/commit/6ee7b0f40b7cf7cbc54b3ade782a36af48f2c389))

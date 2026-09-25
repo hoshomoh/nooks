@@ -4,7 +4,7 @@ Binding on every contributor and every agent working in this repo. `AGENTS.md` p
 enforce it. Where a rule below and a rule in `AGENTS.md` disagree, `AGENTS.md` wins — it is closer to
 the commands.
 
-Nooks is a small app that people run on their own machines and that other developers will extend after
+nooks is a small app that people run on their own machines and that other developers will extend after
 v1. Both facts push the same way: **plain code that a newcomer can read, test, and change without
 first learning our abstractions.**
 
@@ -116,7 +116,7 @@ content. `apps/web/src/i18n` is the app's.
 
 **Generated shadcn components are never edited.** `src/components/ui/` is output from
 `pnpm dlx shadcn@latest add <component>` and must stay byte-for-byte what the generator
-produces, so that adding or updating a component never clobbers a local change. Nooks'
+produces, so that adding or updating a component never clobbers a local change. nooks'
 own components live in `src/components/ds/` and compose those primitives. When something
 needs to look or behave differently, in this order:
 

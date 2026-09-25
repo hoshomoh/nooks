@@ -1,4 +1,4 @@
-# Nooks — design system
+# nooks — design system
 
 The specification the UI is built to. The values here are exact, not approximate. If a component in
 the app disagrees with this file, the component is wrong.
@@ -21,14 +21,14 @@ things being displayed.
 - **16px is the floor** for anything a Member wrote.
 - **Never summarise the Member.** A long Note previews as its own first line plus a count of what is
   left. Nothing is generated on their behalf.
-- **Nooks sends no email.** Anything that would need one waits in Activity.
+- **nooks sends no email.** Anything that would need one waits in Activity.
 
 ---
 
 ## 2. Colour
 
 Names here are the **real CSS custom properties** in `apps/web/src/index.css`. Where a colour fills one
-of shadcn's semantics it carries shadcn's name; where shadcn has no name for it, it is Nooks' own and
+of shadcn's semantics it carries shadcn's name; where shadcn has no name for it, it is nooks' own and
 is exposed as a utility through `@theme inline`. §16 explains the contract; this is the palette.
 
 Hex is given because that is what the canvas specifies and what a designer reads. The CSS is OKLCH —
@@ -396,7 +396,7 @@ lives) and a Copy at the right. Until the token exists the block still renders, 
 where the secret will go: a Member should be able to see what they are about to be asked to paste
 before they cut anything.
 
-**About** — what this copy of Nooks is, as settings rows: version, how long the Instance has been
+**About** — what this copy of nooks is, as settings rows: version, how long the Instance has been
 running, how much room it is taking, how many Members, Lists and Items it holds, and the licence.
 Facts, in the same rows every other settings page uses; there is no dashboard here and nothing is
 charted.
@@ -650,8 +650,8 @@ optical size, not a scale: `M4 8h8` at stroke 3, and `M4 14h16` at stroke 1.5.
 
 Tab title is `<List> · nooks`.
 
-The product is **Nooks** in prose and **nooks** as a logotype. Sentences capitalise it; the wordmark,
-the tab title and the app icon do not.
+The product is **nooks**, lowercase, everywhere: in prose, in the wordmark, the tab title and the
+app icon. A sentence may start with it. It is a brand name, and it keeps its styling there too.
 
 ---
 
@@ -713,31 +713,31 @@ come from that and are not ours to vary:
 :root  { /* light values */ }
 .dark  { /* dark values  */ }
 
-@theme inline { /* --color-* mappings, incl. Nooks' own */ }
+@theme inline { /* --color-* mappings, incl. nooks' own */ }
 
 @layer base { /* base styles */ }
 ```
 
 ### The collision, and how it is resolved
 
-**shadcn's `--accent` is a subtle hover surface, not a brand colour.** Nooks' accent is a meaning
+**shadcn's `--accent` is a subtle hover surface, not a brand colour.** nooks' accent is a meaning
 colour. Reusing the name would silently restyle every shadcn hover state.
 
-The Foundations artboard labels that swatch **"Shared / accent"**, so Nooks' takes the name **`shared`**
+The Foundations artboard labels that swatch **"Shared / accent"**, so nooks' takes the name **`shared`**
 and shadcn keeps `--accent` for its own job. Everywhere §2 says *accent*, the token is `shared`.
 
 ### Mapping onto shadcn's semantics
 
-| shadcn variable | Nooks source | Note |
+| shadcn variable | nooks source | Note |
 | --- | --- | --- |
 | `--background` / `--foreground` | paper / ink | |
 | `--card`, `--popover` (+ `-foreground`) | paper / ink | |
 | `--primary` / `--primary-foreground` | ink / paper | The primary button is ink on paper |
 | `--secondary` / `--secondary-foreground` | selected / sub | |
 | `--muted` | selected | shadcn `--muted` is a **surface** |
-| `--muted-foreground` | muted `#5F5F5B` | Nooks' "muted" is a **text** colour |
-| `--accent` / `--accent-foreground` | selected / ink | shadcn's hover surface — **not** Nooks' accent |
-| `--destructive` | error-text | Nooks' destructive button is outlined, not filled |
+| `--muted-foreground` | muted `#5F5F5B` | nooks' "muted" is a **text** colour |
+| `--accent` / `--accent-foreground` | selected / ink | shadcn's hover surface — **not** nooks' accent |
+| `--destructive` | error-text | nooks' destructive button is outlined, not filled |
 | `--border` | line | |
 | `--input` | input-line `#D6D6D1` | Deliberately darker than `--border` |
 | `--ring` | shared | The 2px focus ring |
@@ -746,7 +746,7 @@ and shadcn keeps `--accent` for its own job. Everywhere §2 says *accent*, the t
 | `--sidebar-border` / `--sidebar-ring` | line / shared | |
 | `--chart-1` … `--chart-5` | shared, done, offline, overdue, control | Unused; set so shadcn defaults never leak |
 
-### Nooks' own tokens
+### nooks' own tokens
 
 Added the documented way — declared in `:root` and `.dark`, exposed through `@theme inline` as
 `--color-<name>`, which is what generates the `bg-*` / `text-*` / `border-*` utilities:
@@ -757,7 +757,7 @@ Added the documented way — declared in `:root` and `.dark`, exposed through `@
 ### Radius
 
 shadcn's own components reach for `rounded-sm` / `md` / `lg` / `xl`, and its preset derives those from
-one `--radius` by multiplication. Rather than fight that, **Nooks' five radii are written directly onto
+one `--radius` by multiplication. Rather than fight that, **nooks' five radii are written directly onto
 that scale**, so a shadcn component gets the right corner without being touched:
 
 | Tailwind | Value | DESIGN.md role |

@@ -669,3 +669,72 @@ func TestAskingForAResetAgainTellsTheAdmin(t *testing.T) {
 	}
 	t.Fatalf("no entry points at the waiting reset, out of %d", len(entries))
 }
+
+/*
+An approval to join stops working, the way an approval to reset already did.
+
+A reset identifier takes over an account that exists and a join identifier makes one at
+an address an Admin agreed to, which is the same kind of capability. Only one of them
+was bounded. What bounded the other was the thirty-day sweep of answered requests, a
+number chosen for keeping history rather than for how long a door should stand open, and
+on a shared browser that is a month in which whoever sits down next finishes somebody
+else's account.
+
+A day rather than the reset's hour: an hour assumes the Admin and the person are in the
+same room, and somebody waiting to hear about an account may not look until tomorrow.
+*/
+func TestJoinApprovalExpires(t *testing.T) {
+	svc, s := newAuthService(t)
+	completeSetup(t, svc)
+
+	uid, err := askToJoin(t, svc, "til@example.com")
+	if err != nil {
+		t.Fatalf("RequestJoin: %v", err)
+	}
+	// Approved a day and a half before the service's clock reads.
+	if err := s.DecideJoinRequest(t.Context(), uid, store.StatusApproved,
+		testClock.Add(-36*time.Hour)); err != nil {
+		t.Fatalf("DecideJoinRequest: %v", err)
+	}
+
+	status, err := svc.GetJoinRequest(t.Context(),
+		connect.NewRequest(&apiv1.GetJoinRequestRequest{RequestUid: uid}))
+	if err != nil {
+		t.Fatalf("GetJoinRequest: %v", err)
+	}
+	if status.Msg.GetStatus() != apiv1.RequestStatus_REQUEST_STATUS_PENDING {
+		t.Errorf("status = %v, want pending once the approval has expired", status.Msg.GetStatus())
+	}
+
+	_, err = svc.CompleteJoin(t.Context(), connect.NewRequest(&apiv1.CompleteJoinRequest{
+		RequestUid: uid, Password: "a brand new password",
+	}))
+	if got := connect.CodeOf(err); got != connect.CodeFailedPrecondition {
+		t.Errorf("code = %v, want failed_precondition on an expired approval", got)
+	}
+}
+
+// An expiry must not strand anybody: the second ask is refused only while one is still
+// pending, so somebody whose approval ran out asks again and gets a real request rather
+// than the dead identifier a repeat asker is handed.
+func TestAnExpiredApprovalCanBeAskedForAgain(t *testing.T) {
+	svc, s := newAuthService(t)
+	completeSetup(t, svc)
+
+	first, err := askToJoin(t, svc, "til@example.com")
+	if err != nil {
+		t.Fatalf("RequestJoin: %v", err)
+	}
+	if err := s.DecideJoinRequest(t.Context(), first, store.StatusApproved,
+		testClock.Add(-36*time.Hour)); err != nil {
+		t.Fatalf("DecideJoinRequest: %v", err)
+	}
+
+	second, err := askToJoin(t, svc, "til@example.com")
+	if err != nil {
+		t.Fatalf("RequestJoin again: %v", err)
+	}
+	if _, err := s.JoinRequestByUID(t.Context(), second); err != nil {
+		t.Errorf("asking again after an expiry handed back a dead identifier: %v", err)
+	}
+}

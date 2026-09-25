@@ -1,0 +1,18 @@
+-- An approval to join stops being usable, the way an approval to reset already did.
+--
+-- A reset identifier takes over an account that exists; a join identifier makes one at
+-- an address an Admin agreed to. Both are the same kind of capability, and only one of
+-- them was bounded: usableResetRequest checked expires_at, approvedJoinRequest checked
+-- nothing but the status.
+--
+-- So what bounded a join was the thirty-day sweep of answered requests, which is a
+-- number chosen for keeping history rather than for how long a door should stand open.
+-- On a shared browser that is a month in which whoever sits down next can finish the
+-- account somebody else was approved for.
+--
+-- Twenty-four hours. Not the reset's one hour, which assumes the Admin and the person
+-- are in the same room, and not a week: an expired approval does not strand anybody,
+-- because CreateJoinRequest refuses a second ask only where one is still PENDING, so
+-- asking again after an expiry writes a real request rather than the dead identifier
+-- somebody who asks twice is handed.
+ALTER TABLE join_request ADD COLUMN expires_at TEXT NOT NULL DEFAULT '';

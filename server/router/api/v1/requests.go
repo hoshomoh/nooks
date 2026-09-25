@@ -117,21 +117,17 @@ func (s *AuthService) GetJoinRequest(
 	ctx context.Context,
 	req *connect.Request[apiv1.GetJoinRequestRequest],
 ) (*connect.Response[apiv1.GetJoinRequestResponse], error) {
-	request, err := s.store.JoinRequestByUID(ctx, req.Msg.GetRequestUid())
+	// Anything not usable — missing, pending, ignored, expired, spent — reads as
+	// pending, so none of them can be told apart from outside. Ignored in particular:
+	// the sender is never told they were turned down.
+	request, err := s.approvedJoinRequest(ctx, req.Msg.GetRequestUid())
 	if err != nil {
-		if errors.Is(err, store.ErrNotFound) {
+		if errors.Is(err, errRequestNotApproved) {
 			return connect.NewResponse(&apiv1.GetJoinRequestResponse{
 				Status: apiv1.RequestStatus_REQUEST_STATUS_PENDING,
 			}), nil
 		}
-		return nil, internalError("read join request", err)
-	}
-
-	// Ignored is reported as pending: the sender is never told they were turned down.
-	if request.Status != store.StatusApproved {
-		return connect.NewResponse(&apiv1.GetJoinRequestResponse{
-			Status: apiv1.RequestStatus_REQUEST_STATUS_PENDING,
-		}), nil
+		return nil, err
 	}
 	return connect.NewResponse(&apiv1.GetJoinRequestResponse{
 		Status: apiv1.RequestStatus_REQUEST_STATUS_APPROVED,
@@ -309,7 +305,7 @@ func (s *AuthService) approvedJoinRequest(ctx context.Context, uid string) (stor
 		}
 		return store.JoinRequest{}, internalError("read join request", err)
 	}
-	if request.Status != store.StatusApproved {
+	if !request.Usable(s.now()) {
 		return store.JoinRequest{}, errRequestNotApproved
 	}
 	return request, nil

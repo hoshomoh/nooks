@@ -28,6 +28,23 @@ const (
 // approval nobody acted on does not linger.
 const ResetApprovalLifetime = time.Hour
 
+/*
+JoinApprovalLifetime is how long an approved Join request stays usable.
+
+Longer than a reset, because the two are waited on differently. A reset's hour assumes
+the Admin and the Member are in the same room and one of them says "go ahead"; somebody
+who asked for an account is waiting to hear back and may not look until tomorrow.
+
+Shorter than the thirty-day sweep, which is what used to bound this and was never a
+lifetime: it is how long an answered request is kept as history. A day is what a shared
+browser holds an unfinished account open for.
+
+An expiry strands nobody. CreateJoinRequest refuses a second ask only where one is still
+pending, so asking again after this writes a real request rather than the dead
+identifier somebody who asks twice is handed.
+*/
+const JoinApprovalLifetime = 24 * time.Hour
+
 // JoinRequest is a Visitor's request for an account.
 type JoinRequest struct {
 	ID    int64
@@ -40,6 +57,13 @@ type JoinRequest struct {
 	CreatedAt time.Time
 	// DecidedAt is the zero value while the request is pending.
 	DecidedAt time.Time
+	// ExpiresAt is when an approval stops being usable. Zero while pending.
+	ExpiresAt time.Time
+}
+
+// Usable reports whether an approved Join request may still be acted on.
+func (r JoinRequest) Usable(now time.Time) bool {
+	return r.Status == StatusApproved && now.Before(r.ExpiresAt)
 }
 
 // ResetRequest is a Member's request to replace a forgotten password.
@@ -108,8 +132,8 @@ one at a time there rather than reaching for something finer.
 */
 func (s *sqlStore) CreateJoinRequest(ctx context.Context, params CreateJoinRequestParams) (JoinRequest, error) {
 	const claim = `
-		INSERT INTO join_request (uid, name, email, message, status, created_at, decided_at)
-		SELECT ?, ?, ?, ?, ?, ?, ''
+		INSERT INTO join_request (uid, name, email, message, status, created_at, decided_at, expires_at)
+		SELECT ?, ?, ?, ?, ?, ?, '', ''
 		WHERE NOT EXISTS (SELECT 1 FROM join_request WHERE email = ? AND status = ?)
 		AND (SELECT COUNT(*) FROM join_request WHERE status = ?) < ?`
 
@@ -280,12 +304,18 @@ func (s *sqlStore) JoinRequestByUID(ctx context.Context, uid string) (JoinReques
 	return row.toJoinRequest()
 }
 
-// DecideJoinRequest records an Admin's decision.
+// DecideJoinRequest records an Admin's decision. An approval carries an expiry.
 func (s *sqlStore) DecideJoinRequest(ctx context.Context, uid string, status RequestStatus, at time.Time) error {
+	expiresAt := time.Time{}
+	if status == StatusApproved {
+		expiresAt = at.Add(JoinApprovalLifetime)
+	}
+
 	result, err := s.db.NewUpdate().
 		Model((*joinRequestModel)(nil)).
 		Set("status = ?", string(status)).
 		Set("decided_at = ?", formatTime(at)).
+		Set("expires_at = ?", formatTime(expiresAt)).
 		Where("uid = ? AND status = ?", uid, string(StatusPending)).
 		Exec(ctx)
 	if err != nil {
@@ -425,6 +455,7 @@ type joinRequestModel struct {
 	Status    string `bun:"status,notnull"`
 	CreatedAt string `bun:"created_at,notnull"`
 	DecidedAt string `bun:"decided_at,notnull"`
+	ExpiresAt string `bun:"expires_at,notnull"`
 }
 
 func (m joinRequestModel) toJoinRequest() (JoinRequest, error) {
@@ -436,9 +467,14 @@ func (m joinRequestModel) toJoinRequest() (JoinRequest, error) {
 	if err != nil {
 		return JoinRequest{}, err
 	}
+	expiresAt, err := parseTime(m.ExpiresAt)
+	if err != nil {
+		return JoinRequest{}, err
+	}
 	return JoinRequest{
 		ID: m.ID, UID: m.UID, Name: m.Name, Email: m.Email, Message: m.Message,
 		Status: RequestStatus(m.Status), CreatedAt: createdAt, DecidedAt: decidedAt,
+		ExpiresAt: expiresAt,
 	}, nil
 }
 

@@ -57,7 +57,9 @@ CREATE TABLE join_request (
   -- PENDING, APPROVED or IGNORED. Ignoring is silent and never notifies the sender.
   status     TEXT    NOT NULL DEFAULT 'PENDING',
   created_at TEXT    NOT NULL,
-  decided_at TEXT    NOT NULL DEFAULT ''
+  decided_at TEXT    NOT NULL DEFAULT '',
+  -- When an approval stops being usable. Empty while pending. See 0019.
+  expires_at TEXT    NOT NULL DEFAULT ''
 );
 
 CREATE INDEX idx_join_request_status ON join_request (status);

@@ -8,7 +8,7 @@
 @import "@nooks/design/foundations.css";
 
 /*
- * Fumadocs brings its own look, and the docs have to look like the rest of Nooks.
+ * Fumadocs brings its own look, and the docs have to look like the rest of nooks.
  *
  * Its colour file comes first because the preset builds utilities from those variables
  * and will not compile without them. Every one that decides how the docs read is then

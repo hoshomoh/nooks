@@ -3,7 +3,7 @@ title: Using the API
 description: The base URL, how a token authenticates, and what comes back when something goes wrong.
 ---
 
-Everything the app does, Nooks does over REST. There is no endpoint the browser has that
+Everything the app does, nooks does over REST. There is no endpoint the browser has that
 a script does not, and a check in CI refuses one that ships without a route. If you can
 do it in the interface, you can do it from a shell.
 
@@ -31,7 +31,7 @@ curl https://nooks.example.com/api/v1/lists \
 ```
 
 Make one in **Settings → Access tokens**. The secret is shown once, when it is created,
-and never again. Nooks stores only a hash of it, so a token that is lost is replaced
+and never again. nooks stores only a hash of it, so a token that is lost is replaced
 rather than recovered.
 
 ### What a token can reach
@@ -78,13 +78,13 @@ The message is written to be read by a person: the same sentence the app shows.
 | `403` | A valid token that is not allowed to do this: the wrong ability, or a list it was not given |
 | `404` | No such thing, or none this token is allowed to see |
 | `409` | It already exists |
-| `500` | Nooks failed. This is a bug, and the message says what it was doing |
+| `500` | nooks failed. This is a bug, and the message says what it was doing |
 
 A `403` and a `404` can both mean "not yours". Which one you get depends on whether the
 thing would be visible at all: a list outside a token's scope answers `404`, because
 telling you it exists is itself something the token is not allowed to know.
 
-## What Nooks does not do
+## What nooks does not do
 
 Worth knowing before you write against it:
 
@@ -97,6 +97,6 @@ Worth knowing before you write against it:
 
 ## Pointing an assistant at it
 
-An assistant does not need any of this. Nooks speaks the Model Context Protocol at
+An assistant does not need any of this. nooks speaks the Model Context Protocol at
 `/mcp`, authenticated with the same access token, reaching exactly what the token
 reaches. See [the MCP page](/docs/mcp).

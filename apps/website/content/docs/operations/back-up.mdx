@@ -3,7 +3,7 @@ title: Back up
 description: The export is the database, so there is nothing to restore from — only a file to copy back.
 ---
 
-Nooks does not invent a backup format. On SQLite the export **is** the database, copied
+nooks does not invent a backup format. On SQLite the export **is** the database, copied
 while the instance keeps running.
 
 That matters more than it sounds. A hand-written exporter is a second description of the
@@ -44,7 +44,7 @@ There is no importer because nothing was ever converted.
 
 ## On postgres
 
-Use `pg_dump`. Nooks does not wrap it — it is better than anything we would write, and
+Use `pg_dump`. nooks does not wrap it — it is better than anything we would write, and
 it is already on the machine running your database.
 
 ```bash

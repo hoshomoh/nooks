@@ -4,7 +4,7 @@
     "stillWaiting": "Still waiting on the server. It's probably just waking up.",
     "offline": "Offline. What you change is kept and sent when you are back.",
     "offlineSince": "Offline since {{seen}}. What you change is kept and sent when you are back.",
-    "updateReady": "A new version of Nooks is ready.",
+    "updateReady": "A new version of nooks is ready.",
     "updateReload": "Reload"
   },
   "action": {
@@ -21,7 +21,7 @@
   },
   "auth": {
     "setup": {
-      "title": "Nooks is running.",
+      "title": "nooks is running.",
       "blurb": "Make yourself an account and name the instance. Everything else can wait until someone asks for it.",
       "footer": "People ask to join from the public list; you approve them",
       "yourName": "Your name",
@@ -44,7 +44,7 @@
       "eyebrow": "An admin made you an account",
       "title": "Replace the temporary password",
       "blurb": "They had to pick the first one, so it can't stay. Choose your own now and theirs stops working.",
-      "footer": "Required before you can use Nooks",
+      "footer": "Required before you can use nooks",
       "temporary": "Temporary password",
       "temporaryHint": "The one they gave you.",
       "yours": "Your password",
@@ -54,7 +54,7 @@
     "join": {
       "title": "Ask to join",
       "blurb": "An admin approves requests. Public signup is off, so this is the way in.",
-      "footer": "Nothing is sent by email — the request waits in Nooks",
+      "footer": "Nothing is sent by email — the request waits in nooks",
       "namePlaceholder": "What should people call you?",
       "emailPlaceholder": "So they know who you are",
       "message": "Anything to add — optional",
@@ -79,7 +79,7 @@
     },
     "reset": {
       "title": "Ask for a reset",
-      "blurb": "Nooks sends no email. An admin sees it in Activity, checks it's really you however they like, and approves it. Then you set a new password yourself.",
+      "blurb": "nooks sends no email. An admin sees it in Activity, checks it's really you however they like, and approves it. Then you set a new password yourself.",
       "footer": "No email, ever",
       "backToSignIn": "Back to sign in",
       "emailOrName": "Your email or name",

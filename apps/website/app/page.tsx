@@ -3,7 +3,7 @@ import Link from "next/link"
 import { AppPreview } from "@/components/app-preview"
 import { SOURCE } from "@nooks/shared"
 
-/** What somebody has to type to have Nooks running, and nothing more. */
+/** What somebody has to type to have nooks running, and nothing more. */
 const RUN = `go build -o nooks ./cmd/nooks
 ./nooks --data ./data`
 
@@ -30,7 +30,7 @@ const CLAIMS = [
 /** The questions a self-hoster asks before they run anything. */
 const FAQS = [
   {
-    q: "Is Nooks free?",
+    q: "Is nooks free?",
     a: "Yes. AGPL-3.0, with no paid tier and no seat pricing. You pay for whatever you run it on, and anything you change stays yours on the same terms.",
   },
   {
@@ -64,7 +64,7 @@ export default function Home() {
           </p>
           <h1 className="text-hero text-pretty">A list you can hand to someone.</h1>
           <p className="max-w-[46ch] text-lede text-pretty text-secondary-foreground">
-            Nooks is a self-hosted list app for a household. One line to add something, one page
+            nooks is a self-hosted list app for a household. One line to add something, one page
             to read it on, and a printed sheet that is a real deliverable rather than a fallback.
           </p>
           <div className="flex flex-wrap gap-2.5 pt-0.5">
@@ -72,7 +72,7 @@ export default function Home() {
               href="/docs"
               className="flex h-8.5 items-center rounded-md bg-primary px-4 text-chrome font-medium text-primary-foreground"
             >
-              Install Nooks
+              Install nooks
             </Link>
             <Link
               href="/features"
@@ -178,7 +178,7 @@ export default function Home() {
             href="/docs/deploy"
             className="flex h-8.5 items-center rounded-md bg-primary px-4 text-chrome font-medium text-primary-foreground"
           >
-            Install Nooks
+            Install nooks
           </Link>
           <a
             href={SOURCE}

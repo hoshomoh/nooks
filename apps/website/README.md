@@ -1,4 +1,4 @@
-# The Nooks website
+# The nooks website
 
 The landing page and the documentation, including the API reference generated from
 `proto/gen/openapi.yaml`. Next.js and Fumadocs, sharing `packages/design` with the app so a

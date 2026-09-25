@@ -5,7 +5,7 @@ description: The failures that actually come up, and what each one really is.
 
 ## Ticks from other people never arrive
 
-Almost always a reverse proxy buffering the event stream. Nooks pushes changes over
+Almost always a reverse proxy buffering the event stream. nooks pushes changes over
 server-sent events on one long-lived connection, and a proxy that buffers responses
 holds every event until the connection closes, which looks exactly like live updates
 being broken rather than delayed.
@@ -17,7 +17,7 @@ arrives on reload but not before, it is buffering.
 
 ## It will not start: address already in use
 
-Something else has the port. Move Nooks:
+Something else has the port. Move nooks:
 
 ```bash
 ./nooks --addr :9090
@@ -28,21 +28,21 @@ Or find what is holding it with `ss -lptn 'sport = :8081'` on Linux.
 ## Signing in says the instance needs setting up
 
 The instance cannot find its database. Usually `--data` is pointing somewhere new: a
-relative path resolves against the working directory, so starting Nooks from a different
+relative path resolves against the working directory, so starting nooks from a different
 folder finds a different, empty instance.
 
 Give it an absolute path in whatever starts it.
 
 ## Postgres: too many connections
 
-Small hosts often cap connections lower than you expect. Nooks holds a pool and does not
+Small hosts often cap connections lower than you expect. nooks holds a pool and does not
 currently bound it, so under a burst the host counts every connection it opens alongside
 whatever else is connected.
 
-There is no Nooks setting for this yet. Raise `max_connections` on the server, or put a
+There is no nooks setting for this yet. Raise `max_connections` on the server, or put a
 pooler such as PgBouncer in front of it.
 
-Do not try to cap it in the connection string. Nooks talks to Postgres through pgx's
+Do not try to cap it in the connection string. nooks talks to Postgres through pgx's
 `database/sql` driver, which is not pgxpool, so `pool_max_conns` is not one of its
 parameters — it is passed on to the server as a setting, and the server refuses to start
 the session:
@@ -68,5 +68,5 @@ waiting on an admin is listed, or remove and re-add the account.
 ## Still stuck
 
 [Raise an issue](https://github.com/hoshomoh/nooks/issues). Include what the log says at
-`--log-level debug`, the driver, and how Nooks is started. A self-hosted app failing
+`--log-level debug`, the driver, and how nooks is started. A self-hosted app failing
 quietly on somebody else's machine is a bug report nobody can write without help.

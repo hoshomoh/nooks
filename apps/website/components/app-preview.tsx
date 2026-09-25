@@ -1,5 +1,5 @@
 /**
- * What Nooks looks like, drawn rather than captured.
+ * What nooks looks like, drawn rather than captured.
  *
  * A screenshot goes stale the first time a colour changes and has to be retaken by
  * somebody with the app running. This is built from the same tokens the app is, so it

@@ -2,10 +2,10 @@ import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Features — nooks",
-  description: "Everything Nooks does today, grouped by what it is for.",
+  description: "Everything nooks does today, grouped by what it is for.",
 }
 
-/** One thing Nooks does. Everything on this page is shipped; nothing here is a plan. */
+/** One thing nooks does. Everything on this page is shipped; nothing here is a plan. */
 interface Feature {
   name: string
   text: string

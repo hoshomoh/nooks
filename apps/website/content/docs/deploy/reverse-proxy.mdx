@@ -1,10 +1,10 @@
 ---
 title: Reverse proxy
-description: What Nooks needs from a proxy in front of it, and the one setting that breaks live updates.
+description: What nooks needs from a proxy in front of it, and the one setting that breaks live updates.
 ---
 
-Nooks speaks plain HTTP and expects something else to terminate TLS. Any proxy will do;
-what matters is that the event stream is not buffered, and that Nooks is told it is
+nooks speaks plain HTTP and expects something else to terminate TLS. Any proxy will do;
+what matters is that the event stream is not buffered, and that nooks is told it is
 behind TLS rather than left to guess.
 
 ## Do not buffer the event stream
@@ -36,7 +36,7 @@ nooks.example {
 }
 ```
 
-## Tell Nooks it is behind TLS
+## Tell nooks it is behind TLS
 
 Set `NOOKS_SECURE_COOKIES=true`. The session cookie is then marked `Secure`, so a
 browser will never send it over plain HTTP, and it is renamed to `__Host-nooks_session`.
@@ -49,7 +49,7 @@ Because the name changes, everybody signed in at the moment you turn it on signs
 more. Nothing has gone wrong; the browser is holding a cookie under the old name and the
 instance is now asking for the new one.
 
-Nooks does not work this out for itself and does not read `X-Forwarded-Proto`. Behind a
+nooks does not work this out for itself and does not read `X-Forwarded-Proto`. Behind a
 proxy the server sees plain HTTP even though the person using it does not, and a
 forwarded header is only as trustworthy as whatever sent it — so this is a deployment
 fact you state rather than one the server guesses at.
@@ -60,13 +60,13 @@ without TLS is what makes signing in appear to do nothing.
 
 ## Offline, and installing it as an app
 
-Nooks keeps a copy of the app on the machine that opened it, so reading a list works with
+nooks keeps a copy of the app on the machine that opened it, so reading a list works with
 no signal, including after closing the tab and opening it again. It is also what lets a
-phone install Nooks to its home screen.
+phone install nooks to its home screen.
 
 Browsers allow that only in a **secure context**: HTTPS, or the machine the instance runs
 on. Over plain HTTP at a LAN address such as `http://192.168.1.20:8081` the browser
-refuses, and Nooks falls back to what it did before. Everything works while the tab is
+refuses, and nooks falls back to what it did before. Everything works while the tab is
 open, and reopening it needs the instance to answer.
 
 So if people use your instance from their phones, TLS is not only about eavesdropping. It

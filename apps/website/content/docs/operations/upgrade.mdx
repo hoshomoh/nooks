@@ -3,7 +3,7 @@ title: Upgrade
 description: Replace what is running. Migrations run on the way up, and the data stays where it is.
 ---
 
-Nooks brings its schema up to date when it starts, so an upgrade is whatever replaces
+nooks brings its schema up to date when it starts, so an upgrade is whatever replaces
 the running version — and nothing else. The data is never in the thing you replace: it
 is in the volume or the `--data` directory, which an upgrade does not touch.
 
@@ -115,7 +115,7 @@ shape of stored data.
 
 ## What a migration will not do
 
-Nooks will not silently take an ability away from something that is working. When access
+nooks will not silently take an ability away from something that is working. When access
 tokens gained three separate permissions, tokens that already existed kept everything
 they had — a migration that quietly narrows a key in use is a key that stops working for
 reasons nobody can see.

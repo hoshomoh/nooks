@@ -15,7 +15,7 @@ const NEVER_CHANGES = () => () => {}
 /**
  * Whether the browser has taken over from the server-rendered HTML.
  *
- * useSyncExternalStore rather than an effect, which is the rule everywhere in Nooks:
+ * useSyncExternalStore rather than an effect, which is the rule everywhere in nooks:
  * it takes a server snapshot and a client one, which is precisely the question being
  * asked. An effect would answer it by rendering the wrong thing first and correcting
  * itself.

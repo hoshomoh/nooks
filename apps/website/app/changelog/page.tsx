@@ -5,7 +5,7 @@ import { SOURCE } from "@nooks/shared"
 
 export const metadata: Metadata = {
   title: "Changelog — nooks",
-  description: "Every released version of Nooks, and what changed in it.",
+  description: "Every released version of nooks, and what changed in it.",
 }
 
 /**
@@ -68,7 +68,7 @@ export default async function Changelog() {
       <div className="pt-11">
         {published.length === 0 ? (
           <p className="border-t border-border pt-7 text-field text-secondary-foreground">
-            Nooks has not had a release yet. The first one will appear here.
+            nooks has not had a release yet. The first one will appear here.
           </p>
         ) : (
           recent.map((release) => <Entry key={release.version} release={release} />)
@@ -82,7 +82,7 @@ export default async function Changelog() {
               {older} earlier {older === 1 ? "release" : "releases"}
             </h2>
             <p className="text-field text-secondary-foreground">
-              This page keeps the most recent {SHOWN}. Every release Nooks has ever made is
+              This page keeps the most recent {SHOWN}. Every release nooks has ever made is
               on GitHub, with the binaries and checksums attached to each one.
             </p>
           </div>

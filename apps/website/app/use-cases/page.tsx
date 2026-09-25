@@ -3,7 +3,7 @@ import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Use cases — nooks",
-  description: "Who Nooks is for, and what they actually do with it.",
+  description: "Who nooks is for, and what they actually do with it.",
 }
 
 /** One kind of household or team, and what they get out of it. */
@@ -71,7 +71,7 @@ export default function UseCases() {
         <span className="text-label text-muted-foreground uppercase">Use cases</span>
         <h1 className="text-page max-w-[18ch] text-pretty">Four households, one primitive.</h1>
         <p className="max-w-[54ch] text-lede text-pretty text-secondary-foreground">
-          Nooks is one list, shared four ways. The shape of the work changes; the thing you are
+          nooks is one list, shared four ways. The shape of the work changes; the thing you are
           looking at does not.
         </p>
       </div>

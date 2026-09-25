@@ -10,7 +10,7 @@ the token, and no more.
 ## It is a remote server
 
 Most MCP servers a client knows about are **local**: the client starts a program on your
-machine and talks to it over a pipe. Nooks is **remote**. It is already running, on your
+machine and talks to it over a pipe. nooks is **remote**. It is already running, on your
 own hardware, and a client reaches it over HTTP at the same address you open in a
 browser.
 
@@ -23,7 +23,7 @@ two things from you: the URL, and a token that says who it is acting for.
   changed it with [`--addr`](/docs/configure). It has to be an address the assistant can
   actually reach, so a client on another machine cannot use `localhost`.
 
-  Working on Nooks itself? The app runs on `:3001` in development and the instance on
+  Working on nooks itself? The app runs on `:3001` in development and the instance on
   `:8081`. Point the assistant at **`:8081`**.
 </Callout>
 
@@ -45,7 +45,7 @@ rather see what the block is made of.
   separate answers, and delete is off unless you ask for it.
 - **When it expires.** Ninety days by default.
 
-The secret is shown once, as a line of base64 with no prefix or marker. Nooks keeps only
+The secret is shown once, as a line of base64 with no prefix or marker. nooks keeps only
 a hash of it, so nobody — including you — can read it back afterwards. Lose it and the
 answer is to revoke that token and cut another.
 
@@ -77,7 +77,7 @@ Check it with `claude mcp list`.
 <Tab value="Claude Desktop">
 
 Claude Desktop adds remote servers through **Settings → Connectors → Add custom
-connector**, which takes a URL and expects the server to run a sign-in flow. Nooks
+connector**, which takes a URL and expects the server to run a sign-in flow. nooks
 authenticates with a bearer token instead, so there is no field to paste it into.
 
 Bridge it with `mcp-remote`, which speaks the local protocol Claude Desktop knows and
@@ -125,7 +125,7 @@ transport, and one header:
 <SetupBlock client="other" token="PASTE_YOUR_TOKEN_HERE" />
 
 If a client only speaks the local protocol, put `mcp-remote` in front of it as the
-Claude Desktop tab does. If it offers to sign in with OAuth, it cannot connect: Nooks
+Claude Desktop tab does. If it offers to sign in with OAuth, it cannot connect: nooks
 authenticates with a bearer token and nothing else.
 
 </Tab>
@@ -163,9 +163,9 @@ list; by hand it is `initialize`, then the `Mcp-Session-Id` it returns sent back
 | --- | --- |
 | `not signed in` | The token is wrong, revoked, or expired. Cut a new one. |
 | Connection refused, or a timeout | The client cannot reach the address. A client on another machine cannot use `localhost`. |
-| `404` on POST, but the URL opens in a browser | Something other than Nooks is on that port, answering every path with the app's HTML. In development that is the dev server on `:3001` — use `:8081`. |
+| `404` on POST, but the URL opens in a browser | Something other than nooks is on that port, answering every path with the app's HTML. In development that is the dev server on `:3001` — use `:8081`. |
 | A certificate error | The instance is on plain HTTP, or using a certificate the client does not trust. See [Behind a domain](/docs/deploy/reverse-proxy). |
-| The server connects but has no tools | Something is in front of Nooks that does not pass `Authorization` through. Check the reverse proxy. |
+| The server connects but has no tools | Something is in front of nooks that does not pass `Authorization` through. Check the reverse proxy. |
 | A tool answers "not found" for a list you can see | The token does not reach that list. Its lists are fixed when it is cut. |
 | A tool is refused | That ability was left off when the token was cut, or the action needs a signed-in browser. |
 

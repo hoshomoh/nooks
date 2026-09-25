@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package nooks.api.v1;
 
+import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 
 // AuthService covers getting into a Nooks Instance: first run, signing in, signing
@@ -138,13 +139,17 @@ message Member {
 }
 
 message CompleteSetupRequest {
-  string name = 1;
-  string email = 2;
+  // At most 100 characters.
+  string name = 1 [(buf.validate.field).string.max_len = 100];
+  // At most 254 characters.
+  string email = 2 [(buf.validate.field).string.max_len = 254];
   string password = 3;
 
   // What this Instance should be called, e.g. "Brunnen Street". Shows in the sidebar
   // and on printed pages.
-  string instance_name = 4;
+  //
+  // At most 200 characters.
+  string instance_name = 4 [(buf.validate.field).string.max_len = 200];
 }
 
 message CompleteSetupResponse {
@@ -207,11 +212,15 @@ message ReplacePasswordResponse {
 }
 
 message RequestJoinRequest {
-  string name = 1;
-  string email = 2;
+  // At most 100 characters.
+  string name = 1 [(buf.validate.field).string.max_len = 100];
+  // At most 254 characters.
+  string email = 2 [(buf.validate.field).string.max_len = 254];
 
   // Anything the Visitor wants to add, e.g. "It's Til, from upstairs". Optional.
-  string message = 3;
+  //
+  // At most 1000 characters.
+  string message = 3 [(buf.validate.field).string.max_len = 1000];
 }
 
 message RequestJoinResponse {

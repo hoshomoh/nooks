@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package nooks.api.v1;
 
+import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "nooks/api/v1/auth_service.proto";
 
@@ -102,7 +103,8 @@ message ListGroupsResponse {
 }
 
 message CreateGroupRequest {
-  string name = 1;
+  // At most 200 characters.
+  string name = 1 [(buf.validate.field).string.max_len = 200];
 
   // Who is in it from the start. A Group is made in order to share with the people in
   // it, so naming it and filling it is one decision, not two.
@@ -123,16 +125,21 @@ message SetGroupMembersResponse {
 }
 
 message AddMemberRequest {
-  string name = 1;
-  string email = 2;
+  // At most 100 characters.
+  string name = 1 [(buf.validate.field).string.max_len = 100];
+  // At most 254 characters.
+  string email = 2 [(buf.validate.field).string.max_len = 254];
 }
 
 message UpdateOwnProfileRequest {
-  string name = 1;
+  // At most 100 characters.
+  string name = 1 [(buf.validate.field).string.max_len = 100];
 
   // Used to sign in, so it has to stay unique on the Instance. Nooks never sends mail
   // to it, and changing it takes effect on the next sign-in like any other.
-  string email = 2;
+  //
+  // At most 254 characters.
+  string email = 2 [(buf.validate.field).string.max_len = 254];
 }
 
 message UpdateOwnProfileResponse {

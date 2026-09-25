@@ -3,11 +3,12 @@
  *
  * These are the Instance's numbers, not the app's: the server refuses anything longer,
  * and this is what lets a field say so while somebody is typing rather than after they
- * press save. `limits.test.ts` holds every one of them to the Go constant it copies, so
- * the two cannot drift.
+ * press save. `limits.test.ts` holds every one of them to the proto that declares it,
+ * so the two cannot drift.
  *
  * Counted in characters rather than bytes, which is what the number means to whoever is
- * typing, and is what the server counts too.
+ * typing. The proto says max_len, which counts Unicode code points, and so does the
+ * server.
  */
 export const LIMITS = {
   itemLabel: 500,

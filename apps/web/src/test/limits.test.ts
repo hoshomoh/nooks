@@ -3,8 +3,22 @@ import { describe, expect, it } from "vitest"
 
 import { LIMITS } from "@/lib/limits"
 
-/** Where the Instance declares what it will refuse. */
-const SERVER = "../../server/router/api/v1/auth.go"
+/**
+ * The protos where the Instance declares what it will refuse, by the field each limit
+ * is named after.
+ */
+const DECLARED_IN: Record<keyof typeof LIMITS, [string, string, string]> = {
+  itemLabel: ["list_service", "CreateItemRequest", "label"],
+  itemQuantity: ["list_service", "CreateItemRequest", "quantity"],
+  itemNote: ["list_service", "UpdateItemRequest", "note"],
+  listName: ["list_service", "CreateListRequest", "name"],
+  memberName: ["member_service", "AddMemberRequest", "name"],
+  memberEmail: ["member_service", "AddMemberRequest", "email"],
+  groupName: ["member_service", "CreateGroupRequest", "name"],
+  tokenName: ["token_service", "CreateAccessTokenRequest", "name"],
+  instanceName: ["instance_service", "InstanceSettings", "name"],
+  joinMessage: ["auth_service", "RequestJoinRequest", "message"],
+}
 
 /**
  * What the app says a field holds is what the Instance will accept.
@@ -15,33 +29,38 @@ const SERVER = "../../server/router/api/v1/auth.go"
  * the Instance stopped accepting them twenty ago is worse than no count at all, because
  * somebody trusted it.
  *
- * Read out of the Go rather than shared through the protos, which carry no limits. If
- * they ever do, this goes and the generated client carries them instead.
+ * Read out of the protos, which is where the limit is now declared. It used to be read
+ * out of the Go, which held the numbers itself; the constraint moved into the proto so
+ * that the generated clients and the published API reference carry it too.
  */
 describe("the field limits", () => {
-  const source = readFileSync(SERVER, "utf8")
-
-  // A file that stopped holding these would let every number below agree with nothing.
-  it("is reading the constants", () => {
-    expect(source).toContain("LimitItemLabel")
-  })
-
   it("are the Instance's own numbers", () => {
     for (const [field, limit] of Object.entries(LIMITS)) {
-      expect(declaredIn(source, field), `${field} in ${SERVER}`).toBe(limit)
+      const where = DECLARED_IN[field as keyof typeof LIMITS]
+      expect(where, `${field} is not named in DECLARED_IN`).toBeDefined()
+      expect(declaredIn(where), `${field} in ${where[0]}.proto`).toBe(limit)
+    }
+  })
+
+  // A rename or a move would otherwise leave every number above agreeing with nothing.
+  it("is reading fields that exist", () => {
+    for (const field of Object.keys(LIMITS)) {
+      expect(Object.keys(DECLARED_IN)).toContain(field)
     }
   })
 })
 
-/**
- * declaredIn is the value of the Go constant for one field.
- *
- * `itemLabel` is `LimitItemLabel`, and the Go is written with underscores in the long
- * ones, which is a Go spelling of the same number.
- */
-function declaredIn(source: string, field: string): number {
-  const name = "Limit" + field[0].toUpperCase() + field.slice(1)
-  const found = source.match(new RegExp(`\\b${name}\\s*=\\s*([\\d_]+)`))
-  expect(found, `${name} is not declared`).not.toBeNull()
-  return Number(found?.[1].replaceAll("_", ""))
+/** declaredIn is the max_len one proto field carries. */
+function declaredIn([file, message, field]: [string, string, string]): number {
+  const source = readFileSync(`../../proto/nooks/api/v1/${file}.proto`, "utf8")
+
+  const start = source.indexOf(`message ${message} {`)
+  expect(start, `message ${message} in ${file}.proto`).toBeGreaterThan(-1)
+  const body = source.slice(start, source.indexOf("\n}", start))
+
+  const found = body.match(
+    new RegExp(`\\b${field} = \\d+ \\[\\(buf\\.validate\\.field\\)\\.string\\.max_len = (\\d+)\\]`),
+  )
+  expect(found, `${message}.${field} declares no max_len`).not.toBeNull()
+  return Number(found?.[1])
 }

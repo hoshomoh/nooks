@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -352,6 +353,8 @@ func (x *PublicListSettings) GetListName() string {
 type InstanceSettings struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// What the Instance calls itself, e.g. "Brunnen Street".
+	//
+	// At most 200 characters.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Whether a stranger may ask for an account at all. Off and RequestJoin is refused,
 	// and the sign-in screen stops offering it. On and anybody who can reach the Instance
@@ -707,7 +710,7 @@ var File_nooks_api_v1_instance_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_instance_service_proto_rawDesc = "" +
 	"\n" +
-	"#nooks/api/v1/instance_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\"X\n" +
+	"#nooks/api/v1/instance_service.proto\x12\fnooks.api.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\"X\n" +
 	"\x15DeleteInstanceRequest\x12\x1a\n" +
 	"\bpassword\x18\x01 \x01(\tR\bpassword\x12#\n" +
 	"\rinstance_name\x18\x02 \x01(\tR\finstanceName\"\x18\n" +
@@ -733,9 +736,9 @@ const file_nooks_api_v1_instance_service_proto_rawDesc = "" +
 	"\tshow_meta\x18\x03 \x01(\bR\bshowMeta\x12\x1d\n" +
 	"\n" +
 	"allow_join\x18\x04 \x01(\bR\tallowJoin\x12\x1b\n" +
-	"\tlist_name\x18\x05 \x01(\tR\blistName\"\xb5\x01\n" +
-	"\x10InstanceSettings\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12#\n" +
+	"\tlist_name\x18\x05 \x01(\tR\blistName\"\xbf\x01\n" +
+	"\x10InstanceSettings\x12\x1c\n" +
+	"\x04name\x18\x01 \x01(\tB\b\xbaH\x05r\x03\x18\xc8\x01R\x04name\x12#\n" +
 	"\rpublic_signup\x18\x02 \x01(\bR\fpublicSignup\x12A\n" +
 	"\vpublic_list\x18\x03 \x01(\v2 .nooks.api.v1.PublicListSettingsR\n" +
 	"publicList\x12%\n" +

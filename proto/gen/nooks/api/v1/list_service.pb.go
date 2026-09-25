@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -1042,8 +1043,9 @@ func (x *GetItemResponse) GetList() *List {
 }
 
 type CreateListRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// At most 200 characters.
+	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1130,9 +1132,10 @@ func (x *CreateListResponse) GetList() *List {
 }
 
 type RenameListRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ListUid       string                 `protobuf:"bytes,1,opt,name=list_uid,json=listUid,proto3" json:"list_uid,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	ListUid string                 `protobuf:"bytes,1,opt,name=list_uid,json=listUid,proto3" json:"list_uid,omitempty"`
+	// At most 200 characters.
+	Name          string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1886,11 +1889,13 @@ func (*SetListPinnedResponse) Descriptor() ([]byte, []int) {
 }
 
 type CreateItemRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ListUid       string                 `protobuf:"bytes,1,opt,name=list_uid,json=listUid,proto3" json:"list_uid,omitempty"`
-	Label         string                 `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
-	Quantity      string                 `protobuf:"bytes,3,opt,name=quantity,proto3" json:"quantity,omitempty"`
-	DueOn         string                 `protobuf:"bytes,4,opt,name=due_on,json=dueOn,proto3" json:"due_on,omitempty"`
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	ListUid string                 `protobuf:"bytes,1,opt,name=list_uid,json=listUid,proto3" json:"list_uid,omitempty"`
+	// At most 500 characters.
+	Label string `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
+	// At most 50 characters.
+	Quantity      string `protobuf:"bytes,3,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	DueOn         string `protobuf:"bytes,4,opt,name=due_on,json=dueOn,proto3" json:"due_on,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2002,10 +2007,15 @@ type UpdateItemRequest struct {
 	ItemUid string                 `protobuf:"bytes,1,opt,name=item_uid,json=itemUid,proto3" json:"item_uid,omitempty"`
 	// Each field is optional: an unset one is left alone, so changing a quantity does not
 	// have to restate the label.
-	Label    *string `protobuf:"bytes,2,opt,name=label,proto3,oneof" json:"label,omitempty"`
+	//
+	// At most 500 characters.
+	Label *string `protobuf:"bytes,2,opt,name=label,proto3,oneof" json:"label,omitempty"`
+	// At most 50 characters.
 	Quantity *string `protobuf:"bytes,3,opt,name=quantity,proto3,oneof" json:"quantity,omitempty"`
 	DueOn    *string `protobuf:"bytes,4,opt,name=due_on,json=dueOn,proto3,oneof" json:"due_on,omitempty"`
 	// The Note, as markdown. Sending an empty string removes it.
+	//
+	// At most 64000 characters.
 	Note *string `protobuf:"bytes,5,opt,name=note,proto3,oneof" json:"note,omitempty"`
 	// What the caller believed the text was when they started changing it.
 	//
@@ -2743,7 +2753,7 @@ var File_nooks_api_v1_list_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1fnooks/api/v1/list_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\"\xf7\x02\n" +
+	"\x1fnooks/api/v1/list_service.proto\x12\fnooks.api.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\"\xf7\x02\n" +
 	"\x04List\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12/\n" +
@@ -2808,14 +2818,14 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\bitem_uid\x18\x01 \x01(\tR\aitemUid\"a\n" +
 	"\x0fGetItemResponse\x12&\n" +
 	"\x04item\x18\x01 \x01(\v2\x12.nooks.api.v1.ItemR\x04item\x12&\n" +
-	"\x04list\x18\x02 \x01(\v2\x12.nooks.api.v1.ListR\x04list\"'\n" +
-	"\x11CreateListRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\"<\n" +
+	"\x04list\x18\x02 \x01(\v2\x12.nooks.api.v1.ListR\x04list\"1\n" +
+	"\x11CreateListRequest\x12\x1c\n" +
+	"\x04name\x18\x01 \x01(\tB\b\xbaH\x05r\x03\x18\xc8\x01R\x04name\"<\n" +
 	"\x12CreateListResponse\x12&\n" +
-	"\x04list\x18\x01 \x01(\v2\x12.nooks.api.v1.ListR\x04list\"B\n" +
+	"\x04list\x18\x01 \x01(\v2\x12.nooks.api.v1.ListR\x04list\"L\n" +
 	"\x11RenameListRequest\x12\x19\n" +
-	"\blist_uid\x18\x01 \x01(\tR\alistUid\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\"<\n" +
+	"\blist_uid\x18\x01 \x01(\tR\alistUid\x12\x1c\n" +
+	"\x04name\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x18\xc8\x01R\x04name\"<\n" +
 	"\x12RenameListResponse\x12&\n" +
 	"\x04list\x18\x01 \x01(\v2\x12.nooks.api.v1.ListR\x04list\"\xbe\x01\n" +
 	"\x15SetListSharingRequest\x12\x19\n" +
@@ -2854,20 +2864,20 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\x14SetListPinnedRequest\x12\x19\n" +
 	"\blist_uid\x18\x01 \x01(\tR\alistUid\x12\x16\n" +
 	"\x06pinned\x18\x02 \x01(\bR\x06pinned\"\x17\n" +
-	"\x15SetListPinnedResponse\"w\n" +
+	"\x15SetListPinnedResponse\"\x8a\x01\n" +
 	"\x11CreateItemRequest\x12\x19\n" +
-	"\blist_uid\x18\x01 \x01(\tR\alistUid\x12\x14\n" +
-	"\x05label\x18\x02 \x01(\tR\x05label\x12\x1a\n" +
-	"\bquantity\x18\x03 \x01(\tR\bquantity\x12\x15\n" +
+	"\blist_uid\x18\x01 \x01(\tR\alistUid\x12\x1e\n" +
+	"\x05label\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x18\xf4\x03R\x05label\x12#\n" +
+	"\bquantity\x18\x03 \x01(\tB\a\xbaH\x04r\x02\x182R\bquantity\x12\x15\n" +
 	"\x06due_on\x18\x04 \x01(\tR\x05dueOn\"<\n" +
 	"\x12CreateItemResponse\x12&\n" +
-	"\x04item\x18\x01 \x01(\v2\x12.nooks.api.v1.ItemR\x04item\"\xc5\x02\n" +
+	"\x04item\x18\x01 \x01(\v2\x12.nooks.api.v1.ItemR\x04item\"\xe3\x02\n" +
 	"\x11UpdateItemRequest\x12\x19\n" +
-	"\bitem_uid\x18\x01 \x01(\tR\aitemUid\x12\x19\n" +
-	"\x05label\x18\x02 \x01(\tH\x00R\x05label\x88\x01\x01\x12\x1f\n" +
-	"\bquantity\x18\x03 \x01(\tH\x01R\bquantity\x88\x01\x01\x12\x1a\n" +
-	"\x06due_on\x18\x04 \x01(\tH\x02R\x05dueOn\x88\x01\x01\x12\x17\n" +
-	"\x04note\x18\x05 \x01(\tH\x03R\x04note\x88\x01\x01\x12*\n" +
+	"\bitem_uid\x18\x01 \x01(\tR\aitemUid\x12#\n" +
+	"\x05label\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x18\xf4\x03H\x00R\x05label\x88\x01\x01\x12(\n" +
+	"\bquantity\x18\x03 \x01(\tB\a\xbaH\x04r\x02\x182H\x01R\bquantity\x88\x01\x01\x12\x1a\n" +
+	"\x06due_on\x18\x04 \x01(\tH\x02R\x05dueOn\x88\x01\x01\x12\"\n" +
+	"\x04note\x18\x05 \x01(\tB\t\xbaH\x06r\x04\x18\x80\xf4\x03H\x03R\x04note\x88\x01\x01\x12*\n" +
 	"\x0eexpected_label\x18\x06 \x01(\tH\x04R\rexpectedLabel\x88\x01\x01\x12(\n" +
 	"\rexpected_note\x18\a \x01(\tH\x05R\fexpectedNote\x88\x01\x01B\b\n" +
 	"\x06_labelB\v\n" +

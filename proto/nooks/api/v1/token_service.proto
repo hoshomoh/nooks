@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package nooks.api.v1;
 
+import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 
 // TokenService covers the keys a Member cuts for things that are not browsers.
@@ -83,7 +84,8 @@ message ListAccessTokensResponse {
 }
 
 message CreateAccessTokenRequest {
-  string name = 1;
+  // At most 200 characters.
+  string name = 1 [(buf.validate.field).string.max_len = 200];
   TokenAbilities abilities = 2;
 
   // The Lists it may reach, unless all_lists is set instead. Naming none is refused

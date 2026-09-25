@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -232,12 +233,16 @@ func (x *Member) GetLastSignedInAt() string {
 }
 
 type CompleteSetupRequest struct {
-	state    protoimpl.MessageState `protogen:"open.v1"`
-	Name     string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Email    string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	Password string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// At most 100 characters.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// At most 254 characters.
+	Email    string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	Password string `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
 	// What this Instance should be called, e.g. "Brunnen Street". Shows in the sidebar
 	// and on printed pages.
+	//
+	// At most 200 characters.
 	InstanceName  string `protobuf:"bytes,4,opt,name=instance_name,json=instanceName,proto3" json:"instance_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -821,9 +826,13 @@ func (x *ReplacePasswordResponse) GetMember() *Member {
 
 type RequestJoinRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Email string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	// At most 100 characters.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// At most 254 characters.
+	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
 	// Anything the Visitor wants to add, e.g. "It's Til, from upstairs". Optional.
+	//
+	// At most 1000 characters.
 	Message       string `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1449,7 +1458,7 @@ var File_nooks_api_v1_auth_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_auth_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1fnooks/api/v1/auth_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\"\xe8\x01\n" +
+	"\x1fnooks/api/v1/auth_service.proto\x12\fnooks.api.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\"\xe8\x01\n" +
 	"\x06Member\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
@@ -1458,12 +1467,12 @@ const file_nooks_api_v1_auth_service_proto_rawDesc = "" +
 	"\x14must_change_password\x18\x05 \x01(\bR\x12mustChangePassword\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x06 \x01(\tR\tcreatedAt\x12)\n" +
-	"\x11last_signed_in_at\x18\a \x01(\tR\x0elastSignedInAt\"\x81\x01\n" +
-	"\x14CompleteSetupRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
-	"\bpassword\x18\x03 \x01(\tR\bpassword\x12#\n" +
-	"\rinstance_name\x18\x04 \x01(\tR\finstanceName\"\x9f\x01\n" +
+	"\x11last_signed_in_at\x18\a \x01(\tR\x0elastSignedInAt\"\x9e\x01\n" +
+	"\x14CompleteSetupRequest\x12\x1b\n" +
+	"\x04name\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x18dR\x04name\x12\x1e\n" +
+	"\x05email\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x18\xfe\x01R\x05email\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\x12-\n" +
+	"\rinstance_name\x18\x04 \x01(\tB\b\xbaH\x05r\x03\x18\xc8\x01R\finstanceName\"\x9f\x01\n" +
 	"\x15CompleteSetupResponse\x12,\n" +
 	"\x06member\x18\x01 \x01(\v2\x14.nooks.api.v1.MemberR\x06member\x12!\n" +
 	"\faccess_token\x18\x02 \x01(\tR\vaccessToken\x125\n" +
@@ -1488,11 +1497,11 @@ const file_nooks_api_v1_auth_service_proto_rawDesc = "" +
 	"\x10current_password\x18\x01 \x01(\tR\x0fcurrentPassword\x12!\n" +
 	"\fnew_password\x18\x02 \x01(\tR\vnewPassword\"G\n" +
 	"\x17ReplacePasswordResponse\x12,\n" +
-	"\x06member\x18\x01 \x01(\v2\x14.nooks.api.v1.MemberR\x06member\"X\n" +
-	"\x12RequestJoinRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\x12\x18\n" +
-	"\amessage\x18\x03 \x01(\tR\amessage\"6\n" +
+	"\x06member\x18\x01 \x01(\v2\x14.nooks.api.v1.MemberR\x06member\"u\n" +
+	"\x12RequestJoinRequest\x12\x1b\n" +
+	"\x04name\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x18dR\x04name\x12\x1e\n" +
+	"\x05email\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x18\xfe\x01R\x05email\x12\"\n" +
+	"\amessage\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x18\xe8\aR\amessage\"6\n" +
 	"\x13RequestJoinResponse\x12\x1f\n" +
 	"\vrequest_uid\x18\x01 \x01(\tR\n" +
 	"requestUid\"8\n" +

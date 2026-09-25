@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package nooks.api.v1;
 
+import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 
 // ListService covers Lists and the Items on them — the whole of Nooks, really.
@@ -354,7 +355,8 @@ message GetItemResponse {
 }
 
 message CreateListRequest {
-  string name = 1;
+  // At most 200 characters.
+  string name = 1 [(buf.validate.field).string.max_len = 200];
 }
 
 message CreateListResponse {
@@ -363,7 +365,8 @@ message CreateListResponse {
 
 message RenameListRequest {
   string list_uid = 1;
-  string name = 2;
+  // At most 200 characters.
+  string name = 2 [(buf.validate.field).string.max_len = 200];
 }
 
 message RenameListResponse {
@@ -437,8 +440,10 @@ message SetListPinnedResponse {}
 
 message CreateItemRequest {
   string list_uid = 1;
-  string label = 2;
-  string quantity = 3;
+  // At most 500 characters.
+  string label = 2 [(buf.validate.field).string.max_len = 500];
+  // At most 50 characters.
+  string quantity = 3 [(buf.validate.field).string.max_len = 50];
   string due_on = 4;
 }
 
@@ -451,12 +456,17 @@ message UpdateItemRequest {
 
   // Each field is optional: an unset one is left alone, so changing a quantity does not
   // have to restate the label.
-  optional string label = 2;
-  optional string quantity = 3;
+  //
+  // At most 500 characters.
+  optional string label = 2 [(buf.validate.field).string.max_len = 500];
+  // At most 50 characters.
+  optional string quantity = 3 [(buf.validate.field).string.max_len = 50];
   optional string due_on = 4;
 
   // The Note, as markdown. Sending an empty string removes it.
-  optional string note = 5;
+  //
+  // At most 64000 characters.
+  optional string note = 5 [(buf.validate.field).string.max_len = 64000];
 
   // What the caller believed the text was when they started changing it.
   //

@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -289,9 +290,10 @@ func (x *ListAccessTokensResponse) GetTokens() []*AccessToken {
 }
 
 type CreateAccessTokenRequest struct {
-	state     protoimpl.MessageState `protogen:"open.v1"`
-	Name      string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Abilities *TokenAbilities        `protobuf:"bytes,2,opt,name=abilities,proto3" json:"abilities,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// At most 200 characters.
+	Name      string          `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Abilities *TokenAbilities `protobuf:"bytes,2,opt,name=abilities,proto3" json:"abilities,omitempty"`
 	// The Lists it may reach, unless all_lists is set instead. Naming none is refused
 	// rather than answered with a token that opens nothing.
 	ListUids []string `protobuf:"bytes,3,rep,name=list_uids,json=listUids,proto3" json:"list_uids,omitempty"`
@@ -506,7 +508,7 @@ var File_nooks_api_v1_token_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_token_service_proto_rawDesc = "" +
 	"\n" +
-	" nooks/api/v1/token_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\"R\n" +
+	" nooks/api/v1/token_service.proto\x12\fnooks.api.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\"R\n" +
 	"\x0eTokenAbilities\x12\x12\n" +
 	"\x04read\x18\x01 \x01(\bR\x04read\x12\x14\n" +
 	"\x05write\x18\x02 \x01(\bR\x05write\x12\x16\n" +
@@ -528,9 +530,9 @@ const file_nooks_api_v1_token_service_proto_rawDesc = "" +
 	"memberName\"\x19\n" +
 	"\x17ListAccessTokensRequest\"M\n" +
 	"\x18ListAccessTokensResponse\x121\n" +
-	"\x06tokens\x18\x01 \x03(\v2\x19.nooks.api.v1.AccessTokenR\x06tokens\"\xc3\x01\n" +
-	"\x18CreateAccessTokenRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12:\n" +
+	"\x06tokens\x18\x01 \x03(\v2\x19.nooks.api.v1.AccessTokenR\x06tokens\"\xcd\x01\n" +
+	"\x18CreateAccessTokenRequest\x12\x1c\n" +
+	"\x04name\x18\x01 \x01(\tB\b\xbaH\x05r\x03\x18\xc8\x01R\x04name\x12:\n" +
 	"\tabilities\x18\x02 \x01(\v2\x1c.nooks.api.v1.TokenAbilitiesR\tabilities\x12\x1b\n" +
 	"\tlist_uids\x18\x03 \x03(\tR\blistUids\x12\x1b\n" +
 	"\tall_lists\x18\x05 \x01(\bR\ballLists\x12\x1d\n" +

@@ -7,6 +7,11 @@ managed:
   disable:
     - file_option: go_package
       module: buf.build/googleapis/googleapis
+    # protovalidate for the same reason: its Go types are published, and rewriting the
+    # package to a path under this module leaves the generated code importing something
+    # nothing generates.
+    - file_option: go_package
+      module: buf.build/bufbuild/protovalidate
   override:
     - file_option: go_package_prefix
       value: github.com/hoshomoh/nooks/proto/gen

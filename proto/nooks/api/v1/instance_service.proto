@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package nooks.api.v1;
 
+import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 
 // InstanceService reports what this copy of Nooks is and how it is configured.
@@ -105,7 +106,9 @@ message PublicListSettings {
 
 message InstanceSettings {
   // What the Instance calls itself, e.g. "Brunnen Street".
-  string name = 1;
+  //
+  // At most 200 characters.
+  string name = 1 [(buf.validate.field).string.max_len = 200];
 
   // Whether a stranger may ask for an account at all. Off and RequestJoin is refused,
   // and the sign-in screen stops offering it. On and anybody who can reach the Instance

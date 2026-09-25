@@ -7,6 +7,7 @@
 package apiv1
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -256,7 +257,8 @@ func (x *ListGroupsResponse) GetGroups() []*Group {
 
 type CreateGroupRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// At most 200 characters.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Who is in it from the start. A Group is made in order to share with the people in
 	// it, so naming it and filling it is one decision, not two.
 	MemberUids    []string `protobuf:"bytes,2,rep,name=member_uids,json=memberUids,proto3" json:"member_uids,omitempty"`
@@ -449,9 +451,11 @@ func (x *SetGroupMembersResponse) GetGroup() *Group {
 }
 
 type AddMemberRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// At most 100 characters.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// At most 254 characters.
+	Email         string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -502,9 +506,12 @@ func (x *AddMemberRequest) GetEmail() string {
 
 type UpdateOwnProfileRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// At most 100 characters.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Used to sign in, so it has to stay unique on the Instance. Nooks never sends mail
 	// to it, and changing it takes effect on the next sign-in like any other.
+	//
+	// At most 254 characters.
 	Email         string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -856,7 +863,7 @@ var File_nooks_api_v1_member_service_proto protoreflect.FileDescriptor
 
 const file_nooks_api_v1_member_service_proto_rawDesc = "" +
 	"\n" +
-	"!nooks/api/v1/member_service.proto\x12\fnooks.api.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fnooks/api/v1/auth_service.proto\"|\n" +
+	"!nooks/api/v1/member_service.proto\x12\fnooks.api.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fnooks/api/v1/auth_service.proto\"|\n" +
 	"\x05Group\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12.\n" +
@@ -868,9 +875,9 @@ const file_nooks_api_v1_member_service_proto_rawDesc = "" +
 	"\amembers\x18\x01 \x03(\v2\x14.nooks.api.v1.MemberR\amembers\"\x13\n" +
 	"\x11ListGroupsRequest\"A\n" +
 	"\x12ListGroupsResponse\x12+\n" +
-	"\x06groups\x18\x01 \x03(\v2\x13.nooks.api.v1.GroupR\x06groups\"I\n" +
-	"\x12CreateGroupRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1f\n" +
+	"\x06groups\x18\x01 \x03(\v2\x13.nooks.api.v1.GroupR\x06groups\"S\n" +
+	"\x12CreateGroupRequest\x12\x1c\n" +
+	"\x04name\x18\x01 \x01(\tB\b\xbaH\x05r\x03\x18\xc8\x01R\x04name\x12\x1f\n" +
 	"\vmember_uids\x18\x02 \x03(\tR\n" +
 	"memberUids\"@\n" +
 	"\x13CreateGroupResponse\x12)\n" +
@@ -880,13 +887,13 @@ const file_nooks_api_v1_member_service_proto_rawDesc = "" +
 	"\vmember_uids\x18\x02 \x03(\tR\n" +
 	"memberUids\"D\n" +
 	"\x17SetGroupMembersResponse\x12)\n" +
-	"\x05group\x18\x01 \x01(\v2\x13.nooks.api.v1.GroupR\x05group\"<\n" +
-	"\x10AddMemberRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\"C\n" +
-	"\x17UpdateOwnProfileRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\"H\n" +
+	"\x05group\x18\x01 \x01(\v2\x13.nooks.api.v1.GroupR\x05group\"O\n" +
+	"\x10AddMemberRequest\x12\x1b\n" +
+	"\x04name\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x18dR\x04name\x12\x1e\n" +
+	"\x05email\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x18\xfe\x01R\x05email\"V\n" +
+	"\x17UpdateOwnProfileRequest\x12\x1b\n" +
+	"\x04name\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x18dR\x04name\x12\x1e\n" +
+	"\x05email\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x18\xfe\x01R\x05email\"H\n" +
 	"\x18UpdateOwnProfileResponse\x12,\n" +
 	"\x06member\x18\x01 \x01(\v2\x14.nooks.api.v1.MemberR\x06member\"p\n" +
 	"\x11AddMemberResponse\x12,\n" +

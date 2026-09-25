@@ -1,5 +1,75 @@
 # Changelog
 
+## [1.6.0](https://github.com/hoshomoh/nooks/compare/v1.5.0...v1.6.0) (2026-09-25)
+
+
+### New
+
+* **api:** bring back a deleted list, and end the window it waits in ([6cca004](https://github.com/hoshomoh/nooks/commit/6cca00488265ac36ea1b5ff3a4d8ad321578fad5))
+* **api:** choose what becomes of a removed member's lists ([a58ff48](https://github.com/hoshomoh/nooks/commit/a58ff482c7cd34fb4b4f29eeaf2493fe9a6ddf09))
+* **api:** let the signup setting decide who may ask to join ([e58dc70](https://github.com/hoshomoh/nooks/commit/e58dc702ffb5eead62abd4d85cb01d10a8f30539))
+* **live:** cap how many streams one member may hold open ([2d6ec54](https://github.com/hoshomoh/nooks/commit/2d6ec5411a52d8e337f825c390a9acf1dc95c2a3))
+* **live:** one person edits a note, everybody else reads it ([628d68f](https://github.com/hoshomoh/nooks/commit/628d68f8c948969964d767c88487da55764860af))
+* **mcp:** say how much a field holds before it is asked ([f0da375](https://github.com/hoshomoh/nooks/commit/f0da37594ef138f6d4cde6d1f08bda6cfaa0a373))
+* **mcp:** tell an assistant how the tools fit together ([1832b8c](https://github.com/hoshomoh/nooks/commit/1832b8c45596d415e24409adac2071a773d20ed9))
+* **requests:** bound who may be waiting, and what the panel draws ([2ed5ee4](https://github.com/hoshomoh/nooks/commit/2ed5ee466cb232c81ec552bc235c3044cd39f2bf))
+* **store:** keep what a removed member gave everybody else ([fed20a7](https://github.com/hoshomoh/nooks/commit/fed20a74270745698a2d164c053ceb07bf99545b))
+* **store:** sweep requests an admin answered a month ago ([a3d4ac7](https://github.com/hoshomoh/nooks/commit/a3d4ac7f0cab9e28e53a0b71398c0457e2eeb06b))
+* **web:** say how much room is left in a bounded field ([013df3b](https://github.com/hoshomoh/nooks/commit/013df3b29f30ba1cfeaab1b0579c18b0f6fabd14))
+* **web:** show pending reset requests beside the join requests ([3070637](https://github.com/hoshomoh/nooks/commit/3070637147225cec73d4f38555f71f0d9776e10e))
+
+
+### Fixed
+
+* **api:** bound every field a member writes into ([188726e](https://github.com/hoshomoh/nooks/commit/188726e7ff1fed2fb3e5acaf8fe5ae1a0fff4f4c))
+* **api:** keep the cause of a failure out of the answer ([797aad4](https://github.com/hoshomoh/nooks/commit/797aad459190c7d9e5e019768da53a2989d10c2b))
+* **api:** let only one person complete first run ([7f14b56](https://github.com/hoshomoh/nooks/commit/7f14b569fd67533d6dedad514c59da16876648ed))
+* **api:** remember a member with no name on the public list ([29fdc8f](https://github.com/hoshomoh/nooks/commit/29fdc8fe63465a3aedeea2bf7ad96fed41c90ac6))
+* **api:** stop telling a visitor which build is running ([f5250b1](https://github.com/hoshomoh/nooks/commit/f5250b11fe2ee4966a731f2da740208294ccc24c))
+* **api:** tell a caller a contended write is worth trying again ([856d7b1](https://github.com/hoshomoh/nooks/commit/856d7b144f31eddd047e94685aed6c7e0f3fc033))
+* **auth:** name the session cookie __Host- behind tls ([fb1bc92](https://github.com/hoshomoh/nooks/commit/fb1bc9290fcfd448e80a873132ec6c50d196228a))
+* **ci:** run the checks CI runs, and say what is skipped ([7ac4cac](https://github.com/hoshomoh/nooks/commit/7ac4cac262e38f20fe90fd4f2752d41b6571d0eb))
+* **ci:** set the test timeout from what the packages cost ([4f41ca4](https://github.com/hoshomoh/nooks/commit/4f41ca4db8c1a066b2db21739f98432f4ebcdf1b))
+* **copy:** write the name in lower case where anybody reads it ([f31ac1a](https://github.com/hoshomoh/nooks/commit/f31ac1ae62f8fcd7ef9323cb783eabc364443411))
+* **item:** compare the note where it is written, not before ([4b60715](https://github.com/hoshomoh/nooks/commit/4b607159754855f7972335d6738830a4aec7cc30))
+* **live:** end a stream on a list its member can no longer see ([f4c7660](https://github.com/hoshomoh/nooks/commit/f4c76601991a35741eb3694fe58238a0a867ef9a))
+* **live:** keep a note with whoever opened it first ([bec8511](https://github.com/hoshomoh/nooks/commit/bec851185a92c831c69ab5f0403fff3506fa19de))
+* **mcp:** name every status a refused one could have been ([7490e63](https://github.com/hoshomoh/nooks/commit/7490e63087e257f63c8a35ab5f1b1faf4bb3f7c1))
+* **mcp:** write the name in lower case where an assistant reads it ([95418b0](https://github.com/hoshomoh/nooks/commit/95418b02d6e3a637c34653340e9f81f5395763e8))
+* **note:** keep punctuation somebody typed out of the markup ([b976598](https://github.com/hoshomoh/nooks/commit/b976598f1fd38709d6176e9e8f2aaa75f168f055))
+* **proto:** write the name in lower case in the api comments ([8082d48](https://github.com/hoshomoh/nooks/commit/8082d487c965c2fcf8a3eca6b21ad5ae6ce3563a))
+* **requests:** stop an approval to join standing open for ever ([f091c3d](https://github.com/hoshomoh/nooks/commit/f091c3d303a067cd2fdd716453d01346809a4f85))
+* **requests:** tell the admin when somebody asks a second time ([7a54d69](https://github.com/hoshomoh/nooks/commit/7a54d6935f2633fce833de0ac3ae0ef674cd2386))
+* **server:** refuse to be framed by another site ([2f3cd55](https://github.com/hoshomoh/nooks/commit/2f3cd5526c8b7bb7648842a147888a4e6395512a))
+* **server:** write the backup snapshot beside the database ([9b97c23](https://github.com/hoshomoh/nooks/commit/9b97c23b5568ffb2dcd0403279f0050d002b0d57))
+* **store:** bound how many connections postgres is asked for ([e8697aa](https://github.com/hoshomoh/nooks/commit/e8697aacf735b928e0082a691b5500f2fe2642d6))
+* **store:** give every drawn list a settled order ([e2aa2bb](https://github.com/hoshomoh/nooks/commit/e2aa2bb023608f76d4706099b110f1f6161e13d4))
+* **store:** give every item its own place on postgres ([78f6d51](https://github.com/hoshomoh/nooks/commit/78f6d51276292269246bef7eace6954af4e54fe9))
+* **store:** give two items added at once different positions ([7f7f2f4](https://github.com/hoshomoh/nooks/commit/7f7f2f404905edcf8d117a4c27ff7704e1e47f03))
+* **store:** hold the request queues one at a time on postgres ([dd6b13d](https://github.com/hoshomoh/nooks/commit/dd6b13d7512bae73f100fab783302791a8d9c60a))
+* **store:** keep a list's counts true when people write at once ([b01b888](https://github.com/hoshomoh/nooks/commit/b01b888302fd7aa59e6f7031f8855fb9bab7da69))
+* **store:** move a list's updated time when something on it changes ([186bf9d](https://github.com/hoshomoh/nooks/commit/186bf9dbd801b4006460393b385d4ffcb74ca409))
+* **test:** stop the suite paying for bcrypt ([11d0112](https://github.com/hoshomoh/nooks/commit/11d0112a88ae0c7dff103c99a5ef835a43fc0f9a))
+* **web:** give an icon button the row's hit area ([0f33a53](https://github.com/hoshomoh/nooks/commit/0f33a53305c98053ea78f623cb0a3fe937d42cfa))
+* **web:** let a session change end a tick that is not its own ([0583dc5](https://github.com/hoshomoh/nooks/commit/0583dc5a64e5ed918138461f021fe3eb487ddde5))
+* **web:** let asking again forget what was asked before ([8c621ab](https://github.com/hoshomoh/nooks/commit/8c621ab148f234dad3e8f02b81b7d7d6b735c2a7))
+* **web:** write calendar months the way the design writes them ([78db8c3](https://github.com/hoshomoh/nooks/commit/78db8c390731c06f2a086f966e89522ceed0404a))
+* write the name in lower case in the code, and hold it there ([83645d2](https://github.com/hoshomoh/nooks/commit/83645d2573edb85809509c7d99110df42b7090d2))
+
+
+### Changed
+
+* **api:** remove the conflict activity kind nothing could send ([1fd64cf](https://github.com/hoshomoh/nooks/commit/1fd64cf0c585fac845977e5b7e0e6b9f92c69139))
+* **api:** state the field limits as constants rather than derive them ([99c4c9f](https://github.com/hoshomoh/nooks/commit/99c4c9f078091a771e249c5204039b706a4293c9))
+* **design:** one token for how tall a floating list grows ([8444bd2](https://github.com/hoshomoh/nooks/commit/8444bd27eb7c4e30e51d4853ed6ab0d87f095c21))
+* **proto:** declare the field limits where everything can read them ([8f8f8e4](https://github.com/hoshomoh/nooks/commit/8f8f8e47f1fd0feb6a4ffd0729ec3b9a79ccebb1))
+* **public:** build the published page again only when it changed ([1122edd](https://github.com/hoshomoh/nooks/commit/1122eddf78fd9487bbb58b5bdcce837c57e43f95))
+* **store:** keep the interface to what the app is promised ([8d631e4](https://github.com/hoshomoh/nooks/commit/8d631e40f3eb6b9b7313e9aef748fc1e66c3429f))
+* **store:** remove the three functions nothing calls ([ae32b1e](https://github.com/hoshomoh/nooks/commit/ae32b1eb8fedff1096ddc14d9a61cd39b63cc56c))
+* **test:** migrate one database and copy it ([e396087](https://github.com/hoshomoh/nooks/commit/e396087f7a3b5039259da38c99b15474041a1f26))
+* **web:** draw the avatar chip in one place ([9c1e39e](https://github.com/hoshomoh/nooks/commit/9c1e39ef4fe0c6d5142240e29d67f183cdc1cd02))
+* **website:** name the types in a signature ([c25790a](https://github.com/hoshomoh/nooks/commit/c25790a42ceea41380cccf365b5dcc6967f58ec3))
+
 ## [1.5.0](https://github.com/hoshomoh/nooks/compare/v1.4.1...v1.5.0) (2026-09-22)
 
 

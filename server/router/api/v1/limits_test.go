@@ -8,188 +8,147 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-
-	"buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/reflect/protoregistry"
 )
 
-// sameCap groups the fields that mean the same thing, because a label is capped where
-// an Item is made and again where one is changed. limits.go reads one of each; these
-// are the rest, and they have to agree or a caller is refused at one door and not the
-// other.
-var sameCap = map[string][]string{
-	"nooks.api.v1.CreateItemRequest.label":       {"nooks.api.v1.UpdateItemRequest.label"},
-	"nooks.api.v1.CreateItemRequest.quantity":    {"nooks.api.v1.UpdateItemRequest.quantity"},
-	"nooks.api.v1.CreateListRequest.name":        {"nooks.api.v1.RenameListRequest.name"},
-	"nooks.api.v1.AddMemberRequest.name":         {"nooks.api.v1.UpdateOwnProfileRequest.name", "nooks.api.v1.CompleteSetupRequest.name", "nooks.api.v1.RequestJoinRequest.name"},
-	"nooks.api.v1.AddMemberRequest.email":        {"nooks.api.v1.UpdateOwnProfileRequest.email", "nooks.api.v1.CompleteSetupRequest.email", "nooks.api.v1.RequestJoinRequest.email"},
-	"nooks.api.v1.InstanceSettings.name":         {"nooks.api.v1.CompleteSetupRequest.instance_name"},
-	"nooks.api.v1.CreateGroupRequest.name":       {},
-	"nooks.api.v1.CreateAccessTokenRequest.name": {},
-	"nooks.api.v1.RequestJoinRequest.message":    {},
-	"nooks.api.v1.UpdateItemRequest.note":        {},
+/*
+capped is every field the protos put a length on, against the constant that states the
+same number here.
+
+Both are plain numbers on purpose. The proto declares the cap so the generated clients
+and the published API reference carry it; limits.go states it so the code that refuses a
+caller reads like code. Neither derives the other, because a number worked out at
+startup from a registry lookup is a number nobody can read and a rename nobody finds
+until the Instance will not start.
+
+Every capped field is listed, not one per limit. The same text is capped in more than
+one place — a label where an Item is made and again where one is changed, a name on the
+four messages for setting up, joining, being added and editing your own profile — and
+caps that disagree refuse a caller at one door and not the other.
+*/
+var capped = map[string]int{
+	"CreateItemRequest.label":            LimitItemLabel,
+	"UpdateItemRequest.label":            LimitItemLabel,
+	"CreateItemRequest.quantity":         LimitItemQuantity,
+	"UpdateItemRequest.quantity":         LimitItemQuantity,
+	"UpdateItemRequest.note":             LimitItemNote,
+	"CreateListRequest.name":             LimitListName,
+	"RenameListRequest.name":             LimitListName,
+	"AddMemberRequest.name":              LimitMemberName,
+	"UpdateOwnProfileRequest.name":       LimitMemberName,
+	"CompleteSetupRequest.name":          LimitMemberName,
+	"RequestJoinRequest.name":            LimitMemberName,
+	"AddMemberRequest.email":             LimitMemberEmail,
+	"UpdateOwnProfileRequest.email":      LimitMemberEmail,
+	"CompleteSetupRequest.email":         LimitMemberEmail,
+	"RequestJoinRequest.email":           LimitMemberEmail,
+	"CreateGroupRequest.name":            LimitGroupName,
+	"CreateAccessTokenRequest.name":      LimitTokenName,
+	"InstanceSettings.name":              LimitInstanceName,
+	"CompleteSetupRequest.instance_name": LimitInstanceName,
+	"RequestJoinRequest.message":         LimitJoinMessage,
+}
+
+// cappedField is what one proto field says about its length: the cap it declares, and
+// the sentence above it that carries the number into the API reference.
+type cappedField struct {
+	limit   int
+	inWords int
+	saysSo  bool
 }
 
 /*
-One field means one cap, wherever it is written.
+The protos and the constants say the same numbers.
 
-The same text is capped in more than one place: a label where an Item is made and again
-where one is changed, a name on four messages between setting up, joining, being added
-and editing your own profile. limits.go reads one field per limit, so nothing stops
-another from drifting except this.
+Checked both ways round. A constant that disagrees with its field means the Instance
+refuses at a length the reference does not state. A capped field missing from `capped`
+means somebody added a limit and only half the doors know about it.
 
-It is not a list of numbers. The numbers live in the protos; this says which fields are
-the same field, which is a decision somebody makes rather than something a parser can
-work out from two ints that happen to match.
+The sentence is checked too, because the OpenAPI generator carries comments into
+`description` and carries the constraint nowhere. Without the sentence the published
+reference states no limit at all, which is the gap this was written to close.
 */
-func TestTheSameFieldHasTheSameCapEverywhere(t *testing.T) {
-	for leader, followers := range sameCap {
-		want := capOf(t, leader)
-		for _, follower := range followers {
-			if got := capOf(t, follower); got != want {
-				t.Errorf("%s caps at %d and %s at %d, which refuses a caller at one door and not the other",
-					leader, want, follower, got)
-			}
+func TestTheProtosAndTheConstantsAgree(t *testing.T) {
+	declared := capsInProtos(t)
+	if len(declared) < 20 {
+		t.Fatalf("read %d capped fields out of the protos, fewer than there are", len(declared))
+	}
+
+	for field, stated := range capped {
+		found, ok := declared[field]
+		if !ok {
+			t.Errorf("%s has a constant here and no cap in the protos", field)
+			continue
+		}
+		if found.limit != stated {
+			t.Errorf("%s is capped at %d in the proto and %d here", field, found.limit, stated)
+		}
+		if !found.saysSo {
+			t.Errorf("%s is capped and says nothing about it, so the API reference will not either", field)
+			continue
+		}
+		if found.inWords != found.limit {
+			t.Errorf("%s is capped at %d and its comment says %d", field, found.limit, found.inWords)
+		}
+	}
+
+	for field := range declared {
+		if _, ok := capped[field]; !ok {
+			t.Errorf("%s is capped in the protos and nothing here knows the number", field)
 		}
 	}
 }
 
-/*
-Every capped field says its number in words as well.
+// declaresACap matches a field carrying a length, and saysACap the sentence above it.
+var (
+	declaresACap = regexp.MustCompile(`^\s*(?:optional )?\w+ (\w+) = \d+ \[\(buf\.validate\.field\)\.string\.max_len = (\d+)\];\s*$`)
+	saysACap     = regexp.MustCompile(`^\s*// At most (\d+) characters\.\s*$`)
+)
 
-The constraint is what refuses a caller and what the generated clients carry. It is not
-what a person reads: the OpenAPI generator writes comments into `description` and does
-not write the constraint anywhere, so the published API reference says how long a label
-may be only because somebody wrote a sentence beside it.
-
-Two statements of one number is how a number goes wrong, so the sentence is checked
-against the constraint rather than trusted. Read out of the .proto files, because the
-comment is not in the descriptor.
-*/
-func TestEveryCapIsAlsoWrittenInWords(t *testing.T) {
-	said := capsSaidInProtos(t)
-	if len(said) < 20 {
-		t.Fatalf("read %d sentences out of the protos, fewer than the fields that carry one", len(said))
-	}
-
-	for field, inWords := range said {
-		if declared := capOf(t, field); declared != inWords {
-			t.Errorf("%s is capped at %d and its comment says %d", field, declared, inWords)
-		}
-	}
-
-	// And the other way round: a constraint nobody wrote a sentence for is a limit the
-	// reference does not state, which is the gap this was written to close.
-	forEachCappedField(t, func(name string, _ int) {
-		if _, ok := said[name]; !ok {
-			t.Errorf("%s is capped and says nothing about it, so the API reference will not either", name)
-		}
-	})
-}
-
-// capOf is the max_len one field declares.
-func capOf(t *testing.T, field string) int {
+// capsInProtos reads every capped field out of the .proto files, by message and field.
+func capsInProtos(t *testing.T) map[string]cappedField {
 	t.Helper()
 
-	at := strings.LastIndex(field, ".")
-	value := maxLenOfOrZero(field[:at], field[at+1:])
-	if value == 0 {
-		t.Fatalf("%s declares no max_len", field)
-	}
-	return value
-}
-
-// maxLenOfOrZero is maxLenOf without the panic, so a test can report rather than stop.
-func maxLenOfOrZero(message, field string) int {
-	descriptor, err := protoregistry.GlobalFiles.FindDescriptorByName(protoreflect.FullName(message))
-	if err != nil {
-		return 0
-	}
-	asMessage, ok := descriptor.(protoreflect.MessageDescriptor)
-	if !ok {
-		return 0
-	}
-	one := asMessage.Fields().ByName(protoreflect.Name(field))
-	if one == nil {
-		return 0
-	}
-	rules, ok := proto.GetExtension(one.Options(), validate.E_Field).(*validate.FieldRules)
-	if !ok || rules.GetString_() == nil || rules.GetString_().MaxLen == nil {
-		return 0
-	}
-	return int(rules.GetString_().GetMaxLen())
-}
-
-// forEachCappedField visits every field in this API that declares a max_len.
-func forEachCappedField(t *testing.T, visit func(name string, limit int)) {
-	t.Helper()
-
-	protoregistry.GlobalFiles.RangeFiles(func(file protoreflect.FileDescriptor) bool {
-		if !strings.HasPrefix(string(file.Package()), "nooks.api.v1") {
-			return true
-		}
-		messages := file.Messages()
-		for i := range messages.Len() {
-			message := messages.Get(i)
-			fields := message.Fields()
-			for j := range fields.Len() {
-				field := fields.Get(j)
-				name := fmt.Sprintf("%s.%s", message.FullName(), field.Name())
-				if limit := maxLenOfOrZero(string(message.FullName()), string(field.Name())); limit != 0 {
-					visit(name, limit)
-				}
-			}
-		}
-		return true
-	})
-}
-
-// saysACap matches the sentence a capped field carries, which is the only place the
-// number reaches whoever reads the API reference.
-var saysACap = regexp.MustCompile(`^\s*// At most (\d+) characters\.\s*$`)
-
-// declaresAField matches a field that carries a max_len, so the sentence above it can be
-// attached to the right name.
-var declaresAField = regexp.MustCompile(`^\s*(?:optional )?\w+ (\w+) = \d+ \[\(buf\.validate\.field\)\.string\.max_len = \d+\];\s*$`)
-
-// capsSaidInProtos reads the sentence above every capped field, by full field name.
-func capsSaidInProtos(t *testing.T) map[string]int {
-	t.Helper()
-
-	said := map[string]int{}
 	paths, err := filepath.Glob("../../../../proto/nooks/api/v1/*.proto")
 	if err != nil || len(paths) == 0 {
 		t.Fatalf("found no protos to read: %v", err)
 	}
 
+	found := map[string]cappedField{}
 	for _, path := range paths {
 		body, err := os.ReadFile(path)
 		if err != nil {
 			t.Fatalf("read %s: %v", path, err)
 		}
-		lines := strings.Split(string(body), "\n")
+
 		message := ""
+		lines := strings.Split(string(body), "\n")
 		for i, line := range lines {
-			if strings.HasPrefix(line, "message ") {
-				message = strings.TrimSuffix(strings.Fields(line)[1], "{")
-				message = strings.TrimSpace(message)
-			}
-			field := declaresAField.FindStringSubmatch(line)
-			if field == nil || i == 0 {
+			if name, ok := strings.CutPrefix(line, "message "); ok {
+				message = strings.TrimSpace(strings.TrimSuffix(strings.TrimSpace(name), "{"))
 				continue
 			}
-			above := saysACap.FindStringSubmatch(lines[i-1])
-			if above == nil {
+			declares := declaresACap.FindStringSubmatch(line)
+			if declares == nil {
 				continue
 			}
-			limit, err := strconv.Atoi(above[1])
-			if err != nil {
-				t.Fatalf("%s: %q is not a number", path, above[1])
+
+			one := cappedField{limit: number(t, declares[2])}
+			if i > 0 {
+				if says := saysACap.FindStringSubmatch(lines[i-1]); says != nil {
+					one.saysSo, one.inWords = true, number(t, says[1])
+				}
 			}
-			said[fmt.Sprintf("nooks.api.v1.%s.%s", message, field[1])] = limit
+			found[fmt.Sprintf("%s.%s", message, declares[1])] = one
 		}
 	}
-	return said
+	return found
+}
+
+func number(t *testing.T, said string) int {
+	t.Helper()
+	value, err := strconv.Atoi(said)
+	if err != nil {
+		t.Fatalf("%q is not a number", said)
+	}
+	return value
 }

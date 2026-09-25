@@ -86,7 +86,7 @@ type AuthServiceClient interface {
 	// able to copy out of a log.
 	RefreshAccess(context.Context, *connect.Request[v1.RefreshAccessRequest]) (*connect.Response[v1.RefreshAccessResponse], error)
 	// ReplacePassword sets a new password for the signed-in Member. A Member who was
-	// given a temporary password must call this before they can use Nooks.
+	// given a temporary password must call this before they can use nooks.
 	ReplacePassword(context.Context, *connect.Request[v1.ReplacePasswordRequest]) (*connect.Response[v1.ReplacePasswordResponse], error)
 	// RequestJoin asks an Admin for an account. Every account begins this way: the request
 	// waits in Activity until an Admin approves it and hands over a temporary password.
@@ -103,7 +103,7 @@ type AuthServiceClient interface {
 	// CompleteJoin turns an approved Join request into an account, once the Visitor
 	// chooses a password.
 	CompleteJoin(context.Context, *connect.Request[v1.CompleteJoinRequest]) (*connect.Response[v1.CompleteJoinResponse], error)
-	// RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
+	// RequestPasswordReset asks an Admin to unlock an account. nooks sends no email, so
 	// the Admin checks it is really them however they like, then approves.
 	//
 	// One request may wait per Member. Asking again while one is waiting reports success
@@ -295,7 +295,7 @@ type AuthServiceHandler interface {
 	// able to copy out of a log.
 	RefreshAccess(context.Context, *connect.Request[v1.RefreshAccessRequest]) (*connect.Response[v1.RefreshAccessResponse], error)
 	// ReplacePassword sets a new password for the signed-in Member. A Member who was
-	// given a temporary password must call this before they can use Nooks.
+	// given a temporary password must call this before they can use nooks.
 	ReplacePassword(context.Context, *connect.Request[v1.ReplacePasswordRequest]) (*connect.Response[v1.ReplacePasswordResponse], error)
 	// RequestJoin asks an Admin for an account. Every account begins this way: the request
 	// waits in Activity until an Admin approves it and hands over a temporary password.
@@ -312,7 +312,7 @@ type AuthServiceHandler interface {
 	// CompleteJoin turns an approved Join request into an account, once the Visitor
 	// chooses a password.
 	CompleteJoin(context.Context, *connect.Request[v1.CompleteJoinRequest]) (*connect.Response[v1.CompleteJoinResponse], error)
-	// RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
+	// RequestPasswordReset asks an Admin to unlock an account. nooks sends no email, so
 	// the Admin checks it is really them however they like, then approves.
 	//
 	// One request may wait per Member. Asking again while one is waiting reports success

@@ -374,7 +374,7 @@ func (x *CreateAccessTokenRequest) GetExpiresAt() string {
 type CreateAccessTokenResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Token *AccessToken           `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	// The secret, in clear, shown once and never again. Nooks keeps only a hash.
+	// The secret, in clear, shown once and never again. nooks keeps only a hash.
 	Secret        string `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

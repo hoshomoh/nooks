@@ -45,7 +45,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// ListService covers Lists and the Items on them — the whole of Nooks, really.
+// ListService covers Lists and the Items on them — the whole of nooks, really.
 // Everything else is a view over these.
 type ListServiceClient interface {
 	// ListLists returns one page of the Lists the signed-in Member can reach, filtered
@@ -328,7 +328,7 @@ func (c *listServiceClient) Search(ctx context.Context, in *SearchRequest, opts 
 // All implementations must embed UnimplementedListServiceServer
 // for forward compatibility.
 //
-// ListService covers Lists and the Items on them — the whole of Nooks, really.
+// ListService covers Lists and the Items on them — the whole of nooks, really.
 // Everything else is a view over these.
 type ListServiceServer interface {
 	// ListLists returns one page of the Lists the signed-in Member can reach, filtered

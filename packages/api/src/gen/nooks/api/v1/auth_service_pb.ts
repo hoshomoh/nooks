@@ -36,7 +36,7 @@ export type Member = Message<"nooks.api.v1.Member"> & {
   name: string;
 
   /**
-   * Used to sign in. Nooks never sends mail to it.
+   * Used to sign in. nooks never sends mail to it.
    *
    * @generated from field: string email = 3;
    */
@@ -693,10 +693,10 @@ export const RoleSchema: GenEnum<Role> = /*@__PURE__*/
   enumDesc(file_nooks_api_v1_auth_service, 1);
 
 /**
- * AuthService covers getting into a Nooks Instance: first run, signing in, signing
+ * AuthService covers getting into a nooks Instance: first run, signing in, signing
  * out, and replacing a temporary password.
  *
- * Nooks sends no email, so there is no emailed reset link here. A forgotten password
+ * nooks sends no email, so there is no emailed reset link here. A forgotten password
  * becomes a Reset request an Admin approves in Activity.
  *
  * @generated from service nooks.api.v1.AuthService
@@ -759,7 +759,7 @@ export const AuthService: GenService<{
   },
   /**
    * ReplacePassword sets a new password for the signed-in Member. A Member who was
-   * given a temporary password must call this before they can use Nooks.
+   * given a temporary password must call this before they can use nooks.
    *
    * @generated from rpc nooks.api.v1.AuthService.ReplacePassword
    */
@@ -808,7 +808,7 @@ export const AuthService: GenService<{
     output: typeof CompleteJoinResponseSchema;
   },
   /**
-   * RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
+   * RequestPasswordReset asks an Admin to unlock an account. nooks sends no email, so
    * the Admin checks it is really them however they like, then approves.
    *
    * One request may wait per Member. Asking again while one is waiting reports success

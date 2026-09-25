@@ -72,7 +72,7 @@ type MemberServiceClient interface {
 	SetGroupMembers(context.Context, *connect.Request[v1.SetGroupMembersRequest]) (*connect.Response[v1.SetGroupMembersResponse], error)
 	// AddMember creates an account with a temporary password, which is read out once.
 	//
-	// Nooks has no mail server, so an Admin hands the password over in person or however
+	// nooks has no mail server, so an Admin hands the password over in person or however
 	// else they already talk. The Member must replace it before anything else.
 	AddMember(context.Context, *connect.Request[v1.AddMemberRequest]) (*connect.Response[v1.AddMemberResponse], error)
 	// SetMemberRole makes somebody an Admin, or stops them being one.
@@ -84,7 +84,7 @@ type MemberServiceClient interface {
 	// UpdateOwnProfile changes the signed-in Member's own name and email.
 	//
 	// Their own, and only their own. An Admin who wants somebody else's name changed
-	// asks them: an account is a person, and Nooks does not let one person edit another.
+	// asks them: an account is a person, and nooks does not let one person edit another.
 	UpdateOwnProfile(context.Context, *connect.Request[v1.UpdateOwnProfileRequest]) (*connect.Response[v1.UpdateOwnProfileResponse], error)
 }
 
@@ -216,7 +216,7 @@ type MemberServiceHandler interface {
 	SetGroupMembers(context.Context, *connect.Request[v1.SetGroupMembersRequest]) (*connect.Response[v1.SetGroupMembersResponse], error)
 	// AddMember creates an account with a temporary password, which is read out once.
 	//
-	// Nooks has no mail server, so an Admin hands the password over in person or however
+	// nooks has no mail server, so an Admin hands the password over in person or however
 	// else they already talk. The Member must replace it before anything else.
 	AddMember(context.Context, *connect.Request[v1.AddMemberRequest]) (*connect.Response[v1.AddMemberResponse], error)
 	// SetMemberRole makes somebody an Admin, or stops them being one.
@@ -228,7 +228,7 @@ type MemberServiceHandler interface {
 	// UpdateOwnProfile changes the signed-in Member's own name and email.
 	//
 	// Their own, and only their own. An Admin who wants somebody else's name changed
-	// asks them: an account is a person, and Nooks does not let one person edit another.
+	// asks them: an account is a person, and nooks does not let one person edit another.
 	UpdateOwnProfile(context.Context, *connect.Request[v1.UpdateOwnProfileRequest]) (*connect.Response[v1.UpdateOwnProfileResponse], error)
 }
 

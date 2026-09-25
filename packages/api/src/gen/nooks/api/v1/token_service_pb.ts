@@ -214,7 +214,7 @@ export type CreateAccessTokenResponse = Message<"nooks.api.v1.CreateAccessTokenR
   token?: AccessToken | undefined;
 
   /**
-   * The secret, in clear, shown once and never again. Nooks keeps only a hash.
+   * The secret, in clear, shown once and never again. nooks keeps only a hash.
    *
    * @generated from field: string secret = 2;
    */

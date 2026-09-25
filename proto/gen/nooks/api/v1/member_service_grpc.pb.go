@@ -50,7 +50,7 @@ type MemberServiceClient interface {
 	SetGroupMembers(ctx context.Context, in *SetGroupMembersRequest, opts ...grpc.CallOption) (*SetGroupMembersResponse, error)
 	// AddMember creates an account with a temporary password, which is read out once.
 	//
-	// Nooks has no mail server, so an Admin hands the password over in person or however
+	// nooks has no mail server, so an Admin hands the password over in person or however
 	// else they already talk. The Member must replace it before anything else.
 	AddMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*AddMemberResponse, error)
 	// SetMemberRole makes somebody an Admin, or stops them being one.
@@ -62,7 +62,7 @@ type MemberServiceClient interface {
 	// UpdateOwnProfile changes the signed-in Member's own name and email.
 	//
 	// Their own, and only their own. An Admin who wants somebody else's name changed
-	// asks them: an account is a person, and Nooks does not let one person edit another.
+	// asks them: an account is a person, and nooks does not let one person edit another.
 	UpdateOwnProfile(ctx context.Context, in *UpdateOwnProfileRequest, opts ...grpc.CallOption) (*UpdateOwnProfileResponse, error)
 }
 
@@ -175,7 +175,7 @@ type MemberServiceServer interface {
 	SetGroupMembers(context.Context, *SetGroupMembersRequest) (*SetGroupMembersResponse, error)
 	// AddMember creates an account with a temporary password, which is read out once.
 	//
-	// Nooks has no mail server, so an Admin hands the password over in person or however
+	// nooks has no mail server, so an Admin hands the password over in person or however
 	// else they already talk. The Member must replace it before anything else.
 	AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error)
 	// SetMemberRole makes somebody an Admin, or stops them being one.
@@ -187,7 +187,7 @@ type MemberServiceServer interface {
 	// UpdateOwnProfile changes the signed-in Member's own name and email.
 	//
 	// Their own, and only their own. An Admin who wants somebody else's name changed
-	// asks them: an account is a person, and Nooks does not let one person edit another.
+	// asks them: an account is a person, and nooks does not let one person edit another.
 	UpdateOwnProfile(context.Context, *UpdateOwnProfileRequest) (*UpdateOwnProfileResponse, error)
 	mustEmbedUnimplementedMemberServiceServer()
 }

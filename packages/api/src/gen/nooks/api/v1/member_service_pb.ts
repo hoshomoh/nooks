@@ -236,7 +236,7 @@ export type UpdateOwnProfileRequest = Message<"nooks.api.v1.UpdateOwnProfileRequ
   name: string;
 
   /**
-   * Used to sign in, so it has to stay unique on the Instance. Nooks never sends mail
+   * Used to sign in, so it has to stay unique on the Instance. nooks never sends mail
    * to it, and changing it takes effect on the next sign-in like any other.
    *
    * At most 254 characters.
@@ -280,7 +280,7 @@ export type AddMemberResponse = Message<"nooks.api.v1.AddMemberResponse"> & {
   member?: Member | undefined;
 
   /**
-   * The temporary password, in clear, shown once and never again. Nooks does not keep
+   * The temporary password, in clear, shown once and never again. nooks does not keep
    * it: what is stored is a hash, and this is the only time it can be read.
    *
    * @generated from field: string temporary_password = 2;
@@ -438,7 +438,7 @@ export const MemberService: GenService<{
   /**
    * AddMember creates an account with a temporary password, which is read out once.
    *
-   * Nooks has no mail server, so an Admin hands the password over in person or however
+   * nooks has no mail server, so an Admin hands the password over in person or however
    * else they already talk. The Member must replace it before anything else.
    *
    * @generated from rpc nooks.api.v1.MemberService.AddMember
@@ -474,7 +474,7 @@ export const MemberService: GenService<{
    * UpdateOwnProfile changes the signed-in Member's own name and email.
    *
    * Their own, and only their own. An Admin who wants somebody else's name changed
-   * asks them: an account is a person, and Nooks does not let one person edit another.
+   * asks them: an account is a person, and nooks does not let one person edit another.
    *
    * @generated from rpc nooks.api.v1.MemberService.UpdateOwnProfile
    */

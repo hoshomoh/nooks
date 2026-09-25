@@ -103,7 +103,7 @@ message CreateAccessTokenRequest {
 message CreateAccessTokenResponse {
   AccessToken token = 1;
 
-  // The secret, in clear, shown once and never again. Nooks keeps only a hash.
+  // The secret, in clear, shown once and never again. nooks keeps only a hash.
   string secret = 2;
 }
 

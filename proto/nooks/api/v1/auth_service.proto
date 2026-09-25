@@ -5,10 +5,10 @@ package nooks.api.v1;
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 
-// AuthService covers getting into a Nooks Instance: first run, signing in, signing
+// AuthService covers getting into a nooks Instance: first run, signing in, signing
 // out, and replacing a temporary password.
 //
-// Nooks sends no email, so there is no emailed reset link here. A forgotten password
+// nooks sends no email, so there is no emailed reset link here. A forgotten password
 // becomes a Reset request an Admin approves in Activity.
 service AuthService {
   // CompleteSetup creates the first Admin and names the Instance, in one step. It is
@@ -39,7 +39,7 @@ service AuthService {
   }
 
   // ReplacePassword sets a new password for the signed-in Member. A Member who was
-  // given a temporary password must call this before they can use Nooks.
+  // given a temporary password must call this before they can use nooks.
   rpc ReplacePassword(ReplacePasswordRequest) returns (ReplacePasswordResponse) {
     option (google.api.http) = {
       post: "/api/v1/auth/password"
@@ -72,7 +72,7 @@ service AuthService {
   // chooses a password.
   rpc CompleteJoin(CompleteJoinRequest) returns (CompleteJoinResponse);
 
-  // RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
+  // RequestPasswordReset asks an Admin to unlock an account. nooks sends no email, so
   // the Admin checks it is really them however they like, then approves.
   //
   // One request may wait per Member. Asking again while one is waiting reports success
@@ -120,7 +120,7 @@ message Member {
   // How the Member appears on Items they add.
   string name = 2;
 
-  // Used to sign in. Nooks never sends mail to it.
+  // Used to sign in. nooks never sends mail to it.
   string email = 3;
 
   Role role = 4;

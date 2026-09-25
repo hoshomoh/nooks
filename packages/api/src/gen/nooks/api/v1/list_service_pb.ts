@@ -883,7 +883,7 @@ export type UpdateItemRequest = Message<"nooks.api.v1.UpdateItemRequest"> & {
    * What the caller believed the text was when they started changing it.
    *
    * Set one of these and the change is refused when the stored text is something else,
-   * with ABORTED. That is the whole of conflict detection in Nooks, and it is only
+   * with ABORTED. That is the whole of conflict detection in nooks, and it is only
    * offered for text: a tick says what an Item should be rather than what it was, so
    * there is nothing to compare and nothing to refuse.
    *
@@ -1339,7 +1339,7 @@ export const SearchHitKindSchema: GenEnum<SearchHitKind> = /*@__PURE__*/
   enumDesc(file_nooks_api_v1_list_service, 3);
 
 /**
- * ListService covers Lists and the Items on them — the whole of Nooks, really.
+ * ListService covers Lists and the Items on them — the whole of nooks, really.
  * Everything else is a view over these.
  *
  * @generated from service nooks.api.v1.ListService

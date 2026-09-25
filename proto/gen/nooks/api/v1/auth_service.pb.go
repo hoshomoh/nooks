@@ -137,7 +137,7 @@ type Member struct {
 	Uid string `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
 	// How the Member appears on Items they add.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// Used to sign in. Nooks never sends mail to it.
+	// Used to sign in. nooks never sends mail to it.
 	Email string `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
 	Role  Role   `protobuf:"varint,4,opt,name=role,proto3,enum=nooks.api.v1.Role" json:"role,omitempty"`
 	// True while an Admin-set temporary password has not been replaced. The app must

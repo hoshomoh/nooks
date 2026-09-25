@@ -5,7 +5,7 @@ package nooks.api.v1;
 import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 
-// InstanceService reports what this copy of Nooks is and how it is configured.
+// InstanceService reports what this copy of nooks is and how it is configured.
 service InstanceService {
   // GetInstance returns the public profile of this Instance. It is reachable without
   // authentication because the sign-in page and the Public list both need it before
@@ -29,14 +29,14 @@ service InstanceService {
     };
   }
 
-  // GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
+  // GetInstanceAbout reports what this copy of nooks is and how much it holds. Any
   // Member: it is their Instance too, and none of it is anybody else's business.
   rpc GetInstanceAbout(GetInstanceAboutRequest) returns (GetInstanceAboutResponse) {
     option (google.api.http) = {get: "/api/v1/instance/about"};
   }
 
   // DeleteInstance empties it and returns it to first run. Admins only, and there is
-  // no undo: Nooks keeps no backup of its own.
+  // no undo: nooks keeps no backup of its own.
   rpc DeleteInstance(DeleteInstanceRequest) returns (DeleteInstanceResponse) {
     option (google.api.http) = {
       post: "/api/v1/instance:delete"

@@ -31,7 +31,7 @@ const (
 // RequestService is the Admin's side of the two things that would be emails elsewhere:
 // somebody asking for an account, and somebody asking to replace a forgotten password.
 //
-// Every method here requires an Admin. Nooks has no mail server, so these requests wait
+// Every method here requires an Admin. nooks has no mail server, so these requests wait
 // in the Instance until an Admin acts on them.
 type RequestServiceClient interface {
 	// ListPendingRequests returns everything waiting for an Admin, oldest first.
@@ -89,7 +89,7 @@ func (c *requestServiceClient) DecideResetRequest(ctx context.Context, in *Decid
 // RequestService is the Admin's side of the two things that would be emails elsewhere:
 // somebody asking for an account, and somebody asking to replace a forgotten password.
 //
-// Every method here requires an Admin. Nooks has no mail server, so these requests wait
+// Every method here requires an Admin. nooks has no mail server, so these requests wait
 // in the Instance until an Admin acts on them.
 type RequestServiceServer interface {
 	// ListPendingRequests returns everything waiting for an Admin, oldest first.

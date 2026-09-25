@@ -508,7 +508,7 @@ type UpdateOwnProfileRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// At most 100 characters.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Used to sign in, so it has to stay unique on the Instance. Nooks never sends mail
+	// Used to sign in, so it has to stay unique on the Instance. nooks never sends mail
 	// to it, and changing it takes effect on the next sign-in like any other.
 	//
 	// At most 254 characters.
@@ -608,7 +608,7 @@ func (x *UpdateOwnProfileResponse) GetMember() *Member {
 type AddMemberResponse struct {
 	state  protoimpl.MessageState `protogen:"open.v1"`
 	Member *Member                `protobuf:"bytes,1,opt,name=member,proto3" json:"member,omitempty"`
-	// The temporary password, in clear, shown once and never again. Nooks does not keep
+	// The temporary password, in clear, shown once and never again. nooks does not keep
 	// it: what is stored is a hash, and this is the only time it can be read.
 	TemporaryPassword string `protobuf:"bytes,2,opt,name=temporary_password,json=temporaryPassword,proto3" json:"temporary_password,omitempty"`
 	unknownFields     protoimpl.UnknownFields

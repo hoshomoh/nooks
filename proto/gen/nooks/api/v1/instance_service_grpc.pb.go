@@ -30,7 +30,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// InstanceService reports what this copy of Nooks is and how it is configured.
+// InstanceService reports what this copy of nooks is and how it is configured.
 type InstanceServiceClient interface {
 	// GetInstance returns the public profile of this Instance. It is reachable without
 	// authentication because the sign-in page and the Public list both need it before
@@ -42,11 +42,11 @@ type InstanceServiceClient interface {
 	GetInstanceSettings(ctx context.Context, in *GetInstanceSettingsRequest, opts ...grpc.CallOption) (*GetInstanceSettingsResponse, error)
 	// UpdateInstanceSettings replaces them. Admins only.
 	UpdateInstanceSettings(ctx context.Context, in *UpdateInstanceSettingsRequest, opts ...grpc.CallOption) (*UpdateInstanceSettingsResponse, error)
-	// GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
+	// GetInstanceAbout reports what this copy of nooks is and how much it holds. Any
 	// Member: it is their Instance too, and none of it is anybody else's business.
 	GetInstanceAbout(ctx context.Context, in *GetInstanceAboutRequest, opts ...grpc.CallOption) (*GetInstanceAboutResponse, error)
 	// DeleteInstance empties it and returns it to first run. Admins only, and there is
-	// no undo: Nooks keeps no backup of its own.
+	// no undo: nooks keeps no backup of its own.
 	DeleteInstance(ctx context.Context, in *DeleteInstanceRequest, opts ...grpc.CallOption) (*DeleteInstanceResponse, error)
 }
 
@@ -112,7 +112,7 @@ func (c *instanceServiceClient) DeleteInstance(ctx context.Context, in *DeleteIn
 // All implementations must embed UnimplementedInstanceServiceServer
 // for forward compatibility.
 //
-// InstanceService reports what this copy of Nooks is and how it is configured.
+// InstanceService reports what this copy of nooks is and how it is configured.
 type InstanceServiceServer interface {
 	// GetInstance returns the public profile of this Instance. It is reachable without
 	// authentication because the sign-in page and the Public list both need it before
@@ -124,11 +124,11 @@ type InstanceServiceServer interface {
 	GetInstanceSettings(context.Context, *GetInstanceSettingsRequest) (*GetInstanceSettingsResponse, error)
 	// UpdateInstanceSettings replaces them. Admins only.
 	UpdateInstanceSettings(context.Context, *UpdateInstanceSettingsRequest) (*UpdateInstanceSettingsResponse, error)
-	// GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
+	// GetInstanceAbout reports what this copy of nooks is and how much it holds. Any
 	// Member: it is their Instance too, and none of it is anybody else's business.
 	GetInstanceAbout(context.Context, *GetInstanceAboutRequest) (*GetInstanceAboutResponse, error)
 	// DeleteInstance empties it and returns it to first run. Admins only, and there is
-	// no undo: Nooks keeps no backup of its own.
+	// no undo: nooks keeps no backup of its own.
 	DeleteInstance(context.Context, *DeleteInstanceRequest) (*DeleteInstanceResponse, error)
 	mustEmbedUnimplementedInstanceServiceServer()
 }

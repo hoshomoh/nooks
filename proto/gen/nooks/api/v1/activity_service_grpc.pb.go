@@ -29,7 +29,7 @@ const (
 //
 // ActivityService is everything waiting for one Member's attention.
 //
-// Nooks has no mail server, so this panel is the only place any of it surfaces. That is
+// nooks has no mail server, so this panel is the only place any of it surfaces. That is
 // why an entry carries its own words rather than a code the reader has to interpret.
 type ActivityServiceClient interface {
 	// ListActivity returns what is waiting, newest first.
@@ -72,7 +72,7 @@ func (c *activityServiceClient) MarkActivityRead(ctx context.Context, in *MarkAc
 //
 // ActivityService is everything waiting for one Member's attention.
 //
-// Nooks has no mail server, so this panel is the only place any of it surfaces. That is
+// nooks has no mail server, so this panel is the only place any of it surfaces. That is
 // why an entry carries its own words rather than a code the reader has to interpret.
 type ActivityServiceServer interface {
 	// ListActivity returns what is waiting, newest first.

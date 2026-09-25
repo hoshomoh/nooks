@@ -354,7 +354,7 @@ export const GetInstanceResponseSchema: GenMessage<GetInstanceResponse> = /*@__P
   messageDesc(file_nooks_api_v1_instance_service, 11);
 
 /**
- * InstanceService reports what this copy of Nooks is and how it is configured.
+ * InstanceService reports what this copy of nooks is and how it is configured.
  *
  * @generated from service nooks.api.v1.InstanceService
  */
@@ -394,7 +394,7 @@ export const InstanceService: GenService<{
     output: typeof UpdateInstanceSettingsResponseSchema;
   },
   /**
-   * GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
+   * GetInstanceAbout reports what this copy of nooks is and how much it holds. Any
    * Member: it is their Instance too, and none of it is anybody else's business.
    *
    * @generated from rpc nooks.api.v1.InstanceService.GetInstanceAbout
@@ -406,7 +406,7 @@ export const InstanceService: GenService<{
   },
   /**
    * DeleteInstance empties it and returns it to first run. Admins only, and there is
-   * no undo: Nooks keeps no backup of its own.
+   * no undo: nooks keeps no backup of its own.
    *
    * @generated from rpc nooks.api.v1.InstanceService.DeleteInstance
    */

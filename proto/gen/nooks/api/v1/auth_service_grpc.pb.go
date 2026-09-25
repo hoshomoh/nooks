@@ -37,10 +37,10 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AuthService covers getting into a Nooks Instance: first run, signing in, signing
+// AuthService covers getting into a nooks Instance: first run, signing in, signing
 // out, and replacing a temporary password.
 //
-// Nooks sends no email, so there is no emailed reset link here. A forgotten password
+// nooks sends no email, so there is no emailed reset link here. A forgotten password
 // becomes a Reset request an Admin approves in Activity.
 type AuthServiceClient interface {
 	// CompleteSetup creates the first Admin and names the Instance, in one step. It is
@@ -59,7 +59,7 @@ type AuthServiceClient interface {
 	// able to copy out of a log.
 	RefreshAccess(ctx context.Context, in *RefreshAccessRequest, opts ...grpc.CallOption) (*RefreshAccessResponse, error)
 	// ReplacePassword sets a new password for the signed-in Member. A Member who was
-	// given a temporary password must call this before they can use Nooks.
+	// given a temporary password must call this before they can use nooks.
 	ReplacePassword(ctx context.Context, in *ReplacePasswordRequest, opts ...grpc.CallOption) (*ReplacePasswordResponse, error)
 	// RequestJoin asks an Admin for an account. Every account begins this way: the request
 	// waits in Activity until an Admin approves it and hands over a temporary password.
@@ -76,7 +76,7 @@ type AuthServiceClient interface {
 	// CompleteJoin turns an approved Join request into an account, once the Visitor
 	// chooses a password.
 	CompleteJoin(ctx context.Context, in *CompleteJoinRequest, opts ...grpc.CallOption) (*CompleteJoinResponse, error)
-	// RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
+	// RequestPasswordReset asks an Admin to unlock an account. nooks sends no email, so
 	// the Admin checks it is really them however they like, then approves.
 	//
 	// One request may wait per Member. Asking again while one is waiting reports success
@@ -220,10 +220,10 @@ func (c *authServiceClient) CompletePasswordReset(ctx context.Context, in *Compl
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
 //
-// AuthService covers getting into a Nooks Instance: first run, signing in, signing
+// AuthService covers getting into a nooks Instance: first run, signing in, signing
 // out, and replacing a temporary password.
 //
-// Nooks sends no email, so there is no emailed reset link here. A forgotten password
+// nooks sends no email, so there is no emailed reset link here. A forgotten password
 // becomes a Reset request an Admin approves in Activity.
 type AuthServiceServer interface {
 	// CompleteSetup creates the first Admin and names the Instance, in one step. It is
@@ -242,7 +242,7 @@ type AuthServiceServer interface {
 	// able to copy out of a log.
 	RefreshAccess(context.Context, *RefreshAccessRequest) (*RefreshAccessResponse, error)
 	// ReplacePassword sets a new password for the signed-in Member. A Member who was
-	// given a temporary password must call this before they can use Nooks.
+	// given a temporary password must call this before they can use nooks.
 	ReplacePassword(context.Context, *ReplacePasswordRequest) (*ReplacePasswordResponse, error)
 	// RequestJoin asks an Admin for an account. Every account begins this way: the request
 	// waits in Activity until an Admin approves it and hands over a temporary password.
@@ -259,7 +259,7 @@ type AuthServiceServer interface {
 	// CompleteJoin turns an approved Join request into an account, once the Visitor
 	// chooses a password.
 	CompleteJoin(context.Context, *CompleteJoinRequest) (*CompleteJoinResponse, error)
-	// RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
+	// RequestPasswordReset asks an Admin to unlock an account. nooks sends no email, so
 	// the Admin checks it is really them however they like, then approves.
 	//
 	// One request may wait per Member. Asking again while one is waiting reports success

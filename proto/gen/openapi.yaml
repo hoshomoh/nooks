@@ -205,7 +205,7 @@ paths:
                 - AuthService
             description: |-
                 ReplacePassword sets a new password for the signed-in Member. A Member who was
-                 given a temporary password must call this before they can use Nooks.
+                 given a temporary password must call this before they can use nooks.
             operationId: AuthService_ReplacePassword
             requestBody:
                 content:
@@ -261,7 +261,7 @@ paths:
             tags:
                 - AuthService
             description: |-
-                RequestPasswordReset asks an Admin to unlock an account. Nooks sends no email, so
+                RequestPasswordReset asks an Admin to unlock an account. nooks sends no email, so
                  the Admin checks it is really them however they like, then approves.
 
                  One request may wait per Member. Asking again while one is waiting reports success
@@ -450,7 +450,7 @@ paths:
             tags:
                 - InstanceService
             description: |-
-                GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
+                GetInstanceAbout reports what this copy of nooks is and how much it holds. Any
                  Member: it is their Instance too, and none of it is anybody else's business.
             operationId: InstanceService_GetInstanceAbout
             responses:
@@ -518,7 +518,7 @@ paths:
                 - InstanceService
             description: |-
                 DeleteInstance empties it and returns it to first run. Admins only, and there is
-                 no undo: Nooks keeps no backup of its own.
+                 no undo: nooks keeps no backup of its own.
             operationId: InstanceService_DeleteInstance
             requestBody:
                 content:
@@ -1100,7 +1100,7 @@ paths:
             description: |-
                 AddMember creates an account with a temporary password, which is read out once.
 
-                 Nooks has no mail server, so an Admin hands the password over in person or however
+                 nooks has no mail server, so an Admin hands the password over in person or however
                  else they already talk. The Member must replace it before anything else.
             operationId: MemberService_AddMember
             requestBody:
@@ -1130,7 +1130,7 @@ paths:
                 UpdateOwnProfile changes the signed-in Member's own name and email.
 
                  Their own, and only their own. An Admin who wants somebody else's name changed
-                 asks them: an account is a person, and Nooks does not let one person edit another.
+                 asks them: an account is a person, and nooks does not let one person edit another.
             operationId: MemberService_UpdateOwnProfile
             requestBody:
                 content:
@@ -1478,7 +1478,7 @@ components:
                 temporaryPassword:
                     type: string
                     description: |-
-                        The temporary password, in clear, shown once and never again. Nooks does not keep
+                        The temporary password, in clear, shown once and never again. nooks does not keep
                          it: what is stored is a hash, and this is the only time it can be read.
         CreateAccessTokenRequest:
             type: object
@@ -1510,7 +1510,7 @@ components:
                     $ref: '#/components/schemas/AccessToken'
                 secret:
                     type: string
-                    description: The secret, in clear, shown once and never again. Nooks keeps only a hash.
+                    description: The secret, in clear, shown once and never again. nooks keeps only a hash.
         CreateGroupRequest:
             type: object
             properties:
@@ -2017,7 +2017,7 @@ components:
                     description: How the Member appears on Items they add.
                 email:
                     type: string
-                    description: Used to sign in. Nooks never sends mail to it.
+                    description: Used to sign in. nooks never sends mail to it.
                 role:
                     enum:
                         - ROLE_UNSPECIFIED
@@ -2442,7 +2442,7 @@ components:
                         What the caller believed the text was when they started changing it.
 
                          Set one of these and the change is refused when the stored text is something else,
-                         with ABORTED. That is the whole of conflict detection in Nooks, and it is only
+                         with ABORTED. That is the whole of conflict detection in nooks, and it is only
                          offered for text: a tick says what an Item should be rather than what it was, so
                          there is nothing to compare and nothing to refuse.
 
@@ -2463,7 +2463,7 @@ components:
                 email:
                     type: string
                     description: |-
-                        Used to sign in, so it has to stay unique on the Instance. Nooks never sends mail
+                        Used to sign in, so it has to stay unique on the Instance. nooks never sends mail
                          to it, and changing it takes effect on the next sign-in like any other.
 
                          At most 254 characters.
@@ -2477,20 +2477,20 @@ tags:
       description: |-
         ActivityService is everything waiting for one Member's attention.
 
-         Nooks has no mail server, so this panel is the only place any of it surfaces. That is
+         nooks has no mail server, so this panel is the only place any of it surfaces. That is
          why an entry carries its own words rather than a code the reader has to interpret.
     - name: AuthService
       description: |-
-        AuthService covers getting into a Nooks Instance: first run, signing in, signing
+        AuthService covers getting into a nooks Instance: first run, signing in, signing
          out, and replacing a temporary password.
 
-         Nooks sends no email, so there is no emailed reset link here. A forgotten password
+         nooks sends no email, so there is no emailed reset link here. A forgotten password
          becomes a Reset request an Admin approves in Activity.
     - name: InstanceService
-      description: InstanceService reports what this copy of Nooks is and how it is configured.
+      description: InstanceService reports what this copy of nooks is and how it is configured.
     - name: ListService
       description: |-
-        ListService covers Lists and the Items on them — the whole of Nooks, really.
+        ListService covers Lists and the Items on them — the whole of nooks, really.
          Everything else is a view over these.
     - name: MemberService
       description: |-
@@ -2511,7 +2511,7 @@ tags:
         RequestService is the Admin's side of the two things that would be emails elsewhere:
          somebody asking for an account, and somebody asking to replace a forgotten password.
 
-         Every method here requires an Admin. Nooks has no mail server, so these requests wait
+         Every method here requires an Admin. nooks has no mail server, so these requests wait
          in the Instance until an Admin acts on them.
     - name: TokenService
       description: |-

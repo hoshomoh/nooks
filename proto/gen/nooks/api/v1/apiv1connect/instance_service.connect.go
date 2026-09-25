@@ -62,11 +62,11 @@ type InstanceServiceClient interface {
 	GetInstanceSettings(context.Context, *connect.Request[v1.GetInstanceSettingsRequest]) (*connect.Response[v1.GetInstanceSettingsResponse], error)
 	// UpdateInstanceSettings replaces them. Admins only.
 	UpdateInstanceSettings(context.Context, *connect.Request[v1.UpdateInstanceSettingsRequest]) (*connect.Response[v1.UpdateInstanceSettingsResponse], error)
-	// GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
+	// GetInstanceAbout reports what this copy of nooks is and how much it holds. Any
 	// Member: it is their Instance too, and none of it is anybody else's business.
 	GetInstanceAbout(context.Context, *connect.Request[v1.GetInstanceAboutRequest]) (*connect.Response[v1.GetInstanceAboutResponse], error)
 	// DeleteInstance empties it and returns it to first run. Admins only, and there is
-	// no undo: Nooks keeps no backup of its own.
+	// no undo: nooks keeps no backup of its own.
 	DeleteInstance(context.Context, *connect.Request[v1.DeleteInstanceRequest]) (*connect.Response[v1.DeleteInstanceResponse], error)
 }
 
@@ -160,11 +160,11 @@ type InstanceServiceHandler interface {
 	GetInstanceSettings(context.Context, *connect.Request[v1.GetInstanceSettingsRequest]) (*connect.Response[v1.GetInstanceSettingsResponse], error)
 	// UpdateInstanceSettings replaces them. Admins only.
 	UpdateInstanceSettings(context.Context, *connect.Request[v1.UpdateInstanceSettingsRequest]) (*connect.Response[v1.UpdateInstanceSettingsResponse], error)
-	// GetInstanceAbout reports what this copy of Nooks is and how much it holds. Any
+	// GetInstanceAbout reports what this copy of nooks is and how much it holds. Any
 	// Member: it is their Instance too, and none of it is anybody else's business.
 	GetInstanceAbout(context.Context, *connect.Request[v1.GetInstanceAboutRequest]) (*connect.Response[v1.GetInstanceAboutResponse], error)
 	// DeleteInstance empties it and returns it to first run. Admins only, and there is
-	// no undo: Nooks keeps no backup of its own.
+	// no undo: nooks keeps no backup of its own.
 	DeleteInstance(context.Context, *connect.Request[v1.DeleteInstanceRequest]) (*connect.Response[v1.DeleteInstanceResponse], error)
 }
 

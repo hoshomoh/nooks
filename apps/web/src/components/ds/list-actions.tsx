@@ -11,6 +11,7 @@ import { Menu, MenuItem, MenuSeparator } from "./menu"
 import { PromptDialog } from "./prompt-dialog"
 import { ShareDialog, type ShareDecision } from "./share-dialog"
 import { listClient } from "@/lib/api"
+import { afterDeletingList } from "@/lib/after-deleting-list"
 import { download } from "@/lib/download"
 import { exportFileFor } from "@/lib/list-export"
 import { isArchived } from "@/lib/list-state"
@@ -88,10 +89,7 @@ export function ListActions({ list, instanceName, items, withControls }: ListAct
 
   const remove = useMutation({
     mutationFn: () => listClient.deleteList({ listUid }),
-    onSuccess: async () => {
-      await refresh()
-      void navigate({ to: "/" })
-    },
+    onSuccess: () => afterDeletingList(queryClient, listUid, () => navigate({ to: "/" })),
   })
 
   return (

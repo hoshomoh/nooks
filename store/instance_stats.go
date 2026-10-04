@@ -38,7 +38,14 @@ func (s *sqlStore) Stats(ctx context.Context) (InstanceStats, error) {
 	if err != nil {
 		return InstanceStats{}, fmt.Errorf("count lists: %w", err)
 	}
-	items, err := s.db.NewSelect().Model((*itemModel)(nil)).Where("deleted_at = ''").Count(ctx)
+	// Deleting a List leaves its Items as they were, so restoring it brings them back.
+	// That makes an Item's own deleted_at only half the answer: one on a List in the bin
+	// is gone as far as anybody can see, and counting it reported Items with no List.
+	items, err := s.db.NewSelect().
+		Model((*itemModel)(nil)).
+		Join("JOIN list ON list.id = item.list_id").
+		Where("item.deleted_at = '' AND list.deleted_at = ''").
+		Count(ctx)
 	if err != nil {
 		return InstanceStats{}, fmt.Errorf("count items: %w", err)
 	}

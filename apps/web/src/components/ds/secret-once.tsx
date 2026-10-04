@@ -35,7 +35,7 @@ export function SecretOnce({ secret, title, blurb, onDone }: SecretOnceProps) {
       </div>
 
       <div className="flex items-center gap-3 rounded-xl border border-shared-line bg-shared-bg px-4 py-3.5">
-        <code className="min-w-0 font-mono text-meta break-all text-foreground">{secret}</code>
+        <code className="min-w-0 font-mono text-meta break-all text-foreground select-all">{secret}</code>
         <CopyButton
           text={secret}
           label={t("action.copy")}

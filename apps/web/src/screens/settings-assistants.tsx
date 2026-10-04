@@ -251,7 +251,7 @@ export function SettingsAssistantsScreen() {
                   className="ml-auto shrink-0"
                 />
               </div>
-              <pre className="overflow-x-auto px-3.5 py-3 font-mono text-micro leading-[1.55] whitespace-pre-wrap text-foreground">
+              <pre className="overflow-x-auto px-3.5 py-3 font-mono text-micro leading-[1.55] whitespace-pre-wrap text-foreground select-all">
                 {block}
               </pre>
             </div>
@@ -290,7 +290,7 @@ function MadeTokenPanel({ made }: MadeTokenPanelProps) {
       </div>
 
       <div className="flex items-center gap-3.5">
-        <code className="min-w-0 font-mono text-meta leading-[1.6] break-all">{made.secret}</code>
+        <code className="min-w-0 font-mono text-meta leading-[1.6] break-all select-all">{made.secret}</code>
         <CopyButton
           text={made.secret}
           label={t("assistants.copyToken")}

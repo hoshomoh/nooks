@@ -11,6 +11,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { groupsQuery, listSharesQuery, membersQuery } from "@/lib/sharing-queries"
 import { TickBox } from "./tick-box"
 import { Avatar } from "./avatar"
+import { browserCopy } from "@/lib/copy-text"
 import { initialsOf } from "@/lib/initials"
 
 /** What the dialog sends back when the Member saves. */
@@ -283,14 +284,18 @@ function Toggle({ on, onChange, label }: ToggleProps) {
   )
 }
 
+/** What the copy-address link says: an offer, a confirmation, or where to look instead. */
+type AddressCopy = "share.copyAddress" | "share.copied" | "share.copyFailed"
+
 /** Copies the List's address, so it can be pasted where a person already talks. */
 function CopyAddress() {
   const { t } = useTranslation()
-  const [copied, setCopied] = useState(false)
+  const [said, setSaid] = useState<AddressCopy>("share.copyAddress")
 
+  // Where nothing can copy, the address is already in the address bar, so that is where
+  // the Member is sent.
   const copy = async () => {
-    await navigator.clipboard.writeText(window.location.href)
-    setCopied(true)
+    setSaid((await browserCopy(window.location.href)) ? "share.copied" : "share.copyFailed")
   }
 
   return (
@@ -299,7 +304,7 @@ function CopyAddress() {
       onClick={() => void copy()}
       className="text-field text-shared hover:underline"
     >
-      {copied ? t("share.copied") : t("share.copyAddress")}
+      {t(said)}
     </button>
   )
 }

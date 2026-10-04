@@ -176,8 +176,8 @@ importers:
         specifier: ^1.1.1
         version: 1.1.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       cn:
-        specifier: ^0.2.6
-        version: 0.2.6
+        specifier: 0.4.0
+        version: 0.4.0
       date-fns:
         specifier: ^4.4.0
         version: 4.4.0
@@ -3274,6 +3274,11 @@ packages:
 
   cn@0.3.3:
     resolution: {integrity: sha512-OEiyJkSpYm2kOuNOKQ+c2wmzZRG8orrb9fnObtHTbCGNx/E9KLnGcmcocItOzREKk5KzQN5I2e3BUCj563KEpw==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  cn@0.4.0:
+    resolution: {integrity: sha512-qOAeUhPwPzBxx6jaeQdo646XIKliKHc2j1ZF7Ngb1o0pJZKH5gq8FkA0aVdUdPFUDXNXyUCXpCtoJISo6dhizg==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -8840,6 +8845,8 @@ snapshots:
   cn@0.2.6: {}
 
   cn@0.3.3: {}
+
+  cn@0.4.0: {}
 
   code-block-writer@13.0.3: {}
 

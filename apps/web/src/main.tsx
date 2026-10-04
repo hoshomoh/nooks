@@ -11,14 +11,13 @@ import { connectionStore } from "./lib/connection-store"
 import { registerItemChanges, resumeQueuedChanges } from "./lib/item-changes"
 import { wireLiveUpdates } from "./lib/live-wiring"
 import { wireOnline } from "./lib/online-wiring"
+import { worthAskingAgain } from "./lib/retry"
 import "./index.css"
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // A home server can be slow or asleep; retrying twice is worth it, retrying
-      // forever is not.
-      retry: 2,
+      retry: worthAskingAgain,
       refetchOnWindowFocus: false,
     },
   },

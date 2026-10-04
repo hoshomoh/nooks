@@ -16,7 +16,7 @@
     "@nooks/shared": "workspace:*",
     "fumadocs-core": "16.15.18",
     "fumadocs-mdx": "15.4.6",
-    "fumadocs-openapi": "^11.4.2",
+    "fumadocs-openapi": "12.1.1",
     "fumadocs-ui": "16.15.18",
     "next": "16.3.8",
     "react": "19.3.0",

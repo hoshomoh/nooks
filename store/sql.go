@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/uptrace/bun"
@@ -232,8 +233,25 @@ func (s *sqlStore) Analyse(ctx context.Context) error {
 }
 
 // sqliteDialect and postgresDialect are the two Bun dialects nooks supports.
-func sqliteDialect() schema.Dialect   { return sqlitedialect.New() }
-func postgresDialect() schema.Dialect { return pgdialect.New() }
+func sqliteDialect() schema.Dialect   { return nulFreeDialect{sqlitedialect.New()} }
+func postgresDialect() schema.Dialect { return nulFreeDialect{pgdialect.New()} }
+
+/*
+nulFreeDialect is a Bun dialect that drops NUL characters from text before writing it
+into SQL. Everything else is the embedded dialect's own.
+
+Bun up to 1.2 did this itself. From 1.3 it fails the whole query instead, so a label
+pasted with a stray NUL in it, or an id with one on the end, would come back as a
+database error rather than saving or reading as before. Postgres cannot store a NUL in
+text at all, so there is nothing to keep.
+*/
+type nulFreeDialect struct {
+	schema.Dialect
+}
+
+func (d nulFreeDialect) AppendString(b []byte, s string) []byte {
+	return d.Dialect.AppendString(b, strings.ReplaceAll(s, "\x00", ""))
+}
 
 /*
 The locks a queue is taken one at a time under. Numbers rather than names because that is

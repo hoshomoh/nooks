@@ -77,7 +77,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 RUN mkdir -p /out/data
 
 # What ships.
-FROM gcr.io/distroless/static-debian12:nonroot
+FROM gcr.io/distroless/static-debian13:nonroot
 
 COPY --from=build --chown=65532:65532 /out/nooks /usr/local/bin/nooks
 

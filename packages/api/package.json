@@ -11,10 +11,10 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "2.16.0",
-    "@connectrpc/connect": "^2.1.1"
+    "@bufbuild/protobuf": "2.17.0",
+    "@connectrpc/connect": "^2.3.0"
   },
   "devDependencies": {
-    "typescript": "~6.0.2"
+    "typescript": "~6.0.3"
   }
 }

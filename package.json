@@ -9,6 +9,6 @@
     "proto:format": "cd proto && buf format -w"
   },
   "devDependencies": {
-    "@bufbuild/buf": "1.73.0"
+    "@bufbuild/buf": "1.75.0"
   }
 }

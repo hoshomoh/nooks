@@ -39,7 +39,7 @@ RUN pnpm --filter @nooks/web release
 # Also on the building architecture. Go cross-compiles, so an arm64 image is built by a
 # native toolchain told to emit arm64 rather than by an emulated one — the difference
 # between a minute and most of an hour on a release that builds both.
-FROM --platform=$BUILDPLATFORM golang:1.27.1-alpine AS build
+FROM --platform=$BUILDPLATFORM golang:1.27.4-alpine AS build
 WORKDIR /src
 
 COPY go.mod go.sum ./

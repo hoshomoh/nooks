@@ -52,8 +52,8 @@ func (s *sqlStore) Stats(ctx context.Context) (InstanceStats, error) {
 
 	return InstanceStats{
 		Members:      members,
-		Lists:        lists,
-		Items:        items,
+		Lists:        int(lists),
+		Items:        int(items),
 		StorageBytes: s.storageBytes(ctx),
 		Driver:       s.name,
 	}, nil

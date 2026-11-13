@@ -276,7 +276,7 @@ func (s *sqlStore) ListsPage(ctx context.Context, q ListQuery) (ListPage, error)
 	rows := []listModel{}
 	reading := orderListsBy(matching(s.db.NewSelect().Model(&rows).ColumnExpr("list.*")), q.Order)
 	if q.Limit > 0 {
-		reading = reading.Limit(q.Limit).Offset(q.Offset)
+		reading = reading.Limit(int64(q.Limit)).Offset(int64(q.Offset))
 	}
 	if err := reading.Scan(ctx); err != nil {
 		return ListPage{}, fmt.Errorf("read lists: %w", err)
@@ -493,7 +493,7 @@ func (s *sqlStore) listsWhere(
 	rows := []listModel{}
 	reading := matching(s.db.NewSelect().Model(&rows).ColumnExpr("list.*")).OrderExpr(byName)
 	if limit > 0 {
-		reading = reading.Limit(limit)
+		reading = reading.Limit(int64(limit))
 	}
 	if err := reading.Scan(ctx); err != nil {
 		return ListPage{}, fmt.Errorf("read sidebar lists: %w", err)

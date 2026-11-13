@@ -250,7 +250,7 @@ func (s *sqlStore) CountMembers(ctx context.Context) (int, error) {
 	if err != nil {
 		return 0, fmt.Errorf("count members: %w", err)
 	}
-	return count, nil
+	return int(count), nil
 }
 
 // SetMemberPassword replaces a Member's password and clears the must-change-password

@@ -66,7 +66,7 @@ const NoteSheet = lazyNamed<NoteSheetProps>(
 export function ListScreen() {
   const { listUid } = route.useParams()
   const { instanceName, member, groups } = useSignedInData()
-  const list = useSuspenseQuery(listQuery(listUid)).data
+  const { data: list, dataUpdatedAt, isFetchedAfterMount } = useSuspenseQuery(listQuery(listUid))
   const live = useLive()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -104,10 +104,15 @@ export function ListScreen() {
 
   // A tick somebody else just made lands with a highlight and then settles. Read from
   // the Item itself rather than remembered between renders: the Item already says when
-  // it was ticked and by whom, so there is nothing to keep in sync.
-  const settled = new Date()
+  // it was ticked and by whom, so there is nothing to keep in sync. Measured against
+  // when this copy of the List arrived, and only a copy fetched while the List was open:
+  // coming back to it paints the cached copy first, and that tick landed long ago.
+  const arrived = new Date(dataUpdatedAt)
   const justTickedByAnother = (item: Item) =>
-    item.done && item.doneByUid !== member?.uid && justHappened(item.doneAt, settled)
+    isFetchedAfterMount &&
+    item.done &&
+    item.doneByUid !== member?.uid &&
+    justHappened(item.doneAt, arrived)
 
   const showItem = useCallback(
     (itemUid: string | undefined) => {

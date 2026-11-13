@@ -1,6 +1,8 @@
-import { globSync, readFileSync } from "node:fs"
-import ts from "typescript"
+import { globSync } from "node:fs"
+import { Visitor, type JSXAttribute, type JSXChild, type JSXElement, type JSXText } from "oxc-parser"
 import { describe, expect, it } from "vitest"
+
+import { parseFile } from "@/test/syntax"
 
 /** GENERATED is upstream's, and its words are upstream's problem. */
 const GENERATED = "src/components/ui/"
@@ -33,7 +35,7 @@ const PRODUCT = "nooks"
  * twenty-eight hits and then twenty-four, every one of them TypeScript: `useState<X>("y")`
  * hands a pattern looking for `>text<` exactly that, and `return null` is two words on a
  * line of its own. A guard that cries wolf is one somebody turns off, so this walks the
- * syntax tree and asks the compiler what is markup and what is code.
+ * syntax tree and asks the parser what is markup and what is code.
  */
 describe("the words in a component", () => {
   const files = globSync("src/**/*.tsx")
@@ -49,43 +51,54 @@ describe("the words in a component", () => {
     const written: string[] = []
 
     for (const file of files) {
-      const source = ts.createSourceFile(
-        file,
-        readFileSync(file, "utf8"),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TSX,
-      )
+      const { program, lineOf } = parseFile(file)
 
-      const walk = (node: ts.Node): void => {
-        if (ts.isJsxText(node) && readable(node.text) && !spoken(node)) {
-          written.push(`${file}:${lineOf(source, node)} ${JSON.stringify(trim(node.text))}`)
+      const wordsAmong = (children: JSXChild[], onAKey: boolean): void => {
+        if (onAKey) {
+          return
         }
-        if (ts.isJsxAttribute(node) && speaksToAMember(node.name.getText())) {
-          const value = node.initializer
-          if (value && ts.isStringLiteral(value) && readable(value.text)) {
-            written.push(`${file}:${lineOf(source, node)} ${node.name.getText()}=${JSON.stringify(value.text)}`)
+        for (const child of children) {
+          if (child.type !== "JSXText" || !readable(child.value) || trim(child.value) === PRODUCT) {
+            continue
           }
+          written.push(`${file}:${lineOf(firstWordOf(child))} ${JSON.stringify(trim(child.value))}`)
         }
-        ts.forEachChild(node, walk)
       }
-      walk(source)
+
+      new Visitor({
+        JSXElement: (node) => wordsAmong(node.children, isKeycap(node)),
+        JSXFragment: (node) => wordsAmong(node.children, false),
+        JSXAttribute: (node) => {
+          const name = attributeName(node)
+          if (!speaksToAMember(name) || node.value?.type !== "Literal") {
+            return
+          }
+          if (readable(node.value.value)) {
+            written.push(`${file}:${lineOf(node.start)} ${name}=${JSON.stringify(node.value.value)}`)
+          }
+        },
+      }).visit(program)
     }
 
     expect(written, "move these into src/i18n/locales/en.json").toEqual([])
   })
 })
 
-/**
- * spoken reports whether this text is a word rather than a label on a key or the name
- * of the product.
- */
-function spoken(node: ts.JsxText): boolean {
-  if (trim(node.text) === PRODUCT) {
-    return true
-  }
-  const parent = node.parent
-  return ts.isJsxElement(parent) && parent.openingElement.tagName.getText() === KEYCAP
+/** isKeycap reports whether this element draws a key, whose label is not a word. */
+function isKeycap(node: JSXElement): boolean {
+  const tag = node.openingElement.name
+  return tag.type === "JSXIdentifier" && tag.name === KEYCAP
+}
+
+function attributeName(node: JSXAttribute): string {
+  return node.name.type === "JSXIdentifier"
+    ? node.name.name
+    : `${node.name.namespace.name}:${node.name.name.name}`
+}
+
+/** firstWordOf is where the text starts once the indentation before it is skipped. */
+function firstWordOf(node: JSXText): number {
+  return node.start + node.value.length - node.value.trimStart().length
 }
 
 /** speaksToAMember names the attributes whose value a person reads or hears. */
@@ -100,8 +113,4 @@ function readable(text: string): boolean {
 
 function trim(text: string): string {
   return text.replaceAll(/\s+/g, " ").trim()
-}
-
-function lineOf(source: ts.SourceFile, node: ts.Node): number {
-  return source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1
 }

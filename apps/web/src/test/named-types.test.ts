@@ -1,6 +1,14 @@
-import { globSync, readFileSync } from "node:fs"
-import ts from "typescript"
+import { globSync } from "node:fs"
+import {
+  Visitor,
+  type ArrowFunctionExpression,
+  type Function,
+  type ParamPattern,
+  type TSTypeAnnotation,
+} from "oxc-parser"
 import { describe, expect, it } from "vitest"
+
+import { parseFile } from "@/test/syntax"
 
 /** GENERATED is upstream's, and its signatures are upstream's to write. */
 const GENERATED = "src/components/ui/"
@@ -33,47 +41,56 @@ describe("a type in a signature", () => {
     const inline: string[] = []
 
     for (const file of files) {
-      const source = ts.createSourceFile(
-        file,
-        readFileSync(file, "utf8"),
-        ts.ScriptTarget.Latest,
-        true,
-        file.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
-      )
+      const { program, source, lineOf } = parseFile(file)
 
-      const walk = (node: ts.Node): void => {
-        if (takesArguments(node)) {
-          for (const parameter of node.parameters) {
-            if (parameter.type && ts.isTypeLiteralNode(parameter.type)) {
-              inline.push(`${file}:${lineOf(source, parameter)} ${parameter.name.getText()}`)
-            }
-          }
-          if (node.type && ts.isTypeLiteralNode(node.type)) {
-            inline.push(`${file}:${lineOf(source, node)} what it returns`)
+      const check = (node: Signature): void => {
+        for (const parameter of node.params) {
+          const typed = annotated(parameter)
+          if (isWrittenIn(typed.typeAnnotation)) {
+            const name = source.slice(typed.start, typed.typeAnnotation.start).trim()
+            inline.push(`${file}:${lineOf(parameter.start)} ${name}`)
           }
         }
-        ts.forEachChild(node, walk)
+        if (isWrittenIn(node.returnType)) {
+          inline.push(`${file}:${lineOf(node.start)} what it returns`)
+        }
       }
-      walk(source)
+
+      new Visitor({
+        FunctionDeclaration: check,
+        FunctionExpression: check,
+        ArrowFunctionExpression: check,
+        TSDeclareFunction: check,
+        TSEmptyBodyFunctionExpression: check,
+      }).visit(program)
     }
 
     expect(inline, "give these a name — see STANDARDS §5").toEqual([])
   })
 })
 
-type Signature =
-  | ts.FunctionDeclaration
-  | ts.MethodDeclaration
-  | ts.ArrowFunction
-  | ts.FunctionExpression
+type Signature = Function | ArrowFunctionExpression
 
-function takesArguments(node: ts.Node): node is Signature {
-  return (
-    ts.isFunctionDeclaration(node) ||
-    ts.isMethodDeclaration(node) ||
-    ts.isArrowFunction(node) ||
-    ts.isFunctionExpression(node)
-  )
+/** AnnotatedParameter is the part of a parameter that carries its type. */
+type AnnotatedParameter = Exclude<ParamPattern, { type: "TSParameterProperty" | "AssignmentPattern" }>
+
+/**
+ * annotated finds where a parameter's type is written: on the name inside a default
+ * (`{ a }: Props = {}`) or a constructor's `private` one, and otherwise on the parameter.
+ */
+function annotated(parameter: ParamPattern): AnnotatedParameter {
+  if (parameter.type === "TSParameterProperty") {
+    return annotated(parameter.parameter)
+  }
+  if (parameter.type === "AssignmentPattern") {
+    return annotated(parameter.left)
+  }
+  return parameter
+}
+
+/** isWrittenIn reports whether a type is an object type spelled out where it is used. */
+function isWrittenIn(annotation: TSTypeAnnotation | null | undefined): annotation is TSTypeAnnotation {
+  return annotation?.typeAnnotation.type === "TSTypeLiteral"
 }
 
 /**
@@ -89,8 +106,4 @@ function ours(): string[] {
     .filter((file) => !file.includes("node_modules"))
     .filter((file) => !file.endsWith(".d.ts"))
     .filter((file) => !file.replaceAll("\\", "/").includes(GENERATED))
-}
-
-function lineOf(source: ts.SourceFile, node: ts.Node): number {
-  return source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1
 }

@@ -4,6 +4,7 @@ import { currentMemberQuery, instanceQuery } from "@/lib/queries"
 import { sidebarQuery } from "@/lib/list-queries"
 import { datedRangeQuery } from "@/lib/dated-queries"
 import { monthWindow, today } from "@/lib/dates"
+import { clockStore } from "@/lib/clock-store"
 import { rootRoute } from "./root"
 
 /** The month, as a lens on the same dated Items Upcoming lists. */
@@ -16,7 +17,7 @@ export const calendarRoute = createRoute({
       throw redirect({ to: "/sign-in" })
     }
 
-    const { start, end } = monthWindow(today())
+    const { start, end } = monthWindow(today(clockStore.getState()))
 
     const [instance, lists, dated] = await Promise.all([
       context.queryClient.ensureQueryData(instanceQuery),

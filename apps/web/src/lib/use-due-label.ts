@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import { dayHeading, dueLabel, type DateLabelOptions, type DueDate } from "./dates"
 import { today } from "./dates"
 import { useLocale } from "./use-locale"
+import { useNow } from "./use-now"
 
 export type UseDueLabel = {
   /** What a row shows beside an Item. */
@@ -17,12 +18,14 @@ export type UseDueLabel = {
  * The words and the date-fns locale come from one place, so a Member never sees English
  * weekdays under German headings.
  */
-export function useDueLabel(now: Date = new Date()): UseDueLabel {
+export function useDueLabel(now?: Date): UseDueLabel {
+  const ticking = useNow()
+  const at = now ?? ticking
   const { t } = useTranslation()
   const { dateLocale } = useLocale()
 
   const options: DateLabelOptions = {
-    from: today(now),
+    from: today(at),
     locale: dateLocale,
     todayWord: t("date.today"),
     tomorrowWord: t("date.tomorrow"),

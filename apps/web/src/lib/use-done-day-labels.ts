@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next"
 
 import { dayLabel, parseMoment, timeOfDay, type MomentLabelOptions } from "./dates"
 import { useLocale } from "./use-locale"
+import { useNow } from "./use-now"
 
 export interface DoneDayLabels {
   /** Names a day the Member ticked things on: "Today", "Yesterday", "Friday", "3 Jul". */
@@ -11,12 +12,14 @@ export interface DoneDayLabels {
 }
 
 /** Wires the two labels the completed section needs to the active language. */
-export function useDoneDayLabels(now: Date = new Date()): DoneDayLabels {
+export function useDoneDayLabels(now?: Date): DoneDayLabels {
+  const ticking = useNow()
+  const at = now ?? ticking
   const { t } = useTranslation()
   const { dateLocale } = useLocale()
 
   const options: MomentLabelOptions = {
-    from: now,
+    from: at,
     locale: dateLocale,
     yesterdayWord: t("date.yesterday"),
     todayWord: t("date.today"),

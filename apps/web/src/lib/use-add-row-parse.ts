@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import { parseAddRow, type AddRowParse, type AddRowVocabulary, type ChipKind } from "./add-row"
 import { today } from "./dates"
 import { useLocale } from "./use-locale"
+import { useNow } from "./use-now"
 
 /** Reads one line of the add row, in the Member's language. */
 export type ParseAddRowLine = (text: string, taken?: readonly ChipKind[]) => AddRowParse
@@ -13,7 +14,9 @@ export type ParseAddRowLine = (text: string, taken?: readonly ChipKind[]) => Add
  * Weekday and month names come from the date-fns locale, so a new language needs only
  * the handful of words below in its JSON file — not a calendar of its own.
  */
-export function useAddRowParse(now: Date = new Date()): ParseAddRowLine {
+export function useAddRowParse(now?: Date): ParseAddRowLine {
+  const ticking = useNow()
+  const at = now ?? ticking
   const { t } = useTranslation()
   const { dateLocale } = useLocale()
 
@@ -28,7 +31,7 @@ export function useAddRowParse(now: Date = new Date()): ParseAddRowLine {
   }
 
   return (text, taken) =>
-    parseAddRow(text, { from: today(now), locale: dateLocale, vocabulary, taken })
+    parseAddRow(text, { from: today(at), locale: dateLocale, vocabulary, taken })
 }
 
 /**

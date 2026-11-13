@@ -22,6 +22,7 @@ import { useCommandPalette } from "@/lib/use-command-palette"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useLocale } from "@/lib/use-locale"
 import { useSignedInData } from "@/lib/use-signed-in-data"
+import { useNow } from "@/lib/use-now"
 
 /**
  * Today: everything overdue, then everything due today.
@@ -35,9 +36,10 @@ export function TodayScreen() {
   const { dateLocale } = useLocale()
   const palette = useCommandPalette()
   const queryClient = useQueryClient()
-  const due = useDueLabel()
+  const now = useNow()
+  const due = useDueLabel(now)
 
-  const from = today()
+  const from = today(now)
   const dated = useSuspenseQuery(todayQuery(from)).data
 
   const setDone = useSetDone()

@@ -4,6 +4,7 @@ import { currentMemberQuery, instanceQuery } from "@/lib/queries"
 import { sidebarQuery } from "@/lib/list-queries"
 import { upcomingQuery } from "@/lib/dated-queries"
 import { today } from "@/lib/dates"
+import { clockStore } from "@/lib/clock-store"
 import { rootRoute } from "./root"
 
 /** The next two weeks, grouped by day. */
@@ -19,7 +20,7 @@ export const upcomingRoute = createRoute({
     const [instance, lists, dated] = await Promise.all([
       context.queryClient.ensureQueryData(instanceQuery),
       context.queryClient.ensureQueryData(sidebarQuery),
-      context.queryClient.ensureQueryData(upcomingQuery(today())),
+      context.queryClient.ensureQueryData(upcomingQuery(today(clockStore.getState()))),
     ])
     return { member, instance, lists, dated }
   },

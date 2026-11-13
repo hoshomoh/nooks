@@ -37,6 +37,7 @@ import { useLive } from "@/lib/use-live"
 import { doneAttribution, type DoneAttribution, groupDone } from "@/lib/done-groups"
 import { useDoneDayLabels } from "@/lib/use-done-day-labels"
 import { useSignedInData } from "@/lib/use-signed-in-data"
+import { useNow } from "@/lib/use-now"
 import { Sharing, type Item } from "@nooks/api"
 
 const route = getRouteApi("/lists/$listUid")
@@ -87,8 +88,9 @@ export function ListScreen() {
 
   // The day is read once per render rather than per row, so every date in one paint is
   // measured against the same moment.
-  const from = today()
-  const due = useDueLabel()
+  const now = useNow()
+  const from = today(now)
+  const due = useDueLabel(now)
   const { dateLocale } = useLocale()
   const printedOn = dayFullHeading(from, dateLocale)
 

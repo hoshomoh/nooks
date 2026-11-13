@@ -12,6 +12,7 @@ import { monthHeading, monthWindow, today, toStored } from "@/lib/dates"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useLocale } from "@/lib/use-locale"
 import { useSignedInData } from "@/lib/use-signed-in-data"
+import { useNow } from "@/lib/use-now"
 
 /** The days of a week, in the order the grid draws them. */
 const WEEKDAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const
@@ -28,7 +29,8 @@ export function CalendarScreen() {
   const { dateLocale } = useLocale()
   const palette = useCommandPalette()
 
-  const from = today()
+  const now = useNow()
+  const from = today(now)
   const window = monthWindow(from)
   const dated = useSuspenseQuery(datedRangeQuery(window.start, window.end)).data
   const month = buildMonth(from)

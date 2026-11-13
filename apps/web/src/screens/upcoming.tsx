@@ -17,6 +17,7 @@ import { useSetDone } from "@/lib/use-item-changes"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useDueLabel } from "@/lib/use-due-label"
 import { useSignedInData } from "@/lib/use-signed-in-data"
+import { useNow } from "@/lib/use-now"
 import type { ListRowLabels } from "@/components/ds/list-row"
 import { DatedRow } from "./today"
 
@@ -30,8 +31,9 @@ export function UpcomingScreen() {
   const { t } = useTranslation()
   const palette = useCommandPalette()
   const queryClient = useQueryClient()
-  const due = useDueLabel()
-  const dated = useSuspenseQuery(upcomingQuery(today())).data
+  const now = useNow()
+  const due = useDueLabel(now)
+  const dated = useSuspenseQuery(upcomingQuery(today(now))).data
 
   const setDone = useSetDone()
 
@@ -108,7 +110,7 @@ export function UpcomingScreen() {
           {/* Upcoming is what is not today, so a new Item here is due tomorrow. */}
           <DatedAddRow
             groups={groups}
-            defaultDue={toStored(shift(today(), 1))}
+            defaultDue={toStored(shift(today(now), 1))}
             divided={days.length > 0}
           />
         </div>

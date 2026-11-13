@@ -6,13 +6,7 @@ import (
 	"time"
 )
 
-/*
-A NUL in text is dropped on the way into SQL, the way it always was.
-
-Bun 1.3 stopped dropping it and fails the query instead, which turned a label pasted with
-a stray NUL into a database error. Postgres cannot hold one in text at all, so the label
-saves as what it reads as, and an id with one on the end looks for the id without it.
-*/
+// A NUL is dropped from text, so a label saves as it reads and an id finds the one without it.
 func TestTextWithANulInItSavesAndReadsAsBefore(t *testing.T) {
 	for _, driver := range drivers() {
 		t.Run(driver.name, func(t *testing.T) {

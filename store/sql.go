@@ -236,15 +236,8 @@ func (s *sqlStore) Analyse(ctx context.Context) error {
 func sqliteDialect() schema.Dialect   { return nulFreeDialect{sqlitedialect.New()} }
 func postgresDialect() schema.Dialect { return nulFreeDialect{pgdialect.New()} }
 
-/*
-nulFreeDialect is a Bun dialect that drops NUL characters from text before writing it
-into SQL. Everything else is the embedded dialect's own.
-
-Bun up to 1.2 did this itself. From 1.3 it fails the whole query instead, so a label
-pasted with a stray NUL in it, or an id with one on the end, would come back as a
-database error rather than saving or reading as before. Postgres cannot store a NUL in
-text at all, so there is nothing to keep.
-*/
+// nulFreeDialect drops NUL characters from text before Bun writes it into SQL, as Bun did
+// itself until 1.3, which fails the whole query instead. Postgres cannot store one anyway.
 type nulFreeDialect struct {
 	schema.Dialect
 }

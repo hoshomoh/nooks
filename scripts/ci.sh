@@ -145,11 +145,8 @@ fi
 
 if wants web; then
   step "web lint and typecheck"
-  # From scratch, as CI's fresh checkout does. tsc -b skips a file whose timestamp has
-  # not moved, and pnpm links a package's files with the timestamps they were published
-  # with, so after an upgrade every type the new version changed looks unchanged. That
-  # let an upgrade with twenty-one type errors in it pass here, and preflight too, since
-  # its checkout keeps node_modules between runs.
+  # From scratch, as CI's fresh checkout does: tsc -b goes by timestamps, and pnpm links
+  # an upgraded package with its published ones, so its changed types look unchanged.
   rm -rf apps/web/node_modules/.tmp
   pnpm --filter @nooks/web lint
 

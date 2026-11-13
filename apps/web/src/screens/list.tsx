@@ -74,6 +74,14 @@ export function ListScreen() {
   const { t } = useTranslation()
 
   /*
+   * Which Item's sheet is open, read from the address rather than from state.
+   *
+   * The address is what lets a search result open an Item directly, Back close the
+   * sheet instead of leaving the List, and a refresh keep it open.
+   */
+  const { item: openItemUid } = listRoute.useSearch()
+
+  /*
    * Whoever else has this Note open, if anybody.
    *
    * One Note has one editor. The first to open it keeps it and everybody else reads,
@@ -100,14 +108,6 @@ export function ListScreen() {
   const settled = new Date()
   const justTickedByAnother = (item: Item) =>
     item.done && item.doneByUid !== member?.uid && justHappened(item.doneAt, settled)
-
-  /*
-   * Which Item's sheet is open, read from the address rather than from state.
-   *
-   * The address is what lets a search result open an Item directly, Back close the
-   * sheet instead of leaving the List, and a refresh keep it open.
-   */
-  const { item: openItemUid } = listRoute.useSearch()
 
   const showItem = useCallback(
     (itemUid: string | undefined) => {

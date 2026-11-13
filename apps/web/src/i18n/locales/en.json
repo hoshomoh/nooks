@@ -390,7 +390,7 @@
     "addedOn": "added {{date}}",
     "makeAdmin": "Make an admin",
     "makeMember": "Remove admin",
-    "remove": "Remove from {{name}}",
+    "remove": "Remove {{name}}",
     "removeTitle": "Remove {{name}}?",
     "removeBlurb": "Their account goes. What they added to everybody else's lists stays, without their name on it.",
     "removeListsLabel": "The lists they started",

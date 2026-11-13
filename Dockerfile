@@ -11,10 +11,12 @@
 # Built on whatever architecture is doing the building, never emulated: the output is
 # JavaScript, which is the same bytes either way, and emulating a Node build to produce
 # identical files is minutes spent for nothing.
-FROM --platform=$BUILDPLATFORM node:24.21.0-alpine AS app
+FROM --platform=$BUILDPLATFORM node:26.13.1-alpine AS app
 WORKDIR /src
 
-RUN corepack enable
+# Node stopped shipping corepack in 25, and corepack is what reads the pnpm version from
+# package.json, so it is installed rather than the version being written here as well.
+RUN npm install --global corepack@0.36.0 && corepack enable
 
 # The manifests alone first, so a change to the source does not re-resolve every
 # dependency. Every workspace package needs its manifest for the lockfile to install.

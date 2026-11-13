@@ -16,7 +16,7 @@ first change rather than after a first review:
 
 ## Getting it running
 
-You need Go 1.27.4, Node 24.21.0 and pnpm 12.18.0. The Node version is in `.nvmrc`; buf
+You need Go 1.27.4, Node 26.13.1 and pnpm 12.18.0. The Node version is in `.nvmrc`; buf
 is a workspace dependency, so there is nothing to install globally.
 
 ```bash

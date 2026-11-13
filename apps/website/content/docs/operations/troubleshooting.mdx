@@ -35,16 +35,17 @@ Give it an absolute path in whatever starts it.
 
 ## Postgres: too many connections
 
-Small hosts often cap connections lower than you expect. nooks holds a pool and does not
-currently bound it, so under a burst the host counts every connection it opens alongside
-whatever else is connected.
+Small hosts often cap connections lower than you expect, and every other app on the same
+server counts against that cap. nooks opens up to 10 connections at once.
 
-There is no nooks setting for this yet. Raise `max_connections` on the server, or put a
-pooler such as PgBouncer in front of it.
+Lower that with `NOOKS_DB_MAX_CONNS` (or `--db-max-conns`) so nooks fits in what the host
+allows, with room left for everything else. It is on
+[the configure page](/docs/configure). If the cap is already shared out, raise
+`max_connections` on the server, or put a pooler such as PgBouncer in front of it.
 
 Do not try to cap it in the connection string. nooks talks to Postgres through pgx's
 `database/sql` driver, which is not pgxpool, so `pool_max_conns` is not one of its
-parameters — it is passed on to the server as a setting, and the server refuses to start
+parameters. It is passed on to the server as a setting, and the server refuses to start
 the session:
 
 ```text

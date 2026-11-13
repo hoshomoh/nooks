@@ -195,8 +195,7 @@ you are about to push, rather than a working tree that has moved on since.
 
 The difference is not pedantry. `ci.sh` checks the tree you are looking at, and two
 ordinary things break that: a fix made *after* the run passed, and a file that was never
-`git add`ed. Both leave a green run locally and a red one on GitHub. Note also that
-`tsc -b` is incremental, so a local run can skip files a fresh checkout will not.
+`git add`ed. Both leave a green run locally and a red one on GitHub.
 
 **Conventional Commits, and keep them short.**
 

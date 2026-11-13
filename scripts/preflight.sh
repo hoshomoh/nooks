@@ -3,8 +3,7 @@
 #
 # ./scripts/ci.sh checks the working tree, which is not what gets pushed. A fix made
 # after CI passed, or a file never added, both leave a green local run and a red one on
-# GitHub. `tsc -b` is incremental too, so a local run can skip files a fresh checkout
-# will not.
+# GitHub.
 #
 # The checkout is kept between runs rather than thrown away, so its node_modules is
 # installed once instead of on every run.

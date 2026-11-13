@@ -59,7 +59,7 @@ if wants go; then
   # The store suite covers both drivers, and the Postgres half skips itself when there
   # is nowhere to connect. Silent skipping is how a driver rots, and it is half of why
   # this script disagreed with CI for a week.
-  if [ -z "$NOOKS_TEST_POSTGRES_DSN" ]; then
+  if [ -z "${NOOKS_TEST_POSTGRES_DSN:-}" ]; then
     echo "WARNING: NOOKS_TEST_POSTGRES_DSN is unset, so every Postgres case skips."
     echo "         CI sets it. To check what CI checks, start one and point at it:"
     echo '         docker run -d --rm --name nooks-pg -e POSTGRES_USER=nooks \'
@@ -87,7 +87,7 @@ if wants go; then
       -v "${NOOKS_GO_CACHE:-$HOME/.cache/nooks-ci-go}":/gocache \
       -e GOMODCACHE=/gocache/mod -e GOCACHE=/gocache/build \
       -e GOFLAGS=-buildvcs=false \
-      -e "NOOKS_TEST_POSTGRES_DSN=$NOOKS_TEST_POSTGRES_DSN" \
+      -e "NOOKS_TEST_POSTGRES_DSN=${NOOKS_TEST_POSTGRES_DSN:-}" \
       "golang:$(go mod edit -json | sed -n 's/.*"Go": "\([0-9]*\.[0-9]*\).*/\1/p' | head -1)" \
       go test -race -timeout 15m ./...
   else
@@ -145,6 +145,12 @@ fi
 
 if wants web; then
   step "web lint and typecheck"
+  # From scratch, as CI's fresh checkout does. tsc -b skips a file whose timestamp has
+  # not moved, and pnpm links a package's files with the timestamps they were published
+  # with, so after an upgrade every type the new version changed looks unchanged. That
+  # let an upgrade with twenty-one type errors in it pass here, and preflight too, since
+  # its checkout keeps node_modules between runs.
+  rm -rf apps/web/node_modules/.tmp
   pnpm --filter @nooks/web lint
 
   step "web test"

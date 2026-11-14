@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it, vi, type Mock } from "vitest"
-import { render, screen } from "@testing-library/react"
+import { render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { readyForEnglish } from "@/test/i18n"
@@ -35,7 +35,9 @@ async function show(): Promise<Pressed> {
   )
 
   await userEvent.click(screen.getByRole("button", { name: "More" }))
-  await screen.findByRole("menu")
+  const menu = await screen.findByRole("menu")
+  // Base UI moves focus in a frame after the menu appears, and a key goes where focus is.
+  await waitFor(() => expect(menu.contains(document.activeElement)).toBe(true))
   return pressed
 }
 

@@ -1,6 +1,6 @@
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { QueryClientProvider } from "@tanstack/react-query"
 import { RouterProvider } from "@tanstack/react-router"
 
 import "./i18n"
@@ -11,16 +11,15 @@ import { connectionStore } from "./lib/connection-store"
 import { registerItemChanges, resumeQueuedChanges } from "./lib/item-changes"
 import { wireLiveUpdates } from "./lib/live-wiring"
 import { wireOnline } from "./lib/online-wiring"
-import { worthAskingAgain } from "./lib/retry"
+import { createQueryClient } from "./lib/query-client"
 import "./index.css"
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: worthAskingAgain,
-      refetchOnWindowFocus: false,
-    },
-  },
+// A session that ended sends the Member to sign in, from wherever they were. The router
+// is built below; a refusal can only arrive once it is running.
+const queryClient = createQueryClient(() => {
+  if (router.state.location.pathname !== "/sign-in") {
+    void router.navigate({ to: "/sign-in" })
+  }
 })
 
 // What nooks means by offline, rather than what the browser guesses. Wired before

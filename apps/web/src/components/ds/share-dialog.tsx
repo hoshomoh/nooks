@@ -12,7 +12,7 @@ import { groupsQuery, listSharesQuery, membersQuery } from "@/lib/sharing-querie
 import { TickBox } from "./tick-box"
 import { Avatar } from "./avatar"
 import { browserCopy } from "@/lib/copy-text"
-import { initialsOf } from "@/lib/initials"
+import { initialOf } from "@/lib/initial"
 
 /** What the dialog sends back when the Member saves. */
 export interface ShareDecision {
@@ -351,7 +351,7 @@ function PeopleStep({ chosen, onChange, onBack }: PeopleStepProps) {
         {(members.data?.members ?? []).map((member) => (
           <PickRow
             key={member.uid}
-            badge={initialsOf(member.name)}
+            badge={initialOf(member.name)}
             name={member.name}
             detail=""
             picked={chosen.memberUids.includes(member.uid)}

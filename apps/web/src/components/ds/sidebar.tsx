@@ -9,7 +9,7 @@ import { Icon } from "./icon"
 import { ListActions } from "./list-actions"
 import { SETTINGS_HOME } from "./settings-sections"
 import { Avatar } from "./avatar"
-import { initialsOf } from "@/lib/initials"
+import { initialOf } from "@/lib/initial"
 import { reachableCount } from "@/lib/sidebar-groups"
 
 import { Mark } from "@nooks/design/mark"
@@ -141,7 +141,7 @@ export function Sidebar({
         to={SETTINGS_HOME}
         className="mt-auto flex h-8.5 items-center gap-2.5 rounded-md px-2 transition-colors hover:bg-secondary"
       >
-        <Avatar badge={initialsOf(memberName)} size="small" />
+        <Avatar badge={initialOf(memberName)} size="small" />
         <span className="truncate text-small text-secondary-foreground">{memberName}</span>
         <span className="ml-auto text-micro text-muted-foreground">{t("settings.title")}</span>
       </Link>

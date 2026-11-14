@@ -21,7 +21,7 @@ import { groupsQuery, membersQuery } from "@/lib/sharing-queries"
 import type { Translate } from "@/lib/translate"
 import { useMomentLabel } from "@/lib/use-moment-label"
 import { Avatar } from "@/components/ds/avatar"
-import { initialsOf } from "@/lib/initials"
+import { initialOf } from "@/lib/initial"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 import { PendingRequests } from "./pending-requests"
 import { useSettingsCounts } from "@/lib/use-settings-counts"
@@ -258,7 +258,7 @@ function MemberRow({ member, groups, isSignedIn, onSetRole, onRemove }: MemberRo
           a long email was pushing the fixed columns to the right of where their headings
           sit. */}
       <span className="flex min-w-0 items-center gap-3">
-        <Avatar badge={initialsOf(member.name)} size="large" />
+        <Avatar badge={initialOf(member.name)} size="large" />
         <span className="flex min-w-0 flex-col">
           {/* Somebody who has not arrived is greyed by name and detail, never as a
               whole row: the account is real, and the row is not disabled. */}

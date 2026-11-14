@@ -14,7 +14,7 @@ import { groupsQuery, membersQuery } from "@/lib/sharing-queries"
 import { useLocale } from "@/lib/use-locale"
 import { useSettingsCounts } from "@/lib/use-settings-counts"
 import { Avatar } from "@/components/ds/avatar"
-import { initialsOf } from "@/lib/initials"
+import { initialOf } from "@/lib/initial"
 
 /**
  * The Groups page: cards two-up, who is in each, and what each one reaches.
@@ -122,7 +122,7 @@ function GroupCard({ group, onEdit }: GroupCardProps) {
           {group.members.map((member, index) => (
             <Avatar
               key={member.uid}
-              badge={initialsOf(member.name)}
+              badge={initialOf(member.name)}
               size="small"
               ringed
               // Overlapped, which is what the ring is for: each one is drawn over the

@@ -4,7 +4,7 @@ import type { PendingJoinRequest, PendingResetRequest } from "@nooks/api"
 import { Avatar } from "@/components/ds/avatar"
 import { Button } from "@/components/ds/button"
 import { useMomentLabel } from "@/lib/use-moment-label"
-import { initialsOf } from "@/lib/initials"
+import { initialOf } from "@/lib/initial"
 
 export interface PendingRequestsProps {
   joins: PendingJoinRequest[]
@@ -89,7 +89,7 @@ function RequestRow({ name, detail, onDecide }: RequestRowProps) {
   return (
     <div className="grid min-h-13 grid-cols-[1fr_auto] items-center gap-4 border-t border-hair">
       <span className="flex min-w-0 items-center gap-3">
-        <Avatar badge={initialsOf(name)} size="large" />
+        <Avatar badge={initialOf(name)} size="large" />
         <span className="flex min-w-0 flex-col">
           <span className="text-field">{name}</span>
           <span className="truncate text-micro text-muted-foreground">{detail}</span>

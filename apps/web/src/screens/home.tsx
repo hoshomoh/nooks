@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
+import { useSuspenseQuery } from "@tanstack/react-query"
 import { Link, getRouteApi, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { cn } from "cn"
@@ -10,13 +10,12 @@ import { ActivityControl } from "@/components/ds/activity-control"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { COVERING, INERT } from "@/components/ds/covering"
 import { EmptyState } from "@/components/ds/empty-state"
+import { DeletedListActions } from "@/components/ds/deleted-list-actions"
 import { ListActions } from "@/components/ds/list-actions"
 import { Icon } from "@/components/ds/icon"
 import { Menu, MenuItem } from "@/components/ds/menu"
 import { SegmentedControl, type Segment } from "@/components/ds/segmented"
-import { listClient } from "@/lib/api"
 import { listPageQuery } from "@/lib/list-queries"
-import { refreshLists } from "@/lib/refresh"
 import {
   DEFAULT_SORT,
   LIST_SORTS,
@@ -50,20 +49,7 @@ export function Home() {
   const search = route.useSearch()
   const { status = "all", sort = DEFAULT_SORT, page = 1 } = search
 
-  const queryClient = useQueryClient()
   const answer = useSuspenseQuery(listPageQuery(search)).data
-
-  /*
-   * Bringing back a List its owner deleted, from the filter that shows them.
-   *
-   * Only reachable from the deleted filter, because that is the only place a deleted
-   * List is drawn at all. Everything is re-read afterwards: it reappears under whatever
-   * filter it belongs to now, which is not this one.
-   */
-  const restore = useMutation({
-    mutationFn: (listUid: string) => listClient.restoreList({ listUid }),
-    onSuccess: () => refreshLists(queryClient),
-  })
   const { lists, total } = answer
   const { more, from, to } = boundsOf(answer)
 
@@ -158,7 +144,7 @@ export function Home() {
                         key={list.uid}
                         list={list}
                         instanceName={instanceName}
-                        onRestore={status === "deleted" ? () => restore.mutate(list.uid) : undefined}
+                        deleted={status === "deleted"}
                       />
                     ))}
                   </div>
@@ -247,13 +233,13 @@ interface ListTableRowProps {
   list: List
   instanceName: string
   /**
-   * Bringing it back, given only under the deleted filter.
+   * Drawn under the deleted filter.
    *
-   * Its presence is what makes this a deleted row: there is nothing to open, because a
-   * deleted List answers every read as one that is not there, so the row that covers
-   * itself with a link to it would be a control leading nowhere.
+   * There is nothing to open, because a deleted List answers every read as one that is
+   * not there, so the row that covers itself with a link to it would be a control
+   * leading nowhere.
    */
-  onRestore?: () => void
+  deleted?: boolean
 }
 
 /**
@@ -262,13 +248,13 @@ interface ListTableRowProps {
  * The whole row opens it, with the `···` raised above that so the menu still answers a
  * click — the same arrangement every other row in the app uses.
  */
-function ListTableRow({ list, instanceName, onRestore }: ListTableRowProps) {
+function ListTableRow({ list, instanceName, deleted }: ListTableRowProps) {
   const { t } = useTranslation()
   const moment = useMomentLabel()
 
   return (
     <div className={cn(COLUMNS, "group/list relative min-h-13 hover:bg-secondary")}>
-      {onRestore === undefined && (
+      {!deleted && (
         <Link
           to="/lists/$listUid"
           params={{ listUid: list.uid }}
@@ -293,17 +279,13 @@ function ListTableRow({ list, instanceName, onRestore }: ListTableRowProps) {
         {moment(list.updatedAt)}
       </span>
 
-      {onRestore === undefined ? (
-        <span className="relative z-10 opacity-0 transition-opacity group-hover/list:opacity-100 focus-within:opacity-100 has-[[data-popup-open]]:opacity-100">
+      <span className="relative z-10 opacity-0 transition-opacity group-hover/list:opacity-100 focus-within:opacity-100 has-[[data-popup-open]]:opacity-100">
+        {deleted ? (
+          <DeletedListActions list={list} />
+        ) : (
           <ListActions list={list} instanceName={instanceName} />
-        </span>
-      ) : (
-        <span className="relative z-10 justify-self-end">
-          <Button tone="secondary" onClick={onRestore}>
-            {t("list.restore")}
-          </Button>
-        </span>
-      )}
+        )}
+      </span>
     </div>
   )
 }

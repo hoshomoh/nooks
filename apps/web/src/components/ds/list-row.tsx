@@ -61,7 +61,7 @@ export type ListRowProps = {
   onRename?: (label: string) => void
   /** ⌥↑ or ⌥↓ pressed anywhere in the row. Absent where the order is not the Member's. */
   onMove?: Mover
-  /** Picking the row up to drop it elsewhere. Absent where it cannot be moved. */
+  /** The row's place in an order that can change, and the grip that changes it. */
   drag?: RowDrag
   /** What a screen reader calls the label field and the rest of the row. */
   labels: ListRowLabels
@@ -74,14 +74,20 @@ export type ListRowProps = {
   menu?: ReactNode
 }
 
-/** What a row needs from the drag library to be picked up by its grip. */
+/** What a row needs from the drag library to slide, and to be picked up. */
 export interface RowDrag {
   /** The row itself, which is what moves. */
   ref: (element: Element | null) => void
-  /** The grip, the only part that picks the row up. */
-  handleRef: (element: Element | null) => void
   /** This row is the one being carried. */
   lifted: boolean
+  /** The grip, for a Member who may move the row. Absent, the row only slides. */
+  grip?: RowGrip
+}
+
+/** The handle in the margin that picks a row up. */
+export interface RowGrip {
+  /** The grip itself, the only part that picks the row up. */
+  handleRef: (element: Element | null) => void
   /** What the grip is called, to a screen reader and on hover. */
   label: string
 }
@@ -180,12 +186,12 @@ export function ListRow({
         )}
       >
         {/* In the margin, outside the row, so showing it moves nothing inside the row. */}
-        {drag && (
+        {drag?.grip && (
           <button
             type="button"
-            ref={drag.handleRef}
-            aria-label={drag.label}
-            title={drag.label}
+            ref={drag.grip.handleRef}
+            aria-label={drag.grip.label}
+            title={drag.grip.label}
             className={cn(
               "absolute top-2.25 -left-5.5 grid h-6 w-4.5 cursor-grab place-items-center rounded-sm text-control opacity-0 transition-opacity",
               "group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100",

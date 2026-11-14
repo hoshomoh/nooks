@@ -15,11 +15,7 @@ import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
 import { ListRow, type ListRowLabels, type RowLayout } from "@/components/ds/list-row"
-import {
-  SortableListRow,
-  SortableRows,
-  type SortableListRowProps,
-} from "@/components/ds/sortable-rows"
+import { SortableListRow, SortableRows } from "@/components/ds/sortable-rows"
 import { PrintSheet } from "@/components/ds/print-sheet"
 import { lazyNamed } from "@/components/ds/lazy"
 import type { NoteSheetProps } from "@/components/ds/note-sheet"
@@ -333,11 +329,11 @@ export function ListScreen() {
               <SortableRows items={open} onMove={(place) => moveItem.mutate(place)}>
               <div className="flex flex-col">
                 {open.map((item, index) => (
-                  <OpenRow
+                  <SortableListRow
                     key={item.uid}
                     id={item.uid}
                     index={index}
-                    sortable={canEdit === true}
+                    movable={canEdit === true}
                     label={item.label}
                     quantity={item.quantity}
                     notSynced={queued.itemUids.has(item.uid) || isProvisional(item.uid)}
@@ -528,14 +524,4 @@ function sharingKey(sharing: Sharing, canEdit: boolean): string {
     return canEdit ? "list.namedCanEdit" : "list.namedReadOnly"
   }
   return canEdit ? "list.sharedCanEdit" : "list.sharedReadOnly"
-}
-
-interface OpenRowProps extends SortableListRowProps {
-  /** Whether the Member may reorder the List, which is whether they may change it. */
-  sortable: boolean
-}
-
-/** An open Item's row: one the Member can pick up where the List is theirs to change. */
-function OpenRow({ sortable, id, index, ...row }: OpenRowProps) {
-  return sortable ? <SortableListRow id={id} index={index} {...row} /> : <ListRow {...row} />
 }

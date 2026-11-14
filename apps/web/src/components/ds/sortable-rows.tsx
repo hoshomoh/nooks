@@ -103,15 +103,24 @@ export interface SortableListRowProps extends ListRowProps {
   id: string
   /** Where it sits among the open rows. */
   index: number
+  /** Whether the Member may pick it up, which is whether they may change the List. */
+  movable: boolean
 }
 
-/** A list row the Member can pick up by its grip. */
-export function SortableListRow({ id, index, ...row }: SortableListRowProps) {
+/**
+ * An open Item's row, which slides when its place changes.
+ *
+ * Sortable for everyone, so a move made by somebody else on a shared List slides the
+ * rows into their new places for whoever is watching, rather than jumping. Only a
+ * Member who may change the List gets the grip to make a move of their own.
+ */
+export function SortableListRow({ id, index, movable, ...row }: SortableListRowProps) {
   const { t } = useTranslation()
   const reduced = useReducedMotion()
   const { ref, handleRef, isDragging } = useSortable({
     id,
     index,
+    disabled: !movable,
     // The rows that make way slide; for somebody who asked for less motion they step.
     transition: reduced ? null : undefined,
   })
@@ -119,7 +128,11 @@ export function SortableListRow({ id, index, ...row }: SortableListRowProps) {
   return (
     <ListRow
       {...row}
-      drag={{ ref, handleRef, lifted: isDragging, label: t("list.dragGrip") }}
+      drag={{
+        ref,
+        lifted: isDragging,
+        grip: movable ? { handleRef, label: t("list.dragGrip") } : undefined,
+      }}
     />
   )
 }

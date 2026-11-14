@@ -2,7 +2,17 @@ import { describe, expect, it } from "vitest"
 
 import { enGB } from "date-fns/locale"
 
-import { dayHeading, daysUntil, dueLabel, isOverdue, parseDue, rangeFrom, toStored, monthName } from "./dates"
+import {
+  dayHeading,
+  daysUntil,
+  daysUntilMoment,
+  dueLabel,
+  isOverdue,
+  parseDue,
+  rangeFrom,
+  toStored,
+  monthName,
+} from "./dates"
 import type { DateLabelOptions } from "./dates"
 
 // A Tuesday, matching the design's "Tuesday, 25 August".
@@ -116,5 +126,23 @@ describe("writing a month", () => {
     for (const [index, want] of expected.entries()) {
       expect(monthName(new Date(Date.UTC(2026, index, 15)))).toBe(want)
     }
+  })
+})
+
+describe("daysUntilMoment", () => {
+  const morning = new Date(2026, 7, 25, 9, 0)
+
+  it("counts calendar days, not 24-hour stretches", () => {
+    expect(daysUntilMoment(new Date(2026, 7, 26, 8, 0).toISOString(), morning)).toBe(1)
+    expect(daysUntilMoment(new Date(2026, 8, 21, 9, 0).toISOString(), morning)).toBe(27)
+  })
+
+  it("never counts below zero once the moment has come", () => {
+    expect(daysUntilMoment(new Date(2026, 7, 25, 18, 0).toISOString(), morning)).toBe(0)
+    expect(daysUntilMoment(new Date(2026, 7, 20, 9, 0).toISOString(), morning)).toBe(0)
+  })
+
+  it("has nothing to count for a live List", () => {
+    expect(daysUntilMoment("", morning)).toBeNull()
   })
 })

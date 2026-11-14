@@ -2,7 +2,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { Sharing, type List, type RestoreListResponse } from "@nooks/api"
+import { Sharing, type List, type PurgeListResponse, type RestoreListResponse } from "@nooks/api"
 
 import { listClient } from "@/lib/api"
 import { readyForEnglish } from "@/test/i18n"
@@ -16,6 +16,8 @@ const deleted = {
   name: "Party, 30th",
   sharing: Sharing.PRIVATE,
   isOwner: true,
+  openCount: 3,
+  doneCount: 11,
 } as List
 
 async function openMenu() {
@@ -44,6 +46,31 @@ describe("a deleted List's menu", () => {
   it("offers nothing a deleted List cannot do", async () => {
     await openMenu()
 
-    expect(await screen.findAllByRole("menuitem")).toHaveLength(1)
+    const offered = await screen.findAllByRole("menuitem")
+    expect(offered.map((entry) => entry.textContent)).toEqual(["Restore", "Delete forever⌫"])
+  })
+
+  // The one thing that loses something for certain says so, and asks first.
+  it("asks before deleting it forever", async () => {
+    const purge = vi.spyOn(listClient, "purgeList").mockResolvedValue({} as PurgeListResponse)
+    await openMenu()
+
+    await userEvent.click(await screen.findByRole("menuitem", { name: /Delete forever/ }))
+    expect(purge).not.toHaveBeenCalled()
+    expect(await screen.findByText("Delete “Party, 30th” forever?")).toBeInTheDocument()
+    expect(screen.getByText(/its 14 items are removed for everyone/)).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole("button", { name: "Delete forever" }))
+    expect(purge).toHaveBeenCalledWith({ listUid: "list_party" })
+  })
+
+  it("keeps it when the question is turned down", async () => {
+    const purge = vi.spyOn(listClient, "purgeList").mockResolvedValue({} as PurgeListResponse)
+    await openMenu()
+
+    await userEvent.click(await screen.findByRole("menuitem", { name: /Delete forever/ }))
+    await userEvent.click(await screen.findByRole("button", { name: "Cancel" }))
+
+    expect(purge).not.toHaveBeenCalled()
   })
 })

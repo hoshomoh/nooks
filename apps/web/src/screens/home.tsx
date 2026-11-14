@@ -24,10 +24,12 @@ import {
   type ListStatus,
   type ListsSearch,
 } from "@/lib/list-table"
+import { daysUntilMoment } from "@/lib/dates"
 import { isArchived } from "@/lib/list-state"
 import type { Translate } from "@/lib/translate"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useMomentLabel } from "@/lib/use-moment-label"
+import { useNow } from "@/lib/use-now"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 
 const route = getRouteApi("/")
@@ -251,6 +253,7 @@ interface ListTableRowProps {
 function ListTableRow({ list, instanceName, deleted }: ListTableRowProps) {
   const { t } = useTranslation()
   const moment = useMomentLabel()
+  const now = useNow()
 
   return (
     <div className={cn(COLUMNS, "group/list relative min-h-13 hover:bg-secondary")}>
@@ -272,7 +275,7 @@ function ListTableRow({ list, instanceName, deleted }: ListTableRowProps) {
             {list.name}
           </span>
         </span>
-        <span className="text-micro text-muted-foreground">{metaFor(list, t)}</span>
+        <span className="text-micro text-muted-foreground">{metaFor(list, t, now)}</span>
       </span>
 
       <span className={cn(INERT, "text-micro text-right whitespace-nowrap text-muted-foreground")}>
@@ -290,8 +293,15 @@ function ListTableRow({ list, instanceName, deleted }: ListTableRowProps) {
   )
 }
 
-/** metaFor is the line under the name: who put it away, or how much is left on it. */
-function metaFor(list: List, t: Translate): string {
+/**
+ * metaFor is the line under the name: when it goes for good, who put it away, or how much
+ * is left on it.
+ */
+function metaFor(list: List, t: Translate, now: Date): string {
+  const daysLeft = daysUntilMoment(list.purgeAt, now)
+  if (daysLeft !== null) {
+    return daysLeft === 0 ? t("list.purgesToday") : t("list.purgesIn", { count: daysLeft })
+  }
   if (isArchived(list)) {
     return t("list.archivedBy", { name: list.archivedByName })
   }

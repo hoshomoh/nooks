@@ -61,6 +61,12 @@ export function daysUntil(due: DueDate, from: Date): number | null {
   return parsed ? differenceInCalendarDays(parsed, from) : null
 }
 
+/** daysUntilMoment is whole calendar days from today to a timestamp, and 0 once it has come. */
+export function daysUntilMoment(at: string, from: Date): number | null {
+  const parsed = parseMoment(at)
+  return parsed ? Math.max(0, differenceInCalendarDays(parsed, from)) : null
+}
+
 /** isOverdue reports whether a due date has passed. Something due today is not late. */
 export function isOverdue(due: DueDate, from: Date): boolean {
   const days = daysUntil(due, from)

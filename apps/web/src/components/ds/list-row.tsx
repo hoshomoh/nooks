@@ -1,7 +1,8 @@
-import type { ReactNode } from "react"
+import type { KeyboardEvent, ReactNode } from "react"
 import { cn } from "cn"
 
 import { initialOf } from "@/lib/initial"
+import type { MoveDirection, Mover } from "@/lib/item-order"
 
 import { Avatar } from "./avatar"
 import { Checkbox } from "./checkbox"
@@ -58,6 +59,8 @@ export type ListRowProps = {
   onOpen?: () => void
   /** Renames the Item in place. Without it the label is read-only text. */
   onRename?: (label: string) => void
+  /** ⌥↑ or ⌥↓ pressed anywhere in the row. Absent where the order is not the Member's. */
+  onMove?: Mover
   /** What a screen reader calls the label field and the rest of the row. */
   labels: ListRowLabels
   /**
@@ -135,6 +138,7 @@ export function ListRow({
   onToggle,
   onOpen,
   onRename,
+  onMove,
   labels,
   menu,
 }: ListRowProps) {
@@ -144,6 +148,7 @@ export function ListRow({
   return (
     <div className="flex flex-col">
       <div
+        onKeyDown={onMove && ((event) => moveOnArrow(event, onMove))}
         className={cn(
           "group relative grid grid-cols-[20px_1fr_auto] items-start gap-3.5 rounded-md border border-transparent px-2 -mx-2",
           layout.dense ? "min-h-9 py-1.5" : "min-h-row py-2.25",
@@ -266,6 +271,21 @@ export function ListRow({
     </div>
   )
 }
+
+/** moveOnArrow answers ⌥↑ and ⌥↓, the keys DESIGN.md §12 gives to moving a row. */
+function moveOnArrow(event: KeyboardEvent, onMove: Mover) {
+  if (!event.altKey || event.metaKey || event.ctrlKey || event.shiftKey) {
+    return
+  }
+  const direction = ARROWS[event.key]
+  if (!direction) {
+    return
+  }
+  event.preventDefault()
+  onMove(direction)
+}
+
+const ARROWS: Partial<Record<string, MoveDirection>> = { ArrowUp: "up", ArrowDown: "down" }
 
 interface PersonCircleProps {
   person: RowPerson

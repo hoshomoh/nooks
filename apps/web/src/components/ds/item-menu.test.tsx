@@ -75,4 +75,42 @@ describe("an Item's menu", () => {
 
     expect(screen.getByRole("button", { name: /Duplicate/ })).toBeInTheDocument()
   })
+
+  // Moving one place is always offered, so the menu reads the same on every row.
+  it("moves the Item one place, by choosing it or by its key", async () => {
+    const onMoveUp = vi.fn()
+    const onMoveDown = vi.fn()
+    render(
+      <ItemMenu
+        quantity=""
+        dueOn=""
+        actions={{
+          onView: vi.fn(),
+          onSetDate: vi.fn(),
+          onSetQuantity: vi.fn(),
+          onMoveUp,
+          onMoveDown,
+          onDuplicate: vi.fn(),
+          onDelete: vi.fn(),
+        }}
+      />,
+    )
+    await userEvent.click(screen.getByRole("button", { name: "More" }))
+
+    await userEvent.click(await screen.findByRole("button", { name: /Move up/ }))
+    expect(onMoveUp).toHaveBeenCalledOnce()
+
+    await userEvent.click(screen.getByRole("button", { name: "More" }))
+    await screen.findByRole("button", { name: /Move down/ })
+    await userEvent.keyboard("{Alt>}{ArrowDown}{/Alt}")
+    expect(onMoveDown).toHaveBeenCalledOnce()
+  })
+
+  // Nowhere to go is said by the entry, not by a press that does nothing.
+  it("draws a move that cannot happen, and does not offer it", async () => {
+    await openMenu()
+
+    expect(await screen.findByRole("button", { name: /Move up/ })).toBeDisabled()
+    expect(screen.getByRole("button", { name: /Move down/ })).toBeDisabled()
+  })
 })

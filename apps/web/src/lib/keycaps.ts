@@ -10,6 +10,8 @@ import { Children, Fragment, isValidElement, type ElementType, type ReactNode } 
 export interface Keycap {
   /** ⌘ on a Mac and Ctrl everywhere else, which a Member means as the same key. */
   command: boolean
+  /** ⌥, which is Alt everywhere else. Moving a row is the one key that wants it. */
+  alt: boolean
   shift: boolean
   /** What KeyboardEvent.key calls it, lowercased. */
   key: string
@@ -20,7 +22,12 @@ const DRAWN: Record<string, string> = {
   "↵": "enter",
   "⌫": "backspace",
   "⎋": "escape",
+  "↑": "arrowup",
+  "↓": "arrowdown",
 }
+
+/** The modifiers a keycap can draw in front of its key, in the order a Mac prints them. */
+const MODIFIERS = ["⌥", "⇧", "⌘"]
 
 /**
  * readKeycap turns a printed keycap into the key it stands for.
@@ -29,23 +36,21 @@ const DRAWN: Record<string, string> = {
  * place — a tick against the order a table is in — and those are not to be pressed.
  */
 export function readKeycap(drawn: string): Keycap | null {
+  const held = new Set<string>()
   let rest = drawn
-  const command = rest.startsWith("⌘")
-  if (command) {
+  while (MODIFIERS.some((modifier) => rest.startsWith(modifier))) {
+    held.add(rest.charAt(0))
     rest = rest.slice(1)
   }
-  const shift = rest.startsWith("⇧")
-  if (shift) {
-    rest = rest.slice(1)
-  }
+  const modifiers = { command: held.has("⌘"), alt: held.has("⌥"), shift: held.has("⇧") }
 
   if (DRAWN[rest]) {
-    return { command, shift, key: DRAWN[rest] }
+    return { ...modifiers, key: DRAWN[rest] }
   }
   // A letter, or a function key. Anything else is a symbol that means something other
   // than "press this".
   if (/^([a-z]|f\d{1,2})$/i.test(rest)) {
-    return { command, shift, key: rest.toLowerCase() }
+    return { ...modifiers, key: rest.toLowerCase() }
   }
   return null
 }
@@ -57,7 +62,9 @@ export function pressed(cap: Keycap, event: KeyboardEvent): boolean {
     // Either modifier: the same keycap is ⌘ on a Mac and Ctrl on everything else.
     command(event) === cap.command &&
     event.shiftKey === cap.shift &&
-    !event.altKey
+    // Alt makes a different character on most layouts, so only a keycap that drew ⌥
+    // answers a press with it held.
+    event.altKey === cap.alt
   )
 }
 
@@ -75,7 +82,7 @@ export interface BoundKey {
 interface KeyedEntry {
   shortcut?: string
   disabled?: boolean
-  onSelect: () => void
+  onSelect?: () => void
 }
 
 /*
@@ -100,7 +107,7 @@ export function keysIn(children: ReactNode, entry: ElementType): BoundKey[] {
 
     const { shortcut, disabled, onSelect } = child.props as KeyedEntry
     const cap = shortcut ? readKeycap(shortcut) : null
-    return cap && !disabled ? [{ cap, run: onSelect }] : []
+    return cap && !disabled && onSelect ? [{ cap, run: onSelect }] : []
   })
 }
 

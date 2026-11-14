@@ -265,6 +265,31 @@ describe("the list row", () => {
   })
 })
 
+describe("moving a row by its keys", () => {
+  // DESIGN.md §12: ⌥↑ and ⌥↓ move the focused Item, wherever in the row focus is.
+  it("moves up and down with ⌥ and the arrows", async () => {
+    const onMove = vi.fn()
+    render(<ListRow label="Milk" onRename={vi.fn()} onMove={onMove} labels={labels} />)
+
+    await userEvent.click(screen.getByRole("textbox", { name: "Item name" }))
+    await userEvent.keyboard("{Alt>}{ArrowUp}{/Alt}")
+    await userEvent.keyboard("{Alt>}{ArrowDown}{/Alt}")
+
+    expect(onMove.mock.calls).toEqual([["up"], ["down"]])
+  })
+
+  // A bare arrow is the caret's, and moving between rows; only ⌥ moves the Item.
+  it("leaves the arrows alone without ⌥", async () => {
+    const onMove = vi.fn()
+    render(<ListRow label="Milk" onRename={vi.fn()} onMove={onMove} labels={labels} />)
+
+    await userEvent.click(screen.getByRole("textbox", { name: "Item name" }))
+    await userEvent.keyboard("{ArrowUp}{ArrowDown}")
+
+    expect(onMove).not.toHaveBeenCalled()
+  })
+})
+
 describe("a long label on a row", () => {
   it("stays one line, because a row never grows", () => {
     // DESIGN.md §6. A title in the sheet wraps; a row cannot, or the list changes

@@ -36,6 +36,7 @@ import { useCommandPalette } from "@/lib/use-command-palette"
 import { useLive } from "@/lib/use-live"
 import { groupDone } from "@/lib/done-groups"
 import { addedBy, tickedBy } from "@/lib/row-person"
+import { movedAfter, placeFor, type MoveDirection, type MovePlace } from "@/lib/item-order"
 import { useDoneDayLabels } from "@/lib/use-done-day-labels"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 import { useNow } from "@/lib/use-now"
@@ -164,6 +165,32 @@ export function ListScreen() {
     onSuccess: refresh,
   })
 
+  /*
+   * Moving an Item one place, or wherever it is dropped.
+   *
+   * Shown before it is answered, so the row is where it was put the moment it is put
+   * there, and put back if the Instance refuses. The refresh then replaces the guess
+   * with what is really stored, including anybody else's move made meanwhile.
+   */
+  const moveItem = useMutation({
+    mutationFn: (place: MovePlace) => listClient.moveItem(place),
+    onMutate: async (place) => {
+      const { queryKey } = listQuery(listUid)
+      await queryClient.cancelQueries({ queryKey })
+      const before = queryClient.getQueryData(queryKey)
+      if (before) {
+        queryClient.setQueryData(queryKey, { ...before, items: movedAfter(before.items, place) })
+      }
+      return { before }
+    },
+    onError: (_error, _place, context) => {
+      if (context?.before) {
+        queryClient.setQueryData(listQuery(listUid).queryKey, context.before)
+      }
+    },
+    onSettled: refresh,
+  })
+
   const removeItem = useMutation({
     mutationFn: (itemUid: string) => listClient.deleteItem({ itemUid }),
     onSuccess: refresh,
@@ -191,6 +218,11 @@ export function ListScreen() {
 
   const openItem = list.items.find((item) => item.uid === openItemUid)
   const open = list.items.filter((item) => !item.done)
+  // Nothing is sent where there is nowhere to go, so the end rows offer no move.
+  const move = (itemUid: string, direction: MoveDirection) => {
+    const place = placeFor(open, itemUid, direction)
+    return place ? () => moveItem.mutate(place) : undefined
+  }
   const done = list.items.filter((item) => item.done)
   // Every row keeps the person slot, and the note slot wherever any row needs it, so
   // circles and note marks line up down the List.
@@ -302,6 +334,7 @@ export function ListScreen() {
                     notSynced={queued.itemUids.has(item.uid) || isProvisional(item.uid)}
                     person={addedBy(t, item.addedByName, item.addedViaToken)}
                     layout={openLayout}
+                    onMove={canEdit ? (direction) => move(item.uid, direction)?.() : undefined}
                     dueLabel={due.label(item.dueOn)}
                     overdue={isOverdue(item.dueOn, from)}
                     justTicked={justTickedByAnother(item)}
@@ -345,6 +378,8 @@ export function ListScreen() {
                             onSetDate: (dueOn) => editItem.mutate({ itemUid: item.uid, dueOn }),
                             onSetQuantity: (quantity) =>
                               editItem.mutate({ itemUid: item.uid, quantity }),
+                            onMoveUp: move(item.uid, "up"),
+                            onMoveDown: move(item.uid, "down"),
                             onDuplicate: () =>
                               addItem.mutate({
                                 listUid,

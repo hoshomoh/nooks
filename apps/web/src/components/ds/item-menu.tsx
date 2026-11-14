@@ -18,6 +18,10 @@ export interface ItemMenuActions {
   onView: () => void
   onSetDate: (dueOn: DueDate) => void
   onSetQuantity: (quantity: string) => void
+  /** One place up. Absent at the top, where the entry is drawn but cannot be chosen. */
+  onMoveUp?: () => void
+  /** One place down. Absent at the bottom. */
+  onMoveDown?: () => void
   onDuplicate: () => void
   onDelete: () => void
 }
@@ -41,9 +45,9 @@ type Panel = "actions" | "date" | "quantity"
  * A popover rather than a menu, because this holds a calendar and a text field, which
  * want the keyboard for themselves.
  *
- * Moving between Lists, assigning, and the note shortcut are drawn in the design and
- * wait for the milestones that build them. An entry that does nothing teaches a Member
- * the menu is decoration.
+ * Moving up and down is always offered, so the menu reads the same on every row, and is
+ * drawn unavailable where there is nowhere to go: an entry that silently does nothing
+ * teaches a Member the menu is decoration.
  */
 export function ItemMenu({ quantity, dueOn, actions }: ItemMenuProps) {
   const { t } = useTranslation()
@@ -53,6 +57,12 @@ export function ItemMenu({ quantity, dueOn, actions }: ItemMenuProps) {
   const close = () => {
     setOpen(false)
     setPanel("actions")
+  }
+
+  // An entry that acts, rather than turning the menu to another face, closes it first.
+  const after = (act: () => void) => () => {
+    close()
+    act()
   }
 
   return (
@@ -82,6 +92,8 @@ export function ItemMenu({ quantity, dueOn, actions }: ItemMenuProps) {
             }}
             onDate={() => setPanel("date")}
             onQuantity={() => setPanel("quantity")}
+            onMoveUp={actions.onMoveUp && after(actions.onMoveUp)}
+            onMoveDown={actions.onMoveDown && after(actions.onMoveDown)}
             onDuplicate={() => {
               close()
               actions.onDuplicate()
@@ -123,12 +135,22 @@ interface ActionsPanelProps {
   onView: () => void
   onDate: () => void
   onQuantity: () => void
+  onMoveUp?: () => void
+  onMoveDown?: () => void
   onDuplicate: () => void
   onDelete: () => void
 }
 
 /** The menu's first face: what can be done to the Item. */
-function ActionsPanel({ onView, onDate, onQuantity, onDuplicate, onDelete }: ActionsPanelProps) {
+function ActionsPanel({
+  onView,
+  onDate,
+  onQuantity,
+  onMoveUp,
+  onMoveDown,
+  onDuplicate,
+  onDelete,
+}: ActionsPanelProps) {
   const { t } = useTranslation()
 
   // The keycaps the entries below print are the keys this panel answers. Enter is left
@@ -141,6 +163,11 @@ function ActionsPanel({ onView, onDate, onQuantity, onDuplicate, onDelete }: Act
           should be where it is. */}
       <Entry label={t("itemMenu.setDate")} opensPanel onSelect={onDate} />
       <Entry label={t("itemMenu.setQuantity")} opensPanel onSelect={onQuantity} />
+
+      <span className="my-1.5 h-px bg-hair" />
+
+      <Entry label={t("itemMenu.moveUp")} shortcut="⌥↑" onSelect={onMoveUp} />
+      <Entry label={t("itemMenu.moveDown")} shortcut="⌥↓" onSelect={onMoveDown} />
 
       <span className="my-1.5 h-px bg-hair" />
 
@@ -171,7 +198,8 @@ interface EntryProps {
   /** Whether choosing it turns the menu to another of its faces rather than acting. */
   opensPanel?: boolean
   destructive?: boolean
-  onSelect: () => void
+  /** What choosing it does. Absent, the entry is drawn but cannot be chosen. */
+  onSelect?: () => void
 }
 
 /** One row of the menu, at the size DESIGN.md §9 gives a menu item. */
@@ -180,8 +208,9 @@ function Entry({ label, shortcut, opensPanel, destructive, onSelect }: EntryProp
     <button
       type="button"
       onClick={onSelect}
+      disabled={!onSelect}
       className={cn(
-        "flex h-8 items-center rounded-md px-2.5 text-left text-chrome transition-colors",
+        "flex h-8 items-center rounded-md px-2.5 text-left text-chrome transition-colors disabled:text-muted-foreground disabled:hover:bg-transparent",
         destructive ? "text-overdue hover:bg-destructive-bg" : "hover:bg-secondary",
       )}
     >

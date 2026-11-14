@@ -16,20 +16,25 @@ function press(key: string, held: Partial<KeyboardEvent> = {}): KeyboardEvent {
 
 describe("reading a keycap", () => {
   it("reads a plain letter", () => {
-    expect(readKeycap("D")).toEqual({ command: false, shift: false, key: "d" })
+    expect(readKeycap("D")).toEqual({ command: false, alt: false, shift: false, key: "d" })
   })
 
   it("reads a function key", () => {
-    expect(readKeycap("F2")).toEqual({ command: false, shift: false, key: "f2" })
+    expect(readKeycap("F2")).toEqual({ command: false, alt: false, shift: false, key: "f2" })
   })
 
   it("reads the modifiers in front of it", () => {
-    expect(readKeycap("⌘⇧A")).toEqual({ command: true, shift: true, key: "a" })
+    expect(readKeycap("⌘⇧A")).toEqual({ command: true, alt: false, shift: true, key: "a" })
   })
 
   it("reads the keys that are drawn rather than spelled", () => {
     expect(readKeycap("⌫")?.key).toBe("backspace")
     expect(readKeycap("↵")?.key).toBe("enter")
+  })
+
+  it("reads the arrows that move a row, with ⌥ in front", () => {
+    expect(readKeycap("⌥↑")).toEqual({ command: false, alt: true, shift: false, key: "arrowup" })
+    expect(readKeycap("⌥↓")?.key).toBe("arrowdown")
   })
 
   /*
@@ -67,6 +72,12 @@ describe("whether a press is the key a menu named", () => {
   // Alt makes a different character on most layouts, so it is a different press.
   it("is not the same key with alt held", () => {
     expect(pressed(pin, press("d", { metaKey: true, altKey: true }))).toBe(false)
+  })
+
+  it("wants ⌥ held when the keycap drew it, and only then", () => {
+    const up = readKeycap("⌥↑") as Keycap
+    expect(pressed(up, press("ArrowUp", { altKey: true }))).toBe(true)
+    expect(pressed(up, press("ArrowUp"))).toBe(false)
   })
 
   it("reads a capital as the letter it is", () => {

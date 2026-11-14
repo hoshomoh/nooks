@@ -7,9 +7,16 @@ import {
   createRoute,
   createRouter,
 } from "@tanstack/react-router"
-import { render, screen, waitFor } from "@testing-library/react"
+import { render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import type { GetInstanceResponse, GetListResponse, GetSidebarResponse, Item, Member } from "@nooks/api"
+import type {
+  GetInstanceResponse,
+  GetListResponse,
+  GetSidebarResponse,
+  Item,
+  Member,
+  MoveItemResponse,
+} from "@nooks/api"
 
 import { readyForEnglish } from "@/test/i18n"
 import { listClient } from "@/lib/api"
@@ -105,5 +112,57 @@ describe("the list screen", () => {
     await openDone()
 
     await waitFor(() => expect(document.body.querySelector(".animate-settle")).not.toBeNull())
+  })
+})
+
+describe("moving an Item", () => {
+  const milk = { uid: "i1", label: "Milk" } as Item
+  const oats = { uid: "i2", label: "Oats" } as Item
+  const eggs = { uid: "i3", label: "Eggs" } as Item
+
+  /** onShelf is a List the Member may change, holding these Items in this order. */
+  function onShelf(...items: Item[]): GetListResponse {
+    return { list: { uid: "l1", name: "Groceries", canEdit: true }, items } as GetListResponse
+  }
+
+  /** rowOrder reads the open rows top to bottom, by the label each one carries. */
+  function rowOrder(): string[] {
+    return screen
+      .getAllByRole("checkbox")
+      .map((box) => box.closest<HTMLElement>(".group"))
+      .map((row) => (row ? (within(row).getByRole("textbox") as HTMLInputElement).value : ""))
+  }
+
+  // The row lands where it was put the moment it is put there, not when the answer comes.
+  it("moves the row before the Instance answers, and says where it went", async () => {
+    let answer = () => {}
+    const sent = vi.spyOn(listClient, "moveItem").mockReturnValue(
+      new Promise((resolve) => {
+        answer = () => resolve({} as MoveItemResponse)
+      }),
+    )
+    vi.spyOn(listClient, "getList").mockResolvedValue(onShelf(oats, milk, eggs))
+    show(NOBODY_ELSE, onShelf(milk, oats, eggs))
+    await waitFor(() => expect(rowOrder()).toEqual(["Milk", "Oats", "Eggs"]))
+
+    screen.getAllByRole("checkbox")[0]?.focus()
+    await userEvent.keyboard("{Alt>}{ArrowDown}{/Alt}")
+
+    expect(rowOrder()).toEqual(["Oats", "Milk", "Eggs"])
+    expect(sent).toHaveBeenCalledWith({ itemUid: "i1", afterItemUid: "i2" })
+    answer()
+  })
+
+  it("puts the row back when the Instance refuses the move", async () => {
+    vi.spyOn(listClient, "moveItem").mockRejectedValue(new Error("refused"))
+    // The refresh after it never lands, so only putting it back can restore the order.
+    vi.spyOn(listClient, "getList").mockReturnValue(new Promise(() => {}))
+    show(NOBODY_ELSE, onShelf(milk, oats, eggs))
+    await waitFor(() => expect(rowOrder()).toEqual(["Milk", "Oats", "Eggs"]))
+
+    screen.getAllByRole("checkbox")[1]?.focus()
+    await userEvent.keyboard("{Alt>}{ArrowUp}{/Alt}")
+
+    await waitFor(() => expect(rowOrder()).toEqual(["Milk", "Oats", "Eggs"]))
   })
 })

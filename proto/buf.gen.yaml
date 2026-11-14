@@ -15,24 +15,27 @@ managed:
   override:
     - file_option: go_package_prefix
       value: github.com/hoshomoh/nooks/proto/gen
+# Every plugin is pinned. Unpinned, a run takes whatever is newest, and connect-go 2
+# writes code for a connect the module does not use. connect-go stays on 1 with go.mod,
+# and es moves with the @bufbuild/protobuf runtime.
 plugins:
-  - remote: buf.build/protocolbuffers/go
+  - remote: buf.build/protocolbuffers/go:v1.36.12
     out: gen
     opt: paths=source_relative
-  - remote: buf.build/connectrpc/go
+  - remote: buf.build/connectrpc/go:v1.21.0
     out: gen
     opt: paths=source_relative
   # The gateway calls a gRPC-shaped server interface, which this generates. nooks does
   # not serve gRPC — the stubs exist so the gateway has something to talk to in-process.
-  - remote: buf.build/grpc/go
+  - remote: buf.build/grpc/go:v1.6.2
     out: gen
     opt: paths=source_relative
-  - remote: buf.build/grpc-ecosystem/gateway
+  - remote: buf.build/grpc-ecosystem/gateway:v2.33.0
     out: gen
     opt: paths=source_relative
   # The OpenAPI spec, which the docs site and the MCP tools both read. Generated, so it
   # cannot describe an API that no longer exists.
-  - remote: buf.build/community/google-gnostic-openapi
+  - remote: buf.build/community/google-gnostic-openapi:v0.7.1
     out: gen
     opt:
       # Named here because several services contribute paths, so the generator has no
@@ -42,7 +45,7 @@ plugins:
       - title=nooks
       - version=v1
       - enum_type=string
-  - remote: buf.build/bufbuild/es
+  - remote: buf.build/bufbuild/es:v2.17.0
     out: ../packages/api/src/gen
     opt: target=ts
     include_imports: true

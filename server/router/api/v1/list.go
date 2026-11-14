@@ -276,6 +276,8 @@ func statusFromProto(status apiv1.ListStatus) store.ListStatus {
 		return store.StatusCompleted
 	case apiv1.ListStatus_LIST_STATUS_ARCHIVED:
 		return store.StatusArchived
+	case apiv1.ListStatus_LIST_STATUS_DELETED:
+		return store.StatusDeleted
 	default:
 		return store.StatusAny
 	}

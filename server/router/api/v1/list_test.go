@@ -1185,6 +1185,38 @@ func TestArchivingKeepsTheListAndSaysWhoDidIt(t *testing.T) {
 	}
 }
 
+/*
+The deleted filter lists what its owner deleted, and nothing live.
+
+It used to answer with the live Lists instead: the status had no case of its own and
+fell through to "any", so the one List somebody came to bring back was never on it.
+*/
+func TestTheDeletedFilterListsOnlyWhatItsOwnerDeleted(t *testing.T) {
+	f := newListFixture(t)
+	ctx := f.as(t, f.anna)
+	camping := f.createList(t, f.anna, "Camping")
+	f.createList(t, f.anna, "Groceries")
+	if _, err := f.svc.DeleteList(ctx, connect.NewRequest(
+		&apiv1.DeleteListRequest{ListUid: camping},
+	)); err != nil {
+		t.Fatalf("DeleteList: %v", err)
+	}
+
+	listed, err := f.svc.ListLists(ctx, connect.NewRequest(&apiv1.ListListsRequest{
+		Status: apiv1.ListStatus_LIST_STATUS_DELETED,
+	}))
+	if err != nil {
+		t.Fatalf("ListLists: %v", err)
+	}
+	var names []string
+	for _, list := range listed.Msg.GetLists() {
+		names = append(names, list.GetName())
+	}
+	if len(names) != 1 || names[0] != "Camping" {
+		t.Errorf("the deleted filter lists %v, want only Camping", names)
+	}
+}
+
 // Archiving a shared List takes it out of everybody's sidebar, so it is the owner's to
 // decide rather than anybody it was shared with.
 func TestOnlyTheOwnerArchives(t *testing.T) {

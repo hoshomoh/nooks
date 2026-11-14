@@ -273,6 +273,14 @@ func (g listService) DeleteList(ctx context.Context, req *apiv1.DeleteListReques
 	return res.Msg, nil
 }
 
+func (g listService) PurgeList(ctx context.Context, req *apiv1.PurgeListRequest) (*apiv1.PurgeListResponse, error) {
+	res, err := g.svc.PurgeList(ctx, requestFrom(ctx, req))
+	if err != nil {
+		return nil, asStatus(err)
+	}
+	return res.Msg, nil
+}
+
 func (g listService) RestoreList(ctx context.Context, req *apiv1.RestoreListRequest) (*apiv1.RestoreListResponse, error) {
 	res, err := g.svc.RestoreList(ctx, requestFrom(ctx, req))
 	if err != nil {

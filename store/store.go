@@ -235,8 +235,12 @@ type Store interface {
 	// somebody else answers as one that is not there.
 	RestoreList(ctx context.Context, uid string, ownerID int64, at time.Time) error
 
+	// PurgeList removes one deleted List for good, before its window ends. A live List,
+	// or one owned by somebody else, answers as one that is not there.
+	PurgeList(ctx context.Context, uid string, ownerID int64) error
+
 	// PurgeDeletedLists removes for good the Lists deleted before a moment, and reports
-	// how many went. This is the one hard deletion of a List there is.
+	// how many went. Between them, these two are the only hard deletions of a List.
 	PurgeDeletedLists(ctx context.Context, before time.Time) (int64, error)
 
 	// DeleteList removes a List. The removal is soft.

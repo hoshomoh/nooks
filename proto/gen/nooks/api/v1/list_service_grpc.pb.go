@@ -30,6 +30,7 @@ const (
 	ListService_SetListArchived_FullMethodName = "/nooks.api.v1.ListService/SetListArchived"
 	ListService_RestoreList_FullMethodName     = "/nooks.api.v1.ListService/RestoreList"
 	ListService_DeleteList_FullMethodName      = "/nooks.api.v1.ListService/DeleteList"
+	ListService_PurgeList_FullMethodName       = "/nooks.api.v1.ListService/PurgeList"
 	ListService_DuplicateList_FullMethodName   = "/nooks.api.v1.ListService/DuplicateList"
 	ListService_SetListPinned_FullMethodName   = "/nooks.api.v1.ListService/SetListPinned"
 	ListService_CreateItem_FullMethodName      = "/nooks.api.v1.ListService/CreateItem"
@@ -85,6 +86,10 @@ type ListServiceClient interface {
 	RestoreList(ctx context.Context, in *RestoreListRequest, opts ...grpc.CallOption) (*RestoreListResponse, error)
 	// DeleteList removes a List and the Items on it. Only its owner may.
 	DeleteList(ctx context.Context, in *DeleteListRequest, opts ...grpc.CallOption) (*DeleteListResponse, error)
+	// PurgeList removes a deleted List for good, without waiting for its window to end.
+	// Only its owner may, and only a List that is already deleted: a live one answers as
+	// not found, so this can never be the first step of losing something.
+	PurgeList(ctx context.Context, in *PurgeListRequest, opts ...grpc.CallOption) (*PurgeListResponse, error)
 	// DuplicateList copies a List and the Items still open on it.
 	//
 	// The copy starts private and starts empty of history: it is a new List that happens
@@ -234,6 +239,16 @@ func (c *listServiceClient) DeleteList(ctx context.Context, in *DeleteListReques
 	return out, nil
 }
 
+func (c *listServiceClient) PurgeList(ctx context.Context, in *PurgeListRequest, opts ...grpc.CallOption) (*PurgeListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PurgeListResponse)
+	err := c.cc.Invoke(ctx, ListService_PurgeList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *listServiceClient) DuplicateList(ctx context.Context, in *DuplicateListRequest, opts ...grpc.CallOption) (*DuplicateListResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DuplicateListResponse)
@@ -368,6 +383,10 @@ type ListServiceServer interface {
 	RestoreList(context.Context, *RestoreListRequest) (*RestoreListResponse, error)
 	// DeleteList removes a List and the Items on it. Only its owner may.
 	DeleteList(context.Context, *DeleteListRequest) (*DeleteListResponse, error)
+	// PurgeList removes a deleted List for good, without waiting for its window to end.
+	// Only its owner may, and only a List that is already deleted: a live one answers as
+	// not found, so this can never be the first step of losing something.
+	PurgeList(context.Context, *PurgeListRequest) (*PurgeListResponse, error)
 	// DuplicateList copies a List and the Items still open on it.
 	//
 	// The copy starts private and starts empty of history: it is a new List that happens
@@ -439,6 +458,9 @@ func (UnimplementedListServiceServer) RestoreList(context.Context, *RestoreListR
 }
 func (UnimplementedListServiceServer) DeleteList(context.Context, *DeleteListRequest) (*DeleteListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteList not implemented")
+}
+func (UnimplementedListServiceServer) PurgeList(context.Context, *PurgeListRequest) (*PurgeListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method PurgeList not implemented")
 }
 func (UnimplementedListServiceServer) DuplicateList(context.Context, *DuplicateListRequest) (*DuplicateListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DuplicateList not implemented")
@@ -686,6 +708,24 @@ func _ListService_DeleteList_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ListService_PurgeList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PurgeListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ListServiceServer).PurgeList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ListService_PurgeList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ListServiceServer).PurgeList(ctx, req.(*PurgeListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ListService_DuplicateList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DuplicateListRequest)
 	if err := dec(in); err != nil {
@@ -898,6 +938,10 @@ var ListService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteList",
 			Handler:    _ListService_DeleteList_Handler,
+		},
+		{
+			MethodName: "PurgeList",
+			Handler:    _ListService_PurgeList_Handler,
 		},
 		{
 			MethodName: "DuplicateList",

@@ -365,6 +365,13 @@ func TestATokenThatMayWriteCannotAlwaysDelete(t *testing.T) {
 	if got := connect.CodeOf(err); got != connect.CodePermissionDenied {
 		t.Errorf("DeleteList code = %v, want permission_denied", got)
 	}
+
+	_, err = f.svc.PurgeList(ctx, connect.NewRequest(&apiv1.PurgeListRequest{
+		ListUid: groceries,
+	}))
+	if got := connect.CodeOf(err); got != connect.CodePermissionDenied {
+		t.Errorf("PurgeList code = %v, want permission_denied", got)
+	}
 }
 
 // A browser is never narrowed, so nothing it does is gated on an ability.

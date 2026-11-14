@@ -55,6 +55,7 @@ var reaches = map[string]reach{
 	"ListService.DuplicateList":        {tool: "duplicate_list"},
 	"ListService.DeleteList":           {tool: "delete_list"},
 	"ListService.RestoreList":          {tool: "restore_list"},
+	"ListService.PurgeList":            {tool: "purge_list"},
 	"ListService.SetListArchived":      {tool: "archive_list"},
 	"ListService.SetListPinned":        {tool: "pin_list"},
 	"ListService.SetListSharing":       {tool: "set_list_sharing"},

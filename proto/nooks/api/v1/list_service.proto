@@ -93,6 +93,13 @@ service ListService {
     option (google.api.http) = {delete: "/api/v1/lists/{list_uid}"};
   }
 
+  // PurgeList removes a deleted List for good, without waiting for its window to end.
+  // Only its owner may, and only a List that is already deleted: a live one answers as
+  // not found, so this can never be the first step of losing something.
+  rpc PurgeList(PurgeListRequest) returns (PurgeListResponse) {
+    option (google.api.http) = {delete: "/api/v1/lists/{list_uid}:purge"};
+  }
+
   // DuplicateList copies a List and the Items still open on it.
   //
   // The copy starts private and starts empty of history: it is a new List that happens
@@ -214,6 +221,10 @@ message List {
 
   // Who archived it, by name, for a row that says so. Empty while it is not archived.
   string archived_by_name = 12;
+
+  // When a deleted List will be removed for good, RFC 3339, or empty while it is not
+  // deleted. Sent rather than worked out by the caller, so the window is said once.
+  string purge_at = 13;
 }
 
 // Item is one line on a List.
@@ -430,6 +441,12 @@ message DeleteListRequest {
 }
 
 message DeleteListResponse {}
+
+message PurgeListRequest {
+  string list_uid = 1;
+}
+
+message PurgeListResponse {}
 
 message SetListPinnedRequest {
   string list_uid = 1;

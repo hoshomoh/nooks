@@ -577,6 +577,32 @@ func (s *ListService) DeleteList(
 	return connect.NewResponse(&apiv1.DeleteListResponse{}), nil
 }
 
+/*
+PurgeList removes a deleted List for good, without waiting out its window.
+
+Behind the delete ability, unlike RestoreList: this is the one act that loses something
+for certain. A live List, or one somebody else deleted, answers as one that never existed.
+*/
+func (s *ListService) PurgeList(
+	ctx context.Context,
+	req *connect.Request[apiv1.PurgeListRequest],
+) (*connect.Response[apiv1.PurgeListResponse], error) {
+	if err := requireDeletion(ctx); err != nil {
+		return nil, err
+	}
+	member, err := requireWriter(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.store.PurgeList(ctx, req.Msg.GetListUid(), member.ID); err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			return nil, errListNotFound
+		}
+		return nil, internalError("purge list", err)
+	}
+	return connect.NewResponse(&apiv1.PurgeListResponse{}), nil
+}
+
 // SetListPinned pins or unpins a List in the Member's own sidebar.
 //
 // Reading the List needs only read access: pinning is a note to yourself about a List
@@ -688,7 +714,16 @@ func listToProto(list store.List, member store.Member, pinned bool, open, done i
 		CreatedAt:  formatMoment(list.CreatedAt),
 		UpdatedAt:  formatMoment(list.UpdatedAt),
 		ArchivedAt: formatMoment(list.ArchivedAt),
+		PurgeAt:    formatMoment(purgeAt(list)),
 	}
+}
+
+// purgeAt is when a deleted List goes for good, and the zero time for a live one.
+func purgeAt(list store.List) time.Time {
+	if list.DeletedAt.IsZero() {
+		return time.Time{}
+	}
+	return list.DeletedAt.Add(store.DeletedListLifetime)
 }
 
 func sharingToProto(sharing store.Sharing) apiv1.Sharing {

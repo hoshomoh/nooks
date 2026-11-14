@@ -756,6 +756,24 @@ func (s *sqlStore) PurgeDeletedLists(ctx context.Context, before time.Time) (int
 	return gone, nil
 }
 
+/*
+PurgeList removes one deleted List for good, before its window ends.
+
+The owner is asked for in the same statement as the deletion, as RestoreList does, so a
+List somebody else deleted, a live one, and one that never existed all answer alike.
+What goes with the row is everything on it, by the same cascades PurgeDeletedLists uses.
+*/
+func (s *sqlStore) PurgeList(ctx context.Context, uid string, ownerID int64) error {
+	result, err := s.db.NewDelete().
+		Model((*listModel)(nil)).
+		Where("uid = ? AND deleted_at <> '' AND owner_id = ?", uid, ownerID).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("purge list: %w", err)
+	}
+	return requireOneRow(result, "deleted list")
+}
+
 // DeleteList removes a List, and with it the Items on it. The removal is soft, so a
 // List deleted by mistake is recoverable.
 func (s *sqlStore) DeleteList(ctx context.Context, uid string, at time.Time) error {

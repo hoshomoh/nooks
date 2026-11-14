@@ -1464,3 +1464,44 @@ func TestRewritingANoteFromWhatItSaysNowIsAllowed(t *testing.T) {
 		t.Errorf("the Note says %q, want the write that was expected to land", note)
 	}
 }
+
+// A deleted List says when it goes for good, and only its owner can make that sooner.
+func TestADeletedListIsPurgedByItsOwnerOnly(t *testing.T) {
+	f := newListFixture(t)
+	groceries := f.createList(t, f.anna, "Groceries")
+	if _, err := f.svc.DeleteList(f.as(t, f.anna), connect.NewRequest(
+		&apiv1.DeleteListRequest{ListUid: groceries},
+	)); err != nil {
+		t.Fatalf("DeleteList: %v", err)
+	}
+
+	deleted, err := f.svc.ListLists(f.as(t, f.anna), connect.NewRequest(&apiv1.ListListsRequest{
+		Status: apiv1.ListStatus_LIST_STATUS_DELETED,
+	}))
+	if err != nil {
+		t.Fatalf("ListLists: %v", err)
+	}
+	if got := len(deleted.Msg.GetLists()); got != 1 {
+		t.Fatalf("found %d deleted Lists, want Groceries", got)
+	}
+	want := testClock.Add(store.DeletedListLifetime).Format(time.RFC3339)
+	if got := deleted.Msg.GetLists()[0].GetPurgeAt(); got != want {
+		t.Errorf("purge_at = %q, want %q", got, want)
+	}
+
+	purge := func(as store.Member) error {
+		_, err := f.svc.PurgeList(f.as(t, as), connect.NewRequest(
+			&apiv1.PurgeListRequest{ListUid: groceries},
+		))
+		return err
+	}
+	if got := connect.CodeOf(purge(f.jonas)); got != connect.CodeNotFound {
+		t.Errorf("Jonas purging Anna's List: code = %v, want not_found", got)
+	}
+	if err := purge(f.anna); err != nil {
+		t.Fatalf("PurgeList: %v", err)
+	}
+	if got := connect.CodeOf(purge(f.anna)); got != connect.CodeNotFound {
+		t.Errorf("purging it twice: code = %v, want not_found", got)
+	}
+}

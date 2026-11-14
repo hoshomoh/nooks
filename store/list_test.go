@@ -454,3 +454,43 @@ func TestEveryChangeToAnItemSaysTheListChanged(t *testing.T) {
 		})
 	}
 }
+
+// An owner can end the window early, and nothing else can be ended that way.
+func TestAnOwnerPurgesTheirDeletedListEarly(t *testing.T) {
+	at := time.Date(2026, time.April, 1, 9, 0, 0, 0, time.UTC)
+
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			anna := newMember(t, s)
+			jonas := addMember(t, s, "mem_jonas", "Jonas", "jonas@brunnen.lan")
+			camp := makeList(t, s, anna, "list_camp", "Camping", SharingInstance)
+			addItem(t, s, camp, anna, "item_tarp", "Tarpaulin")
+			flat := makeList(t, s, anna, "list_flat", "Flat jobs", SharingInstance)
+
+			if err := s.PurgeList(t.Context(), flat.UID, anna.ID); !errors.Is(err, ErrNotFound) {
+				t.Errorf("purging a live List answered %v, want ErrNotFound", err)
+			}
+
+			if err := s.DeleteList(t.Context(), camp.UID, at); err != nil {
+				t.Fatalf("DeleteList: %v", err)
+			}
+			if err := s.PurgeList(t.Context(), camp.UID, jonas.ID); !errors.Is(err, ErrNotFound) {
+				t.Errorf("Jonas purging Anna's List answered %v, want ErrNotFound", err)
+			}
+
+			if err := s.PurgeList(t.Context(), camp.UID, anna.ID); err != nil {
+				t.Fatalf("PurgeList: %v", err)
+			}
+			if err := s.RestoreList(t.Context(), camp.UID, anna.ID, at); !errors.Is(err, ErrNotFound) {
+				t.Errorf("restoring a purged List answered %v, want ErrNotFound", err)
+			}
+			if items, err := s.ItemsOnList(t.Context(), camp.ID); err != nil || len(items) != 0 {
+				t.Errorf("a purged List left %d Items (%v), want none", len(items), err)
+			}
+			if _, err := s.ListByUID(t.Context(), flat.UID); err != nil {
+				t.Errorf("the live List is %v, want it untouched", err)
+			}
+		})
+	}
+}

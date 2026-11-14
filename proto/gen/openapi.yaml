@@ -1041,6 +1041,34 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/v1/lists/{listUid}:purge:
+        delete:
+            tags:
+                - ListService
+            description: |-
+                PurgeList removes a deleted List for good, without waiting for its window to end.
+                 Only its owner may, and only a List that is already deleted: a live one answers as
+                 not found, so this can never be the first step of losing something.
+            operationId: ListService_PurgeList
+            parameters:
+                - name: listUid
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PurgeListResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/v1/lists/{listUid}:restore:
         post:
             tags:
@@ -1924,6 +1952,11 @@ components:
                 archivedByName:
                     type: string
                     description: Who archived it, by name, for a row that says so. Empty while it is not archived.
+                purgeAt:
+                    type: string
+                    description: |-
+                        When a deleted List will be removed for good, RFC 3339, or empty while it is not
+                         deleted. Sent rather than worked out by the caller, so the window is said once.
             description: List is a named, ordered collection of Items.
         ListAccessTokensResponse:
             type: object
@@ -2135,6 +2168,9 @@ components:
                         What that List is called, so the settings page can say which one is published
                          without looking it up. Filled on read and ignored on write.
             description: PublicListSettings is the Instance's one public page, and what a Visitor sees of it.
+        PurgeListResponse:
+            type: object
+            properties: {}
         RefreshAccessRequest:
             type: object
             properties: {}

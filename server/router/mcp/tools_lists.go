@@ -192,6 +192,16 @@ func addListTools(server *sdk.Server, lists *v1.ListService) {
 				return fmt.Sprintf("Restored %q.", res.GetList().GetName())
 			})
 	})
+
+	sdk.AddTool(server, &sdk.Tool{
+		Name: "purge_list",
+		Description: "Remove a deleted list for good, without waiting out its thirty days. " +
+			"It cannot be brought back afterwards. Refused unless the caller's token may " +
+			"delete, and only for a list its owner already deleted.",
+	}, func(ctx context.Context, _ *sdk.CallToolRequest, args listUIDArgs) (*sdk.CallToolResult, any, error) {
+		return answer(ctx, lists.PurgeList, &apiv1.PurgeListRequest{ListUid: args.ListUID},
+			done[apiv1.PurgeListResponse]("Removed for good."))
+	})
 }
 
 /*

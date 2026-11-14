@@ -58,6 +58,8 @@ const (
 	ListServiceRestoreListProcedure = "/nooks.api.v1.ListService/RestoreList"
 	// ListServiceDeleteListProcedure is the fully-qualified name of the ListService's DeleteList RPC.
 	ListServiceDeleteListProcedure = "/nooks.api.v1.ListService/DeleteList"
+	// ListServicePurgeListProcedure is the fully-qualified name of the ListService's PurgeList RPC.
+	ListServicePurgeListProcedure = "/nooks.api.v1.ListService/PurgeList"
 	// ListServiceDuplicateListProcedure is the fully-qualified name of the ListService's DuplicateList
 	// RPC.
 	ListServiceDuplicateListProcedure = "/nooks.api.v1.ListService/DuplicateList"
@@ -120,6 +122,10 @@ type ListServiceClient interface {
 	RestoreList(context.Context, *connect.Request[v1.RestoreListRequest]) (*connect.Response[v1.RestoreListResponse], error)
 	// DeleteList removes a List and the Items on it. Only its owner may.
 	DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error)
+	// PurgeList removes a deleted List for good, without waiting for its window to end.
+	// Only its owner may, and only a List that is already deleted: a live one answers as
+	// not found, so this can never be the first step of losing something.
+	PurgeList(context.Context, *connect.Request[v1.PurgeListRequest]) (*connect.Response[v1.PurgeListResponse], error)
 	// DuplicateList copies a List and the Items still open on it.
 	//
 	// The copy starts private and starts empty of history: it is a new List that happens
@@ -228,6 +234,12 @@ func NewListServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(listServiceMethods.ByName("DeleteList")),
 			connect.WithClientOptions(opts...),
 		),
+		purgeList: connect.NewClient[v1.PurgeListRequest, v1.PurgeListResponse](
+			httpClient,
+			baseURL+ListServicePurgeListProcedure,
+			connect.WithSchema(listServiceMethods.ByName("PurgeList")),
+			connect.WithClientOptions(opts...),
+		),
 		duplicateList: connect.NewClient[v1.DuplicateListRequest, v1.DuplicateListResponse](
 			httpClient,
 			baseURL+ListServiceDuplicateListProcedure,
@@ -298,6 +310,7 @@ type listServiceClient struct {
 	setListArchived *connect.Client[v1.SetListArchivedRequest, v1.SetListArchivedResponse]
 	restoreList     *connect.Client[v1.RestoreListRequest, v1.RestoreListResponse]
 	deleteList      *connect.Client[v1.DeleteListRequest, v1.DeleteListResponse]
+	purgeList       *connect.Client[v1.PurgeListRequest, v1.PurgeListResponse]
 	duplicateList   *connect.Client[v1.DuplicateListRequest, v1.DuplicateListResponse]
 	setListPinned   *connect.Client[v1.SetListPinnedRequest, v1.SetListPinnedResponse]
 	createItem      *connect.Client[v1.CreateItemRequest, v1.CreateItemResponse]
@@ -362,6 +375,11 @@ func (c *listServiceClient) RestoreList(ctx context.Context, req *connect.Reques
 // DeleteList calls nooks.api.v1.ListService.DeleteList.
 func (c *listServiceClient) DeleteList(ctx context.Context, req *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error) {
 	return c.deleteList.CallUnary(ctx, req)
+}
+
+// PurgeList calls nooks.api.v1.ListService.PurgeList.
+func (c *listServiceClient) PurgeList(ctx context.Context, req *connect.Request[v1.PurgeListRequest]) (*connect.Response[v1.PurgeListResponse], error) {
+	return c.purgeList.CallUnary(ctx, req)
 }
 
 // DuplicateList calls nooks.api.v1.ListService.DuplicateList.
@@ -448,6 +466,10 @@ type ListServiceHandler interface {
 	RestoreList(context.Context, *connect.Request[v1.RestoreListRequest]) (*connect.Response[v1.RestoreListResponse], error)
 	// DeleteList removes a List and the Items on it. Only its owner may.
 	DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error)
+	// PurgeList removes a deleted List for good, without waiting for its window to end.
+	// Only its owner may, and only a List that is already deleted: a live one answers as
+	// not found, so this can never be the first step of losing something.
+	PurgeList(context.Context, *connect.Request[v1.PurgeListRequest]) (*connect.Response[v1.PurgeListResponse], error)
 	// DuplicateList copies a List and the Items still open on it.
 	//
 	// The copy starts private and starts empty of history: it is a new List that happens
@@ -552,6 +574,12 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(listServiceMethods.ByName("DeleteList")),
 		connect.WithHandlerOptions(opts...),
 	)
+	listServicePurgeListHandler := connect.NewUnaryHandler(
+		ListServicePurgeListProcedure,
+		svc.PurgeList,
+		connect.WithSchema(listServiceMethods.ByName("PurgeList")),
+		connect.WithHandlerOptions(opts...),
+	)
 	listServiceDuplicateListHandler := connect.NewUnaryHandler(
 		ListServiceDuplicateListProcedure,
 		svc.DuplicateList,
@@ -630,6 +658,8 @@ func NewListServiceHandler(svc ListServiceHandler, opts ...connect.HandlerOption
 			listServiceRestoreListHandler.ServeHTTP(w, r)
 		case ListServiceDeleteListProcedure:
 			listServiceDeleteListHandler.ServeHTTP(w, r)
+		case ListServicePurgeListProcedure:
+			listServicePurgeListHandler.ServeHTTP(w, r)
 		case ListServiceDuplicateListProcedure:
 			listServiceDuplicateListHandler.ServeHTTP(w, r)
 		case ListServiceSetListPinnedProcedure:
@@ -699,6 +729,10 @@ func (UnimplementedListServiceHandler) RestoreList(context.Context, *connect.Req
 
 func (UnimplementedListServiceHandler) DeleteList(context.Context, *connect.Request[v1.DeleteListRequest]) (*connect.Response[v1.DeleteListResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.DeleteList is not implemented"))
+}
+
+func (UnimplementedListServiceHandler) PurgeList(context.Context, *connect.Request[v1.PurgeListRequest]) (*connect.Response[v1.PurgeListResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("nooks.api.v1.ListService.PurgeList is not implemented"))
 }
 
 func (UnimplementedListServiceHandler) DuplicateList(context.Context, *connect.Request[v1.DuplicateListRequest]) (*connect.Response[v1.DuplicateListResponse], error) {

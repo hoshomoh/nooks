@@ -19,8 +19,8 @@ things being displayed.
   shared List.
 - **A row is 44px** whether it carries one piece of metadata or five.
 - **16px is the floor** for anything a Member wrote.
-- **Never summarise the Member.** A long Note previews as its own first line plus a count of what is
-  left. Nothing is generated on their behalf.
+- **Never summarise the Member.** Where a Note is shown in part, as a search result is, it is the
+  Member's own words cut short. Nothing is generated on their behalf.
 - **nooks sends no email.** Anything that would need one waits in Activity.
 
 ---
@@ -170,17 +170,19 @@ Uppercase is reserved for the 11.5 section and column heads. Nothing else is upp
 | 15 | Chip (a 30px pill) |
 | 50% | Avatar |
 
-**The avatar comes in three sizes, in the UI font:**
+**The avatar comes in three sizes, in the UI font, and carries one letter:**
 
-| Size | Circle | Initials |
+| Size | Circle | Letter |
 | --- | --- | --- |
-| Small | 22px | 9px |
-| Medium | 24px | 10px |
-| Large | 28px | 11px |
+| Small | 22px | 11px |
+| Medium | 24px | 11px |
+| Large | 28px | 13px |
 
-The initials keep their ratio to the circle so two letters sit inside it at every size.
-A Group is the same chip at radius 6 rather than a circle, because a Group is not a
-person and should not read as one. Avatars drawn overlapping carry a 1.5px ring in the
+One letter, the first of the name: the circle is small, and the whole name is a hover
+away. A Group is the same chip at radius 6 rather than a circle, because a Group is not a
+person and should not read as one. Something added through an access token carries a
+small `--shared` spark on the circle's lower right corner, and the hover says so:
+*"Anna via Kitchen tablet"*. Avatars drawn overlapping carry a 1.5px ring in the
 page's own ground, which is what separates them.
 
 **A control in a row is as easy to hit as the row is tall.** The list row is 44px and
@@ -225,22 +227,34 @@ The core component. Everything else is furniture around it.
 
 ```
 grid-template-columns: 20px 1fr auto;
-align-items: center;
+align-items: start;
 gap: 14px;
 min-height: 44px;
-padding: 6px 8px;
+padding: 9px 8px;
 margin: 0 -8px;
 border-radius: 6px;
 ```
 
+The content line is 24px and the row aligns to its top, so 9 + 24 + 9 and a 1px border
+above and below make the 44.
+
 - Checkbox **17 × 17**, 1.5px `--control` border, radius 4. Hit area is **44px** regardless.
-- Label 16px, truncates with ellipsis. **Truncation happens in the label**, never in the metadata, so
-  the label always starts at the same x and the row never grows.
-- Metadata is right-aligned in the third column, `gap: 12px`, `white-space: nowrap`: quantity badge,
-  list name, date, `note` marker, attribution.
-- Quantity is a mono 11.5 badge: 1px `--border`, radius 4, padding `1px 5px`.
-- A due date takes `--shared`; an overdue date takes `--overdue`.
-- Hover fills `--secondary` and darkens the checkbox border to `--muted-foreground`.
+- Label 16px, one line, truncates with an ellipsis and shows in full on hover. **Truncation happens
+  in the label**, never in the metadata, so the label always starts at the same x and the row never
+  grows. Away from its own List, the List's name follows the label in 12 `--secondary-foreground`.
+- The third column is right-aligned, `gap: 12px`, `white-space: nowrap`, and holds, in this order:
+  - **Status**: "not synced", "Try again". A small tinted label, only on a row in that state.
+  - **Date**: 12.5, `--shared`; an overdue date takes `--overdue`. Only when there is one.
+  - **Quantity**: plain 12.5 `--muted-foreground` text. No border, no mono. As wide as its text up
+    to 120px (96px while the side sheet is open), then an ellipsis, with the whole value on hover.
+  - **Person**: the small avatar, in a 26px slot.
+  - **Note**: the `note` glyph at 13px in a 16px slot, last on the row.
+- **Two slots keep their width, and nothing else does.** The person slot, whenever the List shows
+  people, and the note slot, whenever any Item on the List has a note. Status, date and quantity take
+  no room on a row without them. Circles and note marks line up down the List; the label's width
+  varies from row to row, and that is intended.
+- Hover fills `--secondary` and darkens the checkbox border to `--muted-foreground`. On hover or
+  keyboard focus the row's `···` takes the person's slot.
 - Done: checkbox filled `--muted-foreground` with a white tick; label `--muted-foreground` with
   `line-through` in `#C4C4BE`.
 - Completed Items sit **collapsed at the foot of the List**, behind one 13.5
@@ -248,10 +262,20 @@ border-radius: 6px;
   the day is going, a plain count for anything ticked before it. What is done is not what a Member
   came for, and a List that doubles in length as the week goes on is one nobody scrolls to the
   bottom of — but ticking must still visibly **put an Item somewhere** rather than delete it.
+- Opened, the completed section is the **dense row**: 36px, padding `6px 8px`, label 15.5. The time it
+  was ticked sits where the date would, and who ticked it is the person circle.
 - Just ticked by someone else: fill `--done-bg`, checkbox filled `--done`, attribution
   `--done`. Holds for one second, then settles. **No toast, no sound.**
-- A Note previews as one line below the row: 13.5px `--secondary-foreground`, on a 2px `--border` left rule
-  indented 10px, in the label column, with `+N lines` after it.
+- **A Note is never previewed on the row.** The glyph says there is one; the side sheet is where it is
+  read. A List where every Item has a Note still reads as one line per Item.
+
+*Reordering.* A List has one order: the one Members drag Items into. On hover or keyboard focus an
+open Item shows a grip, six dots in `--control`, 22px out in the left margin, outside the row, so
+nothing inside the row moves. Dragging lifts the row on `--background` with a 1px `--border` and the
+floating shadow, 2px up; the rows it passes slide apart to open its place, and letting go drops it
+there. Esc puts it back. ⌥↑ and ⌥↓ move a focused row, and the item menu offers Move up and Move
+down. Completed Items do not move, and the done section is not a place to drop one. Today, Upcoming
+and the calendar have no grip: their order is the date.
 
 **Add row.** Same grid, `border-top: 1px solid var(--hair)`, a `+` in the checkbox column, placeholder
 in `--muted-foreground`, then the date control and a mono `↵` keycap at the right. Enter adds and
@@ -286,7 +310,7 @@ requirement. Three appearances: **empty**, the calendar glyph and "Add a date" i
 value, and the last action wins.
 
 Quantity has no permanent control — only the date earned one, because a date is the one field whose
-absence changes where the Item appears. Notes, assignment and moving between Lists are all sheet-level.
+absence changes where the Item appears. A Note is sheet-level.
 
 *Per-view defaults.* On a List, the Item lands there with no date. On **Today** and **Upcoming** it
 lands on the List last added to — that is what the Member means by "somewhere" — due today and
@@ -452,14 +476,20 @@ page.**
 mono 13.5 with `word-break: break-all`, a primary Copy button, and a sentence saying plainly that it
 cannot be shown again. **Never a warning triangle.**
 
-**Three menus, three jobs.** A List is reached from two places and its `···` says
-different things in each, because what a menu offers depends on what you are looking at:
+**Two menus.** Every `···` on a List is the same **list menu**, wherever it is reached: a sidebar
+row, a row on All lists, or the chrome bar of the List you are on. A List offers the same things
+wherever it is found.
 
-| Where | What it holds |
+| Menu | What it holds, groups split by a rule |
 | --- | --- |
-| A **sidebar row**, on hover | What happens *to* the List: open, rename, pin, share, print, duplicate, delete |
-| The **chrome bar** of the List you are on | How the List is *shown*: sort, where completed items go, whether quantities show — plus print and export |
-| An **item row**, on hover | What happens to that Item: open, set a date, set a quantity, move, assign, note, duplicate, delete |
+| **List** | Open list, Rename, Pin ⌘D · Share…, Print ⌘P, Duplicate, Export as plain text, Archive ⌘⇧A · Delete list ⌫ |
+| **Item** | Open, Set a date, Set a quantity · Move up ⌥↑, Move down ⌥↓ · Duplicate, Delete item ⌫ |
+
+Rename, Share, Archive and Delete are the owner's, and are absent for anyone else. Archive keeps
+everything, so it sits with the entries that keep and never beside Delete. A completed Item's menu
+has no Move up or Move down. A deleted List, under All lists → Deleted, has two entries of its own:
+Restore, and after a rule, Delete forever ⌫, which asks first. No keycap on Open list (Enter opens
+whichever entry is highlighted) and none on Rename (F2 is a Mac's brightness key).
 
 **An entry that names a field opens that field, in the menu.** "Set a quantity" shows a text field
 where the entry was; "Set a date" shows a calendar. One gesture, one place — sending a Member
@@ -467,7 +497,7 @@ somewhere else to find the thing the entry just named is the menu failing at its
 row's menu is therefore a small panel with faces rather than a list of actions, and it keeps an
 **Open** entry, because the row's label is itself a field and cannot also be the way in to the sheet.
 
-A `···` appears on hover and **takes the place of the row's metadata** rather than
+A `···` appears on hover and **takes the place of the person circle** rather than
 sitting beside it — a row that widens as the pointer crosses it is a row nobody can aim
 at. An action that is already a permanent control in the chrome bar is absent from the
 menu beside it: the same action twice in one place reads as two different actions.
@@ -598,6 +628,7 @@ already changed. A Member whose machine asks for reduced motion gets none of it.
 | `↵` | Add — stays focused for the next one |
 | `↑` `↓` | Move between Items |
 | `space` | Tick |
+| `⌥↑` `⌥↓` | Move the focused Item up or down |
 | `⌘P` | Print the List you are looking at |
 | `Esc` | Return to the list from a Note |
 

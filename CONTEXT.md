@@ -138,7 +138,7 @@ _Avoid_: PDF export, print preview, printout
 
 - One list primitive. Anything that feels like a second container is a view over Lists.
 - nooks sends no email. Anything that would need one waits in Activity instead.
-- Nothing is generated on a Member's behalf: a long Note previews as its own first line and a count of
-  what is left, never a summary.
+- Nothing is generated on a Member's behalf: where a Note is shown in part, it is its own words cut
+  short, never a summary.
 - A row is 44px whether it carries one piece of metadata or five.
 - Four meaning colours, each with exactly one job: accent/shared, done/presence, offline, overdue/error.

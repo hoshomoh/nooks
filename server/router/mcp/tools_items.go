@@ -12,7 +12,7 @@ import (
 
 type addItemArgs struct {
 	ListUID  string `json:"list_uid" jsonschema:"the list to add to, from list_lists"`
-	Label    string `json:"label" jsonschema:"what to add, in the words a person would use"`
+	Label    string `json:"label" jsonschema:"a few words a person would read on the list; details go in the note"`
 	Quantity string `json:"quantity,omitempty" jsonschema:"free text like 2 or 1 kg, not a number"`
 	DueOn    string `json:"due_on,omitempty" jsonschema:"a day as YYYY-MM-DD, or empty for no date"`
 }
@@ -55,7 +55,8 @@ type moveItemArgs struct {
 func addItemTools(server *sdk.Server, lists *v1.ListService) {
 	sdk.AddTool(server, &sdk.Tool{
 		Name: "add_item",
-		Description: fmt.Sprintf("Put something on a list. A label is at most %d "+
+		Description: fmt.Sprintf("Put something on a list. Keep the label to a few words and "+
+			"put details in the note afterwards with update_item. A label is at most %d "+
 			"characters and a quantity %d. Refused when the caller's token may only read.",
 			v1.LimitItemLabel, v1.LimitItemQuantity),
 	}, func(ctx context.Context, _ *sdk.CallToolRequest, args addItemArgs) (*sdk.CallToolResult, any, error) {

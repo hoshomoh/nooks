@@ -81,14 +81,18 @@ The protocol offers this and nothing was sent, so a client arrived at twenty-fou
 with no idea which one to call first or how they fit together. A tool description is
 read when a tool is being considered; this is read before any of them are.
 
-It says the shape of the thing and the two traps. The shape is that there is one
-container and identifiers are handed out rather than guessed. The traps are that a note
-is replaced whole rather than appended to, and that a refusal is usually the token's
-edges rather than a fault worth retrying.
+It says the shape of the thing, how an item is written, and the two traps. The shape is
+that there is one container and identifiers are handed out rather than guessed. An item
+is a short label with its details in the note, because nothing else tells an assistant
+so and a whole request pasted into a label is unreadable on the list. The traps are that
+a note is replaced whole rather than appended to, and that a refusal is usually the
+token's edges rather than a fault worth retrying.
 */
 const instructions = `Lists are the only container. Everything is an item on a list, and there are no folders, tags or projects to look for.
 
 Start at list_lists. Every identifier the other tools take came from a tool that returned it, and none of them can be guessed.
+
+An item's label is what a person reads on the list, so keep it to a few words, like "Milk" or "Call the plumber". Details, steps, links and reasons go in its note: add the item with a short label, then write the note with update_item.
 
 get_list shortens a long note to keep a row a row. get_item has the whole of one, and is what to read before rewriting a note: update_item replaces a note rather than adding to it. Send expected_note with the rewrite and it is refused rather than overwriting somebody who changed it in between.
 

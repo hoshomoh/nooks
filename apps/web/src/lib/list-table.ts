@@ -8,12 +8,12 @@ export const LIST_STATUSES: ListStatus[] = ["all", "active", "completed", "archi
 /**
  * What the table is ordered by.
  *
- * Three, not five. "Oldest first" is "recently created" read upwards, and a household
- * with a dozen Lists does not need a fourth way to arrange them.
+ * Updated and created are kept apart: one answers what you have touched lately, the
+ * other what you started lately.
  */
-export type ListSort = "updated" | "name" | "open"
+export type ListSort = "updated" | "newest" | "oldest" | "name" | "open"
 
-export const LIST_SORTS: ListSort[] = ["updated", "name", "open"]
+export const LIST_SORTS: ListSort[] = ["updated", "newest", "oldest", "name", "open"]
 
 /** DEFAULT_SORT is what the table opens on: what changed last is what you came for. */
 export const DEFAULT_SORT: ListSort = "updated"
@@ -51,6 +51,8 @@ const STATUS_ON_THE_WIRE: Record<ListStatus, StatusWire> = {
 
 const SORT_ON_THE_WIRE: Record<ListSort, ListOrder> = {
   updated: ListOrder.UPDATED,
+  newest: ListOrder.NEWEST,
+  oldest: ListOrder.OLDEST,
   name: ListOrder.NAME,
   open: ListOrder.OPEN,
 }

@@ -47,6 +47,8 @@ describe("the words in the address and the enums on the wire", () => {
 
   it("orders by name when the address says so", () => {
     expect(sortOnTheWire("name")).toBe(ListOrder.NAME)
+    expect(sortOnTheWire("newest")).toBe(ListOrder.NEWEST)
+    expect(sortOnTheWire("oldest")).toBe(ListOrder.OLDEST)
   })
 })
 

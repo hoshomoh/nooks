@@ -165,6 +165,8 @@
     "purgesIn_other": "removed for good in {{count}} days",
     "statusLabel": "Which lists",
     "sortUpdated": "Recently updated",
+    "sortNewest": "Recently created",
+    "sortOldest": "Oldest first",
     "sortName": "Name A–Z",
     "sortOpen": "Most open items",
     "sortLabel": "Sort",

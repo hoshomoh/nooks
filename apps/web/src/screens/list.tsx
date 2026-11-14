@@ -230,12 +230,7 @@ export function ListScreen() {
           <>
             <ActivityControl />
             {list.list && (
-              <ListActions
-                list={list.list}
-                instanceName={instanceName}
-                items={list.items}
-                withControls
-              />
+              <ListActions list={list.list} instanceName={instanceName} withControls />
             )}
           </>
         }

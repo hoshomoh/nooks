@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
-import type { Item, List } from "@nooks/api"
+import type { List } from "@nooks/api"
 
 import { Button } from "./button"
 import { ConfirmDialog } from "./confirm-dialog"
@@ -14,6 +14,7 @@ import { listClient } from "@/lib/api"
 import { afterDeletingList } from "@/lib/after-deleting-list"
 import { download } from "@/lib/download"
 import { exportFileFor } from "@/lib/list-export"
+import { listQuery } from "@/lib/list-queries"
 import { isArchived } from "@/lib/list-state"
 import { refreshLists } from "@/lib/refresh"
 
@@ -21,13 +22,6 @@ export interface ListActionsProps {
   list: List
   /** What this Instance calls itself, for the share dialog. */
   instanceName: string
-  /**
-   * The Items, when the caller already has them.
-   *
-   * Exporting needs them; the sidebar does not have them and does not offer it. A
-   * menu entry that would need a second round trip to answer is not worth the entry.
-   */
-  items?: Item[]
   /**
    * Whether to render Share and Print as permanent controls beside the menu.
    *
@@ -45,7 +39,7 @@ export interface ListActionsProps {
  * reached from. It owns its dialogs, so a menu entry never has to hand its work back to
  * a screen that happens to be mounted.
  */
-export function ListActions({ list, instanceName, items, withControls }: ListActionsProps) {
+export function ListActions({ list, instanceName, withControls }: ListActionsProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -75,6 +69,13 @@ export function ListActions({ list, instanceName, items, withControls }: ListAct
   const archive = useMutation({
     mutationFn: (archived: boolean) => listClient.setListArchived({ listUid, archived }),
     onSuccess: refresh,
+  })
+
+  // Read from the cache when the List is open, and fetched when the menu is somewhere
+  // else, so every list menu can export rather than only the one on the List itself.
+  const exportList = useMutation({
+    mutationFn: () => queryClient.ensureQueryData(listQuery(listUid)),
+    onSuccess: ({ items }) => download(exportFileFor(list, items)),
   })
 
   const duplicate = useMutation({
@@ -137,11 +138,7 @@ export function ListActions({ list, instanceName, items, withControls }: ListAct
         )}
         <MenuItem onSelect={() => duplicate.mutate()}>{t("sidebarMenu.duplicate")}</MenuItem>
 
-        {items && (
-          <MenuItem onSelect={() => download(exportFileFor(list, items))}>
-            {t("listMenu.export")}
-          </MenuItem>
-        )}
+        <MenuItem onSelect={() => exportList.mutate()}>{t("listMenu.export")}</MenuItem>
 
         {/* Grouped with Duplicate and above Delete, per the design. Archiving is not
             deleting — it keeps everything and comes back — so it is not destructive and

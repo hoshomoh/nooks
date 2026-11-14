@@ -14,7 +14,7 @@ import { ListActions } from "@/components/ds/list-actions"
 import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { EmptyState } from "@/components/ds/empty-state"
-import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
+import { ListRow, type ListRowLabels, type RowLayout } from "@/components/ds/list-row"
 import { PrintSheet } from "@/components/ds/print-sheet"
 import { lazyNamed } from "@/components/ds/lazy"
 import type { NoteSheetProps } from "@/components/ds/note-sheet"
@@ -34,7 +34,8 @@ import { useDueLabel } from "@/lib/use-due-label"
 import { useLocale } from "@/lib/use-locale"
 import { useCommandPalette } from "@/lib/use-command-palette"
 import { useLive } from "@/lib/use-live"
-import { doneAttribution, type DoneAttribution, groupDone } from "@/lib/done-groups"
+import { groupDone } from "@/lib/done-groups"
+import { addedBy, tickedBy } from "@/lib/row-person"
 import { useDoneDayLabels } from "@/lib/use-done-day-labels"
 import { useSignedInData } from "@/lib/use-signed-in-data"
 import { useNow } from "@/lib/use-now"
@@ -191,6 +192,19 @@ export function ListScreen() {
   const openItem = list.items.find((item) => item.uid === openItemUid)
   const open = list.items.filter((item) => !item.done)
   const done = list.items.filter((item) => item.done)
+  // Every row keeps the person slot, and the note slot wherever any row needs it, so
+  // circles and note marks line up down the List.
+  const openLayout: RowLayout = {
+    people: true,
+    notes: open.some((item) => item.note),
+    narrow: openItem !== undefined,
+  }
+  const doneLayout: RowLayout = {
+    people: true,
+    notes: done.some((item) => item.note),
+    narrow: openItem !== undefined,
+    dense: true,
+  }
   /*
    * Whether the older ticks have been asked for.
    *
@@ -286,8 +300,8 @@ export function ListScreen() {
                     label={item.label}
                     quantity={item.quantity}
                     notSynced={queued.itemUids.has(item.uid) || isProvisional(item.uid)}
-                    addedByName={item.addedByName}
-                    addedVia={viaLabel(t, item.addedViaToken)}
+                    person={addedBy(t, item.addedByName, item.addedViaToken)}
+                    layout={openLayout}
                     dueLabel={due.label(item.dueOn)}
                     overdue={isOverdue(item.dueOn, from)}
                     justTicked={justTickedByAnother(item)}
@@ -370,7 +384,9 @@ export function ListScreen() {
                         key={item.uid}
                         label={item.label}
                         quantity={item.quantity}
-                        addedByName={attribute(t, doneAttribution(item.doneByName, clock(item.doneAt)))}
+                        person={tickedBy(item.doneByName)}
+                        doneWhen={clock(item.doneAt)}
+                        layout={doneLayout}
                         done
                         hasNote={Boolean(item.note)}
                         justTicked={justTickedByAnother(item)}
@@ -469,17 +485,3 @@ function sharingKey(sharing: Sharing, canEdit: boolean): string {
   return canEdit ? "list.sharedCanEdit" : "list.sharedReadOnly"
 }
 
-/**
- * viaLabel says what an Item came through, when that was not a browser.
- *
- * Nothing for the ordinary case, so a List nobody scripts against reads exactly as it
- * did before tokens existed.
- */
-function viaLabel(t: Translate, tokenName: string): string | undefined {
-  return tokenName ? t("list.addedVia", { name: tokenName }) : undefined
-}
-
-/** attribute reads one of the two done lines, whichever the Item can support. */
-function attribute(t: Translate, said: DoneAttribution): string {
-  return t(said.key, said.values)
-}

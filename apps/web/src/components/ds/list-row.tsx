@@ -1,7 +1,9 @@
 import type { ReactNode } from "react"
 import { cn } from "cn"
 
+import { initialOf } from "@/lib/initial"
 
+import { Avatar } from "./avatar"
 import { Checkbox } from "./checkbox"
 import { COVERING, INERT, RAISED } from "./covering"
 import { EditableTitle } from "./editable-title"
@@ -9,10 +11,10 @@ import { Icon } from "./icon"
 
 export type ListRowProps = {
   label: string
-  /** Free text — "2", "1 kg". Rendered as a mono badge beside the label. */
+  /** Free text — "2", "1 kg". Plain text on the right, capped so a long one ends in "…". */
   quantity?: string
-  /** Who put it on the List. Sits at the right of the row. */
-  addedByName?: string
+  /** Whose circle sits at the right of the row: who added it, or who ticked it. */
+  person?: RowPerson
   /**
    * Which List it is on, for a view that gathers Items from several.
    *
@@ -20,17 +22,12 @@ export type ListRowProps = {
    * an Item lives is part of reading the Item, not a fact filed after it.
    */
   listName?: string
-  /**
-   * What it came through, when that was not a browser: "Anna · via Kitchen tablet".
-   *
-   * The Member is still named. A token is somebody's access narrowed, never an identity
-   * of its own, so a row says who did it and only then what through.
-   */
-  addedVia?: string
   /** A date, already formatted for reading: "Fri", "Mon 1 Sep". */
   dueLabel?: string
   /** Overdue dates are the one thing in a row that takes a meaning colour. */
   overdue?: boolean
+  /** When it was ticked, "08:12", in the place a date takes on an open row. */
+  doneWhen?: string
   done?: boolean
   /** Someone else ticked it a moment ago. */
   justTicked?: boolean
@@ -52,10 +49,10 @@ export type ListRowProps = {
   trouble?: ReactNode
   /** Whether that trouble was a refusal, which the row itself is drawn for. */
   failed?: boolean
-  /** The Note attached to the Item, previewed under the row. */
   /** The Item carries a Note. The Note itself is read in the sheet, not on the row. */
   hasNote?: boolean
-  /** How "+N lines" reads in the Member's language. */
+  /** How the List lays its rows out, so the slots line up from one row to the next. */
+  layout?: RowLayout
   onToggle?: (done: boolean) => void
   /** Opening the Item slides the sheet in; the List keeps its place behind it. */
   onOpen?: () => void
@@ -64,12 +61,39 @@ export type ListRowProps = {
   /** What a screen reader calls the label field and the rest of the row. */
   labels: ListRowLabels
   /**
-   * The row's own `···`, shown on hover.
+   * The row's own `···`, shown on hover in the person's slot.
    *
    * Passed in rather than built here: what can be done to an Item is the screen's
    * business, and a row that knew would need every mutation the screen has.
    */
   menu?: ReactNode
+}
+
+/** A person drawn as a circle at the end of a row. */
+export interface RowPerson {
+  /** Whose letter the circle carries. */
+  name: string
+  /** What the circle says on hover and to a screen reader: "Anna via Kitchen tablet". */
+  said: string
+  /** It came in through an access token, which the circle marks with a spark. */
+  viaToken?: boolean
+}
+
+/**
+ * What the List decides for every row on it, so the slots line up down the page.
+ *
+ * DESIGN.md §6: only the person and the note keep their width. Everything else takes no
+ * room on a row without it, so a label's width varies and the circles do not.
+ */
+export interface RowLayout {
+  /** Some row on the List names a person, so every row keeps the slot. */
+  people?: boolean
+  /** Some Item on the List has a Note, so every row keeps the slot. */
+  notes?: boolean
+  /** The side sheet is open and the row is narrower, so the quantity gets less. */
+  narrow?: boolean
+  /** The completed section's shorter row. */
+  dense?: boolean
 }
 
 /** The words the row needs that are not the Item's own. */
@@ -88,42 +112,48 @@ export interface ListRowLabels {
 /**
  * The list row — the core component; everything else is furniture around it.
  *
- * DESIGN.md §6: 44px minimum however much metadata it carries. The grid is
- * `20px 1fr auto`, so the label always starts at the same x, and truncation happens in
- * the label rather than in the metadata — a row never grows and never reflows.
+ * DESIGN.md §6: 44px however much metadata it carries. The grid is `20px 1fr auto` and
+ * aligned to the top of a 24px line, so the label always starts at the same x, and
+ * truncation happens in the label rather than in the metadata — a row never grows and
+ * never reflows.
  */
 export function ListRow({
   label,
   quantity,
-  addedByName,
-  addedVia,
+  person,
   listName,
   dueLabel,
   overdue,
+  doneWhen,
   done,
   justTicked,
   notSynced,
   trouble,
   failed,
   hasNote,
+  layout = {},
   onToggle,
   onOpen,
   onRename,
   labels,
   menu,
 }: ListRowProps) {
+  const personSlot = layout.people || person !== undefined || menu !== undefined
+  const noteSlot = layout.notes || hasNote
+
   return (
     <div className="flex flex-col">
       <div
         className={cn(
-          "group relative grid min-h-row grid-cols-[20px_1fr_auto] items-center gap-3.5 rounded-md px-2 py-1.5 -mx-2",
+          "group relative grid grid-cols-[20px_1fr_auto] items-start gap-3.5 rounded-md border border-transparent px-2 -mx-2",
+          layout.dense ? "min-h-9 py-1.5" : "min-h-row py-2.25",
           "transition-colors duration-150 hover:bg-secondary",
           // The animation paints the highlight and takes it away again; the class
           // must not also paint it, or it would never settle.
           justTicked && "animate-settle",
           // A refusal is the one thing that colours the row. A conflict does not: both
           // versions are somebody's words, and neither of them is an error.
-          failed && "border border-destructive-line bg-destructive-bg hover:bg-destructive-bg",
+          failed && "border-destructive-line bg-destructive-bg hover:bg-destructive-bg",
         )}
       >
         {/* The whole row opens the Item — a 44px row is a target, and asking a Member
@@ -135,14 +165,16 @@ export function ListRow({
 
         {/* Nothing to tick with is a checkbox that says what the Item is and does not
             pretend to be a control: a read-only List still shows what was done. */}
-        <Checkbox
-          checked={done}
-          justTicked={justTicked}
-          onCheckedChange={onToggle}
-          disabled={!onToggle}
-        />
+        <span className="grid h-6 place-items-center">
+          <Checkbox
+            checked={done}
+            justTicked={justTicked}
+            onCheckedChange={onToggle}
+            disabled={!onToggle}
+          />
+        </span>
 
-        <span className={cn(RAISED, "flex min-w-0 items-baseline gap-2.5")}>
+        <span className={cn(RAISED, "flex h-6 min-w-0 items-center gap-2.5")}>
           <EditableTitle
             value={label}
             onCommit={onRename}
@@ -155,50 +187,69 @@ export function ListRow({
             clickTo={onOpen ? "open" : "edit"}
             onOpen={onOpen}
             className={cn(
-              "min-w-0 truncate text-body",
+              "min-w-0 truncate leading-6",
+              layout.dense ? "text-note" : "text-body",
               done && "text-muted-foreground line-through decoration-done-strike",
             )}
           />
 
-          {quantity && (
-            <span className="shrink-0 rounded-sm border border-border px-1.5 py-px font-mono text-badge text-muted-foreground">
-              {quantity}
-            </span>
-          )}
-
           {listName && (
             <span className="shrink-0 text-micro text-secondary-foreground">{listName}</span>
           )}
-
-          {notSynced && (
-            <span className="shrink-0 rounded-sm border border-offline-line bg-offline-bg px-1.5 py-px text-micro text-offline-text">
-              {labels.notSynced}
-            </span>
-          )}
         </span>
 
-        {/* The metadata and the menu share the last column: the menu takes its place on
-            hover rather than sitting beside it, because a row that widens as the
-            pointer crosses it is a row nobody can aim at. */}
-        <span className={cn(RAISED, "flex items-center justify-end gap-3")}>
-          <span className={cn(INERT, "flex items-center gap-3 whitespace-nowrap text-micro text-muted-foreground")}>
+        {/* Status, date, quantity, then the two slots that keep their width. */}
+        <span className={cn(RAISED, "flex h-6 items-center justify-end gap-3 whitespace-nowrap")}>
+          <span className={cn(INERT, "flex min-w-0 items-center gap-3 text-micro text-muted-foreground")}>
+            {notSynced && (
+              <span className="shrink-0 rounded-sm border border-offline-line bg-offline-bg px-1.5 py-px text-offline-text">
+                {labels.notSynced}
+              </span>
+            )}
             {dueLabel && (
-              <span className={overdue ? "text-overdue" : "text-shared"}>{dueLabel}</span>
+              <span className={cn("shrink-0", overdue ? "text-overdue" : "text-shared")}>{dueLabel}</span>
             )}
-            {hasNote && (
-              <Icon name="note" size="small" className="size-3.5 text-control" aria-hidden />
+            {doneWhen && <span className="shrink-0">{doneWhen}</span>}
+            {quantity && (
+              <span
+                title={quantity}
+                className={cn("min-w-0 truncate", layout.narrow ? "max-w-24" : "max-w-30")}
+              >
+                {quantity}
+              </span>
             )}
-            {addedByName && <span>{addedByName}</span>}
-            {addedVia && <span className="text-muted-foreground">{addedVia}</span>}
           </span>
 
-          {/* The `···` has a slot of its own, always the same size, so the row's
-              metadata neither moves nor disappears when the pointer crosses it. Hidden
-              by opacity rather than by display: a trigger that stops being rendered
-              takes with it the element its menu is positioned against. */}
-          {menu && (
-            <span className="-mr-1 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100 has-[[data-popup-open]]:opacity-100">
-              {menu}
+          {/* The `···` takes the person's place on hover rather than sitting beside it,
+              because a row that widens as the pointer crosses it is a row nobody can aim
+              at. Both stay mounted and trade by opacity: a trigger that stops being
+              rendered takes with it the element its menu is positioned against. */}
+          {personSlot && (
+            <span className="relative grid h-6 w-6.5 shrink-0 place-items-center">
+              {person && (
+                <span
+                  className={cn(
+                    INERT,
+                    "transition-opacity",
+                    menu && "group-hover:opacity-0 group-focus-within:opacity-0 group-has-[[data-popup-open]]:opacity-0",
+                  )}
+                >
+                  <PersonCircle person={person} />
+                </span>
+              )}
+              {menu && (
+                <span className="absolute inset-0 grid place-items-center opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 group-has-[[data-popup-open]]:opacity-100">
+                  {menu}
+                </span>
+              )}
+            </span>
+          )}
+
+          {noteSlot && (
+            <span className={cn(INERT, "grid h-6 w-4 shrink-0 place-items-center")}>
+              {hasNote && (
+                <Icon name="note" size="small" className="size-3.5 text-control" aria-hidden />
+              )}
             </span>
           )}
         </span>
@@ -213,5 +264,28 @@ export function ListRow({
         </div>
       )}
     </div>
+  )
+}
+
+interface PersonCircleProps {
+  person: RowPerson
+}
+
+/** The small avatar a row ends in, with a spark when it came in through a token. */
+function PersonCircle({ person }: PersonCircleProps) {
+  return (
+    <span role="img" title={person.said} aria-label={person.said} className="relative grid">
+      <Avatar badge={initialOf(person.name)} size="small" />
+      {person.viaToken && (
+        <span
+          aria-hidden
+          className="absolute -right-0.75 -bottom-0.75 grid size-3 place-items-center rounded-full border-2 border-background bg-shared text-background"
+        >
+          <svg viewBox="0 0 6 6" className="size-1.5" fill="currentColor">
+            <path d="M3 0l.8 2.2L6 3l-2.2.8L3 6l-.8-2.2L0 3l2.2-.8z" />
+          </svg>
+        </span>
+      )}
+    </span>
   )
 }

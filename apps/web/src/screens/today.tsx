@@ -7,7 +7,7 @@ import { ActivityControl } from "@/components/ds/activity-control"
 import { ChromeBar } from "@/components/ds/chrome-bar"
 import { DatedAddRow } from "@/components/ds/dated-add-row"
 import { EmptyState } from "@/components/ds/empty-state"
-import { ListRow, type ListRowLabels } from "@/components/ds/list-row"
+import { ListRow, type ListRowLabels, type RowLayout } from "@/components/ds/list-row"
 import { SectionHeading } from "@/components/ds/section-heading"
 import { ViewSwitch } from "@/components/ds/view-switch"
 import { listClient } from "@/lib/api"
@@ -16,6 +16,7 @@ import type { RenameItemVariables } from "@/lib/item-mutations"
 import type { DatedItem } from "@nooks/api"
 import { dayFullHeading, isDueToday, isOverdue, today, toStored } from "@/lib/dates"
 import { refreshLists } from "@/lib/refresh"
+import { addedBy } from "@/lib/row-person"
 import { useQueuedChanges } from "@/lib/use-queued-changes"
 import { useSetDone } from "@/lib/use-item-changes"
 import { useCommandPalette } from "@/lib/use-command-palette"
@@ -165,11 +166,15 @@ export interface DatedRowProps {
   labels: ListRowLabels
 }
 
+/** Every dated row keeps the person slot, so the circles line up across the days. */
+const DATED_LAYOUT: RowLayout = { people: true }
+
 /**
- * A row in a dated view. It names the List instead of who added it: away from its own
- * List, where an Item lives matters more than who put it there.
+ * A row in a dated view. It names the List beside the label: away from its own List,
+ * where an Item lives is part of reading it.
  */
 export function DatedRow({ entry, dueLabel, overdue, onToggle, onRename, labels }: DatedRowProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const queued = useQueuedChanges()
   const item = entry.item
@@ -182,7 +187,8 @@ export function DatedRow({ entry, dueLabel, overdue, onToggle, onRename, labels 
       label={item.label}
       quantity={item.quantity}
       listName={entry.listName}
-      addedByName={item.addedByName}
+      person={addedBy(t, item.addedByName, item.addedViaToken)}
+      layout={DATED_LAYOUT}
       dueLabel={dueLabel}
       overdue={overdue}
       notSynced={queued.itemUids.has(item.uid)}

@@ -15,20 +15,53 @@ const labels: ListRowLabels = {
 }
 
 describe("the list row", () => {
-  // A token is somebody's access narrowed, never an identity of its own, so a row says
-  // who did it and only then what through.
-  it("names the Member as well as the token an Item came through", () => {
-    render(<ListRow label="Milk" addedByName="Anna" addedVia="via Kitchen tablet" labels={labels} />)
+  // The person is a circle with one letter, and the whole name is what it says.
+  it("ends in the circle of whoever added it", () => {
+    render(<ListRow label="Milk" person={{ name: "Anna", said: "Anna" }} labels={labels} />)
 
-    expect(screen.getByText("Anna")).toBeInTheDocument()
-    expect(screen.getByText("via Kitchen tablet")).toBeInTheDocument()
+    const circle = screen.getByRole("img", { name: "Anna" })
+    expect(circle).toHaveTextContent("A")
   })
 
-  it("says nothing about a token when a browser added the Item", () => {
-    render(<ListRow label="Milk" addedByName="Anna" labels={labels} />)
+  // A token is somebody's access narrowed, never an identity of its own, so the circle
+  // is the Member's and the token is said after their name.
+  it("names the Member as well as the token an Item came through", () => {
+    render(
+      <ListRow
+        label="Milk"
+        person={{ name: "Anna", said: "Anna via Kitchen tablet", viaToken: true }}
+        labels={labels}
+      />,
+    )
 
-    expect(screen.getByText("Anna")).toBeInTheDocument()
-    expect(screen.queryByText(/via/)).not.toBeInTheDocument()
+    expect(screen.getByRole("img", { name: "Anna via Kitchen tablet" })).toBeInTheDocument()
+  })
+
+  // A quantity is plain words, not a badge, and a long one is cut rather than widening
+  // the row, with the whole of it a hover away.
+  it("says a quantity as plain text, cut short when it is long", () => {
+    render(<ListRow label="Coffee" quantity="H · E-invoice, the long estimate" labels={labels} />)
+
+    const quantity = screen.getByText("H · E-invoice, the long estimate")
+    expect(quantity).toHaveAttribute("title", "H · E-invoice, the long estimate")
+    expect(quantity).toHaveClass("truncate", "max-w-30")
+    expect(quantity.className).not.toMatch(/border|font-mono/)
+  })
+
+  it("gives a quantity less room while the sheet is open", () => {
+    render(<ListRow label="Coffee" quantity="250 g" layout={{ narrow: true }} labels={labels} />)
+
+    expect(screen.getByText("250 g")).toHaveClass("max-w-24")
+  })
+
+  // DESIGN.md §6: the note slot is kept on every row of a List with any Note, so the
+  // marks line up, and it is the last thing on the row.
+  it("keeps the note slot on a row with no Note, where the List has some", () => {
+    const { container } = render(<ListRow label="Milk" layout={{ notes: true }} labels={labels} />)
+    const last = container.querySelector(".grid-cols-\\[20px_1fr_auto\\] > :last-child > :last-child")
+
+    expect(last).toHaveClass("w-4")
+    expect(last?.querySelector("svg")).toBeNull()
   })
 
   it("opens the Item from anywhere in the row, not only its label", async () => {
@@ -107,18 +140,24 @@ describe("the list row", () => {
 
   // Two regressions this catches, both from making the `···` appear on hover.
   describe("the row's own menu", () => {
-    it("keeps the metadata on screen, rather than swapping it for the menu", () => {
+    // The `···` takes the person's place on hover, and nothing else moves: the date
+    // stays where it was read.
+    it("trades places with the person, and leaves the rest where it was", () => {
       render(
         <ListRow
           label="Milk"
-          addedByName="Anna"
+          person={{ name: "Anna", said: "Anna" }}
           dueLabel="Fri"
           labels={labels}
           menu={<button type="button">More</button>}
         />,
       )
 
-      expect(screen.getByText("Anna")).toBeInTheDocument()
+      const circle = screen.getByRole("img", { name: "Anna" })
+      const menu = screen.getByRole("button", { name: "More" })
+      expect(circle.parentElement?.parentElement).toBe(menu.parentElement?.parentElement)
+      expect(circle.parentElement).toHaveClass("group-hover:opacity-0")
+      expect(menu.parentElement).toHaveClass("opacity-0", "group-hover:opacity-100")
       expect(screen.getByText("Fri")).toBeInTheDocument()
     })
 

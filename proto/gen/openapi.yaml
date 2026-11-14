@@ -720,6 +720,8 @@ paths:
                         - LIST_ORDER_UPDATED
                         - LIST_ORDER_NAME
                         - LIST_ORDER_OPEN
+                        - LIST_ORDER_NEWEST
+                        - LIST_ORDER_OLDEST
                     type: string
                     format: enum
                 - name: page

@@ -290,6 +290,10 @@ func orderFromProto(order apiv1.ListOrder) store.ListOrder {
 		return store.OrderName
 	case apiv1.ListOrder_LIST_ORDER_OPEN:
 		return store.OrderOpen
+	case apiv1.ListOrder_LIST_ORDER_NEWEST:
+		return store.OrderNewest
+	case apiv1.ListOrder_LIST_ORDER_OLDEST:
+		return store.OrderOldest
 	default:
 		return store.OrderUpdated
 	}

@@ -124,6 +124,32 @@ func TestListsPageOrdersAsAsked(t *testing.T) {
 	}
 }
 
+// When a List was made is its own order, and a later change to it does not move it.
+func TestListsPageOrdersByWhenMade(t *testing.T) {
+	for _, d := range drivers() {
+		t.Run(d.name, func(t *testing.T) {
+			s := d.open(t)
+			owner := newMember(t, s)
+			withItems(t, s, owner, "avocados", 1, 0, createdAt)
+			withItems(t, s, owner, "Bread", 1, 0, createdAt.Add(time.Hour))
+			withItems(t, s, owner, "cheese", 1, 0, createdAt.Add(2*time.Hour))
+			if err := s.RenameList(t.Context(), "list_avocados", "avocados", createdAt.Add(3*time.Hour)); err != nil {
+				t.Fatalf("RenameList: %v", err)
+			}
+
+			newest, _ := page(t, s, ListQuery{MemberID: owner.ID, Order: OrderNewest})
+			if fmt.Sprint(newest) != "[cheese Bread avocados]" {
+				t.Errorf("newest first = %v", newest)
+			}
+
+			oldest, _ := page(t, s, ListQuery{MemberID: owner.ID, Order: OrderOldest})
+			if fmt.Sprint(oldest) != "[avocados Bread cheese]" {
+				t.Errorf("oldest first = %v", oldest)
+			}
+		})
+	}
+}
+
 /*
 The page is cut after the order, not before.
 

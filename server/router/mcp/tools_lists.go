@@ -17,7 +17,7 @@ type listListsArgs struct {
 	// Without these an archived list cannot be found again, which would make
 	// archive_list a one way door.
 	Status string `json:"status,omitempty" jsonschema:"which lists to show: active for ones still in play, completed for ones with everything ticked, archived for ones put away, deleted for ones still inside the thirty days they can be restored, or leave it out for everything except archived and deleted"`
-	Order  string `json:"order,omitempty" jsonschema:"how to order them: updated for what changed last, name, or open for the fullest first. Leave it out for updated"`
+	Order  string `json:"order,omitempty" jsonschema:"how to order them: updated for what changed last, name, open for the fullest first, newest or oldest by when it was made. Leave it out for updated"`
 }
 
 type getListArgs struct {
@@ -62,6 +62,8 @@ var orderWords = map[string]apiv1.ListOrder{
 	"updated": apiv1.ListOrder_LIST_ORDER_UPDATED,
 	"name":    apiv1.ListOrder_LIST_ORDER_NAME,
 	"open":    apiv1.ListOrder_LIST_ORDER_OPEN,
+	"newest":  apiv1.ListOrder_LIST_ORDER_NEWEST,
+	"oldest":  apiv1.ListOrder_LIST_ORDER_OLDEST,
 }
 
 // addListTools registers what can be done to a List itself, as opposed to what is on it.

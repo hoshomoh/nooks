@@ -149,6 +149,10 @@ const (
 	ListOrder_LIST_ORDER_UPDATED     ListOrder = 1
 	ListOrder_LIST_ORDER_NAME        ListOrder = 2
 	ListOrder_LIST_ORDER_OPEN        ListOrder = 3
+	// Most recently made first.
+	ListOrder_LIST_ORDER_NEWEST ListOrder = 4
+	// Longest held first.
+	ListOrder_LIST_ORDER_OLDEST ListOrder = 5
 )
 
 // Enum value maps for ListOrder.
@@ -158,12 +162,16 @@ var (
 		1: "LIST_ORDER_UPDATED",
 		2: "LIST_ORDER_NAME",
 		3: "LIST_ORDER_OPEN",
+		4: "LIST_ORDER_NEWEST",
+		5: "LIST_ORDER_OLDEST",
 	}
 	ListOrder_value = map[string]int32{
 		"LIST_ORDER_UNSPECIFIED": 0,
 		"LIST_ORDER_UPDATED":     1,
 		"LIST_ORDER_NAME":        2,
 		"LIST_ORDER_OPEN":        3,
+		"LIST_ORDER_NEWEST":      4,
+		"LIST_ORDER_OLDEST":      5,
 	}
 )
 
@@ -3024,12 +3032,14 @@ const file_nooks_api_v1_list_service_proto_rawDesc = "" +
 	"\x12LIST_STATUS_ACTIVE\x10\x01\x12\x19\n" +
 	"\x15LIST_STATUS_COMPLETED\x10\x02\x12\x18\n" +
 	"\x14LIST_STATUS_ARCHIVED\x10\x03\x12\x17\n" +
-	"\x13LIST_STATUS_DELETED\x10\x04*i\n" +
+	"\x13LIST_STATUS_DELETED\x10\x04*\x97\x01\n" +
 	"\tListOrder\x12\x1a\n" +
 	"\x16LIST_ORDER_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x12LIST_ORDER_UPDATED\x10\x01\x12\x13\n" +
 	"\x0fLIST_ORDER_NAME\x10\x02\x12\x13\n" +
-	"\x0fLIST_ORDER_OPEN\x10\x03*~\n" +
+	"\x0fLIST_ORDER_OPEN\x10\x03\x12\x15\n" +
+	"\x11LIST_ORDER_NEWEST\x10\x04\x12\x15\n" +
+	"\x11LIST_ORDER_OLDEST\x10\x05*~\n" +
 	"\rSearchHitKind\x12\x1f\n" +
 	"\x1bSEARCH_HIT_KIND_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14SEARCH_HIT_KIND_LIST\x10\x01\x12\x18\n" +

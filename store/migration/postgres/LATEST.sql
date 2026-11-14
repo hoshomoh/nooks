@@ -109,6 +109,8 @@ CREATE INDEX idx_list_live_name ON list (lower(name))
   WHERE deleted_at = '' AND archived_at = '';
 CREATE INDEX idx_list_live_updated ON list (updated_at DESC)
   WHERE deleted_at = '' AND archived_at = '';
+CREATE INDEX idx_list_live_created ON list (created_at DESC)
+  WHERE deleted_at = '' AND archived_at = '';
 CREATE INDEX idx_list_live_open ON list (open_count DESC, lower(name) ASC)
   WHERE deleted_at = '' AND archived_at = '';
 CREATE INDEX idx_list_live_owner_name ON list (owner_id, lower(name))

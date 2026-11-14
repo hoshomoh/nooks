@@ -190,6 +190,8 @@ const (
 	OrderUpdated ListOrder = "UPDATED"
 	OrderName    ListOrder = "NAME"
 	OrderOpen    ListOrder = "OPEN"
+	OrderNewest  ListOrder = "NEWEST"
+	OrderOldest  ListOrder = "OLDEST"
 )
 
 // ListQuery is one page of the Lists a Member can reach.
@@ -340,6 +342,10 @@ func orderListsBy(query *bun.SelectQuery, order ListOrder) *bun.SelectQuery {
 		// Fullest first, and by name between equals, so the order does not shuffle
 		// every time something is ticked.
 		return query.OrderExpr("list.open_count DESC").OrderExpr(byName)
+	case OrderNewest:
+		return query.OrderExpr("list.created_at DESC")
+	case OrderOldest:
+		return query.OrderExpr("list.created_at ASC")
 	default:
 		return query.OrderExpr("list.updated_at DESC")
 	}

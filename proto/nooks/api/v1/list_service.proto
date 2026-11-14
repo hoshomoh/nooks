@@ -295,6 +295,10 @@ enum ListOrder {
   LIST_ORDER_UPDATED = 1;
   LIST_ORDER_NAME = 2;
   LIST_ORDER_OPEN = 3;
+  // Most recently made first.
+  LIST_ORDER_NEWEST = 4;
+  // Longest held first.
+  LIST_ORDER_OLDEST = 5;
 }
 
 message ListListsRequest {

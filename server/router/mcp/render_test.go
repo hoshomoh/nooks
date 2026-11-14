@@ -212,6 +212,18 @@ func TestAPlainListSaysNothingExtra(t *testing.T) {
 	}
 }
 
+// A deleted List says when it goes, so a caller can say how long is left to restore it.
+func TestADeletedListSaysWhenItGoesForGood(t *testing.T) {
+	said := listLine(&apiv1.List{
+		Uid: "list_old", Name: "Old", CanEdit: true,
+		PurgeAt: "2026-12-14T10:00:00Z",
+	})
+
+	if !strings.Contains(said, "removed for good on 2026-12-14") {
+		t.Errorf("row = %q, want it to say the day it is removed", said)
+	}
+}
+
 // Unread is the only reason to read the panel twice.
 func TestAnActivityRowSaysWhetherItIsNews(t *testing.T) {
 	unread := activityLine(&apiv1.Activity{

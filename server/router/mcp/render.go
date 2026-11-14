@@ -3,6 +3,7 @@ package mcp
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	apiv1 "github.com/hoshomoh/nooks/proto/gen/nooks/api/v1"
 )
@@ -88,7 +89,20 @@ func listLine(list *apiv1.List) string {
 	if at := list.GetArchivedAt(); at != "" {
 		fmt.Fprintf(&said, ", archived by %s", list.GetArchivedByName())
 	}
+	if at := list.GetPurgeAt(); at != "" {
+		fmt.Fprintf(&said, ", removed for good on %s", dayOf(at))
+	}
 	return said.String()
+}
+
+// dayOf is the day an RFC 3339 moment falls on, which is all a caller needs to say
+// when something happens. A moment that does not parse is passed through as sent.
+func dayOf(moment string) string {
+	at, err := time.Parse(time.RFC3339, moment)
+	if err != nil {
+		return moment
+	}
+	return at.Format(time.DateOnly)
 }
 
 /*

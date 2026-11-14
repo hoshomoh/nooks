@@ -17,6 +17,8 @@
     "@base-ui/react": "^1.9.0",
     "@connectrpc/connect": "^2.3.0",
     "@connectrpc/connect-web": "^2.3.0",
+    "@dnd-kit/dom": "0.5.3",
+    "@dnd-kit/react": "0.5.3",
     "@fontsource-variable/public-sans": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@nooks/api": "workspace:*",

@@ -165,4 +165,22 @@ describe("moving an Item", () => {
 
     await waitFor(() => expect(rowOrder()).toEqual(["Milk", "Oats", "Eggs"]))
   })
+
+  // DESIGN.md §6: open Items carry a grip; completed ones do not move.
+  it("offers a grip on each open row, and none on a completed one", async () => {
+    const tickedToday = { ...eggs, done: true, doneAt: new Date().toISOString() } as Item
+    show(NOBODY_ELSE, onShelf(milk, oats, tickedToday))
+    await openDone()
+
+    await waitFor(() => expect(screen.getAllByRole("checkbox")).toHaveLength(3))
+    expect(screen.getAllByRole("button", { name: "Drag to reorder" })).toHaveLength(2)
+  })
+
+  // Reordering changes the List for everyone on it, so it is an edit like any other.
+  it("offers no grip on a List the Member may only read", async () => {
+    show(NOBODY_ELSE, { list: { uid: "l1", name: "Groceries" }, items: [milk, oats] } as GetListResponse)
+
+    await waitFor(() => expect(screen.getAllByRole("checkbox")).toHaveLength(2))
+    expect(screen.queryByRole("button", { name: "Drag to reorder" })).not.toBeInTheDocument()
+  })
 })

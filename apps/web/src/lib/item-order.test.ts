@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import type { Item } from "@nooks/api"
 
-import { movedAfter, placeFor } from "./item-order"
+import { movedAfter, placeAfterDrop, placeFor } from "./item-order"
 
 /** shelf is Items in their order, by label, which is all this reads. */
 function shelf(...labels: string[]): Item[] {
@@ -55,5 +55,31 @@ describe("showing a move before it is answered", () => {
 
   it("leaves the List alone for an Item it does not hold", () => {
     expect(labelsOf(movedAfter(items, { itemUid: "item_gone", afterItemUid: "" }))).toEqual(labelsOf(items))
+  })
+})
+
+describe("dropping an Item somewhere new", () => {
+  const open = shelf("milk", "oats", "eggs", "bread")
+
+  it("lands after whatever ends up just above it, going down", () => {
+    expect(placeAfterDrop(open, 0, 2)).toEqual({ itemUid: "item_milk", afterItemUid: "item_eggs" })
+  })
+
+  it("lands after whatever ends up just above it, going up", () => {
+    expect(placeAfterDrop(open, 3, 1)).toEqual({ itemUid: "item_bread", afterItemUid: "item_milk" })
+  })
+
+  it("goes to the top when dropped first", () => {
+    expect(placeAfterDrop(open, 2, 0)).toEqual({ itemUid: "item_eggs", afterItemUid: "" })
+  })
+
+  // Picked up and put down where it was, so nothing is sent.
+  it("is nothing when it is put back where it started", () => {
+    expect(placeAfterDrop(open, 1, 1)).toBeNull()
+  })
+
+  it("agrees with the order shown before the Instance answers", () => {
+    const place = placeAfterDrop(open, 0, 3)
+    expect(place && labelsOf(movedAfter(open, place))).toEqual(["oats", "eggs", "bread", "milk"])
   })
 })

@@ -49,3 +49,19 @@ export function movedAfter(items: readonly Item[], place: MovePlace): Item[] {
   const at = place.afterItemUid === "" ? 0 : rest.findIndex((item) => item.uid === place.afterItemUid) + 1
   return [...rest.slice(0, at), moving, ...rest.slice(at)]
 }
+
+/**
+ * placeAfterDrop is where dropping an open Item at a new index lands it, or null when it
+ * was put back where it started.
+ *
+ * Read off the order as it will be once the Item is out of its old place and in its new
+ * one, so the Item it lands after is whichever ends up just above it.
+ */
+export function placeAfterDrop(open: readonly Item[], from: number, to: number): MovePlace | null {
+  const moving = open[from]
+  if (!moving || from === to) {
+    return null
+  }
+  const rest = open.filter((item) => item.uid !== moving.uid)
+  return { itemUid: moving.uid, afterItemUid: to === 0 ? "" : (rest[to - 1]?.uid ?? "") }
+}

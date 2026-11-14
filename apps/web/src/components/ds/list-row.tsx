@@ -61,6 +61,8 @@ export type ListRowProps = {
   onRename?: (label: string) => void
   /** ⌥↑ or ⌥↓ pressed anywhere in the row. Absent where the order is not the Member's. */
   onMove?: Mover
+  /** Picking the row up to drop it elsewhere. Absent where it cannot be moved. */
+  drag?: RowDrag
   /** What a screen reader calls the label field and the rest of the row. */
   labels: ListRowLabels
   /**
@@ -70,6 +72,18 @@ export type ListRowProps = {
    * business, and a row that knew would need every mutation the screen has.
    */
   menu?: ReactNode
+}
+
+/** What a row needs from the drag library to be picked up by its grip. */
+export interface RowDrag {
+  /** The row itself, which is what moves. */
+  ref: (element: Element | null) => void
+  /** The grip, the only part that picks the row up. */
+  handleRef: (element: Element | null) => void
+  /** This row is the one being carried. */
+  lifted: boolean
+  /** What the grip is called, to a screen reader and on hover. */
+  label: string
 }
 
 /** A person drawn as a circle at the end of a row. */
@@ -139,6 +153,7 @@ export function ListRow({
   onOpen,
   onRename,
   onMove,
+  drag,
   labels,
   menu,
 }: ListRowProps) {
@@ -148,6 +163,7 @@ export function ListRow({
   return (
     <div className="flex flex-col">
       <div
+        ref={drag?.ref}
         onKeyDown={onMove && ((event) => moveOnArrow(event, onMove))}
         className={cn(
           "group relative grid grid-cols-[20px_1fr_auto] items-start gap-3.5 rounded-md border border-transparent px-2 -mx-2",
@@ -159,8 +175,34 @@ export function ListRow({
           // A refusal is the one thing that colours the row. A conflict does not: both
           // versions are somebody's words, and neither of them is an error.
           failed && "border-destructive-line bg-destructive-bg hover:bg-destructive-bg",
+          // Carried: lifted off the List on the page's own ground, DESIGN.md §6.
+          drag?.lifted && "cursor-grabbing border-border bg-background shadow-floating hover:bg-background",
         )}
       >
+        {/* In the margin, outside the row, so showing it moves nothing inside the row. */}
+        {drag && (
+          <button
+            type="button"
+            ref={drag.handleRef}
+            aria-label={drag.label}
+            title={drag.label}
+            className={cn(
+              "absolute top-2.25 -left-5.5 grid h-6 w-4.5 cursor-grab place-items-center rounded-sm text-control opacity-0 transition-opacity",
+              "group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100",
+              drag.lifted && "cursor-grabbing text-secondary-foreground opacity-100",
+            )}
+          >
+            <svg viewBox="0 0 8 14" className="h-3.5 w-2" fill="currentColor" aria-hidden>
+              <circle cx="2" cy="2" r="1.3" />
+              <circle cx="6" cy="2" r="1.3" />
+              <circle cx="2" cy="7" r="1.3" />
+              <circle cx="6" cy="7" r="1.3" />
+              <circle cx="2" cy="12" r="1.3" />
+              <circle cx="6" cy="12" r="1.3" />
+            </svg>
+          </button>
+        )}
+
         {/* The whole row opens the Item — a 44px row is a target, and asking a Member
             to hit the label alone wastes most of it. It sits behind the row's own
             controls, so the checkbox still ticks and the label still edits. */}

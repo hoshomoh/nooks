@@ -1,5 +1,39 @@
 # Changelog
 
+## [1.7.0](https://github.com/hoshomoh/nooks/compare/v1.6.0...v1.7.0) (2026-11-14)
+
+
+### New
+
+* **api:** order lists by when they were made, newest or oldest first ([dead9c0](https://github.com/hoshomoh/nooks/commit/dead9c0d2acaf5b6b7774e8c3b5029c87290a343))
+* **api:** purge a deleted list for good, and say when it would go anyway ([7d35fdb](https://github.com/hoshomoh/nooks/commit/7d35fdb908abd441863976ff01accbdc7abc91ce))
+* **web:** delete a deleted list forever, and count down to when it goes anyway ([1279f55](https://github.com/hoshomoh/nooks/commit/1279f55a7a59451a6ef57690e5c8425b7e033554))
+* **web:** drag an open item to a new place on its list ([0fbd9d4](https://github.com/hoshomoh/nooks/commit/0fbd9d404007ca0b30b9cd2fa5392e2a5576be1b))
+* **web:** draw a person as one letter in a circle ([313f63b](https://github.com/hoshomoh/nooks/commit/313f63bf5c265afb4551517bf18c95d1d7e71050))
+* **web:** give a completed item the same ··· menu, without moving ([a471977](https://github.com/hoshomoh/nooks/commit/a471977fa23c9a24abeeaa9f4f12a2ba6af7aa1c))
+* **web:** lay the list row out as the design draws it ([1d4639f](https://github.com/hoshomoh/nooks/commit/1d4639f5d01db789ba2d2f49ec62313b41367b7e))
+* **web:** move an item up or down from its menu or with ⌥↑ and ⌥↓ ([8d397df](https://github.com/hoshomoh/nooks/commit/8d397df8e3eb8a75fc0f9741cfe0b51f5d62a17a))
+* **web:** offer export in every list menu, not only on the list itself ([2ecac5d](https://github.com/hoshomoh/nooks/commit/2ecac5dd4f4f8f3f11cee80329d49306f97cc04c))
+* **web:** slide rows into place when someone else reorders a shared list ([cf8429b](https://github.com/hoshomoh/nooks/commit/cf8429b609a758db9708ff675a96e5f42cf55b7c))
+* **web:** sort all lists by recently created or oldest first ([8e918a9](https://github.com/hoshomoh/nooks/commit/8e918a92f8fc8b2e378589045358105e901a58aa))
+
+
+### Fixed
+
+* **api:** show deleted lists under the deleted filter, not the live ones ([23e4605](https://github.com/hoshomoh/nooks/commit/23e4605cc1e5aa0f5a5dc885b78deb0c47eb4068))
+* **ci:** type check the web app from scratch, and run without a Postgres address ([efa2031](https://github.com/hoshomoh/nooks/commit/efa2031a67e82659b6b66f36ba6271c5f2823310))
+* **store:** drop a NUL from text before it reaches SQL ([88e619b](https://github.com/hoshomoh/nooks/commit/88e619b084b7afafaa2105dfa824ba367c0c67af))
+* **store:** leave items on a deleted list out of the about count ([c3a5c15](https://github.com/hoshomoh/nooks/commit/c3a5c15919c100912f92e35912287c45251d5cc6))
+* **web:** copy on a plain http page, and only say copied when it was ([816a120](https://github.com/hoshomoh/nooks/commit/816a120eac885efa8a824114b8024da524e1e12f))
+* **web:** give a deleted list the same ··· menu as every other row ([0d0bd93](https://github.com/hoshomoh/nooks/commit/0d0bd93953e7174fc6a0be1f04cd6cd2ee1f4c91))
+* **web:** highlight a tick somebody else made only when it lands, not again on coming back ([79ea316](https://github.com/hoshomoh/nooks/commit/79ea316c4982455501509731b9c4e51ca4e05952))
+* **web:** keep t a Translate on i18next 27 ([db37105](https://github.com/hoshomoh/nooks/commit/db371053933c539157c1d05ce8e692c400529406))
+* **web:** leave a deleted list before re-reading what changed ([758614a](https://github.com/hoshomoh/nooks/commit/758614a5204303b06d339ae33c2d70351cefd992))
+* **web:** move date labels on with the clock, not with the next render ([23d739e](https://github.com/hoshomoh/nooks/commit/23d739e68831615e5e0afdd02743df8614f01ec2))
+* **web:** name the member the menu removes, not a place they are removed from ([9d19946](https://github.com/hoshomoh/nooks/commit/9d19946cb76215502d55b0fb6a5c9d4b3377d47f))
+* **web:** open a List while somebody else has one of its Notes open ([f365717](https://github.com/hoshomoh/nooks/commit/f365717e7c31eb7deb25b09413db591b00718c0c))
+* **web:** stop retrying answers that will not change ([6a86494](https://github.com/hoshomoh/nooks/commit/6a86494898e3ab50da714d3412824ffe079af466))
+
 ## [1.6.0](https://github.com/hoshomoh/nooks/compare/v1.5.0...v1.6.0) (2026-09-25)
 
 

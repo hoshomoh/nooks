@@ -113,4 +113,27 @@ describe("an Item's menu", () => {
     expect(await screen.findByRole("button", { name: /Move up/ })).toBeDisabled()
     expect(screen.getByRole("button", { name: /Move down/ })).toBeDisabled()
   })
+
+  // DESIGN.md §9: a completed Item does not move, so its menu does not offer to.
+  it("offers no move for a completed Item", async () => {
+    render(
+      <ItemMenu
+        quantity=""
+        dueOn=""
+        done
+        actions={{
+          onView: vi.fn(),
+          onSetDate: vi.fn(),
+          onSetQuantity: vi.fn(),
+          onDuplicate: vi.fn(),
+          onDelete: vi.fn(),
+        }}
+      />,
+    )
+    await userEvent.click(screen.getByRole("button", { name: "More" }))
+
+    expect(await screen.findByRole("button", { name: /Duplicate/ })).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: /Move up/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: /Move down/ })).not.toBeInTheDocument()
+  })
 })

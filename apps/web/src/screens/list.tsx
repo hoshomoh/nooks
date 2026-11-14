@@ -9,7 +9,7 @@ import { Presence } from "@/components/ds/presence"
 import { AddRow } from "@/components/ds/add-row"
 import { DoneSection } from "@/components/ds/done-section"
 import { SectionHeading } from "@/components/ds/section-heading"
-import { ItemMenu } from "@/components/ds/item-menu"
+import { ItemMenu, type ItemMenuActions } from "@/components/ds/item-menu"
 import { ListActions } from "@/components/ds/list-actions"
 import { AppShell } from "@/components/ds/app-shell"
 import { ChromeBar } from "@/components/ds/chrome-bar"
@@ -219,6 +219,15 @@ export function ListScreen() {
 
   const openItem = list.items.find((item) => item.uid === openItemUid)
   const open = list.items.filter((item) => !item.done)
+  // What the `···` does to an Item, open or completed. Moving is added for open ones.
+  const actionsFor = (item: Item): ItemMenuActions => ({
+    onView: () => showItem(item.uid),
+    onSetDate: (dueOn) => editItem.mutate({ itemUid: item.uid, dueOn }),
+    onSetQuantity: (quantity) => editItem.mutate({ itemUid: item.uid, quantity }),
+    onDuplicate: () =>
+      addItem.mutate({ listUid, label: item.label, quantity: item.quantity, dueOn: item.dueOn }),
+    onDelete: () => removeItem.mutate(item.uid),
+  })
   // Nothing is sent where there is nowhere to go, so the end rows offer no move.
   const move = (itemUid: string, direction: MoveDirection) => {
     const place = placeFor(open, itemUid, direction)
@@ -379,20 +388,9 @@ export function ListScreen() {
                           quantity={item.quantity}
                           dueOn={item.dueOn}
                           actions={{
-                            onView: () => showItem(item.uid),
-                            onSetDate: (dueOn) => editItem.mutate({ itemUid: item.uid, dueOn }),
-                            onSetQuantity: (quantity) =>
-                              editItem.mutate({ itemUid: item.uid, quantity }),
+                            ...actionsFor(item),
                             onMoveUp: move(item.uid, "up"),
                             onMoveDown: move(item.uid, "down"),
-                            onDuplicate: () =>
-                              addItem.mutate({
-                                listUid,
-                                label: item.label,
-                                quantity: item.quantity,
-                                dueOn: item.dueOn,
-                              }),
-                            onDelete: () => removeItem.mutate(item.uid),
                           }}
                         />
                       ) : undefined
@@ -429,6 +427,16 @@ export function ListScreen() {
                         doneWhen={clock(item.doneAt)}
                         layout={doneLayout}
                         done
+                        menu={
+                          canEdit ? (
+                            <ItemMenu
+                              quantity={item.quantity}
+                              dueOn={item.dueOn}
+                              actions={actionsFor(item)}
+                              done
+                            />
+                          ) : undefined
+                        }
                         hasNote={Boolean(item.note)}
                         justTicked={justTickedByAnother(item)}
                         onToggle={

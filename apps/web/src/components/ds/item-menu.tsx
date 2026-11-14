@@ -31,6 +31,8 @@ export interface ItemMenuProps {
   quantity: string
   dueOn: DueDate
   actions: ItemMenuActions
+  /** A completed Item does not move, so its menu has no Move up or Move down. */
+  done?: boolean
 }
 
 /** Which of the menu's faces is showing. */
@@ -49,7 +51,7 @@ type Panel = "actions" | "date" | "quantity"
  * drawn unavailable where there is nowhere to go: an entry that silently does nothing
  * teaches a Member the menu is decoration.
  */
-export function ItemMenu({ quantity, dueOn, actions }: ItemMenuProps) {
+export function ItemMenu({ quantity, dueOn, actions, done }: ItemMenuProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [panel, setPanel] = useState<Panel>("actions")
@@ -92,6 +94,7 @@ export function ItemMenu({ quantity, dueOn, actions }: ItemMenuProps) {
             }}
             onDate={() => setPanel("date")}
             onQuantity={() => setPanel("quantity")}
+            moves={!done}
             onMoveUp={actions.onMoveUp && after(actions.onMoveUp)}
             onMoveDown={actions.onMoveDown && after(actions.onMoveDown)}
             onDuplicate={() => {
@@ -135,6 +138,8 @@ interface ActionsPanelProps {
   onView: () => void
   onDate: () => void
   onQuantity: () => void
+  /** Whether the Item can move at all, which a completed one cannot. */
+  moves: boolean
   onMoveUp?: () => void
   onMoveDown?: () => void
   onDuplicate: () => void
@@ -146,6 +151,7 @@ function ActionsPanel({
   onView,
   onDate,
   onQuantity,
+  moves,
   onMoveUp,
   onMoveDown,
   onDuplicate,
@@ -164,10 +170,14 @@ function ActionsPanel({
       <Entry label={t("itemMenu.setDate")} opensPanel onSelect={onDate} />
       <Entry label={t("itemMenu.setQuantity")} opensPanel onSelect={onQuantity} />
 
-      <span className="my-1.5 h-px bg-hair" />
+      {moves && (
+        <>
+          <span className="my-1.5 h-px bg-hair" />
 
-      <Entry label={t("itemMenu.moveUp")} shortcut="⌥↑" onSelect={onMoveUp} />
-      <Entry label={t("itemMenu.moveDown")} shortcut="⌥↓" onSelect={onMoveDown} />
+          <Entry label={t("itemMenu.moveUp")} shortcut="⌥↑" onSelect={onMoveUp} />
+          <Entry label={t("itemMenu.moveDown")} shortcut="⌥↓" onSelect={onMoveDown} />
+        </>
+      )}
 
       <span className="my-1.5 h-px bg-hair" />
 

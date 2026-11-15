@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.8.0](https://github.com/hoshomoh/nooks/compare/v1.7.0...v1.8.0) (2026-11-14)
+
+
+### New
+
+* **mcp:** say when a deleted list goes for good ([9a858bd](https://github.com/hoshomoh/nooks/commit/9a858bdaf4b976ea6973abee7523b68412ed6ad2))
+
+
+### Fixed
+
+* **mcp:** tell assistants to keep a label short and put details in the note ([1f5f9e1](https://github.com/hoshomoh/nooks/commit/1f5f9e16d8e13a69b68bcec85477e8de98aea207))
+* **web:** send a member whose session ended to sign in, not to an error page ([0ea6883](https://github.com/hoshomoh/nooks/commit/0ea68838f3b6221a19fa56ecca135a437eac6966))
+
 ## [1.7.0](https://github.com/hoshomoh/nooks/compare/v1.6.0...v1.7.0) (2026-11-14)
 
 
